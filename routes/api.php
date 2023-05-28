@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Actions\Fortify\CreateNewUser;
 
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\Api\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,7 +22,7 @@ use App\Http\Controllers\LoginController;
 
 
 
-Route::post('login', [LoginController::class, 'login']);
+Route::post('login', [AuthController::class, 'login']);
 Route::post('/register', function (Request $request, CreateNewUser $creator) {
     $user = $creator->create($request->all());
     return response()->json(['user' => $user], 201);
@@ -32,10 +32,10 @@ Route::post('/register', function (Request $request, CreateNewUser $creator) {
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Otras rutas que requieren autenticación y verificación
-    Route::post('logout', [LoginController::class, 'logout']);
-    Route::post('user', [LoginController::class, 'user']);
-    Route::post('update-password', [LoginController::class, 'updatePassword']);
-    Route::post('forgot-password', [LoginController::class, 'forgotPassword']);
-    Route::post('reset-password', [LoginController::class, 'resetPassword']);
-    Route::post('update-profile', [LoginController::class, 'updateProfile']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('user', [AuthController::class, 'user']);
+    Route::post('update-password', [AuthController::class, 'updatePassword']);
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('update-profile', [AuthController::class, 'updateProfile']);
 });

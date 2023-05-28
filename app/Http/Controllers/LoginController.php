@@ -119,6 +119,8 @@ public function updatePassword(Request $request)
         }
     }
 
+
+    // UPDATE PROFILE USER
     public function updateProfile(Request $request, UpdateUserProfileInformation $updater)
     {
         $user = $request->user();
