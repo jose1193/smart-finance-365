@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -18,27 +19,30 @@ public function login(Request $request)
 {
     $credentials = $request->only('email', 'password');
 
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
+   if (Auth::attempt($credentials)) {
+    $user = Auth::user();
 
-        $token = $user->createToken('API Token')->plainTextToken;
+    if ($request->filled('remember')) {
+        $rememberToken = Str::random(60); // Generar un token de recordar aleatorio
+        $user->forceFill([
+            'remember_token' => hash('sha256', $rememberToken),
+        ])->save();
 
-        // Crear el objeto user
-        $userObject = [
-            'name' => $user->name,
-            'email' => $user->email,
-            'token' => $token,
-        ];
-
-        // Crear la respuesta completa
-        $response = [
-            'user' => $userObject,
-        ];
-
-        return Response::json($response);
+        $userObject = $user->toArray();
+        $userObject['remember_token'] = $rememberToken;
+    } else {
+        $userObject = $user->toArray();
     }
 
-    return Response::json(['error' => 'Credenciales inválidas'], 401);
+    $userObject['token'] = $user->createToken('API Token')->plainTextToken;
+
+    return response()->json($userObject);
+}
+
+return response()->json(['error' => 'Credenciales inválidas'], 401);
+
+
+
 }
 
 // USER LOGOUT
