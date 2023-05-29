@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -128,6 +129,13 @@ public function updatePassword(Request $request)
         $updater->update($user, $request->all());
 
         return Response::json(['message' => 'Perfil actualizado correctamente.']);
+    }
+
+        // GET ALL USERS
+     public function getUsers()
+    {
+        $users = User::all();
+        return response()->json(['users' => $users], 200);
     }
 
 }

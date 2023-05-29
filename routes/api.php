@@ -25,7 +25,8 @@ use App\Http\Controllers\Api\AuthController;
 Route::post('login', [AuthController::class, 'login']);
 Route::post('/register', function (Request $request, CreateNewUser $creator) {
     $user = $creator->create($request->all());
-    return response()->json(['user' => $user], 201);
+     $message = 'Datos registrados exitosamente';
+    return response()->json(['user' => $user, 'message' => $message], 201);
 });
 
 
@@ -34,6 +35,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Otras rutas que requieren autenticación y verificación
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('user', [AuthController::class, 'user']);
+    Route::get('/users', [AuthController::class, 'getUsers']);
     Route::post('update-password', [AuthController::class, 'updatePassword']);
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
