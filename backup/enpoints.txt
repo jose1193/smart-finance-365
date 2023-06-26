@@ -72,11 +72,15 @@ Authorization -> Bearer Token -> Token: ..................
 
 -- link token reset password enviado a bandeja de email
 
+
+
 - POST https://www.qa.apps-369.com/api/update-profile
 
 Authorization -> Bearer Token -> Token: ..................
 
-{
+
+FORM-DATA:
+
 
 name:
 
@@ -86,4 +90,4 @@ userType:
 
 phone:
 
-}
+photo --> file

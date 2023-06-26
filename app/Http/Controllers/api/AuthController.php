@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\User;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -125,13 +126,33 @@ public function updatePassword(Request $request)
     }
 
 
+
     // UPDATE PROFILE USER
     public function updateProfile(Request $request, UpdateUserProfileInformation $updater)
     {
         $user = $request->user();
 
-        $updater->update($user, $request->all());
 
+        // --- VALIDAR SIZE DE LA PHOTO
+       try {
+    $request->validate([
+        'photo' => 'nullable|file|max:1024', // Cambiar 1024 por 1000 para 1MB
+    ], [
+        'photo.max' => 'La foto no debe ser mayor a 1MB.', // Mensaje personalizado
+    ]);
+} catch (ValidationException $e) {
+    return Response::json(['message' => $e->errors()], 422);
+}
+
+
+ // -- Verificar si se envió una nueva foto
+    if ($request->hasFile('photo')) {
+        $input['photo'] = $request->file('photo');
+    }
+
+    // --- INPUTS UPDATE
+        $updater->update($user, $request->all());
+//--- MESSAGE
         return Response::json(['message' => 'Perfil actualizado correctamente.']);
     }
 
