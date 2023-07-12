@@ -1,0 +1,52 @@
+
+Método	Endpoint	Descripción
+GET	http://localhost/api/roles	Obtener una lista de roles
+POST	http://localhost/api/roles	Crear un nuevo rol
+GET	http://localhost/api/roles/{id}	Mostrar un rol específico
+PUT	http://localhost/api/roles/{id}	Actualizar un rol existente
+DELETE	http://localhost/api/roles/{id}	Eliminar un rol existente
+GET	http://localhost/api/roles/create	Mostrar listado de permisos
+GET	http://localhost/api/roles/{id}/edit	Mostrar listado de roles y permisos para editar
+
+
+Método	Endpoint	Descripción
+GET	http://localhost/api/users-crud			Obtener una lista de usuarios
+POST	http://localhost/api/users-crud			Crear un nuevo usuario
+GET	http://localhost/api/users-crud/{id}		Mostrar un usuario específico
+PUT	http://localhost/api/users-crud/{id}		Actualizar un usuario existente
+DELETE	http://localhost/api/users-crud/{id}		Eliminar un usuario existente
+GET	http://localhost/api/users-crud/create		Mostrar listado de roles
+GET	http://localhost/api/users-crud/{id}/edit	Mostrar listado de roles y permisos del usuario para editar
+
+Método	Endpoint			Descripción
+GET	/api/permissions		index
+POST	/api/permissions		store
+GET	/api/permissions/{id}		show
+PUT	/api/permissions/{id}		update
+DELETE	/api/permissions/{id}		destroy
+GET	/api/permissions/create		create
+GET	/api/permissions/{id}/edit	edit
+
+
+GET	/api/roles	index
+POST	/api/roles	store
+GET	/api/roles/{role}	show
+PUT	/api/roles/{role}	update
+DELETE	/api/roles/{role}	destroy
+GET	/api/roles/create	create
+GET	/api/roles/{role}/edit	edit
+
+GET	/api/users-crud	index
+POST	/api/users-crud	store
+GET	/api/users-crud/{id}	show
+PUT	/api/users-crud/{id}	update
+DELETE	/api/users-crud/{id}	destroy
+GET	/api/users-crud/create	create
+GET	/api/users-crud/{id}/edit	edit
+
+{
+  "name": "NombreDelRol3",
+  "permission": [1, 2, 3]
+}
+
+josegonzalezcr2794@outlook.com

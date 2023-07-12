@@ -1,0 +1,18 @@
+public function store(Request $request)
+{
+    $this->validate($request, [
+        'name' => 'required|unique:roles,name',
+        'permission' => 'required',
+    ]);
+
+    $role = Role::create(['name' => $request->input('name')]);
+    $role->syncPermissions($request->input('permission'));
+
+    if ($request->expectsJson()) {
+        // Respuesta JSON para solicitudes API
+        return response()->json(['message' => 'Role created successfully'], 200);
+    } else {
+        // Redireccionamiento para solicitudes web
+        return redirect()->back()->with('success', 'Formulario enviado correctamente');
+    }
+}
