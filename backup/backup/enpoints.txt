@@ -1,0 +1,93 @@
+* https://www.qa.apps-369.com/
+
+- POST https://www.qa.apps-369.com/api/register
+{
+name:
+
+email:
+
+password:
+
+password_confirmation:
+
+userType:
+
+phone:
+
+}
+
+
+- POST https://www.qa.apps-369.com/api/login
+
+{
+email:
+
+password:
+
+}
+
+- POST https://www.qa.apps-369.com/api/logout
+
+Authorization -> Bearer Token -> Token: ..................
+
+
+
+- POST https://www.qa.apps-369.com/api/user
+
+Authorization -> Bearer Token -> Token: ..................
+
+
+- GET https://www.qa.apps-369.com/api/users
+
+Authorization -> Bearer Token -> Token: ..................
+
+- POST https://www.qa.apps-369.com/api/update-password
+
+Authorization -> Bearer Token -> Token: ..................
+
+{
+
+Current Password:
+
+password: 
+
+password_confirmation:
+
+}
+
+- POST https://www.qa.apps-369.com/api/forgot-password
+
+Authorization -> Bearer Token -> Token: ..................
+
+{
+
+email:
+
+}
+
+
+- POST https://www.qa.apps-369.com/api/reset-password
+
+Authorization -> Bearer Token -> Token: ..................
+
+-- link token reset password enviado a bandeja de email
+
+
+
+- POST https://www.qa.apps-369.com/api/update-profile
+
+Authorization -> Bearer Token -> Token: ..................
+
+
+FORM-DATA:
+
+
+name:
+
+email:
+
+userType:
+
+phone:
+
+photo --> file
