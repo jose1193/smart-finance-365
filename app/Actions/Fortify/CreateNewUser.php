@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
 use Illuminate\Http\JsonResponse;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -22,38 +20,26 @@ class CreateNewUser implements CreatesNewUsers
      * @param  array<string, string>  $input
      */
     public function create(array $input): User|JsonResponse
-{
-    $validator = Validator::make($input, [
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-        'password' => $this->passwordRules(),
-        'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
-        
-        'phone' => ['required', 'string', 'min:6', 'max:20'],
-        'role_id' => ['required', 'exists:roles,id'], // Validación para asegurar que el ID del rol existe en la tabla 'roles'
-    ]);
+    {
+        $validator = Validator::make($input, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => $this->passwordRules(),
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+             'userType' => ['required', 'string', 'min:2','max:20'], 
+            'phone' => ['required', 'string', 'min:6','max:20'],
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+        if ($validator->fails()) {
+            return Response::json(['errors' => $validator->errors()], 422);
+        }
+
+        return User::create([
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+             'userType' => $input['userType'],
+             'phone' => $input['phone'],
+        ]);
     }
-
-    $user = User::create([
-        'name' => $input['name'],
-        'email' => $input['email'],
-        'password' => Hash::make($input['password']),
-      
-        'phone' => $input['phone'],
-    ]);
-
-    $role = Role::find($input['role_id']);
-    
-    if (!$role) {
-        return response()->json(['error' => 'Invalid role ID'], 422);
-    }
-    
-    $user->assignRole($role);
-
-    return $user;
-}
-
 }

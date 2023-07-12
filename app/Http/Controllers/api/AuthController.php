@@ -12,48 +12,39 @@ use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
-public function __construct()
-{
-    $this->middleware('permission:manage manager')->only(['getUsers']);
-   
-}
 // USER LOGIN
 public function login(Request $request)
 {
     $credentials = $request->only('email', 'password');
 
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
+   if (Auth::attempt($credentials)) {
+    $user = Auth::user();
 
-        if ($request->filled('remember')) {
-            $rememberToken = Str::random(60); // Generar un token de recordar aleatorio
-            $user->forceFill([
-                'remember_token' => hash('sha256', $rememberToken),
-            ])->save();
+    if ($request->filled('remember')) {
+        $rememberToken = Str::random(60); // Generar un token de recordar aleatorio
+        $user->forceFill([
+            'remember_token' => hash('sha256', $rememberToken),
+        ])->save();
 
-            $userObject = $user->toArray();
-            $userObject['remember_token'] = $rememberToken;
-        } else {
-            $userObject = $user->toArray();
-        }
-
-        $userObject['token'] = $user->createToken('API Token')->plainTextToken;
-
-        $roles = Role::pluck('name', 'name')->all();
-        $userRole = $user->roles->pluck('name', 'name')->all();
-
-        $welcomeMessage = '¡Bienvenido/a ' . $user->name . '! Tu tipo de usuario es ' . implode(', ', $userRole) . '.';
-
-        return response()->json(['user' => $userObject, 'roles' => $roles, 'userRole' => $userRole, 'message' => $welcomeMessage], 200);
+        $userObject = $user->toArray();
+        $userObject['remember_token'] = $rememberToken;
+    } else {
+        $userObject = $user->toArray();
     }
 
-    return response()->json(['error' => 'Credenciales inválidas'], 401);
+    $userObject['token'] = $user->createToken('API Token')->plainTextToken;
+
+    return response()->json($userObject);
 }
 
+return response()->json(['error' => 'Credenciales inválidas'], 401);
+
+
+
+}
 
 // USER LOGOUT
 public function logout()
@@ -168,8 +159,6 @@ public function updatePassword(Request $request)
         // GET ALL USERS
      public function getUsers()
     {
-
-        
         $users = User::all();
         return response()->json(['users' => $users], 200);
     }
