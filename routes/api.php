@@ -24,7 +24,7 @@ use App\Http\Controllers\Api\PermissionController;
 Route::post('login', [AuthController::class, 'login']);
 Route::post('/register', function (Request $request, CreateNewUser $creator) {
     $user = $creator->create($request->all());
-    $message = 'Datos registrados exitosamente';
+    $message = 'User data was successfully registered';
     return response()->json(['user' => $user, 'message' => $message], 201);
 });
 
