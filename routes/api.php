@@ -33,7 +33,7 @@ Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Rutas protegidas por autenticación y verificación
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('user', [AuthController::class, 'user']);
+    Route::get('user', [AuthController::class, 'user']);
     Route::get('/users', [AuthController::class, 'getUsers']);
     Route::post('update-password', [AuthController::class, 'updatePassword']);
     
@@ -41,29 +41,29 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('update-profile', [AuthController::class, 'updateProfile']);
 
     // Rutas relacionadas con roles
-    Route::get('roles', [RoleController::class, 'index']); // Obtener una lista de roles
+    Route::get('roles-list', [RoleController::class, 'index']); // Obtener una lista de roles
     Route::post('roles', [RoleController::class, 'store']); // Crear un nuevo rol
     Route::get('roles/{id}', [RoleController::class, 'show']); // Mostrar un rol específico
-    Route::put('roles/{id}', [RoleController::class, 'update']); // Actualizar un rol existente
-    Route::delete('roles/{id}', [RoleController::class, 'destroy']); // Eliminar un rol existente
+    Route::put('roles-update/{id}', [RoleController::class, 'update']); // Actualizar un rol existente
+    Route::delete('roles-delete/{id}', [RoleController::class, 'destroy']); // Eliminar un rol existente
     Route::get('roles-permissions', [RoleController::class, 'create']); // Mostrar listado de permisos
     Route::get('roles/{id}/edit', [RoleController::class, 'edit']); // Mostrar listado de roles y permisos del usuario a editar
 
     // Rutas relacionadas con usuarios
-    Route::get('users-crud', [UsersController::class, 'index']); 
-    Route::post('users-crud', [UsersController::class, 'store']); 
-    Route::get('users-crud/{id}', [UsersController::class, 'show']); 
-    Route::put('users-crud/{id}', [UsersController::class, 'update']); 
-    Route::delete('users-crud/{id}', [UsersController::class, 'destroy']); 
+    Route::get('users-list', [UsersController::class, 'index']); 
+    Route::post('users-store', [UsersController::class, 'store']); 
+    Route::get('users-id/{id}', [UsersController::class, 'show']); 
+    Route::put('users-update/{id}', [UsersController::class, 'update']); 
+    Route::delete('users-delete/{id}', [UsersController::class, 'destroy']); 
     Route::get('users-create', [UsersController::class, 'create']); 
-    Route::get('users-crud/{id}/edit', [UsersController::class, 'edit']); 
+    Route::get('users-list/{id}/edit', [UsersController::class, 'edit']); 
 
     // Rutas relacionadas con permisos
-    Route::get('permissions', [PermissionController::class, 'index']);
+    Route::get('permissions-list', [PermissionController::class, 'index']);
     Route::post('permissions', [PermissionController::class, 'store']);
     Route::get('permissions/{id}', [PermissionController::class, 'show']);
-    Route::put('permissions/{id}', [PermissionController::class, 'update']);
-    Route::delete('permissions/{id}', [PermissionController::class, 'destroy']);
+    Route::put('permissions-update/{id}', [PermissionController::class, 'update']);
+    Route::delete('permissions-delete/{id}', [PermissionController::class, 'destroy']);
     Route::get('permissions/create', [PermissionController::class, 'create']);
     Route::get('permissions/{id}/edit', [PermissionController::class, 'edit']);
 });

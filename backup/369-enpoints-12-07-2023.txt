@@ -101,6 +101,7 @@ photo --> file
 
 Authorization -> Bearer Token -> Token: ..................
 
+
 - POST	https://www.qa.apps-369.com/api/permissions		---> store
 
 Authorization -> Bearer Token -> Token: ..................
@@ -156,7 +157,7 @@ Authorization -> Bearer Token -> Token: ..................
 Authorization -> Bearer Token -> Token: ..................
 
 
-- GET	https://www.qa.apps-369.com/api//roles-permissions  --->  Mostrar listado de permisos 
+- GET	https://www.qa.apps-369.com/api/roles-permissions  --->  Mostrar listado de permisos 
 
 Authorization -> Bearer Token -> Token: ..................
 

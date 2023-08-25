@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+// LARAVEL SOCIALITE
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,6 +19,38 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+///------------- ROUTE GOOGLE AUTH ---------///
+Route::get('/google-auth/redirect', function () {
+    return Socialite::driver('google')->redirect();
+});
+ 
+
+
+Route::get('/google-auth/callback', function () {
+    $googleUser = Socialite::driver('google')->user();
+ 
+    $user = User::updateOrCreate([
+        'google_id' => $googleUser->id,
+    ], [
+        'name' => $googleUser->name,
+        'email' => $googleUser->email,
+       
+    ]);
+ 
+ // Accede al token del usuario autenticado
+    $token = $googleUser->token;
+
+
+    Auth::login($user);
+ 
+    return redirect('/dashboard');
+});
+
+
+///------------- END ROUTE GOOGLE AUTH ---------///
+
 
 Route::middleware([
     'auth:sanctum',
