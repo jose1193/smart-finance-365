@@ -75,6 +75,7 @@ class UsersController extends Controller
     {
         $user = User::find($id);
          return response()->json(['user' => $user], 200);
+         
        
     }
     

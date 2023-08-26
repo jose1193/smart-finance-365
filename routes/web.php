@@ -36,6 +36,7 @@ Route::get('/google-auth/callback', function () {
     ], [
         'name' => $googleUser->name,
         'email' => $googleUser->email,
+        'email_verified_at' => now(),
        
     ]);
  

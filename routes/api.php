@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\PermissionController;
-
+use Illuminate\Support\Facades\Response;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,10 +21,53 @@ use App\Http\Controllers\Api\PermissionController;
 */
 
 
+///------------- ROUTE GOOGLE AUTH ---------///
+Route::get('/google-auth/redirect', function () {
+    return Socialite::driver('google')->redirect();
+});
+ 
+
+
+Route::get('/google-auth/callback', function () {
+    $googleUser = Socialite::driver('google')->user();
+ 
+    $user = User::updateOrCreate([
+        'google_id' => $googleUser->id,
+    ], [
+        'name' => $googleUser->name,
+        'email' => $googleUser->email,
+         'email_verified_at' => now(),
+       
+    ]);
+ 
+ 
+     // Accede al token del usuario autenticado
+        $token = $googleUser->token;
+     
+        $tokenData = $user->createToken('API Token')->plainTextToken;
+
+
+    Auth::login($user);
+ 
+    return response()->json([
+            'message' => 'Authentication successful',
+            'user' => $user,
+            'token' => $token,
+            'token_data' => $tokenData
+        ]);
+});
+
+
+///------------- END ROUTE GOOGLE AUTH ---------///
+
 Route::post('login', [AuthController::class, 'login']);
 Route::post('/register', function (Request $request, CreateNewUser $creator) {
-    $user = $creator->create($request->all());
+    $userCreate = $creator->create($request->all());
     $message = 'User data was successfully registered';
+    $user =  [
+            'token' => $userCreate->createToken('API Token')->plainTextToken,
+            'user' => $userCreate,
+        ];
     return response()->json(['user' => $user, 'message' => $message], 201);
 });
 

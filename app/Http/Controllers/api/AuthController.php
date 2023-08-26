@@ -67,11 +67,31 @@ public function logout()
 }
 
 
-/// DETAILS CURRENT USER
+// DETAILS CURRENT USER
  public function user()
 {
-    return response()->json(['User' => auth()->user()]);
+    // Obtener al usuario autenticado
+    $user = auth()->user();
+
+    // Verificar si el usuario está autenticado
+    if (!$user) {
+        return response()->json(['message' => 'User not authenticated'], 401);
+    }
+
+    // Obtener los roles disponibles
+    $roles = Role::pluck('name', 'id')->all();
+
+    // Obtener los IDs de roles asignados al usuario
+    $userRoles = $user->roles->pluck('id')->all();
+
+    // Devolver la respuesta JSON con los detalles del usuario y los roles
+    return response()->json([
+        'user' => $user,
+        'roles' => $roles,
+        'userRoles' => $userRoles
+    ], 200);
 }
+
 
 // UPDATE USER PASSWORD
 public function updatePassword(Request $request)
