@@ -16,36 +16,36 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            Permission::create(['name' => 'manage admin', 'guard_name' => 'sanctum']),
-            Permission::create(['name' => 'manage user', 'guard_name' => 'sanctum']),
+            Permission::create(['name' => 'manage manager', 'guard_name' => 'sanctum']),
+            Permission::create(['name' => 'manage customer', 'guard_name' => 'sanctum']),
             Permission::create(['name' => 'manage others', 'guard_name' => 'sanctum']),
         ];
 
-        // MANAGER ADMIN
-        $adminRole = Role::create(['name' => 'Admin', 'guard_name' => 'sanctum']);
-        $adminRole->syncPermissions($permissions);
-
-        $adminUser = User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@admin.com',
-            'username' => 'admin01',
-            'password' => bcrypt('password')
-        ]);
-        $adminUser->assignRole($adminRole);
-        // END MANAGER ADMIN
-
         // MANAGER USER
-        $userRole = Role::create(['name' => 'User', 'guard_name' => 'sanctum']);
-        $userRole->syncPermissions([$permissions[1]]);
+        $managerRole = Role::create(['name' => 'Manager', 'guard_name' => 'sanctum']);
+        $managerRole->syncPermissions($permissions);
 
-        $userUser = User::factory()->create([
-            'name' => 'User',
-            'email' => 'user@user.com',
-            'username' => 'user01',
+        $managerUser = User::factory()->create([
+            'name' => 'Manager',
+            'email' => 'manager@manager.com',
+            'phone' => '00000',
             'password' => bcrypt('password')
         ]);
-        $userUser->assignRole($userRole);
+        $managerUser->assignRole($managerRole);
         // END MANAGER USER
+
+        // MANAGER CUSTOMER
+        $customerRole = Role::create(['name' => 'Customer', 'guard_name' => 'sanctum']);
+        $customerRole->syncPermissions([$permissions[1]]);
+
+        $customerUser = User::factory()->create([
+            'name' => 'Customer',
+            'email' => 'customer@customer.com',
+            'phone' => '00000',
+            'password' => bcrypt('password')
+        ]);
+        $customerUser->assignRole($customerRole);
+        // END MANAGER CUSTOMER
 
         // OTHERS ROLES
         $othersRole = Role::create(['name' => 'Others', 'guard_name' => 'sanctum']);
