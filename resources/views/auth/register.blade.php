@@ -262,7 +262,7 @@
                 rules: {
                     name: {
                         required: true,
-                        minlength: 5,
+                        minlength: 4,
                         maxlength: 10,
                     },
                     email: {

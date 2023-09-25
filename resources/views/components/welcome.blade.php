@@ -3,7 +3,7 @@
 
     <h1 class="px-5 mb-10 text-base font-bold leading-none tracking-tighter text-indigo-500 md:text-7xl lg:text-3xl">
         Welcome,
-        {{ Auth::user()->name }} </h1>
+        {{ Auth::user()->username }} </h1>
     <!-- component -->
 
 
