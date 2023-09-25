@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Actions\Fortify\CreateNewUser;
+
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
@@ -61,17 +61,11 @@ Route::get('/google-auth/callback', function () {
 ///------------- END ROUTE GOOGLE AUTH ---------///
 
 Route::post('login', [AuthController::class, 'login']);
-Route::post('/register', function (Request $request, CreateNewUser $creator) {
-    $userCreate = $creator->create($request->all());
-    $message = 'User data was successfully registered';
-    $user =  [
-            'token' => $userCreate->createToken('API Token')->plainTextToken,
-            'user' => $userCreate,
-        ];
-    return response()->json(['user' => $user, 'message' => $message], 201);
-});
+
+Route::post('register', [AuthController::class, 'Register']);
 
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('check-email', [AuthController::class, 'checkEmail']);
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Rutas protegidas por autenticación y verificación
@@ -82,6 +76,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
     Route::post('update-profile', [AuthController::class, 'updateProfile']);
+  
 
     // Rutas relacionadas con roles
     Route::get('roles-list', [RoleController::class, 'index']); // Obtener una lista de roles

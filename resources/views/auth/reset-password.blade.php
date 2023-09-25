@@ -13,17 +13,35 @@
 
             <div class="block">
                 <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
+                <x-input id="email"
+                    class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border
+                                 border-gray-200 rounded-md dark:placeholder-gray-600
+                                   focus:border-indigo-400
+                                    dark:focus:border-indigo-400 focus:ring-indigo-400 
+                                    focus:outline-none focus:ring focus:ring-opacity-40"
+                    type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
             </div>
 
             <div class="mt-4">
                 <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                <x-input id="password"
+                    class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border
+                                 border-gray-200 rounded-md dark:placeholder-gray-600
+                                   focus:border-indigo-400
+                                    dark:focus:border-indigo-400 focus:ring-indigo-400 
+                                    focus:outline-none focus:ring focus:ring-opacity-40"
+                    type="password" name="password" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4">
                 <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <x-input id="password_confirmation"
+                    class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border
+                                 border-gray-200 rounded-md dark:placeholder-gray-600
+                                   focus:border-indigo-400
+                                    dark:focus:border-indigo-400 focus:ring-indigo-400 
+                                    focus:outline-none focus:ring focus:ring-opacity-40"
+                    type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
             <div class="flex items-center justify-end mt-4">

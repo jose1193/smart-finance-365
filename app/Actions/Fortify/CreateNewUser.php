@@ -25,11 +25,12 @@ class CreateNewUser implements CreatesNewUsers
 {
     $validator = Validator::make($input, [
         'name' => ['required', 'string', 'max:255'],
+       
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-        'password' => $this->passwordRules(),
+        'password' => ['required', 'string', 'min:8'],
         'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         
-        'phone' => ['required', 'string', 'min:6', 'max:20'],
+       
         'role_id' => ['required', 'exists:roles,id'], // Validación para asegurar que el ID del rol existe en la tabla 'roles'
     ]);
 
@@ -37,12 +38,15 @@ class CreateNewUser implements CreatesNewUsers
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
+// Generar un número aleatorio de 3 dígitos
+$randomNumber = rand(100, 999);
     $user = User::create([
         'name' => $input['name'],
+        'username' => $input['name']. $randomNumber,
         'email' => $input['email'],
         'password' => Hash::make($input['password']),
       
-        'phone' => $input['phone'],
+       
     ]);
 
     $role = Role::find($input['role_id']);
@@ -52,7 +56,8 @@ class CreateNewUser implements CreatesNewUsers
     }
     
     $user->assignRole($role);
-
+// Genera un token de autenticación y asigna al usuario
+$user->token = $user->createToken('API Token')->plainTextToken;
     return $user;
 }
 
