@@ -10,7 +10,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png">
     <link rel="manifest" href="img/favicon/site.webmanifest">
-    <title>Web App</title>
+    <title>Web App -
+
+        @if (empty($title))
+            Dashboard
+        @else
+            {{ $title }}
+        @endif
+    </title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,6 +30,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
 
     <!-- Styles -->
 
@@ -46,6 +54,15 @@
             border-radius: 7px;
         }
     </style>
+
+    <link rel="stylesheet" href="./assets/css/tailwind.output.css" />
+
+    <script src="./assets/js/init-alpine.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" defer></script>
+    <script src="js/charts-lines.js" defer></script>
+    <script src="js/charts-pie.js" defer></script>
+    <script src="js/charts-bars.js" defer></script>
     @livewireStyles
 </head>
 
@@ -53,7 +70,7 @@
     <x-banner />
 
     <div class="min-h-screen bg-gray-100">
-        @livewire('navigation-menu')
+
 
         <!-- Page Heading -->
         @if (isset($header))

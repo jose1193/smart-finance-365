@@ -76,7 +76,7 @@
 
                                 </div>
                                 <input type="text" name="identity" id="identity" :value="old('email')" required
-                                    autofocus autocomplete="username"
+                                    autofocus
                                     class="bg-gray-50 border border-gray-300 px-5 py-3 mt-2 mb-2 text-gray-900 text-sm rounded-lg focus:ring-indigo-500
                                  focus:border-indigo-500 block w-full pl-10  p-2.5  dark:border-gray-700  dark:focus:border-indigo-400 focus:outline-none focus:ring focus:ring-opacity-40"
                                     placeholder="Email or Username">
