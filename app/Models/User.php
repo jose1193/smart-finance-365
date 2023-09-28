@@ -61,4 +61,13 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $appends = [
         'profile_photo_url',
     ];
+
+     public function teachers()
+    {
+        return $this->hasMany(Teacher::class);
+    }
+    public function category()
+    {
+        return $this->hasMany(Category::class);
+    }
 }

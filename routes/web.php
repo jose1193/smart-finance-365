@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use App\Http\Livewire\PrimaryCategories;
+use App\Http\Livewire\Teachers;
+use App\Http\Livewire\Categories;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -61,4 +65,7 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    Route::get('main-categories', PrimaryCategories::class)->name('main-categories');
+     Route::get('teachers', Teachers::class)->name('teachers');
+      Route::get('categories', Categories::class)->name('categories');
 });

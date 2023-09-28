@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use App\Models\MainCategories;
 
 class DatabaseSeeder extends Seeder
 {
@@ -51,5 +52,20 @@ class DatabaseSeeder extends Seeder
         $othersRole = Role::create(['name' => 'Others', 'guard_name' => 'sanctum']);
         $othersRole->syncPermissions([$permissions[2]]);
         // END OTHERS ROLES
+
+
+       $mainCategories = [
+    'Income',
+    'Expenses',
+    // Agrega más valores aquí si es necesario
+];
+
+foreach ($mainCategories as $category) {
+    MainCategories::create([
+        'title' => $category,
+        'description' => 'Descripción de ' . $category, // Puedes personalizar la descripción según tus necesidades
+    ]);
+}
+
     }
 }

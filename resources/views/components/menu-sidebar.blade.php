@@ -31,28 +31,29 @@
          <ul>
              <li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                     href="forms.html">
-                     <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
-                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                         <path
-                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
-                         </path>
-                     </svg>
-                     <span class="ml-4">Forms</span>
-                 </a>
-             </li>
-             <li class="relative px-6 py-3">
-                 <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                     href="cards.html">
+                     href="{{ route('categories') }}">
                      <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
                          stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                          <path
                              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
                          </path>
                      </svg>
-                     <span class="ml-4">Cards</span>
+                     <span class="ml-4">Categories</span>
                  </a>
              </li>
+             <li class="relative px-6 py-3">
+                 <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                     href="{{ route('teachers') }}">
+                     <svg class="w-5 h-5" fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="1em"
+                         viewBox="0 0 640 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+                         <path
+                             d="M160 64c0-35.3 28.7-64 64-64H576c35.3 0 64 28.7 64 64V352c0 35.3-28.7 64-64 64H336.8c-11.8-25.5-29.9-47.5-52.4-64H384V320c0-17.7 14.3-32 32-32h64c17.7 0 32 14.3 32 32v32h64V64L224 64v49.1C205.2 102.2 183.3 96 160 96V64zm0 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zM133.3 352h53.3C260.3 352 320 411.7 320 485.3c0 14.7-11.9 26.7-26.7 26.7H26.7C11.9 512 0 500.1 0 485.3C0 411.7 59.7 352 133.3 352z" />
+                     </svg>
+
+                     <span class="ml-4">Teachers</span>
+                 </a>
+             </li>
+
              <li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="charts.html">
@@ -109,7 +110,7 @@
                                  d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z">
                              </path>
                          </svg>
-                         <span class="ml-4">Pages</span>
+                         <span class="ml-4">Management</span>
                      </span>
                      <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                          <path fill-rule="evenodd"
@@ -124,30 +125,18 @@
                          x-transition:leave-start="opacity-100 max-h-xl" x-transition:leave-end="opacity-0 max-h-0"
                          class="p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50 dark:text-gray-400 dark:bg-gray-900"
                          aria-label="submenu">
+                         <!--<li
+                             class="capitalize px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                             <a class="w-full" href="{{ route('main-categories') }}">Main categories</a>
+                         </li>-->
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="pages/login.html">Login</a>
-                         </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="pages/create-account.html">
-                                 Create account
+                             <a class="w-full" href="{{ route('categories') }}">
+                                 Categories
                              </a>
                          </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="pages/forgot-password.html">
-                                 Forgot password
-                             </a>
-                         </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="pages/404.html">404</a>
-                         </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="pages/blank.html">Blank</a>
-                         </li>
+
+
                      </ul>
                  </template>
              </li>
@@ -201,6 +190,18 @@
          <ul>
              <li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                     href="{{ route('categories') }}">
+                     <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                         <path
+                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                         </path>
+                     </svg>
+                     <span class="ml-4">Categories</span>
+                 </a>
+             </li>
+             <li class="relative px-6 py-3">
+                 <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="forms.html">
                      <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
                          stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -211,18 +212,7 @@
                      <span class="ml-4">Forms</span>
                  </a>
              </li>
-             <li class="relative px-6 py-3">
-                 <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
-                     href="cards.html">
-                     <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
-                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
-                         <path
-                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                         </path>
-                     </svg>
-                     <span class="ml-4">Cards</span>
-                 </a>
-             </li>
+
              <li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="charts.html">
