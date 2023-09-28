@@ -8,7 +8,9 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Http\Livewire\PrimaryCategories;
 use App\Http\Livewire\Teachers;
 use App\Http\Livewire\Categories;
-
+use App\Http\Livewire\IncomeCategories;
+use App\Http\Livewire\ExpensesCategories;
+use App\Http\Livewire\UsersCrud;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -68,4 +70,7 @@ Route::middleware([
     Route::get('main-categories', PrimaryCategories::class)->name('main-categories');
      Route::get('teachers', Teachers::class)->name('teachers');
       Route::get('categories', Categories::class)->name('categories');
+      Route::get('income-categories', IncomeCategories::class)->name('income-categories');
+      Route::get('expenses-categories', ExpensesCategories::class)->name('expenses-categories');
+       Route::get('users', UsersCrud::class)->name('users');
 });
