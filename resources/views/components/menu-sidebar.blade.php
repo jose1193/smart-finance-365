@@ -80,7 +80,7 @@
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expenses
+                                 Expense
                              </a>
                          </li>
 
@@ -129,13 +129,13 @@
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('incomes') }}">
-                                 Incomes
+                                 Income
                              </a>
                          </li>
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expenses
+                             <a class="w-full" href="{{ route('expense') }}">
+                                 Expense
                              </a>
                          </li>
 
@@ -178,7 +178,7 @@
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expenses
+                                 Expense
                              </a>
                          </li>
 
@@ -198,7 +198,7 @@
                  </a>
              </li>
 
-             <li class="relative px-6 py-3">
+             <!--<li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="modals.html">
                      <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
@@ -209,8 +209,8 @@
                      </svg>
                      <span class="ml-4">Modals</span>
                  </a>
-             </li>
-             <li class="relative px-6 py-3">
+             </li>-->
+             <!--<li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="tables.html">
                      <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
@@ -219,7 +219,7 @@
                      </svg>
                      <span class="ml-4">Tables</span>
                  </a>
-             </li>
+             </li>-->
              <li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="{{ route('users') }}">
@@ -235,11 +235,11 @@
              </li>
          </ul>
          <div class="px-6 my-6">
-             <button
-                 class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                 Create account
-                 <span class="ml-2" aria-hidden="true">+</span>
-             </button>
+             <a href="{{ route('emails') }}"
+                 class="flex items-center justify-between px-4 py-2 text-sm font-medium leading-5 text-white  bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 duration-500 ease-in-out hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                 Email Management
+                 <i class="fa-solid fa-envelope-open-text "></i>
+             </a>
          </div>
      </div>
  </aside>
@@ -326,7 +326,7 @@
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expenses
+                                 Expense
                              </a>
                          </li>
 
@@ -368,8 +368,8 @@
                          </li>
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expenses
+                             <a class="w-full" href="{{ route('expense') }}">
+                                 Expense
                              </a>
                          </li>
 
@@ -411,7 +411,7 @@
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expenses
+                                 Expense
                              </a>
                          </li>
 
@@ -432,7 +432,7 @@
                  </a>
              </li>
 
-             <li class="relative px-6 py-3">
+             <!--<li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="modals.html">
                      <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
@@ -443,8 +443,8 @@
                      </svg>
                      <span class="ml-4">Modals</span>
                  </a>
-             </li>
-             <li class="relative px-6 py-3">
+             </li>-->
+             <!--<li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="tables.html">
                      <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round"
@@ -453,7 +453,7 @@
                      </svg>
                      <span class="ml-4">Tables</span>
                  </a>
-             </li>
+             </li>-->
              <li class="relative px-6 py-3">
                  <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                      href="{{ route('users') }}">
@@ -467,11 +467,11 @@
              </li>
          </ul>
          <div class="px-6 my-6">
-             <button
-                 class="flex items-center justify-between px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                 Create account
-                 <span class="ml-2" aria-hidden="true">+</span>
-             </button>
+             <a href="{{ route('emails') }}"
+                 class="flex items-center justify-between px-4 py-2 text-sm font-medium leading-5 text-white  bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 duration-500 ease-in-out hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                 Email Management
+                 <i class="fa-solid fa-envelope-open-text "></i>
+             </a>
          </div>
      </div>
  </aside>

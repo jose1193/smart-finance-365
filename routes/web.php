@@ -12,6 +12,8 @@ use App\Http\Livewire\IncomeCategories;
 use App\Http\Livewire\ExpensesCategories;
 use App\Http\Livewire\UsersCrud;
 use App\Http\Livewire\Incomes;
+use App\Http\Livewire\Expenses;
+use App\Http\Livewire\EmailsManagament;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,4 +78,6 @@ Route::middleware([
       Route::get('expenses-categories', ExpensesCategories::class)->name('expenses-categories');
        Route::get('users', UsersCrud::class)->name('users');
        Route::get('income', Incomes::class)->name('incomes');
+       Route::get('expense', Expenses::class)->name('expense');
+       Route::get('emails', EmailsManagament::class)->name('emails');
 });

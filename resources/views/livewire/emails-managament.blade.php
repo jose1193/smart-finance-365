@@ -19,6 +19,7 @@
 
 
             <!-- END INCLUDE ALERTS MESSAGES-->
+
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
 
@@ -26,65 +27,82 @@
                     <div
                         class="mt-5 flex items-center justify-between p-4 mb-8 text-sm font-semibold text-white bg-blue-500 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple">
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                                </path>
-                            </svg>
+                            <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Main Categories') }}
+                                {{ __('Emails Management') }}
                             </x-slot>
-                            <a href="{{ route('main-categories') }}">
-                                <span>Main Categories</span></a>
+                            <a href="{{ route('emails') }}">
+                                <span>Emails Management</span></a>
                         </div>
 
                     </div>
+                    @can('manage admin')
+                        <div class=" my-7 flex justify-between space-x-2">
+                            <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                                        class="fa-solid fa-envelope-open-text"></i></span>
+                            </x-button>
+                            <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
+                                autocomplete="off" />
+                        </div>
+                    @endcan
                     <!-- Tables -->
+                    <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
+                        <div class="w-full overflow-x-auto">
+                            <table class="w-full whitespace-no-wrap">
+                                <thead>
+                                    <tr
+                                        class="text-xs font-semibold tracking-wide text-left text-white uppercase border-b dark:border-gray-700 bg-gray-900 dark:text-gray-400 dark:bg-gray-800">
+                                        <th class="px-4 py-3">Nro</th>
+                                        <th class="px-4 py-3">Name</th>
+                                        <th class="px-4 py-3">Email</th>
 
-                    <div class=' w-full overflow-hidden shadow-xl'>
-                        <x-button wire:click="create()"><span class="font-semibold">Create </span>
-                        </x-button>
-                        <table
-                            class=' my-5 mx-auto  w-full whitespace-nowrap rounded-lg bg-white divide-y divide-gray-300 overflow-hidden'>
-                            <thead class="bg-gray-900">
-                                <tr class="text-white text-left">
-                                    <th class="font-semibold text-sm capitalize px-6 py-4"> Nro </th>
-                                    <th class="font-semibold text-sm capitalize px-6 py-4"> Title </th>
-                                    <th class="font-semibold text-sm capitalize px-6 py-4"> Description </th>
-
-
-                                    <th class="font-semibold text-sm capitalize px-6 py-4"> </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                @foreach ($categories as $item)
-                                    <tr>
-                                        <td class="px-6 py-4">
-
-                                            <p class="text-gray-500 text-sm font-semibold tracking-wide">
-                                                {{ $loop->iteration }} </p>
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-500 text-base  font-semibold tracking-wide">
-                                            {{ $item->title }}
-                                        </td>
-                                        <td class="px-6 py-4 text-gray-500 text-base  font-semibold tracking-wide">
-                                            {{ $item->description }}
-                                        </td>
-
-                                        <td class="px-6 py-4 text-center"> <button
-                                                wire:click="edit({{ $item->id }})"
-                                                class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                    class="fa-solid fa-pen-to-square"></i></button>
-                                            <button wire:click="delete({{ $item->id }})"
-                                                class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                    class="fa-solid fa-trash"></i></button>
-                                        </td>
+                                        <th class="px-4 py-3">Action</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                    @forelse($data as $item)
+                                        <tr class="text-gray-700 text-xs uppercase dark:text-gray-400">
+                                            <td class="px-4 py-3 text-center">
 
+                                                {{ $loop->iteration }}
+
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ $item->name }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ $item->email }}
+                                            </td>
+
+                                            <td class="px-4 py-3 text-sm">
+                                                @can('manage admin')
+                                                    <button wire:click="edit({{ $item->id }})"
+                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button wire:click="delete({{ $item->id }})"
+                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                                @endcan
+                                            </td>
+                                        </tr>
+
+                                    @empty
+                                        <tr class="text-center">
+                                            <td colspan="4">
+                                                <div class="grid justify-items-center w-full mt-5">
+                                                    <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
+                                                        role="alert">
+                                                        No Data Records
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                            <div class="m-2 p-2">{{ $data->links() }}</div>
+                        </div>
                         <!-- MODAL -->
                         @if ($isOpen)
                             <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
@@ -96,14 +114,14 @@
                                     <!-- This element is to trick the browser into centering the modal contents. -->
                                     <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
-                                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg sm:w-full"
+                                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
                                         role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                                         <div
                                             class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                             <!--Modal title-->
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Category
+                                                Email Management
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -117,35 +135,40 @@
                                                 </svg>
                                             </button>
                                         </div>
-                                        <form>
+                                        <form autocomplete="off">
                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                                 <div class="">
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Title:</label>
-                                                        <input type="text"
+                                                        <label for=""
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Name</label>
+                                                        <input type="text" autocomplete="off"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput1" required maxlength="20"
-                                                            placeholder="Enter Title" wire:model="title">
-                                                        @error('title')
+                                                            maxlength="20" placeholder="Enter Name" wire:model="name">
+                                                        @error('name')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
-                                                        <textarea
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Email</label>
+
+
+                                                        <input type="email" autocomplete="off" wire:model="email"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput2" maxlength="30" wire:model="description" placeholder="Enter Description"></textarea>
-                                                        @error('description')
+                                                            placeholder="Enter Email">
+                                                        @error('email')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
+
                                                 </div>
                                             </div>
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                                 <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                                    <button wire:click.prevent="store()" type="button"
+                                                    <button type="button" wire:click.prevent="store()"
+                                                        wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                                         Save
                                                     </button>
@@ -165,6 +188,7 @@
                         <!-- MODAL -->
                     </div>
 
+
                 </div>
             </main>
 
@@ -176,3 +200,34 @@
 
 
 </div>
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    Livewire.on('deleteData', catId => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Livewire.emitTo('income-categories', 'delete', catId)
+                Swal.fire(
+                    'Deleted!',
+                    'Your Data has been deleted.',
+                    'success'
+                )
+            }
+        })
+    })
+</script>
