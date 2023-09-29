@@ -2,15 +2,17 @@
 
 namespace App\Http\Livewire;
 use App\Models\Category;
+use App\Models\StatuOptions;
 use App\Models\Expense;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 class Expenses extends Component
 {
-     public  $expense_description, $expense_amount,$expense_date,  $category_id, $data_id;
+     public  $expense_description, $expense_amount,$expense_date, $expense_status, $category_id, $data_id;
  public $search = '';
  public $categoriesRender;
+  public $statusOptionsRender;
     public $isOpen = 0;
      protected $listeners = ['render','delete']; 
 
@@ -23,15 +25,19 @@ class Expenses extends Component
         
         $data = Expense::join('categories', 'expenses.category_id', '=', 'categories.id')
      ->join('users', 'expenses.user_id', '=', 'users.id')
-     ->where('users.id', auth()->id()) // Corregido
+     ->join('statu_options', 'expenses.expense_status', '=', 'statu_options.id') 
+     ->where('users.id', auth()->id())
      ->where('expenses.expense_description', 'like', '%' . $this->search . '%')
-     ->select('expenses.*','categories.category_name')
+     ->select('expenses.*', 'categories.category_name', 'statu_options.status_description')
      ->orderBy('expenses.id', 'desc')
      ->paginate(10);
+
 
      $this->categoriesRender = Category::where('main_category_id', 2)
                                   ->orderBy('id', 'asc')
                                   ->get();
+
+    $this->statusOptionsRender = StatuOptions::orderBy('id', 'asc')->get();
        
         return view('livewire.expenses', [
             'data' => $data]);
@@ -67,6 +73,7 @@ public function store()
     $validationRules = [
         'expense_description' => 'required|string|max:255',
         'expense_amount' => 'required|numeric',
+        'expense_status' => 'required',
         'expense_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
     ];
@@ -96,6 +103,7 @@ public function edit($id)
         $this->data_id = $id;
         $this->expense_description = $list->expense_description;
         $this->expense_amount = $list->expense_amount;
+          $this->expense_status = $list->expense_status;
          $this->category_id = $list->category_id;
      
         $this->openModal();

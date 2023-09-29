@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
              $table->string('expense_description');
              $table->string('expense_amount');
+             $table->string('expense_status');
              $table->string('expense_date');
              $table->string('expense_month');
              $table->string('expense_year');

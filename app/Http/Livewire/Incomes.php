@@ -3,15 +3,17 @@
 namespace App\Http\Livewire;
 use App\Models\Category;
 use App\Models\Income;
+use App\Models\StatuOptions;
 use Livewire\WithPagination;
 use Livewire\Component;
 use Carbon\Carbon;
 
 class Incomes extends Component
 {
-    public  $income_description, $income_amount,$income_date,  $category_id, $data_id;
+    public  $income_description, $income_amount,$income_date, $income_status, $category_id, $data_id;
  public $search = '';
  public $categoriesRender;
+ public $statusOptionsRender;
     public $isOpen = 0;
      protected $listeners = ['render','delete']; 
 
@@ -23,16 +25,18 @@ class Incomes extends Component
     {
        $data = Income::join('categories', 'incomes.category_id', '=', 'categories.id')
      ->join('users', 'incomes.user_id', '=', 'users.id')
-     ->where('users.id', auth()->id()) // Corregido
+       ->join('statu_options', 'incomes.income_status', '=', 'statu_options.id') 
+     ->where('users.id', auth()->id()) 
      ->where('incomes.income_description', 'like', '%' . $this->search . '%')
-     ->select('incomes.*','categories.category_name')
+     ->select('incomes.*','categories.category_name', 'statu_options.status_description')
      ->orderBy('incomes.id', 'desc')
      ->paginate(10);
 
      $this->categoriesRender = Category::where('main_category_id', 1)
                                   ->orderBy('id', 'asc')
                                   ->get();
-       
+     $this->statusOptionsRender = StatuOptions::orderBy('id', 'asc')->get();
+
         return view('livewire.incomes', [
             'data' => $data]);
     }
@@ -65,6 +69,7 @@ public function store()
     $validationRules = [
         'income_description' => 'required|string|max:255',
         'income_amount' => 'required|numeric',
+        'income_status' => 'required',
         'income_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
     ];
@@ -95,7 +100,8 @@ public function store()
         $this->data_id = $id;
         $this->income_description = $list->income_description;
         $this->income_amount = $list->income_amount;
-         $this->category_id = $list->category_id;
+        $this->income_status = $list->income_status;
+        $this->category_id = $list->category_id;
      
         $this->openModal();
     }

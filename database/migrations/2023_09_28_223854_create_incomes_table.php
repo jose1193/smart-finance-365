@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('income_description');
              $table->string('income_amount');
+              $table->string('income_status');
              $table->string('income_date');
              $table->string('income_month');
              $table->string('income_year');

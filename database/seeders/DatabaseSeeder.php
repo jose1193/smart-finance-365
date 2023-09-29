@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use App\Models\User;
 use App\Models\MainCategories;
 use App\Models\Category;
+use App\Models\StatuOptions;
 
 class DatabaseSeeder extends Seeder
 {
@@ -127,5 +128,22 @@ foreach ($mainCategories as $category) {
             ]);
         }
         // END EXPENSES CATEGORY
+
+         // MAIN CATEGORIES
+       $statusOptions = [
+    'Paid',
+    'Pending',
+    'Unpaid',
+    'Denied',
+    // Agrega más valores aquí si es necesario
+];
+
+foreach ($statusOptions as $statusDescription) {
+    StatuOptions::create([
+        'status_description' => $statusDescription,
+       
+    ]);
+}
+        // END MAIN CATEGORIES
     }
 }

@@ -52,11 +52,12 @@
                             <table class="w-full whitespace-no-wrap">
                                 <thead>
                                     <tr
-                                        class="text-xs font-semibold tracking-wide text-left text-white uppercase border-b dark:border-gray-700 bg-gray-900 dark:text-gray-400 dark:bg-gray-800">
+                                        class="text-xs font-semibold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Description</th>
                                         <th class="px-4 py-3">Amount</th>
+                                        <th class="px-4 py-3">Status</th>
                                         <th class="px-4 py-3">Date</th>
                                         <th class="px-4 py-3">Action</th>
                                     </tr>
@@ -79,6 +80,33 @@
                                                 {{ $item->expense_amount }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
+
+                                                @if ($item->expense_status === '1')
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
+                                                        {{ $item->status_description }}
+                                                    </span>
+                                                @elseif ($item->expense_status === '3')
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
+                                                        {{ $item->status_description }}
+                                                    </span>
+                                                @elseif ($item->expense_status === '2')
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
+                                                        {{ $item->status_description }}
+                                                    </span>
+                                                @else
+                                                    <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-white bg-red-700 rounded-full dark:bg-gray-700 dark:text-gray-100">
+                                                        {{ $item->status_description }}
+                                                    </span>
+                                                @endif
+
+
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
                                                 {{ $item->expense_date }}
                                             </td>
                                             <td class="px-4 py-3 text-sm">
@@ -95,7 +123,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="6">
+                                            <td colspan="7">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -199,6 +227,27 @@
                                                         </select>
 
                                                         @error('category_id')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+
+                                                    <div class="mb-4">
+                                                        <label for="exampleFormControlInput2"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Status
+                                                        </label>
+                                                        <select wire:model="expense_status"
+                                                            class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                                                            <option value="">
+
+                                                            </option>
+                                                            @foreach ($statusOptionsRender as $item)
+                                                                <option value="{{ $item->id }}">
+                                                                    {{ $item->status_description }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                        @error('expense_status')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>

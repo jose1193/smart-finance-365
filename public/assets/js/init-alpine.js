@@ -56,7 +56,7 @@ function data() {
             this.isPagesMenuOpen3 = !this.isPagesMenuOpen3;
         },
         isPagesMenuOpen4: false,
-        togglePagesMenu3() {
+        togglePagesMenu4() {
             this.isPagesMenuOpen4 = !this.isPagesMenuOpen4;
         },
         // Modal
