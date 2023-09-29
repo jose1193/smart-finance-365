@@ -26,7 +26,7 @@ class ExpensesCategories extends Component
     ->orderBy('categories.id', 'desc') 
     ->paginate(10);
 
-     $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
+     $this->mainCategoriesRender = MainCategories::orderBy('id', 'desc')->get();
 
 
        
@@ -63,7 +63,7 @@ class ExpensesCategories extends Component
         $this->validate([
             'category_name' => 'required|string|max:30',
             'category_description' => 'required|string|max:50',
-           
+             'main_category_id' => 'required|exists:main_categories,id',
             
             
         ]);

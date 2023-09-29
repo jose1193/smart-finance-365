@@ -63,12 +63,12 @@
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
                                         <tr class="text-gray-700  uppercase dark:text-gray-400">
-                                            <td class="px-4 py-3 text-center">
+                                            <td class="px-4 py-3 text-xs text-center">
 
                                                 {{ $loop->iteration }}
 
                                             </td>
-                                            <td class="px-4 py-3 text-sm">
+                                            <td class="px-4 py-3 text-xs">
                                                 {{ $item->main_category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -123,7 +123,7 @@
                                             <!--Modal title-->
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Category
+                                                Income Category
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"

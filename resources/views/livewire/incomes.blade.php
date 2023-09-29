@@ -27,20 +27,20 @@
                     <div
                         class="mt-5 flex items-center justify-between p-4 mb-8 text-sm font-semibold text-white bg-blue-500 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple">
                         <div class="flex items-center">
-                            <i class="fa-solid fa-cash-register mr-3"></i>
+                            <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Expenses Categories') }}
+                                {{ __('Income Management') }}
                             </x-slot>
                             <a href="{{ route('expenses-categories') }}">
-                                <span>Expenses Categories</span></a>
+                                <span>Income Management</span></a>
                         </div>
 
                     </div>
                     @can('manage admin')
                         <div class=" my-7 flex justify-between space-x-2">
                             <x-button wire:click="create()"><span class="font-semibold"> Create New <i
-                                        class="fa-regular fa-folder-open"></i> </span>
+                                        class="fa-solid fa-money-bill-wave"></i></span>
                             </x-button>
                             <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
                                 autocomplete="off" />
@@ -54,28 +54,32 @@
                                     <tr
                                         class="text-xs font-semibold tracking-wide text-left text-white uppercase border-b dark:border-gray-700 bg-gray-900 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
-                                        <th class="px-4 py-3">Item</th>
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Description</th>
+                                        <th class="px-4 py-3">Amount</th>
+                                        <th class="px-4 py-3">Date</th>
                                         <th class="px-4 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700  uppercase dark:text-gray-400">
-                                            <td class="px-4 py-3 text-xs  text-center">
+                                        <tr class="text-gray-700 text-xs uppercase dark:text-gray-400">
+                                            <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->main_category_name }}
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
                                                 {{ $item->category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->category_description }}
+                                                {{ $item->income_description }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ $item->income_amount }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ $item->income_date }}
                                             </td>
                                             <td class="px-4 py-3 text-sm">
                                                 @can('manage admin')
@@ -91,7 +95,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="5">
+                                            <td colspan="6">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -123,7 +127,7 @@
                                             <!--Modal title-->
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Expenses Category
+                                                Income Management
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -141,49 +145,62 @@
                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                                 <div class="">
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                                                        <input type="text" autocomplete="off"
+                                                        <label for="income_description"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Income
+                                                            Description</label>
+                                                        <input type="text" autocomplete="off" id="income_description"
+                                                            name="income_description"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput1" required maxlength="20"
-                                                            placeholder="Enter Category" wire:model="category_name">
-                                                        @error('category_name')
+                                                            maxlength="50" placeholder="Enter Income Description"
+                                                            wire:model="income_description">
+                                                        @error('income_description')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                                                        <input type="text" autocomplete="off"
+                                                        <label for="income_amount"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Income
+                                                            Amount</label>
+                                                        <input type="number" step="0.01" autocomplete="off"
+                                                            id="income_amount" wire:model="income_amount"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput1" maxlength="50"
-                                                            placeholder="Enter Description"
-                                                            wire:model="category_description">
-                                                        @error('category_description')
+                                                            placeholder="Enter Income Amount">
+                                                        @error('income_amount')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <label for="income_date"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Income
+                                                            Date</label>
+                                                        <input type="date" wire:model="income_date"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                        @error('income_date')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Id
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Category
                                                         </label>
-                                                        <select wire:model="main_category_id"
+                                                        <select wire:model="category_id"
                                                             class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                                                             <option value="">
 
                                                             </option>
-                                                            @foreach ($mainCategoriesRender as $item)
+                                                            @foreach ($categoriesRender as $item)
                                                                 <option value="{{ $item->id }}">
-                                                                    {{ $item->title }}
+                                                                    {{ $item->category_name }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
 
-                                                        @error('main_category_id')
+                                                        @error('category_id')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
                                                 </div>
                                             </div>
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
