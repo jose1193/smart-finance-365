@@ -1,4 +1,5 @@
-<div :class="{ 'theme-dark': dark }" x-data="data()" lang="en">
+<div :class="{ 'theme-dark': dark }" x-data="data()" lang="en" id="theme">
+
 
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
         <!-- MENU SIDEBAR -->

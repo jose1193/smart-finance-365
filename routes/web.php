@@ -14,6 +14,7 @@ use App\Http\Livewire\UsersCrud;
 use App\Http\Livewire\Incomes;
 use App\Http\Livewire\Expenses;
 use App\Http\Livewire\EmailsManagament;
+use App\Http\Livewire\GeneralChartForm;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,4 +81,5 @@ Route::middleware([
        Route::get('income', Incomes::class)->name('incomes');
        Route::get('expense', Expenses::class)->name('expense');
        Route::get('emails', EmailsManagament::class)->name('emails');
+        Route::get('general-charts', GeneralChartForm::class)->name('general-charts');
 });
