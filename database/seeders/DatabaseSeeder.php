@@ -134,7 +134,6 @@ foreach ($mainCategories as $category) {
     'Paid',
     'Pending',
     'Unpaid',
-    'Denied',
     // Agrega más valores aquí si es necesario
 ];
 

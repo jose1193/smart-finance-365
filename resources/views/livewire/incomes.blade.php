@@ -32,7 +32,7 @@
                             <x-slot name="title">
                                 {{ __('Income Management') }}
                             </x-slot>
-                            <a href="{{ route('expenses-categories') }}">
+                            <a href="{{ route('incomes') }}">
                                 <span>Income Management</span></a>
                         </div>
 
