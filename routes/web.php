@@ -15,6 +15,9 @@ use App\Http\Livewire\Incomes;
 use App\Http\Livewire\Expenses;
 use App\Http\Livewire\EmailsManagament;
 use App\Http\Livewire\GeneralChartForm;
+use App\Http\Livewire\DashboardTable;
+use App\Http\Livewire\Operations;
+use App\Http\Livewire\IncomesOperations;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,13 +76,19 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
     Route::get('main-categories', PrimaryCategories::class)->name('main-categories');
-     Route::get('teachers', Teachers::class)->name('teachers');
-      Route::get('categories', Categories::class)->name('categories');
-      Route::get('income-categories', IncomeCategories::class)->name('income-categories');
-      Route::get('expenses-categories', ExpensesCategories::class)->name('expenses-categories');
-       Route::get('users', UsersCrud::class)->name('users');
-       Route::get('income', Incomes::class)->name('incomes');
-       Route::get('expense', Expenses::class)->name('expense');
-       Route::get('emails', EmailsManagament::class)->name('emails');
-        Route::get('general-charts', GeneralChartForm::class)->name('general-charts');
+    Route::get('teachers', Teachers::class)->name('teachers');
+    Route::get('categories', Categories::class)->name('categories');
+    Route::get('income-categories', IncomeCategories::class)->name('income-categories');
+    Route::get('expenses-categories', ExpensesCategories::class)->name('expenses-categories');
+    Route::get('users', UsersCrud::class)->name('users');
+       //Route::get('income', Incomes::class)->name('incomes');
+       //Route::get('expense', Expenses::class)->name('expense');
+    Route::get('emails', EmailsManagament::class)->name('emails');
+    Route::get('general-charts', GeneralChartForm::class)->name('general-charts');
+    Route::get('dashboard-table', DashboardTable::class)->name('dashboard-table');
+
+    Route::get('expenses', Operations::class)->name('expense');
+    Route::get('incomes', IncomesOperations::class)->name('incomes');
+      
+
 });
