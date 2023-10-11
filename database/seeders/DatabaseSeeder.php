@@ -132,8 +132,8 @@ foreach ($mainCategories as $category) {
          // MAIN CATEGORIES
        $statusOptions = [
     'Paid',
-    'Pending',
     'Unpaid',
+    'Pending',
     // Agrega más valores aquí si es necesario
 ];
 

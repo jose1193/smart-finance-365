@@ -57,6 +57,8 @@
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Description</th>
                                         <th class="px-4 py-3">Amount</th>
+                                        <th class="px-4 py-3">Currency Amount</th>
+                                        <th class="px-4 py-3">Total Exchange</th>
                                         <th class="px-4 py-3">Status</th>
                                         <th class="px-4 py-3">Date</th>
                                         <th class="px-4 py-3">Action</th>
@@ -71,15 +73,27 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->category_name }}
+                                                {{ Str::words($item->category_name, 2, '...') }}
+
                                             </td>
-                                            <td class="px-4 py-3 text-xs">
-                                                {{ $item->operation_description }}
+                                            <td class="px-4 py-3 text-xs ">
+                                                {{ Str::words($item->operation_description, 2, '...') }}
+
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
                                                 $
                                                 {{ $formatted_amount = number_format($item->operation_amount, 2, '.', ',') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+
+                                                $
+                                                {{ $formatted_amount = number_format($item->operation_currency, 2, '.', ',') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+
+                                                $
+                                                {{ $formatted_amount = number_format($item->operation_currency_total, 2, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
@@ -125,7 +139,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="7">
+                                            <td colspan="9">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -190,17 +204,90 @@
                                                     <div class="mb-4">
                                                         <label for="operation_amount"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Amount</label>
-
-
-                                                        <input type="text" autocomplete="off" id="operation_amount"
-                                                            wire:model="operation_amount"
+                                                            Amount ARS</label>
+                                                        <input type="text" autocomplete="off"
+                                                            id="operation_amount" wire:model="operation_amount"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             placeholder="Enter Expense Amount">
+                                                        <script>
+                                                            const operationAmountField = document.getElementById('operation_amount');
+
+                                                            operationAmountField.addEventListener('input', function(e) {
+                                                                // Remueve todos los caracteres no numéricos
+                                                                let numericValue = e.target.value.replace(/[^\d.]/g, '');
+
+                                                                // Divide en parte entera y decimal
+                                                                let parts = numericValue.split('.');
+
+                                                                // Formatea la parte entera con comas como separadores de miles
+                                                                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                                                                // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                                                numericValue = parts.join('.');
+
+                                                                e.target.value = numericValue;
+                                                            });
+                                                        </script>
                                                         @error('operation_amount')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
+                                                    <div class="mb-4">
+                                                        <label for="operation_currency"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Currency Amount </label>
+
+
+                                                        <input type="text" autocomplete="off"
+                                                            id="operation_currency" wire:model="operation_currency"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                            placeholder="">
+
+                                                        @error('operation_currency')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+
+                                                    <div class="mb-4">
+                                                        <label for="operation_currency"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Total Currency Amount </label>
+
+
+                                                        <input type="text" name="totalbudget2" autocomplete="off"
+                                                            id="operation_currency_total"
+                                                            wire:model="operation_currency_total"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                            placeholder="">
+                                                        @error('operation_currency_total')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+
+                                                        <script>
+                                                            const amountField = document.getElementById('operation_amount');
+                                                            const totalBudgetField = document.getElementById('operation_currency_total');
+                                                            const dollarChangeValue = {{ $data2['blue']['value_sell'] }}; // Obtén el valor del dólar de la base de datos
+
+                                                            amountField.addEventListener('input', function() {
+                                                                const formattedValue = amountField.value.replace(/[^0-9,.]/g,
+                                                                ''); // Elimina todo excepto dígitos, comas y puntos
+                                                                const numericValue = parseFloat(formattedValue.replace(/,/g, '').replace(/\./,
+                                                                '.')); // Reemplaza comas por puntos y convierte en número
+
+                                                                if (!isNaN(numericValue)) {
+                                                                    const calculatedValue = (numericValue / dollarChangeValue).toFixed(2);
+                                                                    totalBudgetField.value = '$' + calculatedValue.replace('.',
+                                                                    ','); // Formatea el valor con coma como separador decimal
+                                                                } else {
+                                                                    totalBudgetField.value = ''; // Limpiar el campo si la entrada no es válida
+                                                                }
+                                                            });
+                                                        </script>
+
+                                                    </div>
+
+
                                                     <div class="mb-4">
                                                         <label for="operation_date"
                                                             class="block text-gray-700 text-sm font-bold mb-2">

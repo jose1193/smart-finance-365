@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
              $table->string('operation_description');
              $table->string('operation_amount');
+             $table->string('operation_currency');
+             $table->string('operation_currency_total');
              $table->string('operation_status');
              $table->string('operation_date');
              $table->string('operation_month');

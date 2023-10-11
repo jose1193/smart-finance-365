@@ -11,6 +11,8 @@ class Operation extends Model
     protected $fillable = [
         'operation_description',
         'operation_amount',
+        'operation_currency',
+        'operation_currency_total',
         'operation_status',
         'operation_date',
         'operation_month',

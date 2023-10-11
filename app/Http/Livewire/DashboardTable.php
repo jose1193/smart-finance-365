@@ -8,20 +8,40 @@ use Livewire\WithPagination;
 use Livewire\Component;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Http; // <-- guzzle query api
 
 class DashboardTable extends Component
 {
-     public  $operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
- public $search = '';
- public $categoriesRender;
-  public $statusOptionsRender;
-    public $isOpen = 0;
-     protected $listeners = ['render','delete']; 
+public  $operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
+public $search = '';
+public $categoriesRender;
+public $statusOptionsRender;
+
+public $data2;
+public $operation_currency; 
+public $operation_currency_total; 
+
+public $isOpen = 0;
+protected $listeners = ['render','delete']; 
 
     public function authorize()
 {
     return true;
+}
+
+
+public function fetchData()
+{
+    // Hacer la solicitud HTTP a la API de monedas
+    $response = Http::get('https://api.bluelytics.com.ar/v2/latest'); // Reemplaza con la URL correcta de la API
+    $this->data2 = $response->json();
+}
+
+public function mount()
+{
+     $this->fetchData(); // Llama a la función fetchData para obtener los datos
+    // Define el valor por defecto en la propiedad
+    $this->operation_currency = $this->data2['blue']['value_sell'];
 }
 
     public function render()
@@ -58,6 +78,9 @@ class DashboardTable extends Component
          $this->authorize('manage admin');
         $this->resetInputFields();
         $this->openModal();
+         $this->fetchData(); // Llama a la función fetchData para obtener los datos
+    // Define el valor por defecto en la propiedad
+    $this->operation_currency = $this->data2['blue']['value_sell'];
     }
 
     public function openModal()
@@ -81,7 +104,9 @@ public function store()
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',
-        'operation_amount' => 'required|numeric',
+        'operation_amount' => 'required',
+         'operation_currency' => 'required',
+          'operation_currency_total' => 'required',
         'operation_status' => 'required',
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
@@ -96,6 +121,21 @@ public function store()
     $operationDate = \Carbon\Carbon::createFromFormat('Y-m-d', $validatedData['operation_date']);
     $validatedData['operation_month'] = $operationDate->format('m');
     $validatedData['operation_year'] = $operationDate->format('Y');
+
+    // Elimina cualquier carácter no numérico, como comas y puntos
+    $numericValue = str_replace(['.', ','], '', $validatedData['operation_amount']);
+     // Para operation_currency_total, primero lo conviertes en un número decimal (float)
+    $roundedValue = round($validatedData['operation_currency_total']);
+
+    $numericValue2 = str_replace(['.', ','], '', $roundedValue);
+
+    // Convierte la cadena en un número entero (sin decimales) para operation_amount
+    $validatedData['operation_amount'] = (int)$numericValue;
+
+   
+    // Luego, lo redondeas al número entero más cercano
+    $validatedData['operation_currency_total'] = (int)$numericValue2;
+
 
     Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
@@ -112,7 +152,9 @@ public function edit($id)
         $list = Operation::findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
-        $this->operation_amount = $list->operation_amount;
+       $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
+         $this->operation_currency = number_format($list->operation_currency, 2, '.', ',');
+        $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
           $this->operation_status = $list->operation_status;
          $this->category_id = $list->category_id;
      

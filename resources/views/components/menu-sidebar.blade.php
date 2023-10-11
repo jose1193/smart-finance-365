@@ -9,7 +9,7 @@
 
          </a>
          <h1
-             class="text-center text-base font-bold leading-none tracking-tighter text-indigo-500 md:text-7xl lg:text-sm">
+             class="text-center text-base font-bold leading-none tracking-tighter text-indigo-500 md:text-base lg:text-sm">
              Welcome,
              {{ Auth::user()->username }} </h1>
          <ul class="mt-6">
