@@ -18,6 +18,7 @@ use App\Http\Livewire\GeneralChartForm;
 use App\Http\Livewire\DashboardTable;
 use App\Http\Livewire\Operations;
 use App\Http\Livewire\IncomesOperations;
+use App\Http\Livewire\CurrencyCalculator;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +90,7 @@ Route::middleware([
 
     Route::get('expenses', Operations::class)->name('expense');
     Route::get('incomes', IncomesOperations::class)->name('incomes');
-      
+    Route::get('currency', CurrencyCalculator::class)->name('currency');
+    Route::get('calculator', [CurrencyCalculator::class, 'Calculator'])->name('calculator');
 
 });

@@ -59,6 +59,10 @@ function data() {
         togglePagesMenu4() {
             this.isPagesMenuOpen4 = !this.isPagesMenuOpen4;
         },
+        isPagesMenuOpen5: false,
+        togglePagesMenu5() {
+            this.isPagesMenuOpen5 = !this.isPagesMenuOpen5;
+        },
         // Modal
         isModalOpen: false,
         trapCleanup: null,
