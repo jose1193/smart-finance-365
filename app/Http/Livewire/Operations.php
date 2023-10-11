@@ -148,7 +148,7 @@ public function edit($id)
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
        $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
-         $this->operation_currency = number_format($list->operation_currency, 2, '.', ',');
+         $this->operation_currency = $list->operation_currency;
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
           $this->operation_status = $list->operation_status;
          $this->category_id = $list->category_id;

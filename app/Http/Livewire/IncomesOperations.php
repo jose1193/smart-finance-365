@@ -41,6 +41,7 @@ public function mount()
      $this->fetchData(); // Llama a la función fetchData para obtener los datos
     // Define el valor por defecto en la propiedad
     $this->operation_currency = $this->data2['blue']['value_sell'];
+    
 }
 
 
@@ -119,6 +120,8 @@ public function store()
     $validatedData['operation_month'] = $operationDate->format('m');
     $validatedData['operation_year'] = $operationDate->format('Y');
 
+   
+    
     // Elimina cualquier carácter no numérico, como comas y puntos
     $numericValue = str_replace(['.', ','], '', $validatedData['operation_amount']);
      // Para operation_currency_total, primero lo conviertes en un número decimal (float)
@@ -133,8 +136,6 @@ public function store()
     // Luego, lo redondeas al número entero más cercano
     $validatedData['operation_currency_total'] = (int)$numericValue2;
 
-
-
     Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
     session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
@@ -144,7 +145,17 @@ public function store()
 }
 
 
-
+public function updatedOperationAmount()
+{
+    // Verifica si $this->operation_amount es un valor numérico
+    if (is_numeric($this->operation_amount) && is_numeric($this->data2['blue']['value_sell'])) {
+        // Realiza la operación de división
+        $this->operation_currency_total = $this->operation_amount / $this->data2['blue']['value_sell'];
+    } else {
+        // Maneja el caso en el que los valores no sean numéricos, por ejemplo, asignando un valor predeterminado o mostrando un mensaje de error.
+        $this->operation_currency_total =  $this->operation_currency_total; // O cualquier otro valor predeterminado
+    }
+}
 
 public function edit($id)
     {
@@ -153,12 +164,13 @@ public function edit($id)
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
         $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
-         $this->operation_currency = number_format($list->operation_currency, 2, '.', ',');
+        $this->operation_currency = $list->operation_currency;
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
           $this->operation_status = $list->operation_status;
          $this->category_id = $list->category_id;
      
         $this->openModal();
+        $this->updatedOperationAmount();
     }
 public function delete($id)
     {
