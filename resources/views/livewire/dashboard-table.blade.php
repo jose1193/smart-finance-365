@@ -1,3 +1,4 @@
+<!-- COMPONENTS.WELCOME.BLADE.PHP -->
 <div :class="{ 'theme-dark': dark }" x-data="data()" lang="en">
 
 

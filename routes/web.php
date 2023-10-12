@@ -16,6 +16,8 @@ use App\Http\Livewire\Expenses;
 use App\Http\Livewire\EmailsManagament;
 use App\Http\Livewire\GeneralChartForm;
 use App\Http\Livewire\DashboardTable;
+use App\Http\Livewire\DashboardCharts;
+use App\Http\Livewire\DashboardCards;
 use App\Http\Livewire\Operations;
 use App\Http\Livewire\IncomesOperations;
 use App\Http\Livewire\CurrencyCalculator;
@@ -87,6 +89,8 @@ Route::middleware([
     Route::get('emails', EmailsManagament::class)->name('emails');
     Route::get('general-charts', GeneralChartForm::class)->name('general-charts');
     Route::get('dashboard-table', DashboardTable::class)->name('dashboard-table');
+    Route::get('dashboard-charts', DashboardCharts::class)->name('dashboard-charts');
+    Route::get('dashboard-cards', DashboardCards::class)->name('dashboard-cards');
 
     Route::get('expenses', Operations::class)->name('expense');
     Route::get('incomes', IncomesOperations::class)->name('incomes');
