@@ -269,7 +269,7 @@
                                                         <script>
                                                             const amountField = document.getElementById('operation_amount');
                                                             const totalBudgetField = document.getElementById('operation_currency_total');
-                                                            const dollarChangeValue = {{ $data2['blue']['value_sell'] }}; // Obtén el valor del dólar de la base de datos
+                                                            const dollarChangeValue = {{ $data2['blue']['value_sell'] ?? 0 }}; // Valor predeterminado 0 si no se encuentra
 
                                                             amountField.addEventListener('input', function() {
                                                                 const formattedValue = amountField.value.replace(/[^0-9,.]/g,

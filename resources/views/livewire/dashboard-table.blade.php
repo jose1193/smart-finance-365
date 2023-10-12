@@ -225,7 +225,7 @@
 
 
                                         <input type="text" autocomplete="off" id="operation_currency"
-                                            wire:model="operation_currency" readonly
+                                            wire:model="operation_currency"
                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                             placeholder="">
 
@@ -278,9 +278,9 @@
                                         // Añadimos un event listener para detectar cambios en el campo "Amount"
                                         amountField.addEventListener('input', function() {
                                             const formattedValue = amountField.value.replace(/[^0-9,.]/g,
-                                            ''); // Elimina todo excepto dígitos, comas y puntos
+                                                ''); // Elimina todo excepto dígitos, comas y puntos
                                             const numericValue = parseFloat(formattedValue.replace(/,/, '').replace(/\./,
-                                            '.')); // Reemplaza comas por puntos y convierte en número
+                                                '.')); // Reemplaza comas por puntos y convierte en número
 
                                             if (!isNaN(numericValue)) {
                                                 const calculatedValue = (numericValue / dollarChangeValue).toFixed(2);

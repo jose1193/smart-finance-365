@@ -267,18 +267,19 @@
                                                         <script>
                                                             const amountField = document.getElementById('operation_amount');
                                                             const totalBudgetField = document.getElementById('operation_currency_total');
-                                                            const dollarChangeValue = {{ $data2['blue']['value_sell'] }}; // Obtén el valor del dólar de la base de datos
+                                                            const dollarChangeValue = {{ $data2['blue']['value_sell'] ?? 0 }}; // Valor predeterminado 0 si no se encuentra
+
 
                                                             amountField.addEventListener('input', function() {
                                                                 const formattedValue = amountField.value.replace(/[^0-9,.]/g,
-                                                                ''); // Elimina todo excepto dígitos, comas y puntos
+                                                                    ''); // Elimina todo excepto dígitos, comas y puntos
                                                                 const numericValue = parseFloat(formattedValue.replace(/,/g, '').replace(/\./,
-                                                                '.')); // Reemplaza comas por puntos y convierte en número
+                                                                    '.')); // Reemplaza comas por puntos y convierte en número
 
                                                                 if (!isNaN(numericValue)) {
                                                                     const calculatedValue = (numericValue / dollarChangeValue).toFixed(2);
                                                                     totalBudgetField.value = '$' + calculatedValue.replace('.',
-                                                                    ','); // Formatea el valor con coma como separador decimal
+                                                                        ','); // Formatea el valor con coma como separador decimal
                                                                 } else {
                                                                     totalBudgetField.value = ''; // Limpiar el campo si la entrada no es válida
                                                                 }

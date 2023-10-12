@@ -145,6 +145,21 @@ public function store()
     $this->resetInputFields();
 }
 
+public function updatedOperationAmount()
+{
+    // Limpia la entrada de usuario para asegurarte de que solo contenga dígitos y un punto decimal
+    $cleanedValue = preg_replace('/[^0-9.]/', '', $this->operation_amount);
+
+    // Verifica si el valor es un número
+    if (is_numeric($cleanedValue) && is_numeric($this->operation_currency)) {
+        // Realiza la operación de división
+        $result = round((float)$cleanedValue / $this->operation_currency);
+        $this->operation_currency_total = $result;
+    } else {
+        // Maneja el caso en el que los valores no sean numéricos, por ejemplo, asignando un valor predeterminado o mostrando un mensaje de error.
+        $this->operation_currency_total = 0; // O cualquier otro valor predeterminado
+    }
+}
 
 public function edit($id)
     {
@@ -159,6 +174,7 @@ public function edit($id)
          $this->category_id = $list->category_id;
      
         $this->openModal();
+          $this->updatedOperationAmount();
     }
 public function delete($id)
     {
