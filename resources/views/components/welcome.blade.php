@@ -37,6 +37,7 @@
                     @livewire('dashboard-cards')
 
                     <!-- New Table -->
+
                     @livewire('dashboard-table')
 
                     <!-- Charts -->

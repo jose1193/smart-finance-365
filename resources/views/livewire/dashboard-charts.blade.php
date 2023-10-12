@@ -96,11 +96,11 @@
             <!-- Chart legend -->
             <div class="flex items-center">
                 <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
-                <span>Income</span>
+                <span>{{ $categoryName }}</span>
             </div>
             <div class="flex items-center">
                 <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                <span>Expenses</span>
+                <span>{{ $categoryName2 }}</span>
             </div>
         </div>
         <script>
