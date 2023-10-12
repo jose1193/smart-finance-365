@@ -3,6 +3,7 @@
     Charts
 </h2>
 
+
 <div class="grid gap-6 mb-8 md:grid-cols-2">
     <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
         <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
@@ -10,14 +11,11 @@
         </h4>
         <canvas id="myChart"></canvas>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
         <script>
             var ctx = document.getElementById('myChart').getContext('2d');
 
-            var data = {
+            var dataBar = {
                 labels: [
                     @for ($i = 1; $i <= 12; $i++)
                         "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
@@ -65,10 +63,11 @@
 
             var myChart = new Chart(ctx, {
                 type: 'bar',
-                data: data,
+                data: dataBar,
                 options: options
             });
         </script>
+
 
         <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
             <!-- Chart legend -->
