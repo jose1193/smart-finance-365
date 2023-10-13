@@ -256,7 +256,6 @@
                                                     <script>
                                                         const amountField = document.getElementById('operation_amount');
                                                         const totalBudgetField = document.getElementById('operation_currency_total');
-                                                        const dollarChangeValue = {{ $data2['blue']['value_sell'] }}; // Obtén el valor del dólar de la base de datos
 
                                                         amountField.addEventListener('input', function() {
                                                             const formattedValue = amountField.value.replace(/[^0-9,.]/g,
@@ -281,7 +280,7 @@
                                                     // Obtenemos los elementos de los campos de entrada
                                                     const amountField = document.getElementById('operation_amount');
                                                     const totalBudgetField = document.getElementById('operation_currency_total');
-                                                    const dollarChangeValue = {{ $data2['blue']['value_sell'] }}; // Obtén el valor del dólar de la base de datos
+
 
                                                     // Añadimos un event listener para detectar cambios en el campo "Amount"
                                                     amountField.addEventListener('input', function() {
