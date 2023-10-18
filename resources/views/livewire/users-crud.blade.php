@@ -191,10 +191,19 @@
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput1"
                                                             class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-                                                        <input type="password" id="password" autocomplete="off"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput1" required maxlength="20"
-                                                            placeholder="Enter Password" wire:model="password">
+                                                        <div class="relative">
+                                                            <input type="password" id="password" autocomplete="off"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                                id="exampleFormControlInput1" required maxlength="20"
+                                                                placeholder="Enter Password" wire:model="password">
+                                                            <span id="toggle-password" class="password-toggle"
+                                                                onclick="togglePasswordVisibility()">
+                                                                <i class="text-gray-500 fa-regular fa-eye"></i>
+                                                            </span>
+                                                        </div>
+
+
+
                                                         @error('password')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -269,7 +278,34 @@
 
 </div>
 
+<style>
+    .relative {
+        position: relative;
+    }
 
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 10px;
+        /* Ajusta esto según tu diseño */
+        cursor: pointer;
+    }
+</style>
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.querySelector('#password');
+        const toggleButton = document.querySelector('#toggle-password');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleButton.innerHTML = '<i class="far fa-eye-slash"></i>'; // Cambia el icono a ojo tachado
+        } else {
+            passwordInput.type = 'password';
+            toggleButton.innerHTML = '<i class="far fa-eye"></i>'; // Cambia el icono a ojo
+        }
+    }
+</script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

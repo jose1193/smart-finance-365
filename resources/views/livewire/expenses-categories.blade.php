@@ -243,7 +243,7 @@
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                Livewire.emitTo('income-categories', 'delete', catId)
+                Livewire.emitTo('expense-categories', 'delete', catId)
                 Swal.fire(
                     'Deleted!',
                     'Your Data has been deleted.',
