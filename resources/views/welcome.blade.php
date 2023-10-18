@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16x16.png">
     <link rel="manifest" href="img/favicon/site.webmanifest">
 
-    <title>Web App</title>
+    <title>Smart Finance - Web App</title>
 
     <!-- Fonts -->
     <!-- Fonts -->

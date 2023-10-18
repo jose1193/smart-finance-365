@@ -30,7 +30,7 @@ class ReportGeneralCharts extends Component
    
 
 // Escucha el evento emitido y actualiza los datos de la gráfica
-public function updatedSelectedYear($selectedYear)
+public function updateChartData()
 {
     // Realiza tu consulta y actualiza los datos de la gráfica
 
@@ -41,7 +41,7 @@ public function updatedSelectedYear($selectedYear)
             ->where('main_categories.id', 1)
             ->where('operations.user_id', auth()->id())
             ->whereMonth('operations.created_at', $i)
-            ->whereYear('operations.created_at', $selectedYear) // Usar $selectedYear en lugar de $this->selectedYear
+            ->whereYear('operations.created_at', $this->selectedYear) // Usar $selectedYear en lugar de $this->selectedYear
             ->sum('operations.operation_amount');
 
         $expenseData[] = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
@@ -49,7 +49,7 @@ public function updatedSelectedYear($selectedYear)
             ->where('main_categories.id', 2)
             ->where('operations.user_id', auth()->id())
             ->whereMonth('operations.created_at', $i)
-            ->whereYear('operations.created_at', $selectedYear) // Usar $selectedYear en lugar de $this->selectedYear
+            ->whereYear('operations.created_at', $this->selectedYear) // Usar $selectedYear en lugar de $this->selectedYear
             ->sum('operations.operation_amount');
     }
     $this->incomeData = $incomeData;
@@ -57,9 +57,7 @@ public function updatedSelectedYear($selectedYear)
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
 
-    //$this->emit('updateChartData', [
-    //'incomeData' => $incomeData,
-    //'expenseData' => $expenseData,]);
+   
 
 
     // Muestra la gráfica después de seleccionar el año

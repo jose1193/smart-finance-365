@@ -93,18 +93,35 @@ return view('livewire.users-crud', [
 ]);
 
 
- $role = Role::find($this->role);
-       $user= User::updateOrCreate(['id' => $this->data_id], [
-            'name' => $this->name,
-            'username' => $this->username,
-            'email' => $this->email,
-             'email_verified_at' => now(),
-           'password' => bcrypt($this->password),
+ // Verificar si el usuario existe antes de realizar la actualización
+$user = User::find($this->data_id);
 
-        ]);
-   $user->assignRole($role);
-        session()->flash('message', 
-            $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+if ($user) {
+    // El usuario ya existe, actualiza el rol
+    $role = Role::find($this->role);
+    $user->syncRoles([$role->name]);
+    // Luego, actualiza otros campos según sea necesario
+    $user->update([
+        'name' => $this->name,
+        'username' => $this->username,
+        'email' => $this->email,
+        'email_verified_at' => now(),
+        'password' => bcrypt($this->password),
+    ]);
+} else {
+    // El usuario no existe, puedes manejar la creación como lo hacías antes
+    $user = User::updateOrCreate(['id' => $this->data_id], [
+        'name' => $this->name,
+        'username' => $this->username,
+        'email' => $this->email,
+        'email_verified_at' => now(),
+        'password' => bcrypt($this->password),
+    ]);
+    $role = Role::find($this->role);
+    $user->assignRole($role->name);
+}
+
+session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
    
         $this->closeModal();
         $this->resetInputFields();

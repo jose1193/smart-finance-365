@@ -37,22 +37,22 @@
                         </div>
 
                     </div>
-                    @can('manage admin')
-                        <div class=" my-7 flex justify-between space-x-2">
-                            <x-button wire:click="create()"><span class="font-semibold"> Create New <i
-                                        class="fa-solid fa-envelope-open-text"></i></span>
-                            </x-button>
-                            <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                                autocomplete="off" />
-                        </div>
-                    @endcan
+
+                    <div class=" my-7 flex justify-between space-x-2">
+                        <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                                    class="fa-solid fa-envelope-open-text"></i></span>
+                        </x-button>
+                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
+                            autocomplete="off" />
+                    </div>
+
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
                             <table class="w-full whitespace-no-wrap">
                                 <thead>
                                     <tr
-                                        class="text-xs font-bold tracking-wide text-left text-white uppercase border-b dark:border-gray-700 bg-gray-900 dark:text-gray-400 dark:bg-gray-800">
+                                        class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Name</th>
                                         <th class="px-4 py-3">Email</th>
@@ -76,14 +76,14 @@
                                             </td>
 
                                             <td class="px-4 py-3 text-sm">
-                                                @can('manage admin')
-                                                    <button wire:click="edit({{ $item->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="delete({{ $item->id }})"
-                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-trash"></i></button>
-                                                @endcan
+
+                                                <button wire:click="edit({{ $item->id }})"
+                                                    class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
+                                                        class="fa-solid fa-pen-to-square"></i></button>
+                                                <button wire:click="delete({{ $item->id }})"
+                                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                        class="fa-solid fa-trash"></i></button>
+
                                             </td>
                                         </tr>
 

@@ -33,10 +33,14 @@
 
                                     <th class="px-4 py-3">Description</th>
 
-                                    <th class="px-4 py-3">Amount</th>
+                                    <th class="px-4 py-3">Amount ARS</th>
+                                    <th class="px-4 py-3">Currency Amount</th>
+                                    <th class="px-4 py-3">Total Exchange</th>
                                     <th class="px-4 py-3">Status</th>
                                     <th class="px-4 py-3">Date</th>
-                                    <th class="px-4 py-3">Action</th>
+                                    @can('manage admin')
+                                        <th class="px-4 py-3">Action</th>
+                                    @endcan
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -87,7 +91,16 @@
                                             $
                                             {{ $formatted_amount = number_format($item->operation_amount, 2, '.', ',') }}
                                         </td>
+                                        <td class="px-4 py-3 text-xs">
 
+                                            $
+                                            {{ $formatted_amount = number_format($item->operation_currency, 2, '.', ',') }}
+                                        </td>
+                                        <td class="px-4 py-3 text-xs">
+
+                                            $
+                                            {{ $formatted_amount = number_format($item->operation_currency_total, 2, '.', ',') }}
+                                        </td>
                                         <td class="px-4 py-3 text-xs">
 
                                             @if ($item->operation_status === '1')
@@ -118,21 +131,23 @@
                                         <td class="px-4 py-3 text-xs">
                                             {{ $item->operation_date }}
                                         </td>
-                                        <td class="px-4 py-3 text-sm">
-                                            @can('manage admin')
+                                        @can('manage admin')
+                                            <td class="px-4 py-3 text-sm">
+
                                                 <button wire:click="edit({{ $item->id }})"
                                                     class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-pen-to-square"></i></button>
                                                 <button wire:click="delete({{ $item->id }})"
                                                     class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-trash"></i></button>
-                                            @endcan
-                                        </td>
+
+                                            </td>
+                                        @endcan
                                     </tr>
 
                                 @empty
                                     <tr class="text-center">
-                                        <td colspan="7">
+                                        <td colspan="8">
                                             <div class="grid justify-items-center w-full mt-5">
                                                 <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                     role="alert">

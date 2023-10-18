@@ -40,7 +40,7 @@
 
                     <!-- Chart JS -->
                     <div class="my-7 mx-auto flex justify-content-center space-x-2">
-                        <select wire:model="selectedYear"
+                        <select wire:model="selectedYear" wire:change="updateChartData"
                             class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                             <option value="">Select Year
 
@@ -51,9 +51,6 @@
                         </select>
 
                     </div>
-
-
-
 
                     <div id="chart-container" class="">
                         @if ($showChart)
@@ -228,19 +225,7 @@
                         @endif
                     </div>
 
-                    @push('scripts')
-                        <script>
-                            document.addEventListener('livewire:load', function() {
-                                const chartContainer = document.getElementById('chart-container');
 
-                                window.livewire.on('updateChartData', data => {
-                                    // Actualiza tu gráfica con los nuevos datos en `data`
-                                    // Puedes usar Chart.js, Highcharts, Google Charts o cualquier otra biblioteca de gráficos que prefieras
-                                    // Asegúrate de tener el código JavaScript necesario para mostrar la gráfica aquí
-                                });
-                            });
-                        </script>
-                    @endpush
 
 
                 </div>

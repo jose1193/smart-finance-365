@@ -62,7 +62,7 @@ public function store()
     if ($existingEmail) {
         
         
-        session()->flash('error', 'El correo electrónico ya existe en la base de datos.');
+        session()->flash('error', 'The email already exists in the database.');
     } else {
         // El correo electrónico no existe, puedes proceder a crear el registro
         $validatedData['user_id'] = auth()->user()->id;

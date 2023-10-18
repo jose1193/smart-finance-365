@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// LARAVEL SOCIALITE
+
 use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Facades\Socialite;// LARAVEL SOCIALITE
 use App\Http\Livewire\PrimaryCategories;
 use App\Http\Livewire\Teachers;
 use App\Http\Livewire\Categories;
@@ -22,6 +24,7 @@ use App\Http\Livewire\Operations;
 use App\Http\Livewire\IncomesOperations;
 use App\Http\Livewire\CurrencyCalculator;
 use App\Http\Livewire\ReportGeneralCharts;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,23 +51,56 @@ Route::get('/google-auth/redirect', function () {
 
 Route::get('/google-auth/callback', function () {
     $googleUser = Socialite::driver('google')->user();
- 
+    // Generar un número aleatorio de 3 dígitos
+    $randomNumber = rand(100, 999);
+    // Elimina los espacios en blanco del nombre
+    $nameWithoutSpaces = str_replace(' ', '', $googleUser->name);
     $user = User::updateOrCreate([
         'google_id' => $googleUser->id,
     ], [
         'name' => $googleUser->name,
+        'username' => $nameWithoutSpaces . $randomNumber,
         'email' => $googleUser->email,
         'email_verified_at' => now(),
        
+       
     ]);
  
+   
+
  // Accede al token del usuario autenticado
     $token = $googleUser->token;
 
 
+   
+
     Auth::login($user);
  
+     //SEND EMAIL FORM CONTACT
+    if (isset($user) && $user->wasRecentlyCreated) {
+    // Verificar si el usuario ya tiene el rol por defecto asignado
+    $defaultRole = Role::find(2); // Reemplaza 2 con el ID del rol por defecto
+
+    if (!$user->hasRole($defaultRole)) {
+        // El usuario no tiene el rol por defecto, asígnalo
+        $user->assignRole($defaultRole);
+    }
+
+    \Mail::send('emails.NewMailUserGoogle', array(
+        'name' => $user->name,
+        'email' => $user->email,
+    ), function($message) use ($user) {
+        $message->from('smartfinance793@gmail.com', 'Smart Finance');
+        $message->to($user->email)->subject('Welcome to Smart Finance');
+    });
+}
+
+ //END SEND EMAIL FORM CONTACT
+ 
     return redirect('/dashboard');
+  
+
+
 });
 
 

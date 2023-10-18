@@ -37,15 +37,15 @@
                         </div>
 
                     </div>
-                    @can('manage admin')
-                        <div class=" my-7 flex justify-between space-x-2">
-                            <x-button wire:click="create()"><span class="font-semibold"> Create New <i
-                                        class="fa-solid fa-money-bill-wave"></i></span>
-                            </x-button>
-                            <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                                autocomplete="off" />
-                        </div>
-                    @endcan
+
+                    <div class=" my-7 flex justify-between space-x-2">
+                        <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                                    class="fa-solid fa-money-bill-wave"></i></span>
+                        </x-button>
+                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
+                            autocomplete="off" />
+                    </div>
+
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
