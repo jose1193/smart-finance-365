@@ -33,7 +33,7 @@
             document.head.appendChild(script);
         });
     </script>
-
+    <script src="./assets/js/operation-amount-input.js"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

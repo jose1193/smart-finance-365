@@ -52,7 +52,7 @@
                             <table class="w-full whitespace-no-wrap">
                                 <thead>
                                     <tr
-                                        class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
+                                        class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Description</th>
@@ -66,7 +66,7 @@
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-xs  uppercase dark:text-gray-400">
+                                        <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
@@ -83,17 +83,17 @@
                                             <td class="px-4 py-3 text-xs">
 
                                                 $
-                                                {{ $formatted_amount = number_format($item->operation_amount, 2, '.', ',') }}
+                                                {{ $formatted_amount = number_format($item->operation_amount, 0, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
                                                 $
-                                                {{ $formatted_amount = number_format($item->operation_currency, 2, '.', ',') }}
+                                                {{ $formatted_amount = number_format($item->operation_currency, 0, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
                                                 $
-                                                {{ $formatted_amount = number_format($item->operation_currency_total, 2, '.', ',') }}
+                                                {{ $formatted_amount = number_format($item->operation_currency_total, 0, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
@@ -209,25 +209,7 @@
                                                             id="operation_amount" wire:model="operation_amount"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             placeholder="Enter Expense Amount">
-                                                        <script>
-                                                            const operationAmountField = document.getElementById('operation_amount');
 
-                                                            operationAmountField.addEventListener('input', function(e) {
-                                                                // Remueve todos los caracteres no numéricos
-                                                                let numericValue = e.target.value.replace(/[^\d.]/g, '');
-
-                                                                // Divide en parte entera y decimal
-                                                                let parts = numericValue.split('.');
-
-                                                                // Formatea la parte entera con comas como separadores de miles
-                                                                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-                                                                // Vuelve a unir parte entera y decimal con punto como separador decimal
-                                                                numericValue = parts.join('.');
-
-                                                                e.target.value = numericValue;
-                                                            });
-                                                        </script>
                                                         @error('operation_amount')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror

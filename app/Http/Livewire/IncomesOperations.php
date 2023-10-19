@@ -84,6 +84,7 @@ public function mount()
     public function openModal()
     {
         $this->isOpen = true;
+        $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
     }
 
     public function closeModal()
@@ -167,7 +168,7 @@ public function edit($id)
         $list = Operation::findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
-        $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
+        $this->operation_amount = number_format($list->operation_amount, 0, '.', ',');
         $this->operation_currency = $list->operation_currency;
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
           $this->operation_status = $list->operation_status;
