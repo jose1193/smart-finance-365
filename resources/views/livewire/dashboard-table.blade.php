@@ -19,7 +19,7 @@
                 @can('manage admin')
                     <div class="my-7 flex justify-end space-x-2">
                         <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" class="sm:w-full lg:w-60" />
+                            autocomplete="off" class="w-full sm:w-full lg:w-60" />
                     </div>
                 @endcan
                 <!-- Tables -->
@@ -74,9 +74,14 @@
                                                     @endif
                                                 </div>
                                                 <div>
-                                                    <p class="font-semibold"> {{ $item->name }}</p>
+                                                    <p class="font-semibold "> {{ $item->name }}</p>
                                                     <p class="text-xs text-gray-600 dark:text-gray-400">
                                                         {{ Str::words($item->category_name, 2, '...') }}
+                                                    </p>
+                                                    <p class="text-xs font-semibold text-gray-600 dark:text-gray-400">
+
+                                                        {{ $item->title }}
+
                                                     </p>
                                                 </div>
                                             </div>
@@ -137,7 +142,7 @@
                                                 <button wire:click="edit({{ $item->id }})"
                                                     class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-pen-to-square"></i></button>
-                                                <button wire:click="delete({{ $item->id }})"
+                                                <button wire:click="$emit('deleteData',{{ $item->id }})"
                                                     class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-trash"></i></button>
 
@@ -199,8 +204,8 @@
                                                     <label for="operation_description"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
                                                         Description</label>
-                                                    <input type="text" autocomplete="off" id="operation_description"
-                                                        name="operation_description"
+                                                    <input type="text" autocomplete="off"
+                                                        id="operation_description" name="operation_description"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                         maxlength="50" placeholder="Enter Income Description"
                                                         wire:model="operation_description">
@@ -413,30 +418,29 @@
 
 
 
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-    Livewire.on('deleteData', catId => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Livewire.emitTo('expenses-operations', 'delete', catId)
-                Swal.fire(
-                    'Deleted!',
-                    'Your Data has been deleted.',
-                    'success'
-                )
-            }
-        })
-    })
+    document.addEventListener('DOMContentLoaded', function() {
+        Livewire.on('deleteData', function(id) {
+            console.log('Evento "deleteData" emitido con ID: ' + id);
+            Swal.fire({
+                title: 'Are you sure you want to delete this item?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('dashboard-table', 'delete',
+                        id); // Envía el Id al método delete
+                    Swal.fire(
+                        'Deleted!',
+                        'Your Data has been deleted.',
+                        'success'
+                    );
+                }
+            });
+        });
+    });
 </script>

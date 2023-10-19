@@ -55,7 +55,7 @@ public function mount()
             ->orWhere('categories.category_name', 'like', '%' . $this->search . '%')
             ->orWhere('users.name', 'like', '%' . $this->search . '%');
     })
-    ->select('operations.*', 'categories.category_name', 'statu_options.status_description', 'users.name')
+    ->select('operations.*', 'main_categories.title','categories.category_name', 'statu_options.status_description', 'users.name')
     ->orderBy('operations.id', 'desc')
     ->paginate(10);
 

@@ -85,9 +85,10 @@
                                                     <button wire:click="edit({{ $item->id }})"
                                                         class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                             class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="delete({{ $item->id }})"
+                                                    <button wire:click="$emit('deleteData',{{ $item->id }})"
                                                         class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                             class="fa-solid fa-trash"></i></button>
+
 
                                                 </td>
                                             @endcan
@@ -227,29 +228,28 @@
 </div>
 
 
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-    Livewire.on('deleteData', catId => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Livewire.emitTo('expense-categories', 'delete', catId)
-                Swal.fire(
-                    'Deleted!',
-                    'Your Data has been deleted.',
-                    'success'
-                )
-            }
-        })
-    })
+    document.addEventListener('DOMContentLoaded', function() {
+        Livewire.on('deleteData', function(id) {
+            Swal.fire({
+                title: 'Are you sure you want to delete this item?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('expenses-categories', 'delete',
+                        id); // Envía el Id al método delete
+                    Swal.fire(
+                        'Deleted!',
+                        'Your Data has been deleted.',
+                        'success'
+                    );
+                }
+            });
+        });
+    });
 </script>
