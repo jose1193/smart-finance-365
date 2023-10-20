@@ -87,6 +87,7 @@
                                          <input id="amount2" autocomplete="off"
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                              placeholder="Amount (ARS)" name="amount2" maxlength="30" required />
+
                                          <input
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                              name="dollarchange2" value="${{ $data['blue']['value_sell'] }}" required
@@ -98,18 +99,34 @@
                                      </div>
 
                                      <script>
-                                         // Obtenemos los elementos de los campos de entrada
-                                         const amountField = document.getElementById('amount2');
-                                         const totalBudgetField = document.getElementById('totalbudget2');
-                                         const dollarChangeValue = parseFloat(
-                                             {{ $data['blue']['value_sell'] }}); // Obtén el valor del dólar de la base de datos
+                                         const operationAmountField = document.getElementById("amount2");
+                                         const totalBudgetField = document.getElementById("totalbudget2");
+                                         const dollarChangeValue = parseFloat({{ $data['blue']['value_sell'] }});
 
-                                         // Añadimos un event listener para detectar cambios en el campo "amount2"
-                                         amountField.addEventListener('input', function() {
-                                             const amountValue = parseFloat(amountField.value);
+                                         operationAmountField.addEventListener("input", function(e) {
+                                             // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                             let numericValue = e.target.value.replace(/[^\d]/g, "");
+
+                                             // Divide en parte entera y decimal
+                                             let parts = numericValue.split(".");
+
+                                             // Formatea la parte entera con comas como separadores de miles
+                                             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                             // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                             numericValue = parts.join(".");
+
+                                             e.target.value = numericValue;
+
+                                             // Convierte el valor formateado a un número
+                                             const amountValue = parseFloat(numericValue.replace(/,/g, ""));
+
                                              if (!isNaN(amountValue)) {
                                                  const calculatedValue = (amountValue / dollarChangeValue).toFixed(2);
-                                                 totalBudgetField.value = '$' + calculatedValue;
+                                                 const roundedValue = Math.round(calculatedValue); // Redondea el valor al entero más cercano
+                                                 totalBudgetField.value = "$" + roundedValue;
+                                             } else {
+                                                 totalBudgetField.value = ""; // Limpiar el campo si la entrada no es válida
                                              }
                                          });
                                      </script>
@@ -137,21 +154,39 @@
                                      </div>
 
                                      <script>
-                                         // Obtenemos los elementos de los campos de entrada
-                                         const amountField3 = document.getElementById('amount3');
-                                         const totalBudgetField3 = document.getElementById('totalbudget3');
-                                         const dollarChangeValue3 = parseFloat(
-                                             {{ $data['oficial']['value_sell'] }}); // Obtén el valor del dólar oficial de la base de datos
+                                         const operationAmountField2 = document.getElementById("amount3");
+                                         const totalBudgetField2 = document.getElementById("totalbudget3");
+                                         const dollarChangeValue2 = parseFloat({{ $data['oficial']['value_sell'] }});
 
-                                         // Añadimos un event listener para detectar cambios en el campo "amount3"
-                                         amountField3.addEventListener('input', function() {
-                                             const amountValue3 = parseFloat(amountField3.value);
-                                             if (!isNaN(amountValue3)) {
-                                                 const calculatedValue = (amountValue3 / dollarChangeValue3).toFixed(2);
-                                                 totalBudgetField3.value = '$' + calculatedValue;
+                                         operationAmountField2.addEventListener("input", function(e) {
+                                             // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                             let numericValue = e.target.value.replace(/[^\d]/g, "");
+
+                                             // Divide en parte entera y decimal
+                                             let parts = numericValue.split(".");
+
+                                             // Formatea la parte entera con comas como separadores de miles
+                                             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                             // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                             numericValue = parts.join(".");
+
+                                             e.target.value = numericValue;
+
+                                             // Convierte el valor formateado a un número
+                                             const amountValue = parseFloat(numericValue.replace(/,/g, ""));
+
+                                             if (!isNaN(amountValue)) {
+                                                 const calculatedValue = (amountValue / dollarChangeValue2).toFixed(2);
+                                                 const roundedValue = Math.round(calculatedValue); // Redondea el valor al entero más cercano
+                                                 totalBudgetField2.value = "$" + roundedValue;
+                                             } else {
+                                                 totalBudgetField2.value = ""; // Limpiar el campo si la entrada no es válida
                                              }
                                          });
                                      </script>
+
+
                                      <!-- end official dollar Calculator -->
 
 
@@ -174,20 +209,43 @@
                                              required />
                                      </div>
 
+
                                      <script>
-                                         // Obtenemos los elementos de los campos de entrada
-                                         const amountField4 = document.getElementById('amount4');
-                                         const totalBudgetField4 = document.getElementById('totalbudget4');
-                                         const euroOficialChangeValue = parseFloat(
-                                             {{ $data['oficial_euro']['value_sell'] }});
-                                         amountField4.addEventListener('input', function() {
-                                             const amountValue4 = parseFloat(amountField4.value);
+                                         const operationAmountField4 = document.getElementById("amount4");
+                                         const totalBudgetField4 = document.getElementById("totalbudget4");
+                                         const dollarChangeValue4 = parseFloat({{ $data['oficial_euro']['value_sell'] }});
+
+                                         operationAmountField4.addEventListener("input", function(e) {
+                                             // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                             let numericValue = e.target.value.replace(/[^\d]/g, "");
+
+                                             // Divide en parte entera y decimal
+                                             let parts = numericValue.split(".");
+
+                                             // Formatea la parte entera con comas como separadores de miles
+                                             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                             // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                             numericValue = parts.join(".");
+
+                                             e.target.value = numericValue;
+
+                                             // Convierte el valor formateado a un número
+                                             const amountValue4 = parseFloat(numericValue.replace(/,/g, ""));
+
                                              if (!isNaN(amountValue4)) {
-                                                 const calculatedValue = (amountValue4 / euroOficialChangeValue).toFixed(2);
-                                                 totalBudgetField4.value = '€' + calculatedValue;
+                                                 const calculatedValue4 = (amountValue4 / dollarChangeValue4).toFixed(2);
+                                                 const roundedValue4 = Math.round(calculatedValue4); // Redondea el valor al entero más cercano
+                                                 totalBudgetField4.value = "€" + roundedValue4;
+
+                                             } else {
+                                                 totalBudgetField4.value = ""; // Limpiar el campo si la entrada no es válida
                                              }
                                          });
                                      </script>
+
+
+
                                      <!-- end euro oficial Calculator -->
 
                                  </div>
@@ -209,19 +267,40 @@
                                      </div>
 
                                      <script>
-                                         // Obtenemos los elementos de los campos de entrada
-                                         const amountField5 = document.getElementById('amount5');
-                                         const totalBudgetField5 = document.getElementById('totalbudget5');
-                                         const euroBlueChangeValue = parseFloat({{ $data['blue_euro']['value_sell'] }});
+                                         const operationAmountField5 = document.getElementById("amount5");
+                                         const totalBudgetField5 = document.getElementById("totalbudget5");
+                                         const dollarChangeValue5 = parseFloat({{ $data['blue_euro']['value_sell'] }});
 
-                                         amountField5.addEventListener('input', function() {
-                                             const amountValue5 = parseFloat(amountField5.value); // Cambiado a 'amountValue5'
+                                         operationAmountField5.addEventListener("input", function(e) {
+                                             // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                             let numericValue = e.target.value.replace(/[^\d]/g, "");
+
+                                             // Divide en parte entera y decimal
+                                             let parts = numericValue.split(".");
+
+                                             // Formatea la parte entera con comas como separadores de miles
+                                             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                             // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                             numericValue = parts.join(".");
+
+                                             e.target.value = numericValue;
+
+                                             // Convierte el valor formateado a un número
+                                             const amountValue5 = parseFloat(numericValue.replace(/,/g, ""));
+
                                              if (!isNaN(amountValue5)) {
-                                                 const calculatedValue = (amountValue5 / euroBlueChangeValue).toFixed(2);
-                                                 totalBudgetField5.value = '€' + calculatedValue;
+                                                 const calculatedValue5 = (amountValue5 / dollarChangeValue5).toFixed(2);
+                                                 const roundedValue5 = Math.round(calculatedValue5); // Redondea el valor al entero más cercano
+                                                 totalBudgetField5.value = "€" + roundedValue5;
+
+                                             } else {
+                                                 totalBudgetField5.value = ""; // Limpiar el campo si la entrada no es válida
                                              }
                                          });
                                      </script>
+
+
 
                                      <!-- end euro blue Calculator -->
                                  </div>
@@ -287,15 +366,34 @@
                                      const dollarChangeValue10 = parseFloat(
                                          {{ $data['blue']['value_sell'] }}); // Obtén el valor del dólar de la base de datos
 
-                                     // Añadimos un event listener para detectar cambios en el campo "amount11"
                                      amountField10.addEventListener('input', function() {
-                                         const amountValue10 = parseFloat(amountField10.value);
+                                         // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                         let numericValue = amountField10.value.replace(/[^\d.]/g, "");
+
+                                         // Divide en parte entera y decimal
+                                         let parts = numericValue.split(".");
+
+                                         // Formatea la parte entera con comas como separadores de miles
+                                         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                         // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                         numericValue = parts.join(".");
+
+                                         amountField10.value = numericValue;
+
+                                         // Convierte el valor formateado a un número
+                                         const amountValue10 = parseFloat(numericValue.replace(/,/g, ""));
+
                                          if (!isNaN(amountValue10)) {
                                              const calculatedValue = (amountValue10 * dollarChangeValue10).toLocaleString('en-US', {
-                                                 style: 'currency',
-                                                 currency: 'USD'
+                                                 style: 'decimal',
+                                                 minimumFractionDigits: 0,
+                                                 maximumFractionDigits: 0
                                              });
-                                             totalBudgetField10.value = calculatedValue;
+
+                                             totalBudgetField10.value = "ARS " + calculatedValue;
+                                         } else {
+                                             totalBudgetField10.value = ""; // Limpiar el campo si la entrada no es válida
                                          }
                                      });
                                  </script>
@@ -325,15 +423,34 @@
                                      const dollarChangeValue11 = parseFloat(
                                          {{ $data['oficial']['value_sell'] }}); // Obtén el valor del dólar de la base de datos
 
-                                     // Añadimos un event listener para detectar cambios en el campo "amount11"
                                      amountField11.addEventListener('input', function() {
-                                         const amountValue11 = parseFloat(amountField11.value);
+                                         // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                         let numericValue = amountField11.value.replace(/[^\d.]/g, "");
+
+                                         // Divide en parte entera y decimal
+                                         let parts = numericValue.split(".");
+
+                                         // Formatea la parte entera con comas como separadores de miles
+                                         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                         // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                         numericValue = parts.join(".");
+
+                                         amountField11.value = numericValue;
+
+                                         // Convierte el valor formateado a un número
+                                         const amountValue11 = parseFloat(numericValue.replace(/,/g, ""));
+
                                          if (!isNaN(amountValue11)) {
-                                             const calculatedValue = (amountValue11 * dollarChangeValue11).toLocaleString('en-US', {
-                                                 style: 'currency',
-                                                 currency: 'USD'
+                                             const calculatedValue11 = (amountValue11 * dollarChangeValue11).toLocaleString('en-US', {
+                                                 style: 'decimal',
+                                                 minimumFractionDigits: 0,
+                                                 maximumFractionDigits: 0
                                              });
-                                             totalBudgetField11.value = calculatedValue;
+
+                                             totalBudgetField11.value = "ARS " + calculatedValue11;
+                                         } else {
+                                             totalBudgetField11.value = ""; // Limpiar el campo si la entrada no es válida
                                          }
                                      });
                                  </script>
@@ -361,21 +478,41 @@
                                      // Obtenemos los elementos de los campos de entrada
                                      const amountField12 = document.getElementById('amount12');
                                      const totalBudgetField12 = document.getElementById('totalbudget12');
-                                     const dollarChangeValue12 = parseFloat(
-                                         {{ $data['oficial_euro']['value_sell'] }}); // Obtén el valor del euro de la base de datos
+                                     const euroChangeValue12 = parseFloat(
+                                         "{{ $data['oficial_euro']['value_sell'] }}"); // Obtén el valor del euro de la base de datos
 
-                                     // Añadimos un event listener para detectar cambios en el campo "amount12"
                                      amountField12.addEventListener('input', function() {
-                                         const amountValue12 = parseFloat(amountField12.value);
+                                         // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                         let numericValue = amountField12.value.replace(/[^\d.]/g, "");
+
+                                         // Divide en parte entera y decimal
+                                         let parts = numericValue.split(".");
+
+                                         // Formatea la parte entera con comas como separadores de miles
+                                         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                         // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                         numericValue = parts.join(".");
+
+                                         amountField12.value = numericValue;
+
+                                         // Convierte el valor formateado a un número
+                                         const amountValue12 = parseFloat(numericValue.replace(/,/g, ""));
+
                                          if (!isNaN(amountValue12)) {
-                                             const calculatedValue = (amountValue12 * dollarChangeValue12).toLocaleString('en-US', {
-                                                 style: 'currency',
-                                                 currency: 'USD'
+                                             const calculatedValue12 = (amountValue12 * euroChangeValue12).toLocaleString('en-US', {
+                                                 style: 'decimal',
+                                                 minimumFractionDigits: 0,
+                                                 maximumFractionDigits: 0
                                              });
-                                             totalBudgetField12.value = calculatedValue;
+
+                                             totalBudgetField12.value = "ARS " + calculatedValue12;
+                                         } else {
+                                             totalBudgetField12.value = ""; // Limpiar el campo si la entrada no es válida
                                          }
                                      });
                                  </script>
+
 
 
 
@@ -401,21 +538,41 @@
                                      // Obtenemos los elementos de los campos de entrada
                                      const amountField13 = document.getElementById('amount13');
                                      const totalBudgetField13 = document.getElementById('totalbudget13');
-                                     const dollarChangeValue13 = parseFloat(
-                                         {{ $data['blue_euro']['value_sell'] }}); // Obtén el valor del euro de la base de datos
+                                     const euroChangeValue13 = parseFloat(
+                                         "{{ $data['blue_euro']['value_sell'] }}"); // Obtén el valor del euro de la base de datos
 
-                                     // Añadimos un event listener para detectar cambios en el campo "amount13"
                                      amountField13.addEventListener('input', function() {
-                                         const amountValue13 = parseFloat(amountField13.value);
+                                         // Remueve todos los caracteres no numéricos, incluyendo puntos
+                                         let numericValue = amountField13.value.replace(/[^\d.]/g, "");
+
+                                         // Divide en parte entera y decimal
+                                         let parts = numericValue.split(".");
+
+                                         // Formatea la parte entera con comas como separadores de miles
+                                         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                         // Vuelve a unir parte entera y decimal con punto como separador decimal
+                                         numericValue = parts.join(".");
+
+                                         amountField13.value = numericValue;
+
+                                         // Convierte el valor formateado a un número
+                                         const amountValue13 = parseFloat(numericValue.replace(/,/g, ""));
+
                                          if (!isNaN(amountValue13)) {
-                                             const calculatedValue = (amountValue13 * dollarChangeValue13).toLocaleString('en-US', {
-                                                 style: 'currency',
-                                                 currency: 'USD'
+                                             const calculatedValue13 = (amountValue13 * euroChangeValue13).toLocaleString('en-US', {
+                                                 style: 'decimal',
+                                                 minimumFractionDigits: 0,
+                                                 maximumFractionDigits: 0
                                              });
-                                             totalBudgetField13.value = calculatedValue;
+
+                                             totalBudgetField13.value = "ARS " + calculatedValue13;
+                                         } else {
+                                             totalBudgetField13.value = ""; // Limpiar el campo si la entrada no es válida
                                          }
                                      });
                                  </script>
+
 
 
 

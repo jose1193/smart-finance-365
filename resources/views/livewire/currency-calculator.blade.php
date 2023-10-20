@@ -75,10 +75,14 @@
                                             Dolar Blue
                                         </td>
                                         <td class="px-4 py-3 text-xs">
-                                            $ {{ $data['blue']['value_buy'] }}
+                                            $
+                                            {{ $formatted_amount = number_format($data['blue']['value_buy'], 0, '.', ',') }}
+
                                         </td>
                                         <td class="px-4 py-3 text-xs">
-                                            $ {{ $data['blue']['value_sell'] }}
+                                            $
+                                            {{ $formatted_amount = number_format($data['blue']['value_sell'], 0, '.', ',') }}
+
 
                                         </td>
 
@@ -89,10 +93,13 @@
                                             Euro Oficial
                                         </td>
                                         <td class="px-4 py-3 text-xs">
-                                            $ {{ $data['oficial_euro']['value_buy'] }}
+                                            $
+                                            {{ $formatted_amount = number_format($data['oficial_euro']['value_buy'], 0, '.', ',') }}
+
                                         </td>
                                         <td class="px-4 py-3 text-xs">
-                                            $ {{ $data['oficial_euro']['value_sell'] }}
+                                            $
+                                            {{ $formatted_amount = number_format($data['oficial_euro']['value_sell'], 0, '.', ',') }}
 
                                         </td>
 
@@ -103,10 +110,14 @@
                                             Euro Blue
                                         </td>
                                         <td class="px-4 py-3 text-xs">
-                                            $ {{ $data['blue_euro']['value_buy'] }}
+                                            $
+                                            {{ $formatted_amount = number_format($data['blue_euro']['value_buy'], 0, '.', ',') }}
+
+
                                         </td>
                                         <td class="px-4 py-3 text-xs">
-                                            $ {{ $data['blue_euro']['value_sell'] }}
+                                            $
+                                            {{ $formatted_amount = number_format($data['blue_euro']['value_sell'], 0, '.', ',') }}
 
                                         </td>
 
