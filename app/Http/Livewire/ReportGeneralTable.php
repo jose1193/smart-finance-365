@@ -14,15 +14,26 @@ class ReportGeneralTable extends Component
 {
      
     public $years = [];
+    
     public $categoryName,$categoryName2;
     public $selectedYear;
+    public $selectedYear2;
+    public $selectedYear3;
+    
     public $selectedUser;
+    public $selectedUser2;
+    public $selectedUser3;
+    public $selectedUser4;
     public $selectedCategoryId;
+    public $selectedMonth;
     public $showData = false;
     public $showData2 = false;
     public $showData3 = false;
+    public $showData4 = false;
     public $incomeData = [];
     public $expenseData = [];
+    public $incomeData3 = [];
+    public $expenseData3 = [];
     public $ArrayCategories = [];
     public $users;
     public $categoriesRender;
@@ -34,14 +45,40 @@ class ReportGeneralTable extends Component
     public $date_end;
     public $categoryNameSelected;
     public $userNameSelected;
-
+    public $userNameSelected2;
+    public $userNameSelected3;
+    public $userNameSelected4;
     public $totalIncome;
     public $totalExpense;
+
+    public $totalIncome3;
+    public $totalExpense3;
+
     public $totalCategoriesRender;
+    public $operationsFetchMonths;
+    public $totalMonthAmount;
+    public $selectedMonthName;
+    public $totalMonthAmountCurrency;
+
+   public function months()
+{
+    $months = [];
+    for ($i = 1; $i <= 12; $i++) {
+        $monthName = Carbon::now()->month($i)->format('F');
+        $months[] = [
+            'number' => $i,
+            'name' => $monthName,
+        ];
+    }
+    return $months;
+}
+
+
 
     public function mount()
     {
         $this->years = Operation::distinct()->pluck('operation_year');
+        
         $this->users = User::orderBy('id', 'desc')->get();
         $this->categoriesRender = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->orderBy('categories.id', 'asc')
@@ -129,23 +166,23 @@ public function updateBetweenData()
 private function updateBetweenDataInternal()
 {
     
-   $this->incomeData = [];
-    $this->expenseData = [];
+   $this->incomeData3 = [];
+    $this->expenseData3 = [];
 
     for ($i = 1; $i <= 12; $i++) {
         // Consulta de ingresos
-        $incomeData[] = $this->fetchBetweenData(1, $i);
+        $incomeData3[] = $this->fetchBetweenData(1, $i);
 
         // Consulta de gastos
-        $expenseData[] = $this->fetchBetweenData(2, $i);
+        $expenseData3[] = $this->fetchBetweenData(2, $i);
     }
 
-    $this->incomeData = $incomeData;
-    $this->expenseData = $expenseData;
+    $this->incomeData3 = $incomeData3;
+    $this->expenseData3 = $expenseData3;
 
-    $this->totalIncome = array_sum($incomeData);
-    $this->totalExpense = array_sum($expenseData);
-    $this->userNameSelected = User::find($this->selectedUser);
+    $this->totalIncome3 = array_sum($incomeData3);
+    $this->totalExpense3 = array_sum($expenseData3);
+    $this->userNameSelected3 = User::find($this->selectedUser3);
 
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
@@ -158,8 +195,8 @@ private function fetchBetweenData($mainCategoryId, $month)
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->where('main_categories.id', $mainCategoryId);
 
-    if ($this->selectedUser) {
-        $query->where('operations.user_id', $this->selectedUser);
+    if ($this->selectedUser3) {
+        $query->where('operations.user_id', $this->selectedUser3);
     }
 
     if ($this->date_start) {
@@ -178,7 +215,7 @@ private function fetchBetweenData($mainCategoryId, $month)
 
 
 
-  // REPORT GENERAL CATEGORIES DATES
+  // REPORT GENERAL CATEGORIES 
 
 public function updateCategoriesData()
 {
@@ -201,7 +238,7 @@ private function updateCategoriesDataInternal()
         $total = $income + $expense;
 
         
-    $this->userNameSelected = User::find($this->selectedUser);
+    $this->userNameSelected2 = User::find($this->selectedUser2);
     
         $this->ArrayCategories[] = [
             'month' => $i,
@@ -224,16 +261,16 @@ private function fetchCategoriesData($mainCategoryId, $month)
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->where('main_categories.id', $mainCategoryId);
 
-    if ($this->selectedUser) {
-        $query->where('operations.user_id', $this->selectedUser);
+    if ($this->selectedUser2) {
+        $query->where('operations.user_id', $this->selectedUser2);
     }
 
     if ($this->selectedCategoryId) {
         $query->where('operations.category_id', $this->selectedCategoryId);
     }
 
-    if ($this->selectedYear) {
-        $query->whereYear('operations.operation_date', $this->selectedYear);
+    if ($this->selectedYear2) {
+        $query->whereYear('operations.operation_date', $this->selectedYear2);
     }
 
     
@@ -246,6 +283,71 @@ private function fetchCategoriesData($mainCategoryId, $month)
 
 
 
+  // REPORT GENERAL MONTH TABLE
+
+public function updateMonthData()
+{
+    $this->updateMonthDataInternal();
+}
+
+private function updateMonthDataInternal()
+{
+    $this->userNameSelected4 = User::find($this->selectedUser4);
+    $this->operationsFetchMonths = $this->fetchMonthData();
+    $this->totalMonthAmount = $this->fetchTotalMonthAmount(); 
+    $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
+    
+    $this->showData4 = true;
+    if ($this->selectedMonth) {
+    $selectedDate = Carbon::create()->month($this->selectedMonth);
+    $this->selectedMonthName = $selectedDate->format('F');
+}
+
+}
+
+
+private function fetchTotalMonthAmountCurrency()
+{
+    return $this->operationsFetchMonths->sum('operation_currency_total');
+}
+
+private function fetchTotalMonthAmount()
+{
+    return $this->operationsFetchMonths->sum('operation_amount');
+}
+
+
+ private function fetchMonthData()
+    {
+        $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+            ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id'); 
+        if ($this->selectedUser4) {
+            $query->where('operations.user_id', $this->selectedUser4);
+        }
+
+        if ($this->selectedMonth) {
+            $query->whereMonth('operations.operation_date', $this->selectedMonth);
+        }
+
+        if ($this->selectedYear3) {
+            $query->whereYear('operations.operation_date', $this->selectedYear3);
+        }
+
+        return $query->select(
+        'operations.operation_amount',
+        'operations.operation_currency',
+         'operations.operation_currency_total',
+        'categories.category_name as category_title',
+        'statu_options.status_description as status_description',
+         'operations.operation_status as operation_status',
+        'operations.operation_description',
+        'main_categories.title as main_category_title'
+    )->orderBy('operations.id', 'desc')->get();
+
+    }
+
+
 
 // FUNCIONT TO EXPORT EXCEL
  public function exportToExcel()
@@ -255,6 +357,31 @@ private function fetchCategoriesData($mainCategoryId, $month)
     $this->emit('exportTableToExcel');
 }
 
+
+// FUNCIONT TO EXPORT EXCEL 2
+ public function exportToExcel2()
+{
+    // Lógica para exportar la tabla a Excel
+
+    $this->emit('exportTableToExcel2');
+}
+
+// FUNCIONT TO EXPORT EXCEL 3
+ public function exportToExcel3()
+{
+    // Lógica para exportar la tabla a Excel
+
+    $this->emit('exportTableToExcel3');
+}
+
+
+// FUNCIONT TO EXPORT EXCEL 4
+ public function exportToExcel4()
+{
+    // Lógica para exportar la tabla a Excel
+
+    $this->emit('exportTableToExcel4');
+}
 
 //FUNCTION RESET FIELDS REPORT GENERAL
 public function resetFields1()
@@ -267,21 +394,30 @@ public function resetFields1()
 
 public function resetFields2()
 {
-    $this->selectedUser = null;
-    $this->selectedYear = null;
+    $this->selectedUser2 = null;
+    $this->selectedYear2 = null;
     $this->selectedCategoryId = null;
     $this->showData2 = false;
 }
 
 public function resetFields3()
 {
-    $this->selectedUser = null;
-    $this->selectedYear = null;
+    $this->selectedUser3 = null;
+    
     $this->date_start = null;
     $this->date_end = null;
     $this->showData3 = false;
 }
 
+
+public function resetFields4()
+{
+    $this->selectedUser4 = null;
+    $this->selectedYear3 = null;
+    $this->selectedMonth = null;
+    
+    $this->showData4 = false;
+}
 
 
 
