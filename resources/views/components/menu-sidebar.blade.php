@@ -211,17 +211,10 @@
                          x-transition:leave-start="opacity-100 max-h-xl" x-transition:leave-end="opacity-0 max-h-0"
                          class="p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50 dark:text-gray-400 dark:bg-gray-900"
                          aria-label="submenu">
-
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('income-categories') }}">
-                                 Income
-                             </a>
-                         </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expense
+                             <a class="w-full" href="{{ route('general-report') }}">
+                                 General
                              </a>
                          </li>
 
@@ -260,18 +253,7 @@
                                  General
                              </a>
                          </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('income-categories') }}">
-                                 Income
-                             </a>
-                         </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expense
-                             </a>
-                         </li>
+
 
                      </ul>
                  </template>
@@ -529,14 +511,9 @@
                          aria-label="submenu">
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('income-categories') }}">Income</a>
+                             <a class="w-full" href="{{ route('general-report') }}">General</a>
                          </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expense
-                             </a>
-                         </li>
+
 
 
                      </ul>
@@ -572,16 +549,7 @@
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('general-charts') }}">General</a>
                          </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('income-categories') }}">Income</a>
-                         </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expenses-categories') }}">
-                                 Expense
-                             </a>
-                         </li>
+
 
 
                      </ul>

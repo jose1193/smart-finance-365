@@ -24,6 +24,7 @@ use App\Http\Livewire\Operations;
 use App\Http\Livewire\IncomesOperations;
 use App\Http\Livewire\CurrencyCalculator;
 use App\Http\Livewire\ReportGeneralCharts;
+use App\Http\Livewire\ReportGeneralTable;
 use Illuminate\Support\Facades\Mail;
 
 /*
@@ -134,4 +135,5 @@ Route::middleware([
     Route::get('currency', CurrencyCalculator::class)->name('currency');
     Route::get('calculator', [CurrencyCalculator::class, 'Calculator'])->name('calculator');
     Route::get('general-charts', ReportGeneralCharts::class)->name('general-charts');
+    Route::get('general-report', ReportGeneralTable::class)->name('general-report');
 });

@@ -1,16 +1,16 @@
 <?php
-
 namespace App\Http\Livewire;
 use App\Models\Operation;
 use App\Models\MainCategories;
+use App\Models\EmailManagement;
 use App\Models\User;
 use App\Models\Category;
 
 use Livewire\Component;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
-
-class ReportGeneralCharts extends Component
+class ReportGeneralTable extends Component
 {
      
     public $years = [];
@@ -18,72 +18,84 @@ class ReportGeneralCharts extends Component
     public $selectedYear;
     public $selectedUser;
     public $selectedCategoryId;
-    public $showChart = false;
-    public $showChart2 = false;
-    public $showChart3 = false;
+    public $showData = false;
+    public $showData2 = false;
+    public $showData3 = false;
     public $incomeData = [];
     public $expenseData = [];
     public $ArrayCategories = [];
     public $users;
     public $categoriesRender;
     public $isOpen = 0;
-    
+    public $emails_user;
+    public $emails;
+
     public $date_start;
     public $date_end;
-  
-    public $totalGeneral = 0;
     public $categoryNameSelected;
+    public $userNameSelected;
 
-    
+    public $totalIncome;
+    public $totalExpense;
+    public $totalCategoriesRender;
+
     public function mount()
     {
         $this->years = Operation::distinct()->pluck('operation_year');
-         $this->users = User::orderBy('id', 'desc')->get();
-           $this->categoriesRender = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        $this->users = User::orderBy('id', 'desc')->get();
+        $this->categoriesRender = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->orderBy('categories.id', 'asc')
         ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_title')
         ->get();
+    
+        $this->emails = EmailManagement::where('user_id', auth()->id())->get();
+
     }
 
     public function render()
     {
          
-        return view('livewire.report-general-charts');
+        return view('livewire.report-general-table');
     }
 
-   
-public function updateChartData()
+   // REPORT GENERAL TABLE
+public function updateData()
 {
-    $this->updateChartDataInternal();
+    $this->updateDataInternal();
+  
 
     
 }
 
 
-private function updateChartDataInternal()
+private function updateDataInternal()
 {
     $this->incomeData = [];
     $this->expenseData = [];
 
     for ($i = 1; $i <= 12; $i++) {
         // Consulta de ingresos
-        $incomeData[] = $this->fetchChartData(1, $i);
+        $incomeData[] = $this->fetchData(1, $i);
 
         // Consulta de gastos
-        $expenseData[] = $this->fetchChartData(2, $i);
+        $expenseData[] = $this->fetchData(2, $i);
     }
 
     $this->incomeData = $incomeData;
     $this->expenseData = $expenseData;
+    $this->totalIncome = array_sum($incomeData);
+    $this->totalExpense = array_sum($expenseData);
+
+
+    $this->userNameSelected = User::find($this->selectedUser);
+
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
-    $this->showChart = true;
+    $this->showData = true;
    
- 
-     
 }
 
-private function fetchChartData($mainCategoryId, $month)
+private function fetchData($mainCategoryId, $month)
 {
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
@@ -104,7 +116,7 @@ private function fetchChartData($mainCategoryId, $month)
 
 
 
- // REPORT GENERAL BETWEEN DATES
+  // REPORT GENERAL BETWEEN DATES
 public function updateBetweenData()
 {
     $this->updateBetweenDataInternal();
@@ -131,9 +143,13 @@ private function updateBetweenDataInternal()
     $this->incomeData = $incomeData;
     $this->expenseData = $expenseData;
 
+    $this->totalIncome = array_sum($incomeData);
+    $this->totalExpense = array_sum($expenseData);
+    $this->userNameSelected = User::find($this->selectedUser);
+
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
-    $this->showChart3 = true;
+    $this->showData3 = true;
 }
 
 private function fetchBetweenData($mainCategoryId, $month)
@@ -167,14 +183,12 @@ private function fetchBetweenData($mainCategoryId, $month)
 public function updateCategoriesData()
 {
     $this->updateCategoriesDataInternal();
-   
 }
-
 
 private function updateCategoriesDataInternal()
 {
     $this->ArrayCategories = [];
-    $totalGeneral = 0;
+    $this->totalCategoriesRender = 0; 
 
     for ($i = 1; $i <= 12; $i++) {
         // Consulta de ingresos
@@ -185,21 +199,23 @@ private function updateCategoriesDataInternal()
 
         // Calcular la suma general
         $total = $income + $expense;
-        $totalGeneral += $total;
 
+        
+    $this->userNameSelected = User::find($this->selectedUser);
+    
         $this->ArrayCategories[] = [
             'month' => $i,
             'total' => $total,
         ];
-    }
 
-    $this->totalGeneral = $totalGeneral;
+
+        $this->totalCategoriesRender += $total;
+    }
 
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
-    $this->showChart2 = true;
+    $this->showData2 = true;
 }
-
 
 
 private function fetchCategoriesData($mainCategoryId, $month)
@@ -220,12 +236,23 @@ private function fetchCategoriesData($mainCategoryId, $month)
         $query->whereYear('operations.operation_date', $this->selectedYear);
     }
 
-     $this->categoryNameSelected = Category::find($this->selectedCategoryId);
-     
+    
+    $this->categoryNameSelected = Category::find($this->selectedCategoryId);
 
     return $query
         ->whereMonth('operations.operation_date', $month)
         ->sum('operations.operation_amount');
+}
+
+
+
+
+// FUNCIONT TO EXPORT EXCEL
+ public function exportToExcel()
+{
+    // Lógica para exportar la tabla a Excel
+
+    $this->emit('exportTableToExcel');
 }
 
 
@@ -235,19 +262,16 @@ public function resetFields1()
     $this->selectedUser = null;
     $this->selectedYear = null;
    
-    $this->showChart = false;
+    $this->showData = false;
 }
-
 
 public function resetFields2()
 {
     $this->selectedUser = null;
     $this->selectedYear = null;
     $this->selectedCategoryId = null;
-    $this->showChart2 = false;
+    $this->showData2 = false;
 }
-
-
 
 public function resetFields3()
 {
@@ -255,8 +279,63 @@ public function resetFields3()
     $this->selectedYear = null;
     $this->date_start = null;
     $this->date_end = null;
-    $this->showChart3 = false;
+    $this->showData3 = false;
 }
 
 
+
+
+
+// FUNCTION SEND REPORT TO USERS EMAILS
+public function sendEmail()
+    {
+        
+        $this->resetInputFields();
+        $this->openModal();
+    }
+
+    public function openModal()
+    {
+        $this->isOpen = true;
+    }
+
+    public function closeModal()
+    {
+        $this->isOpen = false;
+    }
+
+    private function resetInputFields(){
+         $this->reset();
+    }
+
+    public function emailStore()
+    {
+       $validationRules = [
+        'emails_user' => 'required|string|email|max:50',
+        
+    ];
+
+    $validatedData = $this->validate($validationRules);
+    
+        Todo::updateOrCreate(['id' => $this->todo_id], [
+            'emails_user' => $this->emails_user,
+           
+        ]);
+
+   // Llamar al método emailSent para enviar el correo con el archivo Excel
+        $this->emailSent();
+        session()->flash('message', 
+            $this->todo_id ? 'Todo Updated Successfully.' : 'Todo Created Successfully.');
+
+        
+
+        $this->closeModal();
+        $this->resetInputFields();
+    }
+
+
+   
+
+
 }
+

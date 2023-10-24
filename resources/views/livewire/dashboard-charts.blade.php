@@ -73,11 +73,11 @@
             <!-- Chart legend -->
             <div class="flex items-center">
                 <span class="inline-block w-3 h-3 mr-1 bg-teal-500 rounded-full"></span>
-                <span>{{ $categoryName }}</span>
+                <span class="font-semibold">{{ $totalIncome = array_sum($incomeData) }}</span>
             </div>
             <div class="flex items-center">
                 <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                <span>{{ $categoryName2 }}</span>
+                <span class="font-semibold">{{ $totalExpense = array_sum($expenseData) }}</span>
             </div>
         </div>
 
@@ -96,11 +96,11 @@
             <!-- Chart legend -->
             <div class="flex items-center">
                 <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
-                <span>{{ $categoryName }}</span>
+                <span class="font-semibold">{{ $categoryName }}</span>
             </div>
             <div class="flex items-center">
                 <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                <span>{{ $categoryName2 }}</span>
+                <span class="font-semibold">{{ $categoryName2 }}</span>
             </div>
         </div>
         <script>
