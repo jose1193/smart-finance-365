@@ -61,7 +61,7 @@
                             </li>
                             <li class="mr-2">
                                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                    @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '3' }">
+                                    @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
                                     Months
                                 </button>
                             </li>
@@ -288,19 +288,16 @@
                                         <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
                                             <select wire:model="selectedCategoryId" wire:change="updateCategoriesData"
                                                 class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-
                                                 <option value="">Select Category</option>
-                                                </option>
-                                                @foreach ($categoriesRender->groupBy('main_category_title') as $mainCategoryTitle => $categories)
-                                                    <optgroup label="{{ $mainCategoryTitle }}">
-                                                        @foreach ($categories as $category)
-                                                            <option value="{{ $category->id }}">
-                                                                {{ $category->category_name }}
+                                                @foreach ($categoriesRender as $formattedCategory)
+                                                    <optgroup label="{{ $formattedCategory['mainCategoryTitle'] }}">
+                                                        @foreach ($formattedCategory['categories'] as $category)
+                                                            <option value="{{ $category['id'] }}">
+                                                                {{ $category['category_name'] }}
                                                             </option>
                                                         @endforeach
                                                     </optgroup>
                                                 @endforeach
-
                                             </select>
                                         </div>
 

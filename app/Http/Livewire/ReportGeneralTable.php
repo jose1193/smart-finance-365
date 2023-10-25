@@ -9,6 +9,7 @@ use App\Models\Category;
 use Livewire\Component;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class ReportGeneralTable extends Component
 {
@@ -25,7 +26,7 @@ class ReportGeneralTable extends Component
     public $selectedUser3;
     public $selectedUser4;
     public $selectedCategoryId;
-    public $selectedMonth;
+    public $selectedAnotherMonth;
     public $showData = false;
     public $showData2 = false;
     public $showData3 = false;
@@ -55,10 +56,12 @@ class ReportGeneralTable extends Component
     public $totalExpense3;
 
     public $totalCategoriesRender;
-    public $operationsFetchMonths;
+    public $operationsFetchAnotherMonths;
     public $totalMonthAmount;
     public $selectedMonthName;
     public $totalMonthAmountCurrency;
+    
+    
 
    public function months()
 {
@@ -80,10 +83,8 @@ class ReportGeneralTable extends Component
         $this->years = Operation::distinct()->pluck('operation_year');
         
         $this->users = User::orderBy('id', 'desc')->get();
-        $this->categoriesRender = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->orderBy('categories.id', 'asc')
-        ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_title')
-        ->get();
+       
+        $this->categoriesRender = $this->getCategoryOptions();
     
         $this->emails = EmailManagement::where('user_id', auth()->id())->get();
 
@@ -94,6 +95,27 @@ class ReportGeneralTable extends Component
          
         return view('livewire.report-general-table');
     }
+
+
+    // ALL CATEGORIES
+public function getCategoryOptions()
+{
+    $categories = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        ->orderBy('categories.id', 'asc')
+        ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_title')
+        ->get();
+
+    $formattedCategories = $categories->groupBy('main_category_title')->map(function ($categories, $mainCategoryTitle) {
+        return [
+            'mainCategoryTitle' => $mainCategoryTitle,
+            'categories' => $categories,
+        ];
+    });
+
+    return collect($formattedCategories);
+}
+
+
 
    // REPORT GENERAL TABLE
 public function updateData()
@@ -220,6 +242,7 @@ private function fetchBetweenData($mainCategoryId, $month)
 public function updateCategoriesData()
 {
     $this->updateCategoriesDataInternal();
+    
 }
 
 private function updateCategoriesDataInternal()
@@ -319,6 +342,7 @@ private function fetchTotalMonthAmount()
 
  private function fetchMonthData()
     {
+        
         $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
             ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id'); 
@@ -326,9 +350,7 @@ private function fetchTotalMonthAmount()
             $query->where('operations.user_id', $this->selectedUser4);
         }
 
-        if ($this->selectedMonth) {
-            $query->whereMonth('operations.operation_date', $this->selectedMonth);
-        }
+       
 
         if ($this->selectedYear3) {
             $query->whereYear('operations.operation_date', $this->selectedYear3);
@@ -346,7 +368,6 @@ private function fetchTotalMonthAmount()
     )->orderBy('operations.id', 'desc')->get();
 
     }
-
 
 
 // FUNCIONT TO EXPORT EXCEL
@@ -444,6 +465,8 @@ public function sendEmail()
          $this->reset();
     }
 
+
+    // FUNCTION EXCEL FILE EMAIL TO USER
     public function emailStore()
     {
        $validationRules = [
