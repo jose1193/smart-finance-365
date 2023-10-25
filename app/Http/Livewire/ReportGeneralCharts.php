@@ -16,14 +16,23 @@ class ReportGeneralCharts extends Component
     public $years = [];
     public $categoryName,$categoryName2;
     public $selectedYear;
+    public $selectedYear2;
+    public $selectedYear3;
     public $selectedUser;
+    public $selectedUser2;
+    public $selectedUser3;
+    public $selectedUser4;
     public $selectedCategoryId;
+    public $selectedMonth;
     public $showChart = false;
     public $showChart2 = false;
     public $showChart3 = false;
+    public $showChart4 = false;
     public $incomeData = [];
     public $expenseData = [];
     public $ArrayCategories = [];
+    public $incomeData3 = [];
+    public $expenseData3 = [];
     public $users;
     public $categoriesRender;
     public $isOpen = 0;
@@ -33,8 +42,27 @@ class ReportGeneralCharts extends Component
   
     public $totalGeneral = 0;
     public $categoryNameSelected;
+    public $operationsFetchMonths;
+    public $selectedMonthName;
+    public $totalMonthAmount;
+    public $totalMonthAmountCurrency;
+    public $userNameSelected2;
+    public $userNameSelected4;
 
-    
+public function months()
+{
+    $months = [];
+    for ($i = 1; $i <= 12; $i++) {
+        $monthName = Carbon::now()->month($i)->format('F');
+        $months[] = [
+            'number' => $i,
+            'name' => $monthName,
+        ];
+    }
+    return $months;
+}
+
+
     public function mount()
     {
         $this->years = Operation::distinct()->pluck('operation_year');
@@ -117,19 +145,19 @@ public function updateBetweenData()
 private function updateBetweenDataInternal()
 {
     
-   $this->incomeData = [];
-    $this->expenseData = [];
+   $this->incomeData3 = [];
+    $this->expenseData3 = [];
 
     for ($i = 1; $i <= 12; $i++) {
         // Consulta de ingresos
-        $incomeData[] = $this->fetchBetweenData(1, $i);
+        $incomeData3[] = $this->fetchBetweenData(1, $i);
 
         // Consulta de gastos
-        $expenseData[] = $this->fetchBetweenData(2, $i);
+        $expenseData3[] = $this->fetchBetweenData(2, $i);
     }
 
-    $this->incomeData = $incomeData;
-    $this->expenseData = $expenseData;
+    $this->incomeData3 = $incomeData3;
+    $this->expenseData3 = $expenseData3;
 
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
@@ -142,8 +170,8 @@ private function fetchBetweenData($mainCategoryId, $month)
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->where('main_categories.id', $mainCategoryId);
 
-    if ($this->selectedUser) {
-        $query->where('operations.user_id', $this->selectedUser);
+    if ($this->selectedUser3) {
+        $query->where('operations.user_id', $this->selectedUser3);
     }
 
     if ($this->date_start) {
@@ -194,7 +222,7 @@ private function updateCategoriesDataInternal()
     }
 
     $this->totalGeneral = $totalGeneral;
-
+    $this->userNameSelected2 = User::find($this->selectedUser2);
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
     $this->showChart2 = true;
@@ -208,16 +236,16 @@ private function fetchCategoriesData($mainCategoryId, $month)
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->where('main_categories.id', $mainCategoryId);
 
-    if ($this->selectedUser) {
-        $query->where('operations.user_id', $this->selectedUser);
+    if ($this->selectedUser2) {
+        $query->where('operations.user_id', $this->selectedUser2);
     }
 
     if ($this->selectedCategoryId) {
         $query->where('operations.category_id', $this->selectedCategoryId);
     }
 
-    if ($this->selectedYear) {
-        $query->whereYear('operations.operation_date', $this->selectedYear);
+    if ($this->selectedYear2) {
+        $query->whereYear('operations.operation_date', $this->selectedYear2);
     }
 
      $this->categoryNameSelected = Category::find($this->selectedCategoryId);
@@ -228,6 +256,71 @@ private function fetchCategoriesData($mainCategoryId, $month)
         ->sum('operations.operation_amount');
 }
 
+
+  // REPORT GENERAL MONTH TABLE
+
+public function updateMonthData()
+{
+    $this->updateMonthDataInternal();
+}
+
+private function updateMonthDataInternal()
+{
+    $this->userNameSelected4 = User::find($this->selectedUser4);
+    $this->operationsFetchMonths = $this->fetchMonthData();
+    
+    $this->totalMonthAmount = $this->fetchTotalMonthAmount(); 
+    $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
+    
+    $this->showChart4 = true;
+    if ($this->selectedMonth) {
+    $selectedDate = Carbon::create()->month($this->selectedMonth);
+    $this->selectedMonthName = $selectedDate->format('F');
+}
+
+}
+
+
+private function fetchTotalMonthAmountCurrency()
+{
+    return $this->operationsFetchMonths->sum('operation_currency_total');
+}
+
+private function fetchTotalMonthAmount()
+{
+    return $this->operationsFetchMonths->sum('operation_amount');
+}
+
+
+ private function fetchMonthData()
+    {
+        $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+            ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id'); 
+        if ($this->selectedUser4) {
+            $query->where('operations.user_id', $this->selectedUser4);
+        }
+
+        if ($this->selectedMonth) {
+            $query->whereMonth('operations.operation_date', $this->selectedMonth);
+        }
+
+        if ($this->selectedYear3) {
+            $query->whereYear('operations.operation_date', $this->selectedYear3);
+        }
+
+        return $query->select(
+        'operations.operation_amount',
+        'operations.operation_currency',
+         'operations.operation_currency_total',
+        'categories.category_name as category_title',
+        'statu_options.status_description as status_description',
+         'operations.operation_status as operation_status',
+        'operations.operation_description',
+        'main_categories.title as main_category_title'
+    )->orderBy('operations.id', 'desc')->get();
+
+    }
 
 //FUNCTION RESET FIELDS REPORT GENERAL
 public function resetFields1()

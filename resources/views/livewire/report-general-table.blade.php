@@ -221,9 +221,11 @@
                                                                     {{ \Carbon\Carbon::create()->month($i)->format('F') }}
                                                                 </td>
                                                                 <td class="px-4 py-3 text-center">$
-                                                                    {{ $incomeData[$i - 1] }}</td>
+                                                                    {{ $formatted_amount = number_format($incomeData[$i - 1], 0, '.', ',') }}
+                                                                </td>
                                                                 <td class="px-4 py-3 text-center">$
-                                                                    {{ $expenseData[$i - 1] }}
+                                                                    {{ $formatted_amount = number_format($expenseData[$i - 1], 0, '.', ',') }}
+
                                                                 </td>
 
                                                             </tr>
@@ -242,9 +244,11 @@
                                                                 {{ $selectedYear }}
                                                             </td>
                                                             <td class="px-4 py-3 text-center font-semibold">$
-                                                                {{ $totalIncome }}</td>
+                                                                {{ $formatted_amount = number_format($totalIncome, 0, '.', ',') }}
+                                                            </td>
                                                             <td class="px-4 py-3 text-center font-semibold">$
-                                                                {{ $totalExpense }}
+                                                                {{ $formatted_amount = number_format($totalExpense, 0, '.', ',') }}
+
                                                             </td>
 
                                                         </tr>
@@ -435,7 +439,9 @@
                                                                     {{ \Carbon\Carbon::create()->month($i)->format('F') }}
                                                                 </td>
                                                                 <td class="px-4 py-3 text-center">
-                                                                    ${{ $ArrayCategories[$i - 1]['total'] }}</td>
+
+                                                                    ${{ $formatted_amount = number_format($ArrayCategories[$i - 1]['total'], 0, '.', ',') }}
+                                                                </td>
 
 
 
@@ -455,7 +461,8 @@
                                                                 {{ $selectedYear2 }}
                                                             </td>
                                                             <td class="px-4 py-3 text-center font-semibold">$
-                                                                {{ $totalCategoriesRender }}
+                                                                {{ $formatted_amount = number_format($totalCategoriesRender, 0, '.', ',') }}
+
                                                             </td>
 
 
@@ -625,9 +632,11 @@
                                                                     {{ \Carbon\Carbon::create()->month($i)->format('F') }}
                                                                 </td>
                                                                 <td class="px-4 py-3 text-center">$
-                                                                    {{ $incomeData3[$i - 1] }}</td>
+                                                                    {{ $formatted_amount = number_format($incomeData3[$i - 1], 0, '.', ',') }}
+                                                                </td>
                                                                 <td class="px-4 py-3 text-center">$
-                                                                    {{ $expenseData3[$i - 1] }}
+                                                                    {{ $formatted_amount = number_format($expenseData3[$i - 1], 0, '.', ',') }}
+
                                                                 </td>
 
                                                             </tr>
@@ -653,9 +662,11 @@
 
                                                             </td>
                                                             <td class="px-4 py-3 text-center font-semibold">$
-                                                                {{ $totalIncome3 }}</td>
+                                                                {{ $formatted_amount = number_format($totalIncome3, 0, '.', ',') }}
+                                                            </td>
                                                             <td class="px-4 py-3 text-center font-semibold">$
-                                                                {{ $totalExpense3 }}
+                                                                {{ $formatted_amount = number_format($totalExpense3, 0, '.', ',') }}
+
                                                             </td>
 
                                                         </tr>
@@ -846,11 +857,16 @@
 
                                                                 </td>
                                                                 <td class="px-4 py-3 text-center">
-                                                                    $ {{ $item->operation_amount }}</td>
+                                                                    $
+                                                                    {{ $formatted_amount = number_format($item->operation_amount, 0, '.', ',') }}
+                                                                </td>
                                                                 <td class="px-4 py-3 text-center">
-                                                                    $ {{ $item->operation_currency }}</td>
+                                                                    $
+                                                                    {{ $formatted_amount = number_format($item->operation_currency, 0, '.', ',') }}
+                                                                </td>
                                                                 <td class="px-4 py-3 text-center">
-                                                                    {{ $item->operation_currency_total }} $</td>
+                                                                    {{ $formatted_amount = number_format($item->operation_currency_total, 0, '.', ',') }}
+                                                                    $</td>
                                                                 <td class="px-4 py-3 text-center">
                                                                     @if ($item->operation_status === '1')
                                                                         <span
@@ -899,13 +915,14 @@
                                                             <td class="px-4 py-3 text-center font-semibold">
                                                                 {{ $selectedYear3 }}</td>
                                                             <td class="px-4 py-3 text-center font-semibold">$
-                                                                {{ $totalMonthAmount }}
+                                                                {{ $formatted_amount = number_format($totalMonthAmount, 0, '.', ',') }}
                                                             </td>
                                                             <td class="px-4 py-3 text-center font-semibold">
 
                                                             </td>
                                                             <td class="px-4 py-3 text-center font-semibold">
-                                                                {{ $totalMonthAmountCurrency }} $
+                                                                {{ $formatted_amount = number_format($totalMonthAmountCurrency, 0, '.', ',') }}
+                                                                $
                                                             </td>
                                                             <td class="px-4 py-3 text-center font-semibold">
 
