@@ -60,13 +60,14 @@
 
                             <li class="mr-2">
                                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                    @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '3' }">
+                                    @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
                                     Months
                                 </button>
                             </li>
                         </ul>
 
                         <div class="mt-4">
+
                             <div x-show="activeTab === '1'">
                                 <!-- Chart JS -->
                                 <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
@@ -101,7 +102,8 @@
 
                                 </div>
                                 @if ($showChart)
-                                    <div id="chart-container" class="my-5">
+                                    <div id="chart-container" class="my-5"
+                                        wire:key="chart-{{ $selectedUser }}-{{ $selectedYear }}">
 
                                         <div class="grid gap-6 mb-8 md:grid-cols-2">
                                             <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
@@ -279,17 +281,25 @@
                                             window.myLine = new Chart(lineCtx, lineConfig);
                                         </script>
 
-                                    </div>
-                                    <script>
-                                        document.addEventListener('livewire:load', function() {
-                                            Livewire.on('dataUpdated', function() {
-                                                console.log('dataUpdated'); // Verifica si esta función se ejecuta
-                                                // Resto del código para actualizar las gráficas
+                                        <script>
+                                            document.addEventListener('livewire:load', function() {
+                                                Livewire.on('dataUpdated', function() {
+                                                    // Código para actualizar las gráficas
+                                                    var ctx = document.getElementById('myChartGeneral').getContext('2d');
+
+                                                    // Resto del código para crear o actualizar la gráfica
+                                                    // ...
+
+                                                    // Recuerda que aquí debes actualizar los datos de la gráfica según los nuevos datos obtenidos asincrónicamente.
+                                                });
                                             });
-                                        });
-                                    </script>
+                                        </script>
+
+
+                                    </div>
                                 @endif
                             </div>
+
                             <div x-show="activeTab === '2'">
                                 <!-- REPORT GENERAL CATEGORIES TABLE  -->
                                 <div id="between-dates-chart-table">
@@ -343,7 +353,8 @@
                                     </div>
 
                                     @if ($showChart2)
-                                        <div id="chart-container" class="my-5">
+                                        <div id="chart-container" class="my-5"
+                                            wire:key="chart-{{ $selectedUser2 }}-{{ $selectedCategoryId }}-{{ $selectedYear2 }}">
 
                                             <div class="grid gap-6 mb-8 md:grid-cols-2">
                                                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
@@ -545,6 +556,7 @@
                                 </div>
                                 <!-- END REPORT GENERAL CATEGORIES TABLE  -->
                             </div>
+
                             <div x-show="activeTab === '3'">
                                 <!-- REPORT GENERAL BETWEEN DATE TABLE  -->
                                 <div id="between-dates-chart-table">
@@ -584,7 +596,8 @@
                                     </div>
 
                                     @if ($showChart3)
-                                        <div id="chart-container" class="my-5">
+                                        <div id="chart-container" class="my-5"
+                                            wire:key="chart-{{ $selectedUser3 }}-{{ $date_start }}-{{ $date_end }}">
 
                                             <div class="grid gap-6 mb-8 md:grid-cols-2">
                                                 <div
@@ -942,9 +955,7 @@
                                                         backgroundColor: "#0694a2",
                                                         borderColor: "#0694a2",
                                                         data: [
-                                                            @foreach ($operationsFetchMonths as $item)
-                                                                {{ $item->operation_amount }},
-                                                            @endforeach
+                                                            12, 24, 30
                                                         ],
 
                                                     },

@@ -84,7 +84,8 @@ public function updateChartData()
 {
     $this->updateChartDataInternal();
 
-    
+    // Emite un evento para notificar que los datos se han actualizado
+    $this->emit('dataUpdated');
 }
 
 
