@@ -11,6 +11,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
+use PDF;
+use Illuminate\Support\Facades\Auth;
 
 
 class ReportGeneralMainTable extends Component
@@ -24,24 +26,24 @@ class ReportGeneralMainTable extends Component
     public $showData = false;
     public $incomeData = [];
     public $expenseData = [];
-    
+    public $incomeDataCurrency = [];
+    public $expenseDataCurrency = [];
     
     public $users;
     public $isOpen = 0;
-    public $emails_user;
+    public $emails_user = [];
     public $emails;
 
     
     public $userNameSelected;
    
-   
-    
     public $totalIncome;
     public $totalExpense;
+    public $totalIncomeCurrency;
+    public $totalExpenseCurrency;
+    
 
-
-
-    public function mount()
+    public function dataSelect()
     {
         $this->years = Operation::distinct()->pluck('operation_year');
         
@@ -50,12 +52,12 @@ class ReportGeneralMainTable extends Component
     
         $this->emails = EmailManagement::where('user_id', auth()->id())->get();
 
-      
+       
     }
 
     public function render()
     {
-         
+        $this->dataSelect();
         return view('livewire.report-general-main-table');
     }
 
@@ -72,33 +74,39 @@ public function updateData()
     
 }
 
-
 private function updateDataInternal()
 {
     $this->incomeData = [];
     $this->expenseData = [];
+    $this->incomeDataCurrency = [];
+    $this->expenseDataCurrency = [];
 
     for ($i = 1; $i <= 12; $i++) {
-        // Consulta de ingresos
-        $incomeData[] = $this->fetchData(1, $i);
+        $data = $this->fetchData(1, $i);
 
-        // Consulta de gastos
-        $expenseData[] = $this->fetchData(2, $i);
+        $this->incomeData[] = $data['operation_amount'];
+        $this->incomeDataCurrency[] = $data['operation_currency_total'];
+
+        $data = $this->fetchData(2, $i);
+
+        $this->expenseData[] = $data['operation_amount'];
+        $this->expenseDataCurrency[] = $data['operation_currency_total'];
     }
 
-    $this->incomeData = $incomeData;
-    $this->expenseData = $expenseData;
-    $this->totalIncome = array_sum($incomeData);
-    $this->totalExpense = array_sum($expenseData);
-
+    $this->totalIncome = array_sum($this->incomeData);
+    $this->totalIncomeCurrency = array_sum($this->incomeDataCurrency);
+    $this->totalExpense = array_sum($this->expenseData);
+    $this->totalExpenseCurrency = array_sum($this->expenseDataCurrency);
+    
+    
 
     $this->userNameSelected = User::find($this->selectedUser);
 
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
     $this->showData = true;
-   
 }
+
 
 private function fetchData($mainCategoryId, $month)
 {
@@ -114,12 +122,17 @@ private function fetchData($mainCategoryId, $month)
         $query->whereYear('operations.operation_date', $this->selectedYear);
     }
 
-    return $query
-        ->whereMonth('operations.operation_date', $month)
-        ->sum('operations.operation_amount');
+   $data = [
+        'operation_amount' => $query
+            ->whereMonth('operations.operation_date', $month)
+            ->sum('operations.operation_amount'),
+        'operation_currency_total' => $query
+            ->whereMonth('operations.operation_date', $month)
+            ->sum('operations.operation_currency_total')
+    ];
+
+    return $data;
 }
-
-
 
 
 
@@ -164,38 +177,77 @@ public function sendEmail()
     public function closeModal()
     {
         $this->isOpen = false;
-         $this->updateData();
+        
     }
 
     private function resetInputFields(){
-         $this->reset();
+        $this->emails_user = null;
+    
     }
 
 
     // FUNCTION EXCEL FILE EMAIL TO USER
     public function emailStore()
     {
-       $validationRules = [
-        'emails_user' => 'required|string|email|max:50',
         
-    ];
+        $validationRules = [
+    'emails_user' => 'required|array', 
+    'emails_user.*' => 'email|max:50', 
+];
 
     $validatedData = $this->validate($validationRules);
+
+    $user = User::find($this->selectedUser);
+
+    $data = [];
     
-        Todo::updateOrCreate(['id' => $this->todo_id], [
-            'emails_user' => $this->emails_user,
-           
-        ]);
+if ($user) {
+    $userName = $user->name; // Obtener el nombre del usuario si existe
+} else {
+   $userName = 'User Not Selected'; 
+}
 
-   // Llamar al método emailSent para enviar el correo con el archivo Excel
-        $this->emailSent();
-        session()->flash('message', 
-            $this->todo_id ? 'Todo Updated Successfully.' : 'Todo Created Successfully.');
+    $now = Carbon::now('America/Argentina/Buenos_Aires');
+    $datenow = $now->format('Y-m-d H:i:s');
+   
+    $data['user'] = $userName; 
+    $fileName = 'General-PDF-Report' . '-'.$userName. '-'. $datenow . '.pdf';
+    foreach ($this->emails_user as $email) {
+    $data = [
+        'incomeData' => $this->incomeData,
+        'expenseData' => $this->expenseData,
+        'incomeDataCurrency' => $this->incomeDataCurrency,
+        'expenseDataCurrency' => $this->expenseDataCurrency,
+        'totalIncome' => $this->totalIncome,
+        'totalExpense' => $this->totalExpense,
+        'totalIncomeCurrency' => $this->totalIncomeCurrency,
+        'totalExpenseCurrency' => $this->totalExpenseCurrency,
+        'selectedYear' => $this->selectedYear,
+        'categoryName' => $this->categoryName,
+        'categoryName2' => $this->categoryName2,
+        'user' => $userName,
+        'email' => $email, //emails arrays
+        'title' => "Report General",
+        'date' => $datenow,
+    ];
+   
+    
 
-        
+    $pdf = PDF::loadView('emails.pdf-generalmainreport', $data );
 
+    Mail::send('emails.pdf-generalmainreport', $data, function ($message) use ($data, $pdf, $fileName) {
+    $message->to($data["email"], $data["email"])
+        ->subject($data["title"])
+        ->attachData($pdf->output(), $fileName); 
+    });
+    }
+       
+        session()->flash('message',  'Email Sent Successfully.');
         $this->closeModal();
         $this->resetInputFields();
+        $this->dataSelect();
+        $this->updateData();
+        
     }
 
 

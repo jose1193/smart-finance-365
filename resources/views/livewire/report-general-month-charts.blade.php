@@ -67,7 +67,7 @@
                              <span class="inline-block w-3 h-3 mr-1 bg-green-600 rounded-full"></span>
                              <span class="font-semibold">
                                  $
-                                 {{ $formatted_amount = number_format($totalMonthAmount, 0, '.', ',') }}
+                                 {{ number_format($totalMonthAmount, 0, '.', ',') }}
 
 
                              </span>

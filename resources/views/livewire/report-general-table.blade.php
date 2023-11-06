@@ -12,13 +12,8 @@
             <x-header-dashboard />
             <!-- END HEADER -->
 
-            <!-- PANEL MAIN CATEGORIES -->
-            <!--INCLUDE ALERTS MESSAGES-->
+            <!-- PANEL MAIN  -->
 
-            <x-message-success />
-
-
-            <!-- END INCLUDE ALERTS MESSAGES-->
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
@@ -98,12 +93,10 @@
                     </div>
                     <!-- END PANEL TAB ALPINE JS -->
 
-
-
                 </div>
             </main>
 
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
             <script src="https://cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
 
 

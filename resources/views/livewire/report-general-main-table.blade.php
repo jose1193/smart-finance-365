@@ -1,6 +1,8 @@
  <div x-show="activeTab === '1'">
-
      <div id="report-table">
+         <!--INCLUDE ALERTS MESSAGES-->
+         <x-message-success />
+         <!-- END INCLUDE ALERTS MESSAGES-->
          <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
                  <select wire:model="selectedUser" wire:change="updateData"
@@ -17,7 +19,6 @@
 
                  </select>
              </div>
-
 
 
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -68,7 +69,7 @@
                                              <label for="exampleFormControlInput1"
                                                  class="block text-gray-700 text-sm font-bold mb-2">
                                                  User Email:</label>
-                                             <select wire:model="emails_user"
+                                             <select multiple wire:model="emails_user"
                                                  class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                                                  <option value=""></option>
 
@@ -92,7 +93,8 @@
                                  </div>
                                  <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                      <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                         <button wire:click.prevent="emailStore()" type="button"
+                                         <button wire:click.prevent="emailStore()" wire:loading.attr="disabled"
+                                             wire:target="emailStore" type="button"
                                              class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                              Send
                                          </button>
@@ -115,12 +117,40 @@
                  <div class="w-full overflow-x-auto">
                      <table class="w-full whitespace-no-wrap" id="tableId">
                          <thead>
+
+                             <tr
+                                 class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                                 <th class="px-4 py-3">
+                                     @if ($userNameSelected)
+                                         {{ $userNameSelected->name }}
+                                     @else
+                                         User Not Selected
+                                     @endif
+                                 </th>
+                                 <th class="px-4 py-3">
+                                     @if ($selectedYear)
+                                         {{ $selectedYear }}
+                                     @else
+                                         Year Not Selected
+                                     @endif
+                                 </th>
+                                 <th class="px-4 py-3">
+                                 </th>
+                                 <th class="px-4 py-3">
+                                 </th>
+                                 <th class="px-4 py-3">
+                                 </th>
+                                 <th class="px-4 py-3">
+                                 </th>
+                             </tr>
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
                                  <th class="px-4 py-3">Mes</th>
                                  <th class="px-4 py-3">{{ $categoryName }}</th>
+                                 <th class="px-4 py-3"> USD</th>
                                  <th class="px-4 py-3">{{ $categoryName2 }}</th>
+                                 <th class="px-4 py-3"> USD</th>
 
 
                              </tr>
@@ -130,38 +160,40 @@
 
                              @for ($i = 1; $i <= 12; $i++)
                                  <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
-                                     <td class="px-4 py-3 text-center"> {{ $i }}
-                                     </td>
+                                     <td class="px-4 py-3 text-center"> {{ $i }}</td>
                                      <td class="px-4 py-3 text-center">
-                                         {{ \Carbon\Carbon::create()->month($i)->format('F') }}
-                                     </td>
+                                         {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
                                      <td class="px-4 py-3 text-center">$
-                                         {{ $formatted_amount = number_format($incomeData[$i - 1], 0, '.', ',') }}
-                                     </td>
-                                     <td class="px-4 py-3 text-center">$
-                                         {{ $formatted_amount = number_format($expenseData[$i - 1], 0, '.', ',') }}
-
-                                     </td>
-
+                                         {{ number_format($incomeData[$i - 1], 0, '.', ',') }}</td>
+                                     <td class="px-4 py-3 text-center">
+                                         {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }}$</td>
+                                     <td class="px-4 py-3 text-center">
+                                         {{ number_format($expenseData[$i - 1], 0, '.', ',') }}</td>
+                                     <td class="px-4 py-3 text-center">
+                                         {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }}$</td>
                                  </tr>
                              @endfor
 
                              <!-- Fila adicional para mostrar el nombre del usuario -->
                              <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     @if ($userNameSelected)
-                                         {{ $userNameSelected->name }}
-                                     @else
-                                     @endif
+
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ $selectedYear }}
+                                     Total
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">$
                                      {{ $formatted_amount = number_format($totalIncome, 0, '.', ',') }}
                                  </td>
+                                 <td class="px-4 py-3 text-center font-semibold">
+                                     {{ $formatted_amount = number_format($totalIncomeCurrency, 0, '.', ',') }}$
+                                 </td>
                                  <td class="px-4 py-3 text-center font-semibold">$
                                      {{ $formatted_amount = number_format($totalExpense, 0, '.', ',') }}
+
+                                 </td>
+                                 <td class="px-4 py-3 text-center font-semibold">
+                                     {{ $formatted_amount = number_format($totalExpenseCurrency, 0, '.', ',') }}$
 
                                  </td>
 

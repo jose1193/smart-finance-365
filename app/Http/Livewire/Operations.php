@@ -61,7 +61,9 @@ public function mount()
                                   ->orderBy('id', 'asc')
                                   ->get();
 
-    $this->statusOptionsRender = StatuOptions::orderBy('id', 'asc')->get();
+    $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
+                                  ->orderBy('id', 'asc')
+                                  ->get();
        
         return view('livewire.expenses-operations', [
             'data' => $data]);

@@ -46,18 +46,27 @@ public function mount()
 
     public function render()
     {
-       $data = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+        
+      $dataQuery = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
     ->join('users', 'operations.user_id', '=', 'users.id')
     ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id') 
+    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
     ->where(function ($query) {
         $query->where('operations.operation_description', 'like', '%' . $this->search . '%')
             ->orWhere('categories.category_name', 'like', '%' . $this->search . '%')
             ->orWhere('users.name', 'like', '%' . $this->search . '%');
     })
     ->select('operations.*', 'main_categories.title','categories.category_name', 'statu_options.status_description', 'users.name')
-    ->orderBy('operations.id', 'desc')
-    ->paginate(10);
+    ->orderBy('operations.id', 'desc');
+
+        if (auth()->user()->hasRole('Admin')) {
+    $data = $dataQuery->paginate(10);
+        } elseif (auth()->user()->hasRole('User')) {
+    $data = $dataQuery->where('users.id', auth()->user()->id)->paginate(10);
+        } else {
+    // Lógica para otros roles si es necesario
+        }
+
 
 
 

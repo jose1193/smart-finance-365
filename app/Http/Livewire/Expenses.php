@@ -9,12 +9,12 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 class Expenses extends Component
 {
-     public  $expense_description, $expense_amount,$expense_date, $expense_status, $category_id, $data_id;
- public $search = '';
- public $categoriesRender;
-  public $statusOptionsRender;
+    public  $expense_description, $expense_amount,$expense_date, $expense_status, $category_id, $data_id;
+    public $search = '';
+    public $categoriesRender;
+    public $statusOptionsRender;
     public $isOpen = 0;
-     protected $listeners = ['render','delete']; 
+    protected $listeners = ['render','delete']; 
 
     public function authorize()
 {
@@ -46,7 +46,7 @@ class Expenses extends Component
     
     public function create()
     {
-         $this->authorize('manage admin');
+        $this->authorize('manage admin');
         $this->resetInputFields();
         $this->openModal();
     }

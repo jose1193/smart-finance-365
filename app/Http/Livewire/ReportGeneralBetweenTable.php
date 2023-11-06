@@ -12,6 +12,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
+use PDF;
+use Illuminate\Support\Facades\Auth;
+
 class ReportGeneralBetweenTable extends Component
 {
 
@@ -21,36 +24,41 @@ class ReportGeneralBetweenTable extends Component
     public $showData3 = false;
     public $incomeData3 = [];
     public $expenseData3 = [];
+    public $incomeDataCurrency3 = [];
+    public $expenseDataCurrency3= [];
     public $users;
     public $isOpen3 = 0;
-    public $emails_user3;
+    public $emails_user3 = [];
     public $emails;
     public $date_start;
     public $date_end;
     public $userNameSelected3;
     public $totalIncome3;
     public $totalExpense3;
+    public $totalIncomeCurrency3;
+    public $totalExpenseCurrency3;
 
     
-
-
-    public function render()
-    {
-        return view('livewire.report-general-between-table');
-    }
-
-    public function mount()
+public function dataSelect()
     {
        
         
         $this->users = User::orderBy('id', 'desc')->get();
        
-      
     
         $this->emails = EmailManagement::where('user_id', auth()->id())->get();
 
-      
+       
     }
+
+    public function render()
+    {
+        $this->dataSelect();
+        return view('livewire.report-general-between-table');
+    }
+
+    
+
 
   // REPORT GENERAL BETWEEN DATES
 public function updateBetweenData()
@@ -63,23 +71,28 @@ public function updateBetweenData()
 
 private function updateBetweenDataInternal()
 {
-    
-   $this->incomeData3 = [];
+    $this->incomeData3 = [];
     $this->expenseData3 = [];
+    $this->incomeDataCurrency3 = [];
+    $this->expenseDataCurrency3 = [];
 
     for ($i = 1; $i <= 12; $i++) {
-        // Consulta de ingresos
-        $incomeData3[] = $this->fetchBetweenData(1, $i);
+        $data = $this->fetchBetweenData(1, $i);
 
-        // Consulta de gastos
-        $expenseData3[] = $this->fetchBetweenData(2, $i);
+        $this->incomeData3[] = $data->sum('operation_amount');
+        $this->incomeDataCurrency3[] = $data->sum('operation_currency_total');
+
+        $data = $this->fetchBetweenData(2, $i);
+
+        $this->expenseData3[] = $data->sum('operation_amount');
+        $this->expenseDataCurrency3[] = $data->sum('operation_currency_total');
     }
 
-    $this->incomeData3 = $incomeData3;
-    $this->expenseData3 = $expenseData3;
+    $this->totalIncome3 = array_sum($this->incomeData3);
+    $this->totalIncomeCurrency3 = array_sum($this->incomeDataCurrency3);
+    $this->totalExpense3 = array_sum($this->expenseData3);
+    $this->totalExpenseCurrency3 = array_sum($this->expenseDataCurrency3);
 
-    $this->totalIncome3 = array_sum($incomeData3);
-    $this->totalExpense3 = array_sum($expenseData3);
     $this->userNameSelected3 = User::find($this->selectedUser3);
 
     $this->categoryName = MainCategories::where('id', 1)->value('title');
@@ -87,9 +100,10 @@ private function updateBetweenDataInternal()
     $this->showData3 = true;
 }
 
+
 private function fetchBetweenData($mainCategoryId, $month)
 {
-   $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+    $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->where('main_categories.id', $mainCategoryId);
 
@@ -107,7 +121,14 @@ private function fetchBetweenData($mainCategoryId, $month)
 
     return $query
         ->whereMonth('operations.operation_date', $month)
-        ->sum('operations.operation_amount');
+        ->get()
+        ->groupBy('category_id')
+        ->map(function ($group) {
+            return [
+                'operation_amount' => $group->sum('operation_amount'),
+                'operation_currency_total' => $group->sum('operation_currency_total')
+            ];
+        });
 }
 
 // FUNCIONT TO EXPORT EXCEL 3
@@ -154,31 +175,72 @@ public function sendEmail3()
         $this->updateBetweenData();
     }
 
-   
+    private function resetInputFields3(){
+        $this->emails_user3 = null;
+    
+    }
+
 
     // FUNCTION EXCEL FILE EMAIL TO USER
     public function emailStore3()
     {
-       $validationRules = [
-        'emails_user3' => 'required|string|email|max:50',
-        
-    ];
+        $validationRules = [
+    'emails_user3' => 'required|array', 
+    'emails_user3.*' => 'email|max:50'];
 
     $validatedData = $this->validate($validationRules);
     
-        Todo::updateOrCreate(['id' => $this->todo_id], [
-            'emails_user3' => $this->emails_user3,
-           
-        ]);
+    $user = User::find($this->selectedUser3);
 
-   // Llamar al método emailSent4 para enviar el correo con el archivo Excel
-        $this->emailSent3();
-        session()->flash('message', 
-            $this->todo_id ? 'Todo Updated Successfully.' : 'Todo Created Successfully.');
+    $data = [];
+    
+if ($user) {
+    $userName = $user->name; // Obtener el nombre del usuario si existe
+} else {
+   $userName = 'User Not Selected'; 
+}
 
-        
+    $now = Carbon::now('America/Argentina/Buenos_Aires');
+    $datenow = $now->format('Y-m-d H:i:s');
+   
+    $data['user'] = $userName; 
+    $fileName = 'General-PDF-Report-Between-Dates-' . '-'.$userName. '-'. $datenow . '.pdf';
+    foreach ($this->emails_user3 as $email) {
+    $data = [
+        'incomeData3' => $this->incomeData3,
+        'expenseData3' => $this->expenseData3,
+        'incomeDataCurrency3' => $this->incomeDataCurrency3,
+        'expenseDataCurrency3' => $this->expenseDataCurrency3,
+        'totalIncome3' => $this->totalIncome3,
+        'totalExpense3' => $this->totalExpense3,
+        'totalIncomeCurrency3' => $this->totalIncomeCurrency3,
+        'totalExpenseCurrency3' => $this->totalExpenseCurrency3,
+        'date_start' => $this->date_start,
+        'date_end' => $this->date_end,
+        'categoryName' => $this->categoryName,
+        'categoryName2' => $this->categoryName2,
+        'user' => $userName,
+        'email' => $email, //emails arrays
+        'title' => "Report General Between Dates",
+        'date' => $datenow,
+    ];
+   
 
+
+    $pdf = PDF::loadView('emails.pdf-generalbetweenreport', $data );
+
+    Mail::send('emails.pdf-generalbetweenreport', $data, function ($message) use ($data, $pdf, $fileName) {
+    $message->to($data["email"], $data["email"])
+        ->subject($data["title"])
+        ->attachData($pdf->output(), $fileName); // Asegúrate de pasar $fileName aquí
+    });
+
+       }
+        session()->flash('message',  'Email Sent Successfully.');
         $this->closeModal3();
+        $this->resetInputFields3();
+        $this->dataSelect();
+         $this->updateBetweenData();
        
     }
 

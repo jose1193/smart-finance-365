@@ -11,13 +11,9 @@
             <!-- HEADER -->
             <x-header-dashboard />
             <!-- END HEADER -->
-
             <!-- PANEL MAIN CATEGORIES -->
             <!--INCLUDE ALERTS MESSAGES-->
-
             <x-message-success />
-
-
             <!-- END INCLUDE ALERTS MESSAGES-->
 
             <main class="h-full overflow-y-auto">

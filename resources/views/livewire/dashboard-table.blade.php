@@ -136,18 +136,18 @@
                                         <td class="px-4 py-3 text-xs text-center">
                                             {{ $item->operation_date }}
                                         </td>
-                                        @can('manage admin')
-                                            <td class="px-4 py-3 text-sm text-center">
 
-                                                <button wire:click="edit({{ $item->id }})"
-                                                    class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                        class="fa-solid fa-pen-to-square"></i></button>
-                                                <button wire:click="$emit('deleteData',{{ $item->id }})"
-                                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                        class="fa-solid fa-trash"></i></button>
+                                        <td class="px-4 py-3 text-sm text-center">
 
-                                            </td>
-                                        @endcan
+                                            <button wire:click="edit({{ $item->id }})"
+                                                class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
+                                                    class="fa-solid fa-pen-to-square"></i></button>
+                                            <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                    class="fa-solid fa-trash"></i></button>
+
+                                        </td>
+
                                     </tr>
 
                                 @empty

@@ -263,7 +263,7 @@
                     name: {
                         required: true,
                         minlength: 4,
-                        maxlength: 10,
+                        maxlength: 20,
                     },
                     email: {
                         required: true,

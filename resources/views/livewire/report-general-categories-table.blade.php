@@ -1,26 +1,78 @@
    <div x-show="activeTab === '2'">
        <div id="report-table">
+           <!--INCLUDE ALERTS MESSAGES-->
+
+           <x-message-success />
+
+
+           <!-- END INCLUDE ALERTS MESSAGES-->
            <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
                <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                   <select wire:model="selectedUser2" wire:change="updateCategoriesData"
-                       class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                       <option value="">Select User</option>
-                       @if (auth()->user()->hasRole('Admin'))
+
+
+                   @if (auth()->user()->hasRole('Admin'))
+                       <select id="select2"
+                           class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                           wire:model="selectedUser2" wire:change="updateCategoriesData" wire:ignore>
+                           <option value="">Select User</option>
+
                            @foreach ($users as $user)
                                <option value="{{ $user->id }}">{{ $user->name }}
                                </option>
                            @endforeach
-                       @else
-                           <option value="{{ auth()->user()->id }}">
-                               {{ auth()->user()->name }}
-                           </option>
-                       @endif
+                       </select>
+                   @else
+                       <select wire:model="selectedUser2" wire:change="updateCategoriesData"
+                           class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                           <option value="">Select User</option>
 
-                   </select>
+                           <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
+                           </option>
+
+
+                       </select>
+
+                   @endif
+
+
+                   <script>
+                       document.addEventListener('livewire:load', function() {
+                           var select2 = $('#select2');
+                           var selectedValue = null;
+                           var isDropdownOpen = false; // Variable para almacenar si el menú está abierto o cerrado
+
+                           select2.select2();
+
+                           select2.on('change', function(e) {
+                               selectedValue = e.target.value;
+                               Livewire.emit('userSelected', selectedValue);
+                           });
+
+                           select2.on('select2:opening', function(e) {
+                               isDropdownOpen = true; // Actualiza la variable si el menú se está abriendo
+                           });
+
+                           Livewire.hook('message.received', function(message, component) {
+                               isDropdownOpen = select2.next().hasClass(
+                                   'select2-container--open'
+                               ); // Verifica si el menú está abierto antes de la actualización
+                           });
+
+                           Livewire.hook('message.processed', function(message, component) {
+                               if (isDropdownOpen) {
+                                   select2.val(selectedValue).trigger(
+                                       'change.select2'); // Restablece el valor sin cerrar el menú
+                               }
+                               select2.select2(); // Reincializa select2
+                           });
+                       });
+                   </script>
+
                </div>
 
                <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                   <select wire:model="selectedCategoryId" wire:change="updateCategoriesData"
+
+                   <select wire:model="selectedCategoryId" wire:change="updateCategoriesData" id="select3"
                        class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                        <option value="">Select Category</option>
                        @foreach ($categoriesRender as $formattedCategory)
@@ -33,6 +85,38 @@
                            </optgroup>
                        @endforeach
                    </select>
+                   <script>
+                       document.addEventListener('livewire:load', function() {
+                           var select2 = $('#select3');
+                           var selectedValue = null;
+                           var isDropdownOpen = false; // Variable para almacenar si el menú está abierto o cerrado
+
+                           select2.select2();
+
+                           select2.on('change', function(e) {
+                               selectedValue = e.target.value;
+                               Livewire.emit('categorySelected', selectedValue);
+                           });
+
+                           select2.on('select2:opening', function(e) {
+                               isDropdownOpen = true; // Actualiza la variable si el menú se está abriendo
+                           });
+
+                           Livewire.hook('message.received', function(message, component) {
+                               isDropdownOpen = select2.next().hasClass(
+                                   'select2-container--open'
+                               ); // Verifica si el menú está abierto antes de la actualización
+                           });
+
+                           Livewire.hook('message.processed', function(message, component) {
+                               if (isDropdownOpen) {
+                                   select2.val(selectedValue).trigger(
+                                       'change.select2'); // Restablece el valor sin cerrar el menú
+                               }
+                               select2.select2(); // Reincializa select2
+                           });
+                       });
+                   </script>
                </div>
 
                <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -45,8 +129,13 @@
                    </select>
                </div>
 
-
            </div>
+
+
+
+
+
+
            @if ($showData2)
                <div class="my-10 flex justify-end space-x-2">
                    <x-button wire:click="openModal2">
@@ -73,41 +162,42 @@
                                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
                            </div>
                            <!-- This element is to trick the browser into centering the modal contents. -->
-                           <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>?
+                           <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
                            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
                                role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                                <form>
                                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                        <div class="">
-                                           <div class="mb-4">
-                                               <label for="exampleFormControlInput1"
-                                                   class="block text-gray-700 text-sm font-bold mb-2">
-                                                   User Email:</label>
-                                               <select wire:model="emails_user2"
-                                                   class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                   <option value=""></option>
 
-                                                   @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
-                                                       <optgroup label="{{ $nameUser }}">
-                                                           @foreach ($groupedEmails as $email)
-                                                               <option value="{{ $email->email }}">
-                                                                   {{ $email->email }}
-                                                               </option>
-                                                           @endforeach
-                                                       </optgroup>
-                                                   @endforeach
-                                               </select>
+                                           <label for="exampleFormControlInput1"
+                                               class="block text-gray-700 text-sm font-bold mb-2">
+                                               User Email:</label>
+                                           <select multiple wire:model="emails_user2"
+                                               class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                                               <option value=""></option>
 
-                                               @error('emails_user3')
-                                                   <span class="text-red-500">{{ $message }}</span>
-                                               @enderror
-                                           </div>
+                                               @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
+                                                   <optgroup label="{{ $nameUser }}">
+                                                       @foreach ($groupedEmails as $email)
+                                                           <option value="{{ $email->email }}">
+                                                               {{ $email->email }}
+                                                           </option>
+                                                       @endforeach
+                                                   </optgroup>
+                                               @endforeach
+                                           </select>
+
+                                           @error('emails_user2')
+                                               <span class="text-red-500">{{ $message }}</span>
+                                           @enderror
+
 
                                        </div>
                                    </div>
                                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                        <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                           <button wire:click.prevent="emailStore2()" type="button"
+                                           <button wire:click.prevent="emailStore2()" wire:loading.attr="disabled"
+                                               wire:target="emailStore2" type="button"
                                                class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                                Send
                                            </button>
@@ -131,6 +221,27 @@
                        <table class="w-full whitespace-no-wrap" id="tableId2">
                            <thead>
                                <tr
+                                   class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                                   <th class="px-4 py-3">
+                                       @if ($userNameSelected2)
+                                           {{ $userNameSelected2->name }}
+                                       @else
+                                           User Not Selected
+                                       @endif
+                                   </th>
+                                   <th class="px-4 py-3">
+                                       @if ($selectedYear2)
+                                           {{ $selectedYear2 }}
+                                       @else
+                                           Year Not Selected
+                                       @endif
+                                   </th>
+                                   <th class="px-4 py-3">
+                                   </th>
+                                   <th class="px-4 py-3">
+                                   </th>
+                               </tr>
+                               <tr
                                    class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                    <th class="px-4 py-3">Nro</th>
                                    <th class="px-4 py-3">Mes</th>
@@ -138,48 +249,47 @@
                                        @if ($categoryNameSelected)
                                            {{ $categoryNameSelected->category_name }}
                                        @else
+                                           Category Not Selected
                                        @endif
                                    </th>
-
-
+                                   <th class="px-4 py-3">USD</th>
                                </tr>
                            </thead>
                            <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
 
 
-                               @for ($i = 1; $i <= 12; $i++)
+                               @for ($i = 0; $i < count($ArrayCategories); $i++)
                                    <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
-                                       <td class="px-4 py-3 text-center"> {{ $i }}
+                                       <td class="px-4 py-3 text-center">{{ $i + 1 }}</td>
+                                       <td class="px-4 py-3 text-center">
+                                           {{ \Carbon\Carbon::create()->month($i + 1)->format('F') }}
                                        </td>
                                        <td class="px-4 py-3 text-center">
-                                           {{ \Carbon\Carbon::create()->month($i)->format('F') }}
+                                           ${{ number_format($ArrayCategories[$i]['total'], 0, '.', ',') }}
                                        </td>
                                        <td class="px-4 py-3 text-center">
-
-                                           ${{ $formatted_amount = number_format($ArrayCategories[$i - 1]['total'], 0, '.', ',') }}
+                                           ${{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }}
                                        </td>
-
-
-
                                    </tr>
                                @endfor
+
 
                                <!-- Fila adicional para mostrar el nombre del usuario -->
                                <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                    <td class="px-4 py-3 text-center font-semibold">
-                                       @if ($userNameSelected2)
-                                           {{ $userNameSelected2->name }}
-                                       @else
-                                       @endif
+
                                    </td>
                                    <td class="px-4 py-3 text-center font-semibold">
-                                       {{ $selectedYear2 }}
+
                                    </td>
                                    <td class="px-4 py-3 text-center font-semibold">$
-                                       {{ $formatted_amount = number_format($totalCategoriesRender, 0, '.', ',') }}
+                                       {{ number_format($totalCategoriesRender, 0, '.', ',') }}
 
                                    </td>
+                                   <td class="px-4 py-3 text-center font-semibold">
+                                       {{ number_format($totalCategoriesRenderCurrency, 0, '.', ',') }}$
 
+                                   </td>
 
                                </tr>
                            </tbody>

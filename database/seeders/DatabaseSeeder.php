@@ -129,20 +129,20 @@ foreach ($mainCategories as $category) {
         }
         // END EXPENSES CATEGORY
 
-         // MAIN CATEGORIES
-       $statusOptions = [
-    'Paid',
-    'Unpaid',
-    'Pending',
+         // MAIN CATEGORIES STATUS OPTIONS
+      
+$statusOptions = [
+    ['status_description' => 'Collected', 'main_category_id' => 1],
+    ['status_description' => 'Uncollected', 'main_category_id' => 1],
+    ['status_description' => 'Paid', 'main_category_id' => 2],
+    ['status_description' => 'Unpaid', 'main_category_id' => 2],
     // Agrega más valores aquí si es necesario
 ];
 
-foreach ($statusOptions as $statusDescription) {
-    StatuOptions::create([
-        'status_description' => $statusDescription,
-       
-    ]);
+
+foreach ($statusOptions as $statusData) {
+    StatuOptions::create($statusData);
 }
-        // END MAIN CATEGORIES
+        // END MAIN CATEGORIES STATUS OPTIONS
     }
 }

@@ -1,6 +1,9 @@
   <div x-show="activeTab === '4'">
       <!-- REPORT MONTHS TABLE  -->
       <div id="report-table">
+          <!--INCLUDE ALERTS MESSAGES-->
+          <x-message-success />
+          <!-- END INCLUDE ALERTS MESSAGES-->
           <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
                   <select wire:model="selectedUser4" wire:change="updateMonthData"
@@ -80,7 +83,7 @@
                                               <label for="exampleFormControlInput1"
                                                   class="block text-gray-700 text-sm font-bold mb-2">
                                                   User Email:</label>
-                                              <select wire:model="emails_user4"
+                                              <select multiple wire:model="emails_user4"
                                                   class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                                                   <option value=""></option>
 
@@ -104,7 +107,8 @@
                                   </div>
                                   <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                       <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                          <button wire:click.prevent="emailStore4()" type="button"
+                                          <button wire:click.prevent="emailStore4()" wire:loading.attr="disabled"
+                                              wire:target="emailStore4" type="button"
                                               class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                               Send
                                           </button>
@@ -125,14 +129,52 @@
               <!-- Tables -->
               <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                   <div class="w-full overflow-x-auto">
-                      <table class="w-full whitespace-no-wrap" id="tableId4">
+                      <table class="w-full whitespace-no-wrap " id="tableId4">
                           <thead>
+                              <tr
+                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                                  <th class="px-4 py-3">
+                                      @if ($userNameSelected4)
+                                          {{ $userNameSelected4->name }}
+                                      @else
+                                          User Not Selected
+                                      @endif
+                                  </th>
+                                  <th class="px-4 py-3">
+                                      @if ($selectedMonthName)
+                                          {{ $selectedMonthName }}
+                                      @else
+                                          Month Not Selected
+                                      @endif
+                                  </th>
+                                  <th class="px-4 py-3">
+                                      @if ($selectedYear3)
+                                          {{ $selectedYear3 }}
+                                      @else
+                                          Year Not Selected
+                                      @endif
+                                  </th>
+
+                                  <th class="px-4 py-3">
+                                  </th>
+                                  <th class="px-4 py-3">
+                                  </th>
+                                  <th class="px-4 py-3">
+                                  </th>
+                                  <th class="px-4 py-3">
+                                  </th>
+                                  <th class="px-4 py-3">
+                                  </th>
+                                  <th class="px-4 py-3">
+                                  </th>
+                              </tr>
                               <tr
                                   class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                   <th class="px-4 py-3">Nro</th>
                                   <th class="px-4 py-3">Main Category</th>
                                   <th class="px-4 py-3">Category</th>
                                   <th class="px-4 py-3">Description</th>
+                                  <th class="px-4 py-3">Month</th>
                                   <th class="px-4 py-3">Operation ARS</th>
                                   <th class="px-4 py-3">Currency</th>
                                   <th class="px-4 py-3">Total Currency</th>
@@ -156,18 +198,20 @@
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ Str::words($item->operation_description, 2, '...') }}
-
+                                      </td>
+                                      <td class="px-4 py-3 text-center">
+                                          {{ $selectedMonthName }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           $
-                                          {{ $formatted_amount = number_format($item->operation_amount, 0, '.', ',') }}
+                                          {{ number_format($item->operation_amount, 0, '.', ',') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           $
-                                          {{ $formatted_amount = number_format($item->operation_currency, 0, '.', ',') }}
+                                          {{ number_format($item->operation_currency, 0, '.', ',') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ $formatted_amount = number_format($item->operation_currency_total, 0, '.', ',') }}
+                                          {{ number_format($item->operation_currency_total, 0, '.', ',') }}
                                           $</td>
                                       <td class="px-4 py-3 text-center">
                                           @if ($item->operation_status === '1')
@@ -193,6 +237,7 @@
                                               </span>
                                           @endif
                                       </td>
+
                                   </tr>
                               @endforeach
 
@@ -202,31 +247,28 @@
 
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
-                                      @if ($userNameSelected4)
-                                          {{ $userNameSelected4->name }}
-                                      @else
-                                      @endif
-                                  </td>
-                                  <td class="px-4 py-3 text-center font-semibold">
-                                      @if ($selectedMonthName)
-                                          {{ $selectedMonthName }}
-                                      @endif
 
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
-                                      {{ $selectedYear3 }}</td>
+
+
+                                  </td>
+                                  <td class="px-4 py-3 text-center font-semibold">
+                                  </td>
+                                  <td class="px-4 py-3 text-center font-semibold">
+                                  </td>
                                   <td class="px-4 py-3 text-center font-semibold">$
-                                      {{ $formatted_amount = number_format($totalMonthAmount, 0, '.', ',') }}
+                                      {{ number_format($totalMonthAmount, 0, '.', ',') }}
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
 
                                   </td>
+
                                   <td class="px-4 py-3 text-center font-semibold">
-                                      {{ $formatted_amount = number_format($totalMonthAmountCurrency, 0, '.', ',') }}
+                                      {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
                                       $
                                   </td>
-                                  <td class="px-4 py-3 text-center font-semibold">
-
+                                  <td class="px-4 py-3 text-center">
                                   </td>
                               </tr>
                           </tbody>

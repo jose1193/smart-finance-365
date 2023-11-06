@@ -12,14 +12,20 @@ class EmailsManagament extends Component
  
     public $isOpen = 0;
      protected $listeners = ['render','delete']; 
+   
     public function render()
     {
-        $data = EmailManagement::where('user_id', auth()->user()->id)
+    $data = EmailManagement::where('user_id', auth()->user()->id)
+        ->where(function ($query) {
+            $query->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('email', 'like', '%' . $this->search . '%');
+        })
         ->orderBy('id', 'desc')
         ->paginate(10);
 
-        return view('livewire.emails-managament',[
-            'data' => $data]);
+    return view('livewire.emails-managament', [
+        'data' => $data,
+    ]);
     }
 
     

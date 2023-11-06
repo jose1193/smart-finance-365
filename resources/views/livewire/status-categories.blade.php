@@ -1,7 +1,5 @@
 <div :class="{ 'theme-dark': dark }" x-data="data()" lang="en">
 
-
-
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
         <!-- MENU SIDEBAR -->
         <x-menu-sidebar />
@@ -11,13 +9,9 @@
             <!-- HEADER -->
             <x-header-dashboard />
             <!-- END HEADER -->
-
-            <!-- PANEL MAIN CATEGORIES -->
+            <!-- PANEL MAIN  -->
             <!--INCLUDE ALERTS MESSAGES-->
-
             <x-message-success />
-
-
             <!-- END INCLUDE ALERTS MESSAGES-->
 
             <main class="h-full overflow-y-auto">
@@ -27,25 +21,25 @@
                     <div
                         class="mt-5 flex items-center justify-between p-4 mb-8 text-sm font-semibold text-white bg-blue-500 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple">
                         <div class="flex items-center">
-                            <i class="fa-solid fa-cash-register mr-3"></i>
+                            <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Expenses Categories') }}
+                                {{ __('Options Categories') }}
                             </x-slot>
-                            <a href="{{ route('expenses-categories') }}">
-                                <span>Expenses Categories</span></a>
+                            <a href="{{ route('options-categories') }}">
+                                <span>Options Categories</span></a>
                         </div>
 
                     </div>
-                    @can('manage admin')
-                        <div class=" my-7 flex justify-between space-x-2">
-                            <x-button wire:click="create()"><span class="font-semibold"> Create New <i
-                                        class="fa-regular fa-folder-open"></i> </span>
-                            </x-button>
-                            <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                                autocomplete="off" />
-                        </div>
-                    @endcan
+
+                    <div class=" my-7 flex justify-between space-x-2">
+                        <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                                    class="fa-solid fa-envelope-open-text"></i></span>
+                        </x-button>
+                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
+                            autocomplete="off" />
+                    </div>
+
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
@@ -54,49 +48,42 @@
                                     <tr
                                         class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
-                                        <th class="px-4 py-3">Item</th>
                                         <th class="px-4 py-3">Category</th>
-                                        <th class="px-4 py-3">Description</th>
-                                        @can('manage admin')
-                                            <th class="px-4 py-3">Action</th>
-                                        @endcan
+                                        <th class="px-4 py-3">Option Description</th>
+
+                                        <th class="px-4 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700  uppercase dark:text-gray-400">
-                                            <td class="px-4 py-3 text-xs text-center">
+                                        <tr class="text-gray-700 text-xs  uppercase dark:text-gray-400">
+                                            <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->main_category_name }}
+                                                {{ $item->title }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->category_name }}
+                                                {{ $item->status_description }}
                                             </td>
-                                            <td class="px-4 py-3 text-xs">
-                                                {{ $item->category_description }}
+
+                                            <td class="px-4 py-3 text-sm">
+
+                                                <button wire:click="edit({{ $item->id }})"
+                                                    class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
+                                                        class="fa-solid fa-pen-to-square"></i></button>
+                                                <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                        class="fa-solid fa-trash"></i></button>
+
                                             </td>
-                                            @can('manage admin')
-                                                <td class="px-4 py-3 text-sm">
-
-                                                    <button wire:click="edit({{ $item->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="$emit('deleteData',{{ $item->id }})"
-                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-trash"></i></button>
-
-
-                                                </td>
-                                            @endcan
                                         </tr>
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="5">
+                                            <td colspan="4">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -121,14 +108,14 @@
                                     <!-- This element is to trick the browser into centering the modal contents. -->
                                     <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
-                                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg sm:w-full"
+                                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
                                         role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                                         <div
                                             class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                             <!--Modal title-->
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Expenses Category
+                                                Options Categories
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -146,72 +133,40 @@
                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                                 <div class="">
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                                                        <input type="text" autocomplete="off"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput1" required maxlength="40"
-                                                            placeholder="Enter Category" wire:model="category_name">
-                                                        @error('category_name')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="mb-4">
-                                                        <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                                                        <input type="text" autocomplete="off"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput1" maxlength="50"
-                                                            placeholder="Enter Description"
-                                                            wire:model="category_description">
-                                                        @error('category_description')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="mb-4">
-                                                        <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Category
+                                                        <label for=""
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Select Main Category
                                                         </label>
                                                         <select wire:model="main_category_id"
-                                                            class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                            <option value="">
-
-                                                            </option>
-                                                            @foreach ($mainCategoriesRender as $item)
-                                                                <option value="{{ $item->id }}">
-                                                                    {{ $item->title }}
-                                                                </option>
-                                                            @endforeach
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                            <option value="">Select a Category</option>
+                                                            @if ($mainCategories)
+                                                                @foreach ($mainCategories as $category)
+                                                                    <option value="{{ $category->id }}">
+                                                                        {{ $category->title }}</option>
+                                                                @endforeach
+                                                            @endif
                                                         </select>
-
                                                         @error('main_category_id')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">
-                                                            User Assign</label>
-                                                        <select wire:model="user_id_assign"
-                                                            class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Description</label>
 
-                                                            <option value="all">All Users</option>
-                                                            @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
-                                                                <optgroup label="{{ $nameUser }}">
-                                                                    @foreach ($groupedEmails as $email)
-                                                                        <option value="{{ $email->id }}">
-                                                                            {{ $email->email }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endforeach
-                                                        </select>
 
-                                                        @error('user_id_assign')
+                                                        <input type="text" autocomplete="off"
+                                                            wire:model="status_description"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                            placeholder="Enter Description">
+                                                        @error('status_description')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
+
                                                 </div>
                                             </div>
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -242,13 +197,17 @@
             </main>
 
 
-            <!-- END PANEL MAIN CATEGORIES -->
+            <!-- END PANEL MAIN  -->
 
         </div>
     </div>
 
 
 </div>
+
+
+
+
 
 
 <script>
@@ -264,7 +223,7 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.emitTo('expenses-categories', 'delete',
+                    Livewire.emitTo('status-categories', 'delete',
                         id); // Envía el Id al método delete
                     Swal.fire(
                         'Deleted!',

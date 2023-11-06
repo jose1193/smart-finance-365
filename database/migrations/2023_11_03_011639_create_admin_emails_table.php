@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('statu_options', function (Blueprint $table) {
+        Schema::create('admin_emails', function (Blueprint $table) {
             $table->id();
-            $table->string('main_category_id');
-            $table->string('status_description');
+            $table->string('name_support');
+            $table->string('email');
+            // define foreign key
+            $table->foreignId('user_id')
+            ->constrained('users')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('statu_options');
+        Schema::dropIfExists('admin_emails');
     }
 };

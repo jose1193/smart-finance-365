@@ -5,13 +5,14 @@ use App\Models\MainCategories;
 use App\Models\EmailManagement;
 use App\Models\User;
 use App\Models\Category;
-
+use App\Models\CategoriesToAssign;
 use Livewire\Component;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
-
+use PDF;
+use Illuminate\Support\Facades\Auth;
 
 
 class ReportGeneralCategoriesTable extends Component
@@ -23,41 +24,68 @@ class ReportGeneralCategoriesTable extends Component
     public $selectedUser2;
     public $selectedCategoryId;
     public $showData2 = false;
-    public $ArrayCategories = [];
+    public $ArrayCategories;
     public $users;
     public $categoriesRender;
     public $isOpen2 = 0;
-    public $emails_user2;
+    public $emails_user2 = [];
     public $emails;
 
    
     public $categoryNameSelected;
     public $userNameSelected2;
     public $totalCategoriesRender;
+    public $totalCategoriesRenderCurrency;
    
-    
+    protected $listeners = ['userSelected','categorySelected'];
 
-    public function mount()
+    public function userSelected($userId)
+    {
+        // Aquí puedes ejecutar la lógica que desees con el $userId
+        $this->selectedUser2 = $userId;
+        $this->updateCategoriesData();
+    }
+
+    public function categorySelected($categoryId)
+    {
+        // Aquí puedes ejecutar la lógica que desees con el $userId
+        $this->selectedCategoryId = $categoryId;
+        $this->updateCategoriesData();
+    }
+    
+    
+    public function dataSelect()
     {
         $this->years = Operation::distinct()->pluck('operation_year');
         
         $this->users = User::orderBy('id', 'desc')->get();
        
         $this->categoriesRender = $this->getCategoryOptions();
-    
         $this->emails = EmailManagement::where('user_id', auth()->id())->get();
 
-      
+       
     }
 
     
     // ALL CATEGORIES
 public function getCategoryOptions()
 {
-    $categories = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+    $categoriesQuery = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->orderBy('categories.id', 'asc')
+        ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_title');
+
+    if (auth()->user()->hasRole('Admin')) {
+       
+        $categories = $categoriesQuery->get();
+    } elseif (auth()->user()->hasRole('User')) {
+    // Si es un usuario, obtener las categorías asignadas
+    $categories = $categoriesQuery->leftJoin('categories_to_assigns', function ($join) {
+            $join->on('categories.id', '=', 'categories_to_assigns.category_id')
+                ->where('categories_to_assigns.user_id_assign', '=', auth()->user()->id);
+        })
         ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_title')
         ->get();
+}
 
     $formattedCategories = $categories->groupBy('main_category_title')->map(function ($categories, $mainCategoryTitle) {
         return [
@@ -69,14 +97,16 @@ public function getCategoryOptions()
     return collect($formattedCategories);
 }
 
+
     public function render()
-    {
+    { 
+        
+        $this->dataSelect();
         return view('livewire.report-general-categories-table');
     }
 
 
     
-
 
 
   // REPORT GENERAL CATEGORIES 
@@ -90,30 +120,31 @@ public function updateCategoriesData()
 private function updateCategoriesDataInternal()
 {
     $this->ArrayCategories = [];
-    $this->totalCategoriesRender = 0; 
+    $this->totalCategoriesRender = 0;
+    $this->totalCategoriesRenderCurrency = 0;
 
     for ($i = 1; $i <= 12; $i++) {
-        // Consulta de ingresos
+        // Consulta de ingresos por categoría
         $income = $this->fetchCategoriesData(1, $i);
 
-        // Consulta de gastos
+        // Consulta de gastos por categoría
         $expense = $this->fetchCategoriesData(2, $i);
 
         // Calcular la suma general
-        $total = $income + $expense;
-
-        
-    $this->userNameSelected2 = User::find($this->selectedUser2);
-    
+        $total = $income->sum('operation_amount') + $expense->sum('operation_amount');
+        $totalCurrency = $income->sum('operation_currency_total') + $expense->sum('operation_currency_total');
+       
         $this->ArrayCategories[] = [
             'month' => $i,
             'total' => $total,
+            'totalCurrency' => $totalCurrency
         ];
 
-
         $this->totalCategoriesRender += $total;
+        $this->totalCategoriesRenderCurrency += $totalCurrency;
     }
 
+    $this->userNameSelected2 = User::find($this->selectedUser2);
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
     $this->showData2 = true;
@@ -138,13 +169,24 @@ private function fetchCategoriesData($mainCategoryId, $month)
         $query->whereYear('operations.operation_date', $this->selectedYear2);
     }
 
-    
     $this->categoryNameSelected = Category::find($this->selectedCategoryId);
 
-    return $query
+    $operations = $query
         ->whereMonth('operations.operation_date', $month)
-        ->sum('operations.operation_amount');
+        ->get();
+
+    // Agrupar los resultados por categoría
+    $categoryTotal = $operations->groupBy('category_id')
+        ->map(function ($group) {
+            return [
+                'operation_amount' => $group->sum('operation_amount'),
+                'operation_currency_total' => $group->sum('operation_currency_total')
+            ];
+        });
+
+    return $categoryTotal;
 }
+
 
 
 // FUNCIONT TO EXPORT EXCEL 2
@@ -176,8 +218,10 @@ public function sendEmail2()
 
     public function openModal2()
     {
+         $this->emit('select2Initialized');
         $this->isOpen2 = true;
         $this->updateCategoriesData();
+        
     }
 
     public function closeModal2()
@@ -186,31 +230,68 @@ public function sendEmail2()
         $this->updateCategoriesData();
     }
 
-   
+   private function resetInputFields2(){
+        $this->emails_user2 = null;
+    
+    }
 
     // FUNCTION EXCEL FILE EMAIL TO USER
     public function emailStore2()
     {
        $validationRules = [
-        'emails_user2' => 'required|string|email|max:50',
+    'emails_user2' => 'required|array', // Se requiere que sea un array
+    'emails_user2.*' => 'email|max:50', // Cada elemento del array debe ser un email válido y tener un máximo de 50 caracteres
+];
         
-    ];
-
     $validatedData = $this->validate($validationRules);
+
     
-        Todo::updateOrCreate(['id' => $this->todo_id], [
-            'emails_user2' => $this->emails_user2,
-           
-        ]);
+    $user = User::find($this->selectedUser2);
 
-   // Llamar al método emailSent4 para enviar el correo con el archivo Excel
-        $this->emailSent2();
-        session()->flash('message', 
-            $this->todo_id ? 'Todo Updated Successfully.' : 'Todo Created Successfully.');
+    $data = [];
+    
+if ($user) {
+    $userName = $user->name; // Obtener el nombre del usuario si existe
+} else {
+    $userName = 'User Not Selected'; 
+}
 
-        
+    $now = Carbon::now('America/Argentina/Buenos_Aires');
+    $datenow = $now->format('Y-m-d H:i:s');
+   
+    $data['user'] = $userName;
+    $category=$this->categoryNameSelected->category_name;
+    $fileName = 'General-PDF-'.$category.'-Report' . '-'.$userName. '-'. $datenow . '.pdf';
 
+    foreach ($this->emails_user2 as $email) {
+    $data = [
+        'ArrayCategories' => $this->ArrayCategories,
+        'totalCategoriesRender' => $this->totalCategoriesRender,
+        'totalCategoriesRenderCurrency' => $this->totalCategoriesRenderCurrency,
+        'selectedYear2' => $this->selectedYear2,
+        'categoryNameSelected' => $this->categoryNameSelected,
+        'user' => $userName,
+        'email' => $email, //emails arrays
+        'title' => "Report Categories",
+        'date' => $datenow,
+    ];
+   
+    
+    $pdf = PDF::loadView('emails.pdf-generalcategoriesreport', $data );
+
+    Mail::send('emails.pdf-generalcategoriesreport', $data, function ($message) use ($data, $pdf, $fileName) {
+    $message->to($data["email"], $data["email"])
+        ->subject($data["title"])
+        ->attachData($pdf->output(), $fileName); // Asegúrate de pasar $fileName aquí
+    });
+
+}
+
+        session()->flash('message',  'Email Sent Successfully.');
         $this->closeModal2();
+        $this->resetInputFields2();
+        $this->dataSelect();
+        $this->updateCategoriesData();
        
     }
 

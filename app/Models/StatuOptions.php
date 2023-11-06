@@ -9,7 +9,14 @@ class StatuOptions extends Model
 {
     use HasFactory;
      protected $fillable = [
+         'main_category_id',
         'status_description'
         
     ];
+
+     public function mainCategory()
+    {
+        return $this->belongsTo(MainCategories::class, 'main_category_id');
+    }
+
 }

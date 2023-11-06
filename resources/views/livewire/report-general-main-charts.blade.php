@@ -46,13 +46,13 @@
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
                              <span class="font-semibold">
-                                 {{ $formatted_amount = number_format($totalIncome = array_sum($incomeData), 0, '.', ',') }}
+                                 {{ number_format($totalIncome = array_sum($incomeData), 0, '.', ',') }}
                              </span>
                          </div>
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
                              <span class="font-semibold">
-                                 {{ $formatted_amount = number_format($totalExpense = array_sum($expenseData), 0, '.', ',') }}
+                                 {{ number_format($totalExpense = array_sum($expenseData), 0, '.', ',') }}
                              </span>
                          </div>
                      </div>

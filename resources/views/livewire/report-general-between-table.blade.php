@@ -1,6 +1,12 @@
  <div x-show="activeTab === '3'">
      <!-- REPORT GENERAL BETWEEN DATE TABLE  -->
      <div id="between-dates-report-table">
+         <!--INCLUDE ALERTS MESSAGES-->
+
+         <x-message-success />
+
+
+         <!-- END INCLUDE ALERTS MESSAGES-->
          <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
                  <select wire:model="selectedUser3" wire:change="updateBetweenData"
@@ -68,7 +74,7 @@
                                              <label for="exampleFormControlInput1"
                                                  class="block text-gray-700 text-sm font-bold mb-2">
                                                  User Email:</label>
-                                             <select wire:model="emails_user3"
+                                             <select multiple wire:model="emails_user3"
                                                  class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                                                  <option value=""></option>
 
@@ -92,7 +98,8 @@
                                  </div>
                                  <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                      <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                         <button wire:click.prevent="emailStore3()" type="button"
+                                         <button wire:click.prevent="emailStore3()" wire:loading.attr="disabled"
+                                             wire:target="emailStore3" type="button"
                                              class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                              Send
                                          </button>
@@ -116,11 +123,41 @@
                      <table class="w-full whitespace-no-wrap" id="tableId3">
                          <thead>
                              <tr
+                                 class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                                 <th class="px-4 py-3">
+                                     @if ($userNameSelected3)
+                                         {{ $userNameSelected3->name }}
+                                     @else
+                                         User Not Selected
+                                     @endif
+                                 </th>
+                                 <th class="px-4 py-3">
+                                     @if ($date_start)
+                                         <p>Date Start: {{ $date_start }}</p>
+                                     @endif
+
+                                     @if ($date_end)
+                                         <p>Date End: {{ $date_end }}</p>
+                                     @endif
+                                 </th>
+                                 <th class="px-4 py-3">
+
+                                 </th>
+                                 <th class="px-4 py-3">
+                                 </th>
+                                 <th class="px-4 py-3">
+                                 </th>
+                                 <th class="px-4 py-3">
+                                 </th>
+                             </tr>
+                             <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
                                  <th class="px-4 py-3">Mes</th>
                                  <th class="px-4 py-3">{{ $categoryName }}</th>
+                                 <th class="px-4 py-3"> USD</th>
                                  <th class="px-4 py-3">{{ $categoryName2 }}</th>
+                                 <th class="px-4 py-3"> USD</th>
 
                              </tr>
                          </thead>
@@ -135,39 +172,39 @@
                                          {{ \Carbon\Carbon::create()->month($i)->format('F') }}
                                      </td>
                                      <td class="px-4 py-3 text-center">$
-                                         {{ $formatted_amount = number_format($incomeData3[$i - 1], 0, '.', ',') }}
+                                         {{ number_format($incomeData3[$i - 1], 0, '.', ',') }}
                                      </td>
+                                     <td class="px-4 py-3 text-center">
+                                         {{ number_format($incomeDataCurrency3[$i - 1], 0, '.', ',') }}$</td>
                                      <td class="px-4 py-3 text-center">$
-                                         {{ $formatted_amount = number_format($expenseData3[$i - 1], 0, '.', ',') }}
+                                         {{ number_format($expenseData3[$i - 1], 0, '.', ',') }}
 
                                      </td>
-
+                                     <td class="px-4 py-3 text-center">
+                                         {{ number_format($expenseDataCurrency3[$i - 1], 0, '.', ',') }}$</td>
                                  </tr>
                              @endfor
 
                              <!-- Fila adicional para mostrar el nombre del usuario -->
                              <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     @if ($userNameSelected3)
-                                         {{ $userNameSelected3->name }}
-                                     @else
-                                     @endif
+
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     @if ($date_start)
-                                         <p>Date Start: {{ $date_start }}</p>
-                                     @endif
 
-                                     @if ($date_end)
-                                         <p>Date End: {{ $date_end }}</p>
-                                     @endif
 
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">$
-                                     {{ $formatted_amount = number_format($totalIncome3, 0, '.', ',') }}
+                                     {{ number_format($totalIncome3, 0, '.', ',') }}
+                                 </td>
+                                 <td class="px-4 py-3 text-center font-semibold">
+                                     {{ number_format($totalIncomeCurrency3, 0, '.', ',') }}$
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">$
-                                     {{ $formatted_amount = number_format($totalExpense3, 0, '.', ',') }}
+                                     {{ number_format($totalExpense3, 0, '.', ',') }}
+                                 </td>
+                                 <td class="px-4 py-3 text-center font-semibold">
+                                     {{ number_format($totalExpenseCurrency3, 0, '.', ',') }}$
 
                                  </td>
 

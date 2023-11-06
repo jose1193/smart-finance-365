@@ -9,6 +9,9 @@ use App\Models\Category;
 use Livewire\Component;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use PDF;
+use Illuminate\Support\Facades\Auth;
 
 class ReportGeneralMonthTable extends Component
 {
@@ -21,7 +24,7 @@ class ReportGeneralMonthTable extends Component
     public $showData4 = false;
     public $users;
     public $isOpen4 = 0;
-    public $emails_user;
+    public $emails_user4 = [];
     public $emails;
     public $userNameSelected4;
     public $operationsFetchMonths;
@@ -43,8 +46,7 @@ class ReportGeneralMonthTable extends Component
 }
 
 
-
-    public function mount()
+public function dataSelect()
     {
         $this->years = Operation::distinct()->pluck('operation_year');
         
@@ -55,9 +57,10 @@ class ReportGeneralMonthTable extends Component
 
     }
 
+
     public function render()
     {
-         
+        $this->dataSelect();
         return view('livewire.report-general-month-table');
     }
 
@@ -155,12 +158,13 @@ public function resetFields4()
 
 
 // FUNCTION SEND REPORT TO USERS EMAILS
-public function sendEmail4()
+
+    public function sendEmail4()
     {
         
        
         $this->openModal4();
-       
+         
     }
 
     public function openModal4()
@@ -175,33 +179,61 @@ public function sendEmail4()
          $this->updateMonthData();
     }
 
-    private function resetInputFields(){
-         $this->reset();
+    private function resetInputFields3(){
+        $this->emails_user4 = null;
     }
 
     public function emailStore4()
     {
        $validationRules = [
-        'emails_user4' => 'required|string|email|max:50',
+    'emails_user4' => 'required|array', 
+    'emails_user4.*' => 'email|max:50', 
         
     ];
 
     $validatedData = $this->validate($validationRules);
     
-        Todo::updateOrCreate(['id' => $this->todo_id], [
-            'emails_user' => $this->emails_user,
-           
-        ]);
+    $user = User::find($this->selectedUser4);
 
-   // Llamar al método emailSent para enviar el correo con el archivo Excel
-        $this->emailSent();
-        session()->flash('message', 
-            $this->todo_id ? 'Todo Updated Successfully.' : 'Todo Created Successfully.');
+    $data = [];
+    
+    if ($user) {
+    $userName = $user->name; // Obtener el nombre del usuario si existe
+    } else {
+   $userName = 'User Not Selected'; 
+    }
 
-        
+    $now = Carbon::now('America/Argentina/Buenos_Aires');
+    $datenow = $now->format('Y-m-d H:i:s');
+   
+    $data['user'] = $userName; 
+    $fileName = 'General-PDF-Report' . '-'.$userName. '-'. $datenow . '.pdf';
+    foreach ($this->emails_user4 as $email) {
+    $data = [
+        'operationsFetchMonths' => $this->operationsFetchMonths,
+        'totalMonthAmount' => $this->totalMonthAmount,
+        'totalMonthAmountCurrency' => $this->totalMonthAmountCurrency,
+        'selectedYear3' => $this->selectedYear3,
+        'user' => $userName,
+        'email' => $email, //emails arrays
+        'title' => "Report General Month",
+        'date' => $datenow,
+    ];
+   
 
+    $pdf = PDF::loadView('emails.pdf-generalmonthreport', $data );
+
+    Mail::send('emails.pdf-generalmonthreport', $data, function ($message) use ($data, $pdf, $fileName) {
+    $message->to($data["email"], $data["email"])
+        ->subject($data["title"])
+        ->attachData($pdf->output(), $fileName); 
+    });
+        }
+        session()->flash('message',  'Email Sent Successfully.');
         $this->closeModal4();
-        $this->resetInputFields();
+        $this->resetInputFields3();
+        $this->dataSelect();
+        $this->updateMonthData();
     }
    
 

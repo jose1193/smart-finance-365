@@ -19,4 +19,15 @@ protected $fillable = [
     {
         return $this->belongsTo(User::class);
     }
+
+    public function categoryToAssign()
+    {
+        return $this->hasMany(CategoriesToAssign::class, 'category_id');
+    }
+
+    public function Subcategory()
+    {
+        return $this->hasMany(Subcategory::class, 'category_id');
+    }
+
 }

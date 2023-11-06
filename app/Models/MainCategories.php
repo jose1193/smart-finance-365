@@ -9,8 +9,12 @@ class MainCategories extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'title', 'description','user_id',
+        'title', 'description',
     ];
 
+    public function statusOptions()
+    {
+        return $this->hasMany(StatuOptions::class, 'main_category_id');
+    }
     
 }

@@ -39,10 +39,11 @@ class CreateNewUser implements CreatesNewUsers
     }
 
 // Generar un número aleatorio de 3 dígitos
-$randomNumber = rand(100, 999);
+    $randomNumber = rand(100, 999);
+    $nameWithoutSpaces = str_replace(' ', '', $input['name']);
     $user = User::create([
         'name' => $input['name'],
-        'username' => $input['name']. $randomNumber,
+        'username' => $nameWithoutSpaces. $randomNumber,
         'email' => $input['email'],
         'password' => Hash::make($input['password']),
       

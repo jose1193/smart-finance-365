@@ -149,7 +149,7 @@
                                                             class="block text-gray-700 text-sm font-bold mb-2">Category</label>
                                                         <input type="text" autocomplete="off"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            id="exampleFormControlInput1" required maxlength="20"
+                                                            id="exampleFormControlInput1" required maxlength="40"
                                                             placeholder="Enter Category" wire:model="category_name">
                                                         @error('category_name')
                                                             <span class="text-red-500">{{ $message }}</span>
@@ -170,7 +170,7 @@
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Id
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Category
                                                         </label>
                                                         <select wire:model="main_category_id"
                                                             class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
@@ -188,6 +188,31 @@
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
+                                                    <div class="mb-4">
+                                                        <label for="exampleFormControlInput1"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            User Assign</label>
+                                                        <select wire:model="user_id_assign"
+                                                            class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                                                            <option value="all">All Users</option>
+                                                            @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
+                                                                <optgroup label="{{ $nameUser }}">
+                                                                    @foreach ($groupedEmails as $email)
+                                                                        <option value="{{ $email->id }}">
+                                                                            {{ $email->email }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @endforeach
+                                                        </select>
+
+                                                        @error('user_id_assign')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+
                                                 </div>
                                             </div>
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">

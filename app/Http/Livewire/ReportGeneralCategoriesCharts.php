@@ -55,14 +55,25 @@ class ReportGeneralCategoriesCharts extends Component
     }
 
 
-    
     // ALL CATEGORIES
 public function getCategoryOptions()
 {
-    $categories = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+    $categoriesQuery = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->orderBy('categories.id', 'asc')
+        ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_title');
+
+    if (auth()->user()->hasRole('Admin')) {
+       
+        $categories = $categoriesQuery->get();
+    } elseif (auth()->user()->hasRole('User')) {
+    // Si es un usuario, obtener las categorías asignadas
+    $categories = $categoriesQuery->leftJoin('categories_to_assigns', function ($join) {
+            $join->on('categories.id', '=', 'categories_to_assigns.category_id')
+                ->where('categories_to_assigns.user_id_assign', '=', auth()->user()->id);
+        })
         ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_title')
         ->get();
+}
 
     $formattedCategories = $categories->groupBy('main_category_title')->map(function ($categories, $mainCategoryTitle) {
         return [
@@ -73,6 +84,7 @@ public function getCategoryOptions()
 
     return collect($formattedCategories);
 }
+
 
   // REPORT GENERAL CATEGORIES DATES
 

@@ -25,6 +25,9 @@ use App\Http\Livewire\IncomesOperations;
 use App\Http\Livewire\CurrencyCalculator;
 use App\Http\Livewire\ReportGeneralCharts;
 use App\Http\Livewire\ReportGeneralTable;
+use App\Http\Livewire\SupportContact;
+use App\Http\Livewire\EmailAdmin;
+use App\Http\Livewire\StatusCategories;
 use Illuminate\Support\Facades\Mail;
 
 /*
@@ -87,13 +90,6 @@ Route::get('/google-auth/callback', function () {
         $user->assignRole($defaultRole);
     }
 
-    \Mail::send('emails.NewMailUserGoogle', array(
-        'name' => $user->name,
-        'email' => $user->email,
-    ), function($message) use ($user) {
-        $message->from('smartfinance793@gmail.com', 'Smart Finance');
-        $message->to($user->email)->subject('Welcome to Smart Finance');
-    });
 }
 
  //END SEND EMAIL FORM CONTACT
@@ -136,4 +132,7 @@ Route::middleware([
     Route::get('calculator', [CurrencyCalculator::class, 'Calculator'])->name('calculator');
     Route::get('general-charts', ReportGeneralCharts::class)->name('general-charts');
     Route::get('general-report', ReportGeneralTable::class)->name('general-report');
+    Route::get('support-contact', SupportContact::class)->name('support-contact');
+    Route::get('admin-email-support', EmailAdmin::class)->name('admin-email-support');
+    Route::get('options-categories', StatusCategories::class)->name('options-categories');
 });
