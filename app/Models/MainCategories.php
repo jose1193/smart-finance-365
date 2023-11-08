@@ -12,6 +12,11 @@ class MainCategories extends Model
         'title', 'description',
     ];
 
+    public function mainCategories()
+    {
+        return $this->hasMany(Category::class);
+    }
+
     public function statusOptions()
     {
         return $this->hasMany(StatuOptions::class, 'main_category_id');

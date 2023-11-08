@@ -171,7 +171,7 @@
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Tipo
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Type
                                                         </label>
                                                         <select wire:model="main_category_id"
                                                             class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
@@ -193,20 +193,42 @@
                                                         <label for="exampleFormControlInput1"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             User Assign</label>
-                                                        <select wire:model="user_id_assign"
-                                                            class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
 
-                                                            <option value="all">All Users</option>
-                                                            @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
-                                                                <optgroup label="{{ $nameUser }}">
-                                                                    @foreach ($groupedEmails as $email)
-                                                                        <option value="{{ $email->id }}">
-                                                                            {{ $email->email }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endforeach
-                                                        </select>
+                                                        <div wire:ignore>
+                                                            <select multiple wire:model="user_id_assign"
+                                                                id="selectUserAssign" style="width: 100%">
+                                                                <option value="all">All Users</option>
+                                                                @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
+                                                                    <optgroup label="{{ $nameUser }}">
+                                                                        @foreach ($groupedEmails as $email)
+                                                                            <option value="{{ $email->id }}">
+                                                                                {{ $email->email }}</option>
+                                                                        @endforeach
+                                                                    </optgroup>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <script>
+                                                            document.addEventListener('livewire:load', function() {
+                                                                Livewire.hook('message.sent', () => {
+                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                    $('#selectUserAssign').select2({
+                                                                        width: 'resolve' // need to override the changed default
+                                                                    });
+                                                                });
+                                                            });
+
+                                                            $(document).ready(function() {
+                                                                // Inicializa Select2
+                                                                $('#selectUserAssign').select2();
+
+                                                                // Escucha el cambio en Select2 y actualiza Livewire
+                                                                $('#selectUserAssign').on('change', function(e) {
+                                                                    @this.set('user_id_assign', $(this).val());
+                                                                });
+                                                            });
+                                                        </script>
 
                                                         @error('user_id_assign')
                                                             <span class="text-red-500">{{ $message }}</span>

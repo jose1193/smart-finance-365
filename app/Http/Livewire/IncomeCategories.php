@@ -15,12 +15,14 @@ class IncomeCategories extends Component
     public $mainCategoriesRender;
     public $isOpen = 0;
     protected $listeners = ['render','delete'];
-    public $users,$user_id_assign;
+    public $users;
+    public $user_id_assign = [];
 
     public function authorize()
 {
     return true;
 }
+
 
     public function render()
     {
@@ -73,12 +75,15 @@ class IncomeCategories extends Component
 
     public function openModal()
     {
+        
         $this->isOpen = true;
     }
 
     public function closeModal()
     {
         $this->isOpen = false;
+         $this->reset();
+        $this->resetValidation(); 
     }
 
     private function resetInputFields(){
@@ -89,11 +94,27 @@ class IncomeCategories extends Component
     {
         $this->authorize('manage admin');
         $this->validate([
-        'category_name' => 'required|string|max:30',
+        'category_name' => 'required|string|max:30|unique:categories,category_name,' . $this->data_id,
         'category_description' => 'required|string|max:50',
         'main_category_id' => 'required|exists:main_categories,id',
-        'user_id_assign' => 'required|string|max:30',
-        ]);
+        'user_id_assign' => 'required|array',
+        'user_id_assign.*' => 'required|max:50',
+        ],[
+    'category_name.required' => 'El nombre de categoría es obligatorio.',
+    'category_name.string' => 'El nombre de categoría debe ser una cadena de texto.',
+    'category_name.max' => 'El nombre de categoría no debe superar los 30 caracteres.',
+    'category_name.unique' => 'El nombre de categoría ya está en uso.',
+
+    'category_description.required' => 'La descripción de categoría es obligatoria.',
+    'category_description.string' => 'La descripción de categoría debe ser una cadena de texto.',
+    'category_description.max' => 'La descripción de categoría no debe superar los 50 caracteres.',
+
+    'main_category_id.required' => 'El ID de categoría principal es obligatorio.',
+    'main_category_id.exists' => 'El ID de categoría principal no es válido.',
+
+    'user_id_assign.required' => 'El ID de usuario asignado es obligatorio.',
+   
+]);
 
         $storeCategory = Category::updateOrCreate(
     ['id' => $this->data_id],
@@ -105,30 +126,53 @@ class IncomeCategories extends Component
     ]
         );
 
-        
-        if ($this->user_id_assign === 'all') {
-        // Si se selecciona 'all', elimina todas las asignaciones de esa categoría
+       
+        if (in_array('all', $this->user_id_assign)) {
         CategoriesToAssign::where('category_id', $storeCategory->id)->delete();
-        } else {
+        
+    }
+        else
+     {
     
-        $categoryAssignment = CategoriesToAssign::where('category_id', $storeCategory->id)
-        ->first();
+         // Obtener todos los usuarios asignados actualmente a esta categoría
+    $currentAssignments = CategoriesToAssign::where('category_id', $storeCategory->id)->get()->pluck('user_id_assign')->toArray();
+
+    // Obtener la lista de usuarios seleccionados en el formulario
+    $selectedUsers = is_array($this->user_id_assign) ? $this->user_id_assign : [];
+
+    // Usuarios a agregar
+    $usersToAdd = array_diff($selectedUsers, $currentAssignments);
+
+    // Usuarios a eliminar
+    $usersToRemove = array_diff($currentAssignments, $selectedUsers);
+
+    // Eliminar usuarios deseleccionados
+    CategoriesToAssign::where('category_id', $storeCategory->id)
+        ->whereIn('user_id_assign', $usersToRemove)
+        ->delete();
+
+
+        foreach ($this->user_id_assign as $userId) {
+         $categoryAssignment = CategoriesToAssign::where('category_id', $storeCategory->id)
+                                ->where('user_id_assign', $userId)
+                                ->first();
         if ($categoryAssignment) {
        
         $categoryAssignment->update([
             'user_id_admin' => auth()->user()->id,
-            'user_id_assign' => $this->user_id_assign,
+            'user_id_assign' => $userId,
         ]);
         } else {
-        
+   
         $categoryAssignment = CategoriesToAssign::create([
             'category_id' => $storeCategory->id,
-            'user_id_assign' => $this->user_id_assign,
+            'user_id_assign' => $userId,
             'user_id_admin' => auth()->user()->id,
         ]);
+    
         }
         }
-
+ }
         session()->flash('message', 
             $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
    
@@ -136,27 +180,32 @@ class IncomeCategories extends Component
         $this->resetInputFields();
     }
 
-    public function edit($id)
-    {
-        $this->authorize('manage admin');
-        $list = Category::findOrFail($id);
-        $this->data_id = $id;
-        $this->category_name = $list->category_name;
-        $this->category_description = $list->category_description;
-        $this->main_category_id = $list->main_category_id;
+public function edit($id)
+{
+    $this->authorize('manage admin');
+    $list = Category::findOrFail($id);
+    $this->data_id = $id;
+    $this->category_name = $list->category_name;
+    $this->category_description = $list->category_description;
+    $this->main_category_id = $list->main_category_id;
 
-       
-        $categoryToAssign = CategoriesToAssign::where('category_id', $id)->first();
-
-        if ($categoryToAssign) {
     
-    $this->user_id_assign = $categoryToAssign->user_id_assign;
-    } else {
-    $this->user_id_assign = null; 
-        }
-     
-        $this->openModal();
+    $categoriesToAssign = CategoriesToAssign::where('category_id', $id)->get();
+
+    // Inicializar un array para almacenar todos los user_id_assign
+    $userIds = [];
+
+    // Si hay asignaciones, obtener todos los user_id_assign
+    if ($categoriesToAssign->isNotEmpty()) {
+        $userIds = $categoriesToAssign->pluck('user_id_assign')->toArray();
     }
+
+    $this->user_id_assign = $userIds;
+
+    $this->openModal();
+}
+
+
 public function delete($id)
     {
          $this->authorize('manage admin');
@@ -164,5 +213,8 @@ public function delete($id)
        
         session()->flash('message', 'Data Deleted Successfully.');
     }
+
+
+
 
 }

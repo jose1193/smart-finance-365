@@ -226,11 +226,10 @@
                                                         </label>
                                                         <select wire:model="role"
                                                             class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                            <option value="">
-
-                                                            </option>
+                                                            <option value="">Select Role</option>
                                                             @foreach ($rolesRender as $item)
-                                                                <option value="{{ $item->id }}">
+                                                                <option value="{{ $item->id }}"
+                                                                    @if ($item->id === $role) selected @endif>
                                                                     {{ $item->name }}
                                                                 </option>
                                                             @endforeach

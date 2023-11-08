@@ -92,7 +92,7 @@
                                              <div wire:ignore>
                                                  <select multiple id="selectEmailsUser" style="width: 100%"
                                                      wire:model="emails_user">
-                                                     <option value="">Select Emails</option>
+
 
                                                      @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
                                                          <optgroup label="{{ $nameUser }}">

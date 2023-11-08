@@ -6,15 +6,17 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Livewire\WithPagination;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
 
 class UsersCrud extends Component
 {
-     public  $name,$username, $email,$password,$role, $data_id;
+ public  $name,$username, $email,$password,$role, $data_id;
  public $search = '';
  public $rolesRender;
-    public $isOpen = 0;
-     protected $listeners = ['render','delete']; 
-      public function authorize()
+ public $isOpen = 0;
+ protected $listeners = ['render','delete']; 
+
+ public function authorize()
 {
     return true;
 }
@@ -60,6 +62,10 @@ return view('livewire.users-crud', [
     public function closeModal()
     {
         $this->isOpen = false;
+        
+        $this->reset();
+        $this->resetValidation(); 
+
     }
 
     private function resetInputFields(){
@@ -70,21 +76,25 @@ return view('livewire.users-crud', [
    
  public function store()
     {
-        $this->authorize('manage admin');
-      $this->validate([
-    'name' => 'required|string|max:20|regex:/^[A-Za-z]+$/',
-    'email' => 'required|max:50',
-    'username' => 'required|max:20',
+    $this->authorize('manage admin');
+    
+    $this->validate([
+    'name' => 'required|string|max:20|regex:/^[A-Za-z\s]+$/',
+    'username' => 'required|unique:users,username,' . $this->data_id,
+    'email' => 'required|email|unique:users,email,' . $this->data_id,
     'password' => 'required|string|min:5', 
      'role' => 'required',
 ], [
-    'name.required' => 'El campo nombre es obligatorio.',
-    'name.string' => 'El campo nombre debe ser una cadena de texto.',
-    'name.max' => 'El campo nombre no debe superar los 30 caracteres.',
+    'name' => [
+    'required' => 'El campo nombre es obligatorio.',
+    'string' => 'El campo nombre debe ser una cadena de texto.',
+    'max' => 'El campo nombre no debe superar los 30 caracteres.',
+    'regex' => 'El campo nombre solo debe contener letras.',
+],
     'email.required' => 'El campo correo electrónico es obligatorio.',
     'email.email' => 'Por favor, ingrese una dirección de correo electrónico válida.',
-    'email.unique' => 'Esta dirección de correo electrónico ya ha sido registrada.',
-    'email.max' => 'El campo correo electrónico no debe superar los 50 caracteres.',
+    'email.unique' => 'Esta dirección de Email ya ha sido registrada.',
+    'email.max' => 'El campo Email no debe superar los 50 caracteres.',
     'username.required' => 'El campo nombre de usuario es obligatorio.',
     'username.unique' => 'Este nombre de usuario ya está en uso.',
     'username.max' => 'El campo nombre de usuario no debe superar los 20 caracteres.',
@@ -100,7 +110,7 @@ if ($user) {
     // El usuario ya existe, actualiza el rol
     $role = Role::find($this->role);
     $user->syncRoles([$role->name]);
-    // Luego, actualiza otros campos según sea necesario
+    
     $user->update([
         'name' => $this->name,
         'username' => $this->username,
@@ -109,7 +119,7 @@ if ($user) {
         'password' => bcrypt($this->password),
     ]);
 } else {
-    // El usuario no existe, puedes manejar la creación como lo hacías antes
+    
     $user = User::updateOrCreate(['id' => $this->data_id], [
         'name' => $this->name,
         'username' => $this->username,
@@ -139,18 +149,22 @@ session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Dat
 
 
     public function edit($id)
-    {
-         $this->authorize('manage admin');
-        $list = User::findOrFail($id);
-        $this->data_id = $id;
-        $this->name = $list->name;
-        $this->username = $list->username;
-         $this->email = $list->email;
-          $this->password = $list->password;
-          
-     
-        $this->openModal();
-    }
+{
+    $this->authorize('manage admin');
+    $user = User::findOrFail($id);
+
+    $this->data_id = $id;
+    $this->name = $user->name;
+    $this->username = $user->username;
+    $this->email = $user->email;
+    $this->password = $user->password;
+
+    // Obtener el rol del usuario y establecerlo en una propiedad del componente
+    $this->role = $user->roles->first()->id; // Asigna el ID del rol
+
+    $this->openModal();
+}
+
 public function delete($id)
     {
          $this->authorize('manage admin');

@@ -11,9 +11,15 @@ class Category extends Model
 protected $fillable = [
         'category_name', 'category_description','main_category_id','user_id',
     ];
-    public function income()
+
+public function income()
     {
         return $this->hasMany(Income::class);
+    }
+
+    public function mainCategories()
+    {
+        return $this->belongsTo(MainCategories::class);
     }
     public function users()
     {
