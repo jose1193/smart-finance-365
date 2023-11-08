@@ -38,6 +38,16 @@ class ReportGeneralBetweenTable extends Component
     public $totalIncomeCurrency3;
     public $totalExpenseCurrency3;
 
+    protected $listeners = ['userSelected3'];
+
+    public function userSelected3($userId)
+    {
+        // Aquí puedes ejecutar la lógica que desees con el $userId
+        $this->selectedUser3 = $userId;
+        $this->updateBetweenData();
+    }
+
+    
     
 public function dataSelect()
     {
@@ -155,13 +165,7 @@ public function resetFields3()
 
 
 // FUNCTION SEND REPORT TO USERS EMAILS
-public function sendEmail3()
-    {
-        
-       
-        $this->openModal3();
-         
-    }
+
 
     public function openModal3()
     {
@@ -189,6 +193,22 @@ public function sendEmail3()
     'emails_user3.*' => 'email|max:50'];
 
     $validatedData = $this->validate($validationRules);
+    
+    $validationRules = [
+    'emails_user3' => 'required|array',
+    'emails_user3.*' => 'email|max:50',
+    'date_start' => 'required', 
+    'date_end' => 'required', 
+];
+
+    $customMessages = [
+    
+    'date_start.required' => 'Please select a Date Start',
+    'date_end.required' => 'Please select a Date End',
+    
+    ];
+
+    $this->validate($validationRules, $customMessages);
     
     $user = User::find($this->selectedUser3);
 

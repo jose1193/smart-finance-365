@@ -9,20 +9,33 @@
          <!-- END INCLUDE ALERTS MESSAGES-->
          <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                 <select wire:model="selectedUser3" wire:change="updateBetweenData"
-                     class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select User</option>
-                     @if (auth()->user()->hasRole('Admin'))
-                         @foreach ($users as $user)
-                             <option value="{{ $user->id }}">{{ $user->name }}
-                             </option>
-                         @endforeach
-                     @else
-                         <option value="{{ auth()->user()->id }}">
-                             {{ auth()->user()->name }}
+
+                 @if (auth()->user()->hasRole('Admin'))
+
+                     <div wire:ignore>
+                         <select id="selectUser3" style="width: 100%" wire:model="selectedUser3"
+                             wire:change="updateBetweenData" wire:ignore>
+                             <option value="">Select User</option>
+
+                             @foreach ($users as $user)
+                                 <option value="{{ $user->id }}">{{ $user->name }}
+                                 </option>
+                             @endforeach
+                         </select>
+                     </div>
+                 @else
+                     <select wire:model="selectedUser3" wire:change="updateBetweenData"
+                         class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                         <option value="">Select User</option>
+
+                         <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
                          </option>
-                     @endif
-                 </select>
+
+
+                     </select>
+
+                 @endif
+
              </div>
 
 
@@ -74,20 +87,42 @@
                                              <label for="exampleFormControlInput1"
                                                  class="block text-gray-700 text-sm font-bold mb-2">
                                                  User Email:</label>
-                                             <select multiple wire:model="emails_user3"
-                                                 class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                 <option value=""></option>
+                                             <div wire:ignore>
+                                                 <select multiple id="select3EmailsUser" style="width: 100%"
+                                                     wire:model="emails_user3">
+                                                     <option value="">Select Emails</option>
 
-                                                 @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
-                                                     <optgroup label="{{ $nameUser }}">
-                                                         @foreach ($groupedEmails as $email)
-                                                             <option value="{{ $email->email }}">
-                                                                 {{ $email->email }}
-                                                             </option>
-                                                         @endforeach
-                                                     </optgroup>
-                                                 @endforeach
-                                             </select>
+                                                     @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
+                                                         <optgroup label="{{ $nameUser }}">
+                                                             @foreach ($groupedEmails as $email)
+                                                                 <option value="{{ $email->email }}">
+                                                                     {{ $email->email }}
+                                                                 </option>
+                                                             @endforeach
+                                                         </optgroup>
+                                                     @endforeach
+                                                 </select>
+                                             </div>
+                                             <script>
+                                                 document.addEventListener('livewire:load', function() {
+                                                     Livewire.hook('message.sent', () => {
+                                                         // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                         $('#select3EmailsUser').select2({
+                                                             width: 'resolve' // need to override the changed default
+                                                         });
+                                                     });
+                                                 });
+
+                                                 $(document).ready(function() {
+                                                     // Inicializa Select2
+                                                     $('#select3EmailsUser').select2();
+
+                                                     // Escucha el cambio en Select2 y actualiza Livewire
+                                                     $('#select3EmailsUser').on('change', function(e) {
+                                                         @this.set('emails_user3', $(this).val());
+                                                     });
+                                                 });
+                                             </script>
 
                                              @error('emails_user3')
                                                  <span class="text-red-500">{{ $message }}</span>
@@ -154,10 +189,10 @@
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
                                  <th class="px-4 py-3">Mes</th>
-                                 <th class="px-4 py-3">{{ $categoryName }}</th>
-                                 <th class="px-4 py-3"> USD</th>
-                                 <th class="px-4 py-3">{{ $categoryName2 }}</th>
-                                 <th class="px-4 py-3"> USD</th>
+                                 <th class="px-4 py-3">{{ $categoryName }} ARS</th>
+                                 <th class="px-4 py-3"> Total Operation USD</th>
+                                 <th class="px-4 py-3">{{ $categoryName2 }} ARS</th>
+                                 <th class="px-4 py-3"> Total Operation USD</th>
 
                              </tr>
                          </thead>

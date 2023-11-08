@@ -42,6 +42,14 @@
                             autocomplete="off" />
                     </div>
 
+                    <div class="flex justify-end mb-5">
+                        @if (count($checkedSelected) >= 1)
+                            <button wire:click="confirmDelete"
+                                class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Delete Multiple ({{ count($checkedSelected) }})
+                            </button>
+                        @endif
+                    </div>
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
@@ -55,9 +63,14 @@
                                         <th class="px-4 py-3">Email</th>
                                         <th class="px-4 py-3">Subject</th>
                                         <th class="px-4 py-3">Message</th>
+                                        <th class="px-4 py-3"></th>
                                         @can('manage admin')
-                                            <th class="px-4 py-3">Action</th>
-                                        @endcan('manage admin')
+                                            <th class="px-4 py-3">
+                                                @if (!$data->isEmpty())
+                                                    <input type="checkbox" wire:model="selectAll" id="select-all">
+                                                @endif
+                                            </th>
+                                        @endcan
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -78,21 +91,25 @@
                                                 {{ $item->email }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->subject, 3, '...') }}
+                                                {{ Str::words($item->subject, 2, '...') }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->message }}
+                                                {{ Str::words($item->subject, 3, '...') }}
+                                            </td>
+
+                                            <td class="px-4 py-3 text-sm">
+
+
+                                                <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                        class="fa-solid fa-trash"></i></button>
+
                                             </td>
                                             @can('manage admin')
                                                 <td class="px-4 py-3 text-sm">
-
-                                                    <button wire:click="edit({{ $item->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="$emit('deleteData',{{ $item->id }})"
-                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-trash"></i></button>
+                                                    <input type="checkbox" wire:model="checkedSelected"
+                                                        value="{{ $item->id }}" id="checkbox-{{ $item->id }}">
 
                                                 </td>
                                             @endcan
@@ -100,7 +117,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="7">
+                                            <td colspan="8">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -153,13 +170,18 @@
                                                         <label for=""
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Name</label>
-
-                                                        <input type="text" autocomplete="off"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            maxlength="20" placeholder="Enter Name" readonly
-                                                            wire:model="name"
-                                                            @if (auth()->user()->hasRole('Admin')) wire:change="updatedEmail($event.target.value)" @endif>
-
+                                                        @if (auth()->user()->hasRole('Admin'))
+                                                            <input type="text" autocomplete="off"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                                maxlength="20" placeholder="Enter Name" readonly
+                                                                wire:model="name"
+                                                                @if (auth()->user()->hasRole('Admin')) wire:change="updatedEmail($event.target.value)" @endif>
+                                                        @else
+                                                            <input type="text" autocomplete="off"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                                maxlength="20" placeholder="Enter Name"
+                                                                value="{{ auth()->user()->name }}" readonly>
+                                                        @endif
                                                         @error('name')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -169,12 +191,17 @@
                                                             class="block text-gray-700 text-sm font-bold mb-2">Email</label>
 
                                                         @if (auth()->user()->hasRole('User'))
-                                                            <input type="email" autocomplete="off" wire:model="email"
+                                                            <input type="text" autocomplete="off"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                                maxlength="20" placeholder="Enter Name"
+                                                                value="{{ auth()->user()->email }}" readonly>
+                                                            <input type="email" autocomplete="off"
+                                                                wire:model="email"
+                                                                class="hidden shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                                 placeholder="Enter Email" readonly>
                                                         @else
                                                             <select wire:model="email"
-                                                                class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                                                                class="block w-full mt-1 text-sm dark:text-gray-700 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
                                                                 <option value=""></option>
 
                                                                 @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
@@ -228,7 +255,7 @@
                                                     <button type="button" wire:click.prevent="store()"
                                                         wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Save
+                                                        Send
                                                     </button>
                                                 </span>
                                                 <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
@@ -262,8 +289,6 @@
 
 
 
-
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id) {
@@ -284,6 +309,33 @@
                         'Your Data has been deleted.',
                         'success'
                     );
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('showConfirmation', () => {
+            Swal.fire({
+                title: 'Are you sure you want to delete these items?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('support-contact',
+                        'deleteMultiple'); // Envía el Id al método delete
+                    Swal.fire(
+                        'Deleted!',
+                        'Your Data has been deleted.',
+                        'success'
+                    );
+
                 }
             });
         });

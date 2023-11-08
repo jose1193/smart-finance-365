@@ -37,9 +37,9 @@ class ReportGeneralCategoriesTable extends Component
     public $totalCategoriesRender;
     public $totalCategoriesRenderCurrency;
    
-    protected $listeners = ['userSelected','categorySelected'];
+    protected $listeners = ['userSelected2','categorySelected','YearSelected2'];
 
-    public function userSelected($userId)
+    public function userSelected2($userId)
     {
         // Aquí puedes ejecutar la lógica que desees con el $userId
         $this->selectedUser2 = $userId;
@@ -48,12 +48,19 @@ class ReportGeneralCategoriesTable extends Component
 
     public function categorySelected($categoryId)
     {
-        // Aquí puedes ejecutar la lógica que desees con el $userId
+        
         $this->selectedCategoryId = $categoryId;
         $this->updateCategoriesData();
     }
     
-    
+    public function YearSelected2($selectedYear2Id)
+    {
+       
+        $this->selectedYear2 = $selectedYear2Id;
+        $this->updateCategoriesData();
+    }
+
+   
     public function dataSelect()
     {
         $this->years = Operation::distinct()->pluck('operation_year');
@@ -208,17 +215,11 @@ public function resetFields2()
 
 
 // FUNCTION SEND REPORT TO USERS EMAILS
-public function sendEmail2()
-    {
-        
-       
-        $this->openModal2();
-         
-    }
+
 
     public function openModal2()
     {
-         $this->emit('select2Initialized');
+        
         $this->isOpen2 = true;
         $this->updateCategoriesData();
         
@@ -238,10 +239,22 @@ public function sendEmail2()
     // FUNCTION EXCEL FILE EMAIL TO USER
     public function emailStore2()
     {
-       $validationRules = [
-    'emails_user2' => 'required|array', // Se requiere que sea un array
-    'emails_user2.*' => 'email|max:50', // Cada elemento del array debe ser un email válido y tener un máximo de 50 caracteres
+      $validationRules = [
+    'emails_user2' => 'required|array',
+    'emails_user2.*' => 'email|max:50',
+    
+    'categoryNameSelected' => 'required', 
+    'selectedYear2' => 'required', 
 ];
+
+$customMessages = [
+    'categoryNameSelected.required' => 'The Category field is required',
+    'selectedYear2.required' => 'Please select a year',
+   
+   
+];
+$this->validate($validationRules, $customMessages);
+
         
     $validatedData = $this->validate($validationRules);
 

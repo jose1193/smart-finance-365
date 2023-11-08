@@ -174,7 +174,7 @@
                                                                 <td style="line-height: 24px; font-size: 16px; margin: 0;"
                                                                     align="left">
                                                                     <img class="w-40"
-                                                                        src="https://smart-finance365.com/img/logo.png"
+                                                                        src="https://www.smart-finance365.com/img/logo.png"
                                                                         style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 96px; border-style: none; border-width: 0;"
                                                                         width="96">
                                                                 </td>
@@ -204,8 +204,7 @@
                                                                     <h1 class="h3 fw-700"
                                                                         style="padding-top: 0; padding-bottom: 0; font-weight: 700 !important; vertical-align: baseline; font-size: 20px; line-height: 33.6px; margin: 0;"
                                                                         align="left">
-                                                                        <strong>Hola, {{ $name }}. Tienes un
-                                                                            nuevo mensaje de {{ $name2 }}
+                                                                        <strong>Hola, {{ $name }}. <br>
                                                                         </strong>
                                                                     </h1>
                                                                     <table class="s-4 w-full" role="presentation"
@@ -222,17 +221,39 @@
                                                                         </tbody>
                                                                     </table>
                                                                     <p class=""
-                                                                        style="line-height: 24px;  font-size: 16px; width: 100%; margin: 0;"
-                                                                        align="left">
-                                                                        <br><br> <strong>Email:
-                                                                            {{ $emailFrom }}</strong>
-                                                                        <br><br>
-                                                                        <strong>Asunto: {{ $subject }}</strong>
-                                                                    </p>
-                                                                    <p class=""
                                                                         style="line-height: 24px; font-size: 16px; width: 100%; margin: 0;"
                                                                         align="left">
-                                                                        {{ $message2 }}
+                                                                        ¡Bienvenido al servicio de <strong>Smart
+                                                                            Finance 365</strong>!<br><br>
+
+                                                                        Estamos encantados de tenerte como parte de
+                                                                        nuestra comunidad. Tu registro ha sido exitoso y
+                                                                        ahora puedes disfrutar de todos los beneficios
+                                                                        que ofrece nuestro servicio.<br><br>
+
+                                                                        Su Username es:
+                                                                        <strong>{{ $username }}</strong>
+                                                                        <br><br>
+                                                                        Si en algún momento deseas asignar una nueva
+                                                                        contraseña a tu cuenta, puedes hacerlo siguiendo
+                                                                        este <a
+                                                                            href="https://www.smart-finance365.com/forgot-password"
+                                                                            style=" color: #1d4ed8; text-decoration: none;"><strong>enlace</strong>
+                                                                        </a>
+
+                                                                        <br><br>
+                                                                        Si tienes alguna pregunta o necesitas asistencia
+                                                                        adicional, no dudes en ponerte en contacto con
+                                                                        nosotros. Estamos aquí para ayudarte en todo lo
+                                                                        que necesites.
+                                                                        <br><br>
+                                                                        Gracias por elegir Smart Finance. Esperamos que
+                                                                        tengas una gran experiencia con nosotros.
+                                                                        <br><br>
+
+
+                                                                        Atentamente,<br>
+                                                                        El equipo de <strong>Smart Finance</strong>
                                                                     </p>
                                                                     <table class="s-4 w-full" role="presentation"
                                                                         border="0" cellpadding="0"
@@ -256,9 +277,9 @@
                                                                             <tr>
                                                                                 <td style="line-height: 24px; font-size: 16px; border-radius: 6px; font-weight: 700 !important; margin: 0;"
                                                                                     align="center" bgcolor="#0d6efd">
-                                                                                    <a href="https://smart-finance365.com/"
+                                                                                    <a href="https://www.smart-finance365.com/"
                                                                                         target="_blank"
-                                                                                        style="color: #ffffff; font-size: 16px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 6px; line-height: 20px; display: block; font-weight: 700 !important; white-space: nowrap; background-color: #2563eb; padding: 12px; border: 1px solid #2563eb;">Visit
+                                                                                        style="color: #ffffff; font-size: 16px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 6px; line-height: 20px; display: block; font-weight: 700 !important; white-space: nowrap; background-color: #1d4ed8; padding: 12px; border: 1px solid #1d4ed8;">Visit
                                                                                         Website</a>
                                                                                 </td>
                                                                             </tr>
@@ -268,33 +289,7 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
-                                                    <table class="s-10 w-full" role="presentation" border="0"
-                                                        cellpadding="0" cellspacing="0" style="width: 100%;"
-                                                        width="100%">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td style="line-height: 40px; font-size: 40px; width: 100%; height: 40px; margin: 0;"
-                                                                    align="left" width="100%" height="40">
-                                                                    &#160;
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                    <table class="ax-center" role="presentation" align="center"
-                                                        border="0" cellpadding="0" cellspacing="0"
-                                                        style="margin: 0 auto;">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td style="line-height: 24px; font-size: 16px; margin: 0;"
-                                                                    align="left">
-                                                                    <img class="w-40"
-                                                                        src="https://smart-finance365.com/img/logo.png"
-                                                                        style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 160px; border-style: none; border-width: 0;"
-                                                                        width="160">
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+
                                                     <table class="s-6 w-full" role="presentation" border="0"
                                                         cellpadding="0" cellspacing="0" style="width: 100%;"
                                                         width="100%">
@@ -307,7 +302,13 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                    <div class="text-muted text-center" style="color: #718096;"
+                                                        align="center">
+                                                        <strong></strong>
+                                                        <br><br>
 
+                                                        <br>
+                                                    </div>
                                                     <table class="s-6 w-full" role="presentation" border="0"
                                                         cellpadding="0" cellspacing="0" style="width: 100%;"
                                                         width="100%">

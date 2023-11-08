@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\Mail;
 
 class SupportContact extends Component
 {
-    public  $name, $email, $subject,$message,$user_id,$data_id;
+    public  $name, $email,$emailFrom, $subject,$message,$user_id,$data_id;
     public $search = '';
     public $isOpen = 0;
-    protected $listeners = ['render','delete']; 
+    protected $listeners = ['render','delete','deleteMultiple']; 
     public $emails;
     public $name_from;
+
+    public $selectAll = false;
+    public $checkedSelected = [];
+    
 
     public function authorize()
 {
@@ -59,6 +63,7 @@ class SupportContact extends Component
        
         $this->resetInputFields();
         $this->openModal();
+        
        if (auth()->user()->hasRole('User')) {
     $firstAdminEmail = AdminEmail::orderBy('id', 'asc')->first();
     if ($firstAdminEmail) {
@@ -116,10 +121,22 @@ class SupportContact extends Component
     $validatedData['name_from'] = $this->name_from;
     //SEND EMAIL FORM CONTACT
        
+   $emailFrom = '';
+
+if (auth()->user()->hasRole('User')) {
+    // Si el usuario actual es un usuario normal, obtén el correo electrónico del administrador
+    $emailFrom =  auth()->user()->email;
+} elseif (auth()->user()->hasRole('Admin')) {
+    // Si el usuario actual es un administrador, usa el correo del usuario que está enviando el formulario
+    $emailFrom =  AdminEmail::orderBy('email', 'desc')->limit(1)->pluck('email')->first(); // Había un error en esta línea
+}
+
+
 \Mail::send('emails.contactSupportMail', array(
     'name' => $this->name,
     'name2' => $this->name_from,
     'email' => $this->email,
+    'emailFrom' => $emailFrom,
     'subject' => $this->subject,
     'message2' => $this->message,
 ), function($message) {
@@ -155,10 +172,45 @@ public function edit($id)
 
 public function delete($id)
 {
-    $this->authorize('manage admin');
+   
     SupportContactForm::find($id)->delete();
     session()->flash('message', 'Data Deleted Successfully');
 }
+
+ public function updatedSelectAll($value)
+{
+    if ($value) {
+        $this->checkedSelected = $this->getItemsIds();
+    } else {
+        $this->checkedSelected = [];
+    }
+}
+
+public function getItemsIds()
+{
+    // Retorna un array con los IDs de los elementos disponibles
+    return SupportContactForm::pluck('id')->toArray();
+}
+
+public function confirmDelete()
+{
+    $this->emit('showConfirmation'); // Emite un evento para mostrar la confirmación
+    
+    
+}
+
+public function deleteMultiple()
+{
+    if (count($this->checkedSelected) > 0) {
+        SupportContactForm::whereIn('id', $this->checkedSelected)->delete();
+        $this->checkedSelected = [];
+        session()->flash('message', 'Data Deleted Successfully');
+        $this->selectAll = false;
+    }
+}
+
+
+
 
 
 }

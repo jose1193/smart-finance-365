@@ -6,25 +6,36 @@
           <!-- END INCLUDE ALERTS MESSAGES-->
           <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                  <select wire:model="selectedUser4" wire:change="updateMonthData"
-                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option value="">Select User</option>
-                      @if (auth()->user()->hasRole('Admin'))
-                          @foreach ($users as $user)
-                              <option value="{{ $user->id }}">{{ $user->name }}
-                              </option>
-                          @endforeach
-                      @else
-                          <option value="{{ auth()->user()->id }}">
-                              {{ auth()->user()->name }}
-                          </option>
-                      @endif
 
-                  </select>
+                  @if (auth()->user()->hasRole('Admin'))
+
+                      <div wire:ignore>
+                          <select id="selectUser4" style="width: 100%" wire:model="selectedUser4"
+                              wire:change="updateMonthData">
+                              <option value="">Select User</option>
+
+                              @foreach ($users as $user)
+                                  <option value="{{ $user->id }}">{{ $user->name }}
+                                  </option>
+                              @endforeach
+                          </select>
+                      </div>
+                  @else
+                      <select wire:model="selectedUser4" wire:change="updateMonthData"
+                          class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="">Select User</option>
+
+                          <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
+                          </option>
+
+
+                      </select>
+
+                  @endif
               </div>
 
               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0">
-                  <select wire:model="selectedMonth" wire:change="updateMonthData"
+                  <select id="selectMonth" wire:model="selectedMonth" wire:change="updateMonthData"
                       class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                       <option value="">Select Month</option>
                       @foreach ($this->months() as $month)
@@ -36,13 +47,16 @@
 
 
               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                  <select wire:model="selectedYear3" wire:change="updateMonthData"
-                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option value="">Select Year</option>
-                      @foreach ($years as $year)
-                          <option value="{{ $year }}">{{ $year }}</option>
-                      @endforeach
-                  </select>
+                  <div wire:ignore>
+                      <select wire:model="selectedYear3" style="width:100%" id="selectYear3"
+                          wire:change="updateMonthData">
+                          <option value="">Select Year</option>
+
+                          @foreach ($years as $year)
+                              <option value="{{ $year }}">{{ $year }}</option>
+                          @endforeach
+                      </select>
+                  </div>
               </div>
 
 
@@ -83,20 +97,43 @@
                                               <label for="exampleFormControlInput1"
                                                   class="block text-gray-700 text-sm font-bold mb-2">
                                                   User Email:</label>
-                                              <select multiple wire:model="emails_user4"
-                                                  class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                  <option value=""></option>
+                                              <div wire:ignore>
+                                                  <select multiple id="select4EmailsUser" style="width: 100%"
+                                                      wire:model="emails_user4">
+                                                      <option value="">Select Emails</option>
 
-                                                  @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
-                                                      <optgroup label="{{ $nameUser }}">
-                                                          @foreach ($groupedEmails as $email)
-                                                              <option value="{{ $email->email }}">
-                                                                  {{ $email->email }}
-                                                              </option>
-                                                          @endforeach
-                                                      </optgroup>
-                                                  @endforeach
-                                              </select>
+                                                      @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
+                                                          <optgroup label="{{ $nameUser }}">
+                                                              @foreach ($groupedEmails as $email)
+                                                                  <option value="{{ $email->email }}">
+                                                                      {{ $email->email }}
+                                                                  </option>
+                                                              @endforeach
+                                                          </optgroup>
+                                                      @endforeach
+                                                  </select>
+                                              </div>
+
+                                              <script>
+                                                  document.addEventListener('livewire:load', function() {
+                                                      Livewire.hook('message.sent', () => {
+                                                          // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                          $('#select4EmailsUser').select2({
+                                                              width: 'resolve' // need to override the changed default
+                                                          });
+                                                      });
+                                                  });
+
+                                                  $(document).ready(function() {
+                                                      // Inicializa Select2
+                                                      $('#select4EmailsUser').select2();
+
+                                                      // Escucha el cambio en Select2 y actualiza Livewire
+                                                      $('#select4EmailsUser').on('change', function(e) {
+                                                          @this.set('emails_user4', $(this).val());
+                                                      });
+                                                  });
+                                              </script>
 
                                               @error('emails_user4')
                                                   <span class="text-red-500">{{ $message }}</span>
@@ -167,17 +204,23 @@
                                   </th>
                                   <th class="px-4 py-3">
                                   </th>
+                                  <th class="px-4 py-3">
+                                  </th>
+                                  <th class="px-4 py-3">
+                                  </th>
                               </tr>
                               <tr
                                   class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                   <th class="px-4 py-3">Nro</th>
                                   <th class="px-4 py-3">Main Category</th>
                                   <th class="px-4 py-3">Category</th>
+                                  <th class="px-4 py-3">Subcategory</th>
                                   <th class="px-4 py-3">Description</th>
                                   <th class="px-4 py-3">Month</th>
-                                  <th class="px-4 py-3">Operation ARS</th>
-                                  <th class="px-4 py-3">Currency</th>
-                                  <th class="px-4 py-3">Total Currency</th>
+                                  <th class="px-4 py-3">Date</th>
+                                  <th class="px-4 py-3">ARS</th>
+                                  <th class="px-4 py-3">USD</th>
+                                  <th class="px-4 py-3">Total Operation USD</th>
                                   <th class="px-4 py-3">Estatus</th>
                               </tr>
                           </thead>
@@ -197,10 +240,16 @@
                                           {{ $item->category_title }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
+
+                                      </td>
+                                      <td class="px-4 py-3 text-center">
                                           {{ Str::words($item->operation_description, 2, '...') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ $selectedMonthName }}
+                                      </td>
+                                      <td class="px-4 py-3 text-center">
+                                          {{ \Carbon\Carbon::parse($item->operation_date)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           $
@@ -267,6 +316,10 @@
                                   <td class="px-4 py-3 text-center font-semibold">
                                       {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
                                       $
+                                  </td>
+                                  <td class="px-4 py-3 text-center">
+                                  </td>
+                                  <td class="px-4 py-3 text-center">
                                   </td>
                                   <td class="px-4 py-3 text-center">
                                   </td>

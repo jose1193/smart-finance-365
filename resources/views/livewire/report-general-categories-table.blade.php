@@ -11,16 +11,18 @@
 
 
                    @if (auth()->user()->hasRole('Admin'))
-                       <select id="select2"
-                           class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                           wire:model="selectedUser2" wire:change="updateCategoriesData" wire:ignore>
-                           <option value="">Select User</option>
 
-                           @foreach ($users as $user)
-                               <option value="{{ $user->id }}">{{ $user->name }}
-                               </option>
-                           @endforeach
-                       </select>
+                       <div wire:ignore>
+                           <select id="selectUser2" style="width: 100%" wire:model="selectedUser2"
+                               wire:change="updateCategoriesData" wire:ignore>
+                               <option value="">Select User</option>
+
+                               @foreach ($users as $user)
+                                   <option value="{{ $user->id }}">{{ $user->name }}
+                                   </option>
+                               @endforeach
+                           </select>
+                       </div>
                    @else
                        <select wire:model="selectedUser2" wire:change="updateCategoriesData"
                            class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -35,106 +37,45 @@
                    @endif
 
 
-                   <script>
-                       document.addEventListener('livewire:load', function() {
-                           var select2 = $('#select2');
-                           var selectedValue = null;
-                           var isDropdownOpen = false; // Variable para almacenar si el menú está abierto o cerrado
+               </div>
 
-                           select2.select2();
+               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                   <div wire:ignore>
+                       <select wire:model="selectedCategoryId" style="width: 100%" wire:change="updateCategoriesData"
+                           id="selectCategory">
+                           <option value="">Select Category</option>
+                           @foreach ($categoriesRender as $formattedCategory)
+                               <optgroup label="{{ $formattedCategory['mainCategoryTitle'] }}">
+                                   @foreach ($formattedCategory['categories'] as $category)
+                                       <option value="{{ $category['id'] }}">
+                                           {{ $category['category_name'] }}
+                                       </option>
+                                   @endforeach
+                               </optgroup>
+                           @endforeach
+                       </select>
 
-                           select2.on('change', function(e) {
-                               selectedValue = e.target.value;
-                               Livewire.emit('userSelected', selectedValue);
-                           });
-
-                           select2.on('select2:opening', function(e) {
-                               isDropdownOpen = true; // Actualiza la variable si el menú se está abriendo
-                           });
-
-                           Livewire.hook('message.received', function(message, component) {
-                               isDropdownOpen = select2.next().hasClass(
-                                   'select2-container--open'
-                               ); // Verifica si el menú está abierto antes de la actualización
-                           });
-
-                           Livewire.hook('message.processed', function(message, component) {
-                               if (isDropdownOpen) {
-                                   select2.val(selectedValue).trigger(
-                                       'change.select2'); // Restablece el valor sin cerrar el menú
-                               }
-                               select2.select2(); // Reincializa select2
-                           });
-                       });
-                   </script>
+                   </div>
 
                </div>
 
                <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                   <div wire:ignore>
+                       <select wire:model="selectedYear2" style="width:100%" id="selectYear2"
+                           wire:change="updateCategoriesData">
+                           <option value="">Select Year</option>
 
-                   <select wire:model="selectedCategoryId" wire:change="updateCategoriesData" id="select3"
-                       class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                       <option value="">Select Category</option>
-                       @foreach ($categoriesRender as $formattedCategory)
-                           <optgroup label="{{ $formattedCategory['mainCategoryTitle'] }}">
-                               @foreach ($formattedCategory['categories'] as $category)
-                                   <option value="{{ $category['id'] }}">
-                                       {{ $category['category_name'] }}
-                                   </option>
-                               @endforeach
-                           </optgroup>
-                       @endforeach
-                   </select>
-                   <script>
-                       document.addEventListener('livewire:load', function() {
-                           var select2 = $('#select3');
-                           var selectedValue = null;
-                           var isDropdownOpen = false; // Variable para almacenar si el menú está abierto o cerrado
+                           @foreach ($years as $year)
+                               <option value="{{ $year }}">{{ $year }}</option>
+                           @endforeach
+                       </select>
+                   </div>
 
-                           select2.select2();
-
-                           select2.on('change', function(e) {
-                               selectedValue = e.target.value;
-                               Livewire.emit('categorySelected', selectedValue);
-                           });
-
-                           select2.on('select2:opening', function(e) {
-                               isDropdownOpen = true; // Actualiza la variable si el menú se está abriendo
-                           });
-
-                           Livewire.hook('message.received', function(message, component) {
-                               isDropdownOpen = select2.next().hasClass(
-                                   'select2-container--open'
-                               ); // Verifica si el menú está abierto antes de la actualización
-                           });
-
-                           Livewire.hook('message.processed', function(message, component) {
-                               if (isDropdownOpen) {
-                                   select2.val(selectedValue).trigger(
-                                       'change.select2'); // Restablece el valor sin cerrar el menú
-                               }
-                               select2.select2(); // Reincializa select2
-                           });
-                       });
-                   </script>
                </div>
 
-               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                   <select wire:model="selectedYear2" wire:change="updateCategoriesData"
-                       class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                       <option value="">Select Year</option>
-                       @foreach ($years as $year)
-                           <option value="{{ $year }}">{{ $year }}</option>
-                       @endforeach
-                   </select>
-               </div>
+
 
            </div>
-
-
-
-
-
 
            @if ($showData2)
                <div class="my-10 flex justify-end space-x-2">
@@ -172,20 +113,44 @@
                                            <label for="exampleFormControlInput1"
                                                class="block text-gray-700 text-sm font-bold mb-2">
                                                User Email:</label>
-                                           <select multiple wire:model="emails_user2"
-                                               class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                               <option value=""></option>
+                                           <div wire:ignore>
+                                               <select multiple id="select2EmailsUser" style="width: 100%"
+                                                   wire:model="emails_user2">
+                                                   <option value="">Select Emails</option>
 
-                                               @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
-                                                   <optgroup label="{{ $nameUser }}">
-                                                       @foreach ($groupedEmails as $email)
-                                                           <option value="{{ $email->email }}">
-                                                               {{ $email->email }}
-                                                           </option>
-                                                       @endforeach
-                                                   </optgroup>
-                                               @endforeach
-                                           </select>
+                                                   @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
+                                                       <optgroup label="{{ $nameUser }}">
+                                                           @foreach ($groupedEmails as $email)
+                                                               <option value="{{ $email->email }}">
+                                                                   {{ $email->email }}
+                                                               </option>
+                                                           @endforeach
+                                                       </optgroup>
+                                                   @endforeach
+                                               </select>
+                                           </div>
+
+                                           <script>
+                                               document.addEventListener('livewire:load', function() {
+                                                   Livewire.hook('message.sent', () => {
+                                                       // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                       $('#select2EmailsUser').select2({
+                                                           width: 'resolve' // need to override the changed default
+                                                       });
+                                                   });
+                                               });
+
+                                               $(document).ready(function() {
+                                                   // Inicializa Select2
+                                                   $('#select2EmailsUser').select2();
+
+                                                   // Escucha el cambio en Select2 y actualiza Livewire
+                                                   $('#select2EmailsUser').on('change', function(e) {
+                                                       @this.set('emails_user2', $(this).val());
+                                                   });
+                                               });
+                                           </script>
+
 
                                            @error('emails_user2')
                                                <span class="text-red-500">{{ $message }}</span>
@@ -252,7 +217,7 @@
                                            Category Not Selected
                                        @endif
                                    </th>
-                                   <th class="px-4 py-3">USD</th>
+                                   <th class="px-4 py-3">Total Operation USD</th>
                                </tr>
                            </thead>
                            <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -268,7 +233,7 @@
                                            ${{ number_format($ArrayCategories[$i]['total'], 0, '.', ',') }}
                                        </td>
                                        <td class="px-4 py-3 text-center">
-                                           ${{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }}
+                                           {{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }}$
                                        </td>
                                    </tr>
                                @endfor

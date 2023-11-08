@@ -32,6 +32,30 @@ class ReportGeneralMonthTable extends Component
     public $selectedMonthName;
     public $totalMonthAmountCurrency;
 
+    protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
+
+    public function userSelected4($userId)
+    {
+        // Aquí puedes ejecutar la lógica que desees con el $userId
+        $this->selectedUser4 = $userId;
+        $this->updateMonthData();
+    }
+
+     public function MonthSelected($selectedMonthId)
+    {
+       
+        $this->selectedMonth = $selectedMonthId;
+        $this->updateMonthData();
+    }
+
+
+    public function YearSelected3($selectedYear3Id)
+    {
+       
+        $this->selectedYear3 = $selectedYear3Id;
+        $this->updateMonthData();
+    }
+
    public function months()
 {
     $months = [];
@@ -125,6 +149,7 @@ private function fetchTotalMonthAmount()
         'statu_options.status_description as status_description',
          'operations.operation_status as operation_status',
         'operations.operation_description',
+        'operations.operation_date',
         'main_categories.title as main_category_title'
     )->orderBy('operations.id', 'desc')->get();
 
@@ -159,14 +184,6 @@ public function resetFields4()
 
 // FUNCTION SEND REPORT TO USERS EMAILS
 
-    public function sendEmail4()
-    {
-        
-       
-        $this->openModal4();
-         
-    }
-
     public function openModal4()
     {
         $this->isOpen4 = true;
@@ -192,6 +209,23 @@ public function resetFields4()
     ];
 
     $validatedData = $this->validate($validationRules);
+
+     $validationRules = [
+    'emails_user4' => 'required|array',
+    'emails_user4.*' => 'email|max:50',
+    'selectedMonth' => 'required', 
+    'selectedYear3' => 'required',
+   
+    
+];
+
+    $customMessages = [
+   
+    'selectedYear3.required' => 'Please select a year',
+    'selectedMonth.required' => 'Please select a Month',  
+    ];
+
+    $this->validate($validationRules, $customMessages);
     
     $user = User::find($this->selectedUser4);
 

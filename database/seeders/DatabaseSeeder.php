@@ -132,10 +132,10 @@ foreach ($mainCategories as $category) {
          // MAIN CATEGORIES STATUS OPTIONS
       
 $statusOptions = [
-    ['status_description' => 'Collected', 'main_category_id' => 1],
-    ['status_description' => 'Uncollected', 'main_category_id' => 1],
-    ['status_description' => 'Paid', 'main_category_id' => 2],
-    ['status_description' => 'Unpaid', 'main_category_id' => 2],
+    ['status_description' => 'Cobrado', 'main_category_id' => 1],
+    ['status_description' => 'No Cobrado', 'main_category_id' => 1],
+    ['status_description' => 'Pagado', 'main_category_id' => 2],
+    ['status_description' => 'No Pagado', 'main_category_id' => 2],
     // Agrega más valores aquí si es necesario
 ];
 

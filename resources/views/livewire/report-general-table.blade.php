@@ -37,25 +37,29 @@
                     <div x-data="{ activeTab: '1' }">
                         <ul class="flex border-b">
                             <li class="mr-2">
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '1'" :class="{ 'bg-blue-700': activeTab === '1' }">
                                     General
                                 </button>
                             </li>
                             <li class="mr-2">
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '2'" :class="{ 'bg-blue-700': activeTab === '2' }">
                                     Categories
                                 </button>
                             </li>
                             <li class="mr-2">
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '3'" :class="{ 'bg-blue-700': activeTab === '3' }">
                                     Between Dates
                                 </button>
                             </li>
                             <li class="mr-2">
-                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
                                     Months
                                 </button>

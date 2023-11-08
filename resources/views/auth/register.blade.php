@@ -245,25 +245,31 @@
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
     <script>
-        // Extiende el plugin jQuery Validation con una regla personalizada
-        $.validator.addMethod("customPassword", function(value, element) {
-            // Utiliza una expresión regular para validar la contraseña
-            return /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).*$/.test(value);
-        }, "The password must contain at least one uppercase, one lowercase, one number, and one special character");
-
         $(document).ready(function() {
+            // Extiende el plugin jQuery Validation con reglas personalizadas
+            $.validator.addMethod("customPassword", function(value, element) {
+                    return /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).*$/.test(value);
+                },
+                "The password must contain at least one uppercase, one lowercase, one number, and one special character"
+            );
+
+            $.validator.addMethod("soloLetras", function(value, element) {
+                return this.optional(element) || /^[A-Za-z]+$/.test(value);
+            }, "Please, enter only letters");
+
             var form = $("#form");
             var submitButton = $("#SubmitForm");
             var emailInput = $("#email");
             var emailError = $("#emailError");
+
             form.validate({
-                // Agrega la opción "errorClass" para especificar la clase CSS para los mensajes de error
                 errorClass: "error-message",
                 rules: {
                     name: {
                         required: true,
                         minlength: 4,
                         maxlength: 20,
+                        soloLetras: true
                     },
                     email: {
                         required: true,
@@ -272,54 +278,44 @@
                     password: {
                         required: true,
                         minlength: 5,
-                        customPassword: true, // Usa la regla personalizada
+                        customPassword: true,
                     },
                 },
                 messages: {
                     password: {
                         required: "Please provide a password",
                     },
+                    name: {
+                        soloLetras: "Please, enter only letters"
+                    }
                 },
-                // Función que se ejecuta cuando se valida el formulario
                 submitHandler: function(form) {
-                    // Deshabilita el botón y muestra "Enviando..." al enviar el formulario
                     submitButton.prop("disabled", true).css("opacity", 0.5).text("Enviando...");
-                    // Realiza la acción de envío del formulario aquí si es necesario
                     form.submit();
                 }
             });
 
-            // Habilita o deshabilita el botón en función de la validación
             form.on("keyup", function() {
-                if (form.valid()) {
-                    submitButton.prop("disabled", false); // Habilita el botón si el formulario es válido
-                } else {
-                    submitButton.prop("disabled",
-                        true); // Deshabilita el botón si el formulario no es válido
-                }
+                submitButton.prop("disabled", !form.valid());
             });
+
             emailInput.on("keyup", function() {
                 var email = $(this).val();
 
                 $.ajax({
                     type: 'POST',
-                    url: '/api/check-email', // Ajusta la URL de tu ruta para verificar el correo
+                    url: '/api/check-email',
                     data: {
                         email: email,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
                         if (response.message === 'Email is not available') {
-                            emailError.text(
-                                'The email has already been taken.'
-                            ); // Muestra el mensaje de error
-                            submitButton.prop("disabled", true); // Deshabilita el botón
+                            emailError.text('The email has already been taken.');
+                            submitButton.prop("disabled", true);
                         } else {
-                            emailError.text(''); // Limpia el mensaje de error
-                            if (form.valid()) {
-                                submitButton.prop("disabled",
-                                    false); // Habilita el botón si el formulario es válido
-                            }
+                            emailError.text('');
+                            submitButton.prop("disabled", !form.valid());
                         }
                     },
                     error: function() {

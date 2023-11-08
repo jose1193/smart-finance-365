@@ -70,9 +70,9 @@ return view('livewire.users-crud', [
    
  public function store()
     {
-         $this->authorize('manage admin');
+        $this->authorize('manage admin');
       $this->validate([
-    'name' => 'required|string|max:30',
+    'name' => 'required|string|max:20|regex:/^[A-Za-z]+$/',
     'email' => 'required|max:50',
     'username' => 'required|max:20',
     'password' => 'required|string|min:5', 
@@ -119,6 +119,16 @@ if ($user) {
     ]);
     $role = Role::find($this->role);
     $user->assignRole($role->name);
+
+     \Mail::send('emails.NewMailUserCrud', array(
+        'name' => $this->name,
+        'username' => $this->username,
+        'email' => $this->email,
+        'role' => $role->name,
+    ), function($message) use ($user) {
+        $message->from('smartfinance794@gmail.com', 'Smart Finance 365');
+        $message->to($user->email)->subject('Welcome to Smart Finance');
+    });
 }
 
 session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');

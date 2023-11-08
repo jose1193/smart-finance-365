@@ -42,6 +42,22 @@ class ReportGeneralMainTable extends Component
     public $totalIncomeCurrency;
     public $totalExpenseCurrency;
     
+    protected $listeners = ['userSelected','YearSelected'];
+
+    public function userSelected($userId)
+    {
+        
+        
+        $this->selectedUser = $userId;
+        $this->updateData();
+    }
+
+    public function YearSelected($selectedYearId)
+    {
+       
+        $this->selectedYear = $selectedYearId;
+        $this->updateData();
+    }
 
     public function dataSelect()
     {
@@ -161,12 +177,6 @@ public function resetFields1()
 
 
 // FUNCTION SEND REPORT TO USERS EMAILS
-public function sendEmail()
-    {
-        
-       
-        $this->openModal();
-    }
 
     public function openModal()
     {
@@ -190,12 +200,20 @@ public function sendEmail()
     public function emailStore()
     {
         
-        $validationRules = [
-    'emails_user' => 'required|array', 
-    'emails_user.*' => 'email|max:50', 
+      
+    $validationRules = [
+    'emails_user' => 'required|array',
+    'emails_user.*' => 'email|max:50',
+    'selectedYear' => 'required', 
 ];
 
-    $validatedData = $this->validate($validationRules);
+    $customMessages = [
+    'selectedYear.required' => 'Please select a year',
+    ];
+
+    $this->validate($validationRules, $customMessages);
+
+
 
     $user = User::find($this->selectedUser);
 

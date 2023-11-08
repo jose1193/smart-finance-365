@@ -54,7 +54,7 @@
                  Unpaid
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 $ {{ $formatted_amount = number_format($unpaid, 0, '.', ',') }}
+                 $ {{ number_format($unpaid, 0, '.', ',') }}
              </p>
          </div>
      </div>
@@ -72,7 +72,7 @@
                  Paid
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 $ {{ $formatted_amount = number_format($paid, 0, '.', ',') }}
+                 $ {{ number_format($paid, 0, '.', ',') }}
              </p>
          </div>
      </div>
