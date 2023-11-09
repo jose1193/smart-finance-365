@@ -56,9 +56,9 @@
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Description</th>
-                                        <th class="px-4 py-3">Amount</th>
-                                        <th class="px-4 py-3">Currency Amount</th>
-                                        <th class="px-4 py-3">Total Exchange</th>
+                                        <th class="px-4 py-3">Amount ARS</th>
+                                        <th class="px-4 py-3">Rate ARS/USD</th>
+                                        <th class="px-4 py-3">Total in USD</th>
                                         <th class="px-4 py-3">Status</th>
                                         <th class="px-4 py-3">Date</th>
                                         <th class="px-4 py-3">Action</th>
@@ -91,9 +91,8 @@
                                                 {{ $formatted_amount = number_format($item->operation_currency, 0, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-
-                                                $
                                                 {{ $formatted_amount = number_format($item->operation_currency_total, 0, '.', ',') }}
+                                                $
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
@@ -104,7 +103,7 @@
                                                     </span>
                                                 @elseif ($item->operation_status === '3')
                                                     <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
+                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
                                                         {{ $item->status_description }}
                                                     </span>
                                                 @elseif ($item->operation_status === '2')
@@ -115,7 +114,7 @@
                                                 @else
                                                     <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                                     <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-white bg-red-700 rounded-full dark:bg-gray-700 dark:text-gray-100">
+                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-gray-700 dark:text-gray-100">
                                                         {{ $item->status_description }}
                                                     </span>
                                                 @endif
@@ -218,7 +217,7 @@
                                                     <div class="mb-4">
                                                         <label for="operation_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Currency Amount </label>
+                                                            Rate ARS/USD </label>
 
 
                                                         <input type="text" autocomplete="off"
@@ -234,7 +233,7 @@
                                                     <div class="mb-4">
                                                         <label for="operation_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Total Currency Amount </label>
+                                                            Total in USD </label>
 
 
                                                         <input type="text" name="totalbudget2" autocomplete="off"
@@ -286,18 +285,38 @@
                                                         <label for="exampleFormControlInput2"
                                                             class="block text-gray-700 text-sm font-bold mb-2">Category
                                                         </label>
-                                                        <select wire:model="category_id"
-                                                            class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                            <option value="">
+                                                        <div wire:ignore>
+                                                            <select wire:model="category_id" id="select2CategoryId">
+                                                                <option value="">
 
-                                                            </option>
-                                                            @foreach ($categoriesRender as $item)
-                                                                <option value="{{ $item->id }}">
-                                                                    {{ $item->category_name }}
                                                                 </option>
-                                                            @endforeach
-                                                        </select>
+                                                                @foreach ($categoriesRender as $item)
+                                                                    <option value="{{ $item->id }}">
+                                                                        {{ $item->category_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <script>
+                                                            document.addEventListener('livewire:load', function() {
+                                                                Livewire.hook('message.sent', () => {
+                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                    $('#select2CategoryId').select2({
+                                                                        width: 'resolve' // need to override the changed default
+                                                                    });
+                                                                });
+                                                            });
 
+                                                            $(document).ready(function() {
+                                                                // Inicializa Select2
+                                                                $('#select2CategoryId').select2();
+
+                                                                // Escucha el cambio en Select2 y actualiza Livewire
+                                                                $('#select2CategoryId').on('change', function(e) {
+                                                                    @this.set('category_id', $(this).val());
+                                                                });
+                                                            });
+                                                        </script>
                                                         @error('category_id')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror

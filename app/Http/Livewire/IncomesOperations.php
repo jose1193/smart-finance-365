@@ -92,6 +92,8 @@ public function mount()
     public function closeModal()
     {
         $this->isOpen = false;
+         $this->reset();
+        $this->resetValidation(); 
     }
 
     private function resetInputFields(){

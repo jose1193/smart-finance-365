@@ -19,7 +19,8 @@ class SupportContact extends Component
 
     public $selectAll = false;
     public $checkedSelected = [];
-    
+
+    public $selectedMessage,$subjectShow,$selectedMessageShow ;
 
     public function authorize()
 {
@@ -27,25 +28,30 @@ class SupportContact extends Component
 }
 
    
-
-   
-
    public function render()
 {
     $query = SupportContactForm::query();
 
-    if (auth()->user()->hasRole('User')) {
-        $query->where('user_id', auth()->user()->id);
-    } elseif (auth()->user()->hasRole('Admin')) {
+    if (auth()->user()->hasRole('Admin')) {
+        // Si es un administrador, muestra todos los mensajes
         $query->orderBy('id', 'desc');
+    } else {
+        
+        $userEmail = auth()->user()->name;
+
+        $query->where(function ($q) use ($userEmail) {
+            $q->where('name_from', $userEmail)
+                ->orWhere('name', $userEmail)
+                ->orWhere('email', $userEmail);
+        });
     }
 
     if ($this->search) {
         $query->where(function ($q) {
             $q->where('email', 'like', '%' . $this->search . '%')
                 ->orWhere('name_from', 'like', '%' . $this->search . '%')
-                 ->orWhere('name', 'like', '%' . $this->search . '%')
-                   ->orWhere('subject', 'like', '%' . $this->search . '%')
+                ->orWhere('name', 'like', '%' . $this->search . '%')
+                ->orWhere('subject', 'like', '%' . $this->search . '%')
                 ->orWhere('message', 'like', '%' . $this->search . '%');
         });
     }
@@ -54,6 +60,8 @@ class SupportContact extends Component
 
     return view('livewire.support-contact', ['data' => $data]);
 }
+
+
 
 
 
@@ -99,6 +107,8 @@ class SupportContact extends Component
     public function closeModal()
     {
         $this->isOpen = false;
+         $this->reset();
+        $this->resetValidation(); 
     }
 
     private function resetInputFields(){
@@ -108,17 +118,24 @@ class SupportContact extends Component
     public function store()
 {
     $validationRules = [
-        'name' => 'required|string|max:40',
+        'name' => 'required|string|max:20|regex:/^[A-Za-z\s]+$/',
         'email' => 'required|email|string|max:40',
-        'subject' => 'required|string|max:255',
-        'message' => 'required|string',
+        'subject' => 'required|string|max:40',
+        'message' => 'required|string|max:255',
     ];
 
-    $validatedData = $this->validate($validationRules);
+    $validatedData = $this->validate($validationRules, [
+    'name.required' => 'El campo nombre es obligatorio.',
+    'name.string' => 'El campo nombre debe ser una cadena de texto.',
+    'name.max' => 'El campo nombre no debe superar los 20 caracteres.',
+    'name.regex' => 'El campo nombre solo debe contener letras y espacios.',
+    'email.required' => 'El campo email es obligatorio.',
+]);
 
     // Asigna el user_id si el usuario está autenticado
     $validatedData['user_id'] = auth()->user()->id;
     $validatedData['name_from'] = $this->name_from;
+    $validatedData['message'] = nl2br($this->message);
     //SEND EMAIL FORM CONTACT
        
    $emailFrom = '';
@@ -210,6 +227,18 @@ public function deleteMultiple()
 }
 
 
+public function showMessage($messageId)
+{
+    $message = SupportContactForm::find($messageId);
+
+    if ($message) {
+      
+        $this->selectedMessage = $message;
+        $this->subjectShow = $message->subject;
+        $this->selectedMessageShow = $message->message; 
+        
+    } 
+}
 
 
 

@@ -80,66 +80,79 @@ return view('livewire.users-crud', [
     
     $this->validate([
     'name' => 'required|string|max:20|regex:/^[A-Za-z\s]+$/',
-    'username' => 'required|unique:users,username,' . $this->data_id,
+    'username' => ['required', 'unique:users,username,' . $this->data_id, 'regex:/^\S*$/'],
     'email' => 'required|email|unique:users,email,' . $this->data_id,
-    'password' => 'required|string|min:5', 
      'role' => 'required',
 ], [
     'name' => [
-    'required' => 'El campo nombre es obligatorio.',
-    'string' => 'El campo nombre debe ser una cadena de texto.',
-    'max' => 'El campo nombre no debe superar los 30 caracteres.',
-    'regex' => 'El campo nombre solo debe contener letras.',
+    'required' => 'El campo nombre es obligatorio',
+    'string' => 'El campo nombre debe ser una cadena de texto',
+    'max' => 'El campo nombre no debe superar los 40 caracteres',
+    'regex' => 'El campo nombre solo debe contener letras',
 ],
-    'email.required' => 'El campo correo electrónico es obligatorio.',
-    'email.email' => 'Por favor, ingrese una dirección de correo electrónico válida.',
-    'email.unique' => 'Esta dirección de Email ya ha sido registrada.',
-    'email.max' => 'El campo Email no debe superar los 50 caracteres.',
-    'username.required' => 'El campo nombre de usuario es obligatorio.',
-    'username.unique' => 'Este nombre de usuario ya está en uso.',
-    'username.max' => 'El campo nombre de usuario no debe superar los 20 caracteres.',
-    'password.required' => 'El campo contraseña es obligatorio.',
-    'password.min' => 'La contraseña debe tener al menos 5 caracteres.', 
+    'email.required' => 'El campo correo electrónico es obligatorio',
+    'email.email' => 'Por favor, ingrese una dirección de correo electrónico válida',
+    'email.unique' => 'Esta dirección de Email ya ha sido registrada',
+    'email.max' => 'El campo Email no debe superar los 50 caracteres',
+    'username.required' => 'El campo nombre de usuario es obligatorio',
+    'username.unique' => 'Este nombre de usuario ya está en uso',
+    'username.max' => 'El campo nombre de usuario no debe superar los 20 caracteres',
+    'username.regex' => 'El campo Username no debe tener espacios',
 ]);
 
-
- // Verificar si el usuario existe antes de realizar la actualización
+// Verificar si el usuario existe antes de realizar la actualización
 $user = User::find($this->data_id);
 
 if ($user) {
-    // El usuario ya existe, actualiza el rol
-    $role = Role::find($this->role);
-    $user->syncRoles([$role->name]);
-    
-    $user->update([
+    // El usuario ya existe, actualiza la información, pero no la contraseña si no se está actualizando
+    $userData = [
         'name' => $this->name,
         'username' => $this->username,
         'email' => $this->email,
         'email_verified_at' => now(),
-        'password' => bcrypt($this->password),
-    ]);
-} else {
+    ];
+
     
+    if ($this->password) {
+        $userData['password'] = bcrypt($this->password);
+    }
+
+    $user->update($userData);
+
+    // Actualiza el rol
+    $role = Role::find($this->role);
+    $user->syncRoles([$role->name]);
+} else {
+    // Generar una contraseña predeterminada si es un nuevo usuario
+    $password = $this->username;
+
+    // Crear el usuario con la contraseña predeterminada
     $user = User::updateOrCreate(['id' => $this->data_id], [
         'name' => $this->name,
         'username' => $this->username,
         'email' => $this->email,
         'email_verified_at' => now(),
-        'password' => bcrypt($this->password),
+        'password' => bcrypt($password),
     ]);
+
+    // Asignar rol al nuevo usuario
     $role = Role::find($this->role);
     $user->assignRole($role->name);
 
-     \Mail::send('emails.NewMailUserCrud', array(
+    
+    \Mail::send('emails.NewMailUserCrud', [
         'name' => $this->name,
         'username' => $this->username,
         'email' => $this->email,
+        'password' => $password,
         'role' => $role->name,
-    ), function($message) use ($user) {
+    ], function ($message) use ($user) {
         $message->from('smartfinance794@gmail.com', 'Smart Finance 365');
         $message->to($user->email)->subject('Welcome to Smart Finance');
     });
 }
+
+
 
 session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
    
@@ -157,7 +170,7 @@ session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Dat
     $this->name = $user->name;
     $this->username = $user->username;
     $this->email = $user->email;
-    $this->password = $user->password;
+    
 
     // Obtener el rol del usuario y establecerlo en una propiedad del componente
     $this->role = $user->roles->first()->id; // Asigna el ID del rol

@@ -188,26 +188,7 @@
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
-                                                    <div class="mb-4">
-                                                        <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-                                                        <div class="relative">
-                                                            <input type="password" id="password" autocomplete="off"
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                                id="exampleFormControlInput1" required maxlength="20"
-                                                                placeholder="Enter Password" wire:model="password">
-                                                            <span id="toggle-password" class="password-toggle"
-                                                                onclick="togglePasswordVisibility()">
-                                                                <i class="text-gray-500 fa-regular fa-eye"></i>
-                                                            </span>
-                                                        </div>
 
-
-
-                                                        @error('password')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
                                                             class="block text-gray-700 text-sm font-bold mb-2">Email</label>

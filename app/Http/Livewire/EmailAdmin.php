@@ -44,6 +44,8 @@ class EmailAdmin extends Component
     public function closeModal()
     {
         $this->isOpen = false;
+         $this->reset();
+        $this->resetValidation(); 
     }
 
     private function resetInputFields(){
@@ -52,43 +54,58 @@ class EmailAdmin extends Component
 
 public function store()
 {
-    $validationRules = [
-        'name_support' => 'required|string|max:40',
-        'email' => 'required|email|string|max:40',
-    ];
+   $validationRules = [
+    'name_support' => 'required|string|max:20|',
+    'email' => 'required|email|string|max:40',
+];
 
-    $validatedData = $this->validate($validationRules);
+$customMessages = [
+    'name_support.required' => 'El campo nombre es obligatorio',
+    'name_support.string' => 'El campo nombre debe ser una cadena de texto',
+    'name_support.max' => 'El campo nombre no debe superar los 20 caracteres',
+    'email.required' => 'El campo email es obligatorio',
+    'email.email' => 'El campo email debe ser una dirección de correo electrónico válida',
+    'email.string' => 'El campo email debe ser una cadena de texto',
+    'email.max' => 'El campo email no debe superar los 40 caracteres',
+];
+
+    $validatedData = $this->validate($validationRules,$customMessages);
 
     $existingEmail = AdminEmail::where('email', $this->email)->first();
 
-    if ($existingEmail) {
-        session()->flash('error', 'The email already exists in the database.');
-    } else {
-        // Verifica si ya existe un email registrado
-        $existingCount = AdminEmail::count();
+    
+if ($existingEmail && $existingEmail->id != $this->data_id) {
+    session()->flash('error', 'The email already exists in the database.');
+} else {
+    // Asignar el ID del usuario a los datos validados
+    $validatedData['user_id'] = auth()->user()->id;
 
+    // Verificar si ya existe un correo electrónico registrado
+    $existingCount = AdminEmail::count();
 
-        // Assign the user ID to the data
-        $validatedData['user_id'] = auth()->user()->id;
-        if ($existingCount === 0 || $this->data_id) {
-            if ($this->data_id) {
-                // Si es una edición, permite cambiar el correo siempre que el nuevo correo no exista
-                $existingOtherEmail = AdminEmail::where('email', $this->email)->where('id', '!=', $this->data_id)->first();
-                if ($existingOtherEmail) {
-                    session()->flash('error', 'Email already exists for another record.');
-                } else {
-                    AdminEmail::where('id', $this->data_id)->update(['email' => $this->email]);
-                    session()->flash('message', 'Data Updated Successfully.');
-                }
+    if ($existingCount === 0 || $this->data_id) {
+        if ($this->data_id) {
+            // Si es una edición, permite cambiar el correo siempre que el nuevo correo no exista
+            $existingOtherEmail = AdminEmail::where('email', $this->email)->where('id', '!=', $this->data_id)->first();
+            if ($existingOtherEmail) {
+                session()->flash('error', 'Email already exists for another record.');
             } else {
-                // Si es nuevo y no hay registros, permite crear el correo
-                AdminEmail::create($validatedData);
-                session()->flash('message', 'Data Created Successfully.');
+                // Actualiza tanto el email como el name_support
+                AdminEmail::where('id', $this->data_id)->update([
+                    'email' => $this->email,
+                    'name_support' => $this->name_support
+                ]);
+                session()->flash('message', 'Data Updated Successfully.');
             }
         } else {
-            session()->flash('error', 'Only one email can be registered.');
+            // Si es nuevo y no hay registros, permite crear el correo
+            AdminEmail::create($validatedData);
+            session()->flash('message', 'Data Created Successfully.');
         }
+    } else {
+        session()->flash('error', 'Only one email can be registered.');
     }
+}
 
     $this->closeModal();
     $this->resetInputFields();

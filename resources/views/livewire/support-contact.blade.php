@@ -33,7 +33,72 @@
                         </div>
 
                     </div>
+                    <!-- SHOW MESSAGE -->
+                    @if ($selectedMessage)
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
+                            <div
+                                class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div class="fixed inset-0 transition-opacity">
+                                    <div class="absolute inset-0 bg-gray-700 opacity-75"></div>
+                                </div>
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
+                                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                                    role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <div
+                                        class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                        <!--Modal title-->
+                                        <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
+                                            id="exampleModalLabel">
+                                            Details Message
+                                        </h5>
+                                        <!--Close button-->
+                                        <button type="button" wire:click="closeModal()"
+                                            class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                            data-te-modal-dismiss aria-label="Close">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <form autocomplete="off">
+                                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                            <div class="">
+                                                <div class="mb-4">
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                                                        Subject</label>
+
+
+                                                    <input type="text" autocomplete="off" wire:model="subjectShow"
+                                                        readonly
+                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                        placeholder="Enter Subject">
+
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                                                        Message</label>
+
+                                                    <p class="text-base font-medium text-gray-600">
+                                                        {!! $selectedMessageShow !!}</p>
+
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                    @endif
+                    <!-- END SHOW MESSAGE -->
                     <div class=" my-7 flex justify-between space-x-2">
                         <x-button wire:click="create()"><span class="font-semibold"> New Message <i
                                     class="fa-solid fa-envelope-open-text"></i></span>
@@ -53,17 +118,17 @@
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
-                            <table class="w-full whitespace-no-wrap">
+                            <table class="w-full whitespace-no-wrap ">
                                 <thead>
                                     <tr
-                                        class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
+                                        class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">From</th>
                                         <th class="px-4 py-3">To</th>
                                         <th class="px-4 py-3">Email</th>
                                         <th class="px-4 py-3">Subject</th>
                                         <th class="px-4 py-3">Message</th>
-                                        <th class="px-4 py-3"></th>
+                                        <th class="px-4 py-3 ">Action</th>
                                         @can('manage admin')
                                             <th class="px-4 py-3">
                                                 @if (!$data->isEmpty())
@@ -75,7 +140,7 @@
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-xs  uppercase dark:text-gray-400">
+                                        <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
@@ -99,7 +164,9 @@
                                             </td>
 
                                             <td class="px-4 py-3 text-sm">
-
+                                                <button wire:click="showMessage({{ $item->id }})"
+                                                    class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 mr-1  rounded"><i
+                                                        class="fa-solid fa-eye"></i></button>
 
                                                 <button wire:click="$emit('deleteData',{{ $item->id }})"
                                                     class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
@@ -187,8 +254,8 @@
                                                         @enderror
                                                     </div>
                                                     <div class="mb-4">
-                                                        <label
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Email</label>
 
                                                         @if (auth()->user()->hasRole('User'))
                                                             <input type="text" autocomplete="off"
@@ -200,22 +267,43 @@
                                                                 class="hidden shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                                 placeholder="Enter Email" readonly>
                                                         @else
-                                                            <select wire:model="email"
-                                                                class="block w-full mt-1 text-sm dark:text-gray-700 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                                <option value=""></option>
+                                                            <div wire:ignore>
+                                                                <select wire:model="email" id="select2EMailUserId"
+                                                                    style="width: 100%">
+                                                                    <option value=""></option>
 
-                                                                @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
-                                                                    <optgroup label="{{ $nameUser }}">
-                                                                        @foreach ($groupedEmails as $email)
-                                                                            <option value="{{ $email->email }}">
-                                                                                {{ $email->email }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </optgroup>
-                                                                @endforeach
-                                                            </select>
+                                                                    @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
+                                                                        <optgroup label="{{ $nameUser }}">
+                                                                            @foreach ($groupedEmails as $email)
+                                                                                <option value="{{ $email->email }}">
+                                                                                    {{ $email->email }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
                                                         @endif
+                                                        <script>
+                                                            document.addEventListener('livewire:load', function() {
+                                                                Livewire.hook('message.sent', () => {
+                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                    $('#select2EMailUserId').select2({
+                                                                        width: 'resolve' // need to override the changed default
+                                                                    });
+                                                                });
+                                                            });
 
+                                                            $(document).ready(function() {
+                                                                // Inicializa Select2
+                                                                $('#select2EMailUserId').select2();
+
+                                                                // Escucha el cambio en Select2 y actualiza Livewire
+                                                                $('#select2EMailUserId').on('change', function(e) {
+                                                                    @this.set('email', $(this).val());
+                                                                });
+                                                            });
+                                                        </script>
                                                         @error('email')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror

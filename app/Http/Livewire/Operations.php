@@ -61,7 +61,7 @@ public function mount()
                                   ->orderBy('id', 'asc')
                                   ->get();
 
-    $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
+    $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
                                   ->orderBy('id', 'asc')
                                   ->get();
        
@@ -88,6 +88,8 @@ public function mount()
     public function closeModal()
     {
         $this->isOpen = false;
+          $this->reset();
+        $this->resetValidation(); 
     }
 
     private function resetInputFields(){

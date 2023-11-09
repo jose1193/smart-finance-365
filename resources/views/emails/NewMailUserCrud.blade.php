@@ -234,6 +234,9 @@
                                                                         Su Username es:
                                                                         <strong>{{ $username }}</strong>
                                                                         <br><br>
+                                                                        Su Password es:
+                                                                        <strong>{{ $password }}</strong>
+                                                                        <br><br>
                                                                         Si en algún momento deseas asignar una nueva
                                                                         contraseña a tu cuenta, puedes hacerlo siguiendo
                                                                         este <a
