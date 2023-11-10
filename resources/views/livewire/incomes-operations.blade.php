@@ -94,17 +94,17 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
-                                                @if ($item->operation_status === '1')
+                                                @if ($item->operation_status == '1')
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
                                                         {{ $item->status_description }}
                                                     </span>
-                                                @elseif ($item->operation_status === '3')
+                                                @elseif ($item->operation_status == '3')
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
                                                         {{ $item->status_description }}
                                                     </span>
-                                                @elseif ($item->operation_status === '2')
+                                                @elseif ($item->operation_status == '2')
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
                                                         {{ $item->status_description }}
@@ -112,7 +112,7 @@
                                                 @else
                                                     <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                                     <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-gray-700 dark:text-gray-100">
+                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-700 dark:text-red-100">
                                                         {{ $item->status_description }}
                                                     </span>
                                                 @endif
@@ -240,7 +240,7 @@
 
 
                                                         <input type="text" name="totalbudget2" autocomplete="off"
-                                                            id="operation_currency_total"
+                                                            id="operation_currency_total" readonly
                                                             wire:model="operation_currency_total"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             placeholder="">

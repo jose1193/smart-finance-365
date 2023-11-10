@@ -17,10 +17,13 @@ return new class extends Migration
              $table->string('operation_amount');
              $table->string('operation_currency');
              $table->string('operation_currency_total');
-             $table->string('operation_status');
              $table->string('operation_date');
              $table->string('operation_month');
              $table->string('operation_year');
+             $table->foreignId('operation_status')
+            ->constrained('statu_options')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
             $table->foreignId('category_id')
             ->constrained('categories')
             ->onUpdate('cascade')

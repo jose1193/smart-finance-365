@@ -263,17 +263,17 @@
                                           {{ number_format($item->operation_currency_total, 0, '.', ',') }}
                                           $</td>
                                       <td class="px-4 py-3 text-center">
-                                          @if ($item->operation_status === '1')
+                                          @if ($item->operation_status == '1')
                                               <span
                                                   class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
                                                   {{ $item->status_description }}
                                               </span>
-                                          @elseif ($item->operation_status === '3')
+                                          @elseif ($item->operation_status == '3')
                                               <span
                                                   class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
                                                   {{ $item->status_description }}
                                               </span>
-                                          @elseif ($item->operation_status === '2')
+                                          @elseif ($item->operation_status == '2')
                                               <span
                                                   class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
                                                   {{ $item->status_description }}

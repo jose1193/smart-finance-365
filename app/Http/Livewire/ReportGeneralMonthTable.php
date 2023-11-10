@@ -31,7 +31,7 @@ class ReportGeneralMonthTable extends Component
     public $totalMonthAmount;
     public $selectedMonthName;
     public $totalMonthAmountCurrency;
-
+    
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
     public function userSelected4($userId)
@@ -122,38 +122,41 @@ private function fetchTotalMonthAmount()
 {
     return $this->operationsFetchMonths->sum('operation_amount');
 }
+private function fetchMonthData()
+{
+    $query = Operation::with(['category.mainCategories', 'status'])
+        ->join('categories', 'operations.category_id', '=', 'categories.id')
+        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+        ->when($this->selectedUser4, function ($query, $selectedUser4) {
+            // Filtrar por usuario seleccionado
+            return $query->where('operations.user_id', $selectedUser4);
+        })
+        ->when($this->selectedMonth, function ($query, $selectedMonth) {
+            // Filtrar por mes seleccionado
+            return $query->whereMonth('operations.operation_date', $selectedMonth);
+        })
+        ->when($this->selectedYear3, function ($query, $selectedYear3) {
+            // Filtrar por año seleccionado
+            return $query->whereYear('operations.operation_date', $selectedYear3);
+        })
+        ->select(
+            'operations.operation_amount',
+            'operations.operation_currency',
+            'operations.operation_currency_total',
+            'categories.category_name as category_title',
+            'statu_options.status_description as status_description',
+            'operations.operation_status as operation_status',
+            'operations.operation_description',
+            'operations.operation_date',
+            'main_categories.title as main_category_title'
+        )
+        ->orderBy('operations.id', 'desc')
+        ->get();
 
+    return $query;
+}
 
- private function fetchMonthData()
-    {
-        $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-            ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id'); 
-        if ($this->selectedUser4) {
-            $query->where('operations.user_id', $this->selectedUser4);
-        }
-
-        if ($this->selectedMonth) {
-            $query->whereMonth('operations.operation_date', $this->selectedMonth);
-        }
-
-        if ($this->selectedYear3) {
-            $query->whereYear('operations.operation_date', $this->selectedYear3);
-        }
-
-        return $query->select(
-        'operations.operation_amount',
-        'operations.operation_currency',
-         'operations.operation_currency_total',
-        'categories.category_name as category_title',
-        'statu_options.status_description as status_description',
-         'operations.operation_status as operation_status',
-        'operations.operation_description',
-        'operations.operation_date',
-        'main_categories.title as main_category_title'
-    )->orderBy('operations.id', 'desc')->get();
-
-    }
 
 
 

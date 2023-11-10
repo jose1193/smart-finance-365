@@ -100,7 +100,7 @@ foreach ($mainCategories as $category) {
         // END INCOME CATEGORIES
         
         //EXPENSES CATEGORY
-         $expensesCategory = MainCategories::where('title', 'Expenses')->first();
+         $expensesCategory = MainCategories::where('title', 'Expense')->first();
     $expensesCategories = [
     ['category_name' => 'Alquiler/Hipoteca', 'category_description' => 'Gastos relacionados con la vivienda'],
     ['category_name' => 'Alimentación', 'category_description' => 'Gastos en alimentos y comestibles'],

@@ -20,6 +20,10 @@ class StatusCategories extends Component
     public function render()
     {
     
+        $user = auth()->user();
+        if (!$user || !$user->hasRole('Admin')) {
+            abort(403, 'This action is Forbidden.');
+        }
 $data = MainCategories::select('main_categories.*', 'statu_options.*', 'main_categories.title AS Title')
     ->join('statu_options', 'main_categories.id', '=', 'statu_options.main_category_id')
     ->where('statu_options.status_description', 'like', '%' . $this->search . '%')

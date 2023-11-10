@@ -19,4 +19,5 @@ class StatuOptions extends Model
         return $this->belongsTo(MainCategories::class, 'main_category_id');
     }
 
+    
 }

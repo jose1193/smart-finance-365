@@ -108,17 +108,17 @@
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
 
-                                            @if ($item->operation_status === '1')
+                                            @if ($item->operation_status == '1')
                                                 <span
                                                     class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
                                                     {{ $item->status_description }}
                                                 </span>
-                                            @elseif ($item->operation_status === '3')
+                                            @elseif ($item->operation_status == '3')
                                                 <span
                                                     class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
                                                     {{ $item->status_description }}
                                                 </span>
-                                            @elseif ($item->operation_status === '2')
+                                            @elseif ($item->operation_status == '2')
                                                 <span
                                                     class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
                                                     {{ $item->status_description }}
@@ -126,10 +126,11 @@
                                             @else
                                                 <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                                 <span
-                                                    class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-gray-700 dark:text-gray-100">
+                                                    class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-700 dark:text-red-100">
                                                     {{ $item->status_description }}
                                                 </span>
                                             @endif
+
 
 
 
@@ -231,7 +232,7 @@
                                                 <div class="mb-4">
                                                     <label for="operation_currency"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Currency Amount </label>
+                                                        Rate ARS/USD </label>
 
 
                                                     <input type="text" autocomplete="off" id="operation_currency"
@@ -247,11 +248,11 @@
                                                 <div class="mb-4">
                                                     <label for="operation_currency"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Total Currency Amount </label>
+                                                        Total in USD </label>
 
 
                                                     <input type="text" name="totalbudget2" autocomplete="off"
-                                                        id="operation_currency_total"
+                                                        id="operation_currency_total" readonly
                                                         wire:model="operation_currency_total"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                         placeholder="">
@@ -368,7 +369,7 @@
                                                 <button type="button" wire:click.prevent="store()"
                                                     wire:loading.attr="disabled" wire:target="store"
                                                     class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                    Save
+                                                    Register
                                                 </button>
                                             </span>
                                             <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
