@@ -318,22 +318,39 @@
                                                     <label for="exampleFormControlInput2"
                                                         class="block text-gray-700 text-sm font-bold mb-2">Category
                                                     </label>
-                                                    <select wire:model="category_id"
-                                                        class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                        <option value="">
+                                                    <div wire:ignore>
+                                                        <select wire:model="category_id" id="select2DashCategoryId"
+                                                            style="width: 100%">
+                                                            <option value="">
 
-                                                        </option>
-                                                        @foreach ($categoriesRender->groupBy('main_category_title') as $mainCategoryTitle => $categories)
-                                                            <optgroup label="{{ $mainCategoryTitle }}">
-                                                                @foreach ($categories as $category)
-                                                                    <option value="{{ $category->id }}">
-                                                                        {{ $category->category_name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </optgroup>
-                                                        @endforeach
+                                                            </option>
+                                                            @foreach ($categoriesRender as $item)
+                                                                <option value="{{ $item->id }}">
+                                                                    {{ $item->category_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <script>
+                                                        document.addEventListener('livewire:load', function() {
+                                                            Livewire.hook('message.sent', () => {
+                                                                // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                $('#select2DashCategoryId').select2({
+                                                                    width: 'resolve' // need to override the changed default
+                                                                });
+                                                            });
+                                                        });
 
-                                                    </select>
+                                                        $(document).ready(function() {
+                                                            // Inicializa Select2
+                                                            $('#select2DashCategoryId').select2();
+
+                                                            // Escucha el cambio en Select2 y actualiza Livewire
+                                                            $('#select2DashCategoryId').on('change', function(e) {
+                                                                @this.set('category_id', $(this).val());
+                                                            });
+                                                        });
+                                                    </script>
 
 
                                                     @error('category_id')

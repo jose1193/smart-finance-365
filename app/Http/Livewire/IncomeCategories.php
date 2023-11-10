@@ -40,7 +40,7 @@ class IncomeCategories extends Component
                 ->orWhere('users.name', 'like', '%' . $searchTerm . '%');
         })
         ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_name')
-        ->groupBy('categories.id') // Agrupar por el ID de categoría
+        ->groupBy('categories.id', 'categories.category_name', 'main_categories.title')
         ->orderBy('categories.id', 'desc')
         ->paginate(10);
 }

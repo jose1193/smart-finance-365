@@ -39,8 +39,7 @@ class ExpensesCategories extends Component
                 ->orWhere('users.name', 'like', '%' . $searchTerm . '%');
         })
         ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_name')
-        ->groupBy('categories.id') // Agrupar por el ID de categoría
-        ->orderBy('categories.id', 'desc')
+      ->groupBy('categories.id', 'categories.category_name', 'main_categories.title')
         ->paginate(10);
 }
 elseif (auth()->user()->hasRole('User')) {
