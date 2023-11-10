@@ -9,6 +9,8 @@ use App\Models\Operation;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- guzzle query api
+use App\Models\CategoriesToAssign;
+use Illuminate\Support\Facades\DB;
 
 class IncomesOperations extends Component
 {

@@ -86,11 +86,17 @@
                                                 Subcategory income
                                             </td>
                                             <td class="px-4 py-3 text-xs">
+
                                                 @if ($item->assignedUsers->count() === 0)
                                                     All Users
-                                                @else
+                                                @elseif (auth()->user()->hasRole('Admin'))
                                                     {{ $item->assignedUsers->pluck('username')->implode(', ') }}
+                                                @elseif ($item->assignedUsers->pluck('id')->contains(auth()->user()->id))
+                                                    Assigned to {{ auth()->user()->username }}
+                                                @else
+                                                    Not Assigned
                                                 @endif
+
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ \Carbon\Carbon::parse($item->created_at)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}

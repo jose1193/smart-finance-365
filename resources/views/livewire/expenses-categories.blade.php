@@ -82,10 +82,14 @@
                                                 subcategory
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                @if ($item->assignedUsers->isEmpty())
-                                                    ALL USERS
-                                                @else
+                                                @if ($item->assignedUsers->count() === 0)
+                                                    All Users
+                                                @elseif (auth()->user()->hasRole('Admin'))
                                                     {{ $item->assignedUsers->pluck('username')->implode(', ') }}
+                                                @elseif ($item->assignedUsers->pluck('id')->contains(auth()->user()->id))
+                                                    Assigned to {{ auth()->user()->username }}
+                                                @else
+                                                    Not Assigned
                                                 @endif
                                             </td>
                                             <td class="px-4 py-3 text-xs">

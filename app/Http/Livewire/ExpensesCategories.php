@@ -40,6 +40,7 @@ class ExpensesCategories extends Component
         })
         ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_name')
       ->groupBy('categories.id', 'categories.category_name', 'main_categories.title')
+      ->orderBy('categories.id', 'desc')
         ->paginate(10);
 }
 elseif (auth()->user()->hasRole('User')) {
@@ -47,18 +48,18 @@ elseif (auth()->user()->hasRole('User')) {
     $userId = auth()->id(); // Obtener el ID del usuario actual
 
     $data = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-    ->leftJoin('categories_to_assigns', function($join) use ($userId) {
-        $join->on('categories.id', '=', 'categories_to_assigns.category_id')
-            ->where('categories_to_assigns.user_id_assign', $userId);
-    })
-    ->where('main_categories.id', 2)
-    ->where(function($query) use ($searchTerm) {
-        $query->where('categories.category_name', 'like', '%' . $searchTerm . '%');
-    })
-    ->select('categories.*', 'main_categories.title as main_category_name')
-    ->orderBy('categories.id', 'desc')
-    ->paginate(10);
-
+        ->leftJoin('categories_to_assigns', function ($join) use ($userId) {
+            $join->on('categories.id', '=', 'categories_to_assigns.category_id')
+                ->where('categories_to_assigns.user_id_assign', $userId);
+        })
+        ->where('main_categories.id', 2)
+        ->where(function ($query) use ($searchTerm) {
+            $query->where('categories.category_name', 'like', '%' . $searchTerm . '%');
+        })
+        ->select('categories.*', 'main_categories.title as main_category_name')
+        ->addSelect(\DB::raw('CASE WHEN categories_to_assigns.user_id_assign = ' . $userId . ' THEN 1 ELSE 0 END as assigned'))
+        ->orderBy('categories.id', 'desc')
+        ->paginate(10);
 }
 
         $this->mainCategoriesRender = MainCategories::orderBy('id', 'desc')->get();
