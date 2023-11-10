@@ -115,7 +115,7 @@
                                                 </span>
                                             @elseif ($item->operation_status === '3')
                                                 <span
-                                                    class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
+                                                    class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
                                                     {{ $item->status_description }}
                                                 </span>
                                             @elseif ($item->operation_status === '2')
@@ -126,10 +126,11 @@
                                             @else
                                                 <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                                 <span
-                                                    class="px-2 py-1 font-semibold leading-tight text-white bg-red-700 rounded-full dark:bg-gray-700 dark:text-gray-100">
+                                                    class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-gray-700 dark:text-gray-100">
                                                     {{ $item->status_description }}
                                                 </span>
                                             @endif
+
 
 
                                         </td>

@@ -236,47 +236,30 @@ public function resetFields2()
     
     }
 
-    // FUNCTION EXCEL FILE EMAIL TO USER
-    public function emailStore2()
-    {
-      $validationRules = [
-    'emails_user2' => 'required|array',
-    'emails_user2.*' => 'email|max:50',
-    
-    'categoryNameSelected' => 'required', 
-    'selectedYear2' => 'required', 
-];
+   public function emailStore2()
+{
+    $this->validate([
+        'emails_user2' => 'required|array',
+        'emails_user2.*' => 'email|max:50',
+        'categoryNameSelected' => 'required', 
+        'selectedYear2' => 'required', 
+    ], [
+        'emails_user2.required' => 'The :attribute field is required.',
+        'emails_user2.array' => 'The :attribute must be an array.',
+        'emails_user2.*.email' => 'The :attribute must be a valid email address.',
+        'emails_user2.*.max' => 'The :attribute may not be greater than :max characters.',
+        'categoryNameSelected.required' => 'The Category field is required',
+        'selectedYear2.required' => 'Please select a year',
+       
+    ]);
 
-$customMessages = [
-    'categoryNameSelected.required' => 'The Category field is required',
-    'selectedYear2.required' => 'Please select a year',
-   
-   
-];
-$this->validate($validationRules, $customMessages);
-
-        
-    $validatedData = $this->validate($validationRules);
-
-    
     $user = User::find($this->selectedUser2);
+    $userName = $user ? $user->name : 'User Not Selected';
 
-    $data = [];
-    
-if ($user) {
-    $userName = $user->name; // Obtener el nombre del usuario si existe
-} else {
-    $userName = 'User Not Selected'; 
-}
+    $datenow = Carbon::now('America/Argentina/Buenos_Aires')
+        ->locale('es')
+        ->isoFormat('dddd, D [de] MMMM [de] YYYY, H:mm:ss');
 
-    $now = Carbon::now('America/Argentina/Buenos_Aires');
-    $datenow = $now->format('Y-m-d H:i:s');
-   
-    $data['user'] = $userName;
-    $category=$this->categoryNameSelected->category_name;
-    $fileName = 'General-PDF-'.$category.'-Report' . '-'.$userName. '-'. $datenow . '.pdf';
-
-    foreach ($this->emails_user2 as $email) {
     $data = [
         'ArrayCategories' => $this->ArrayCategories,
         'totalCategoriesRender' => $this->totalCategoriesRender,
@@ -284,28 +267,29 @@ if ($user) {
         'selectedYear2' => $this->selectedYear2,
         'categoryNameSelected' => $this->categoryNameSelected,
         'user' => $userName,
-        'email' => $email, //emails arrays
         'title' => "Report Categories",
         'date' => $datenow,
     ];
-   
-    
-    $pdf = PDF::loadView('emails.pdf-generalcategoriesreport', $data );
 
-    Mail::send('emails.pdf-generalcategoriesreport', $data, function ($message) use ($data, $pdf, $fileName) {
-    $message->to($data["email"], $data["email"])
-        ->subject($data["title"])
-        ->attachData($pdf->output(), $fileName); // Asegúrate de pasar $fileName aquí
-    });
+    foreach ($this->emails_user2 as $email) {
+        $data['email'] = $email; // Agregar la dirección de correo electrónico al array $data
 
-}
-
-        session()->flash('message',  'Email Sent Successfully.');
-        $this->closeModal2();
-        $this->resetInputFields2();
-        $this->dataSelect();
-        $this->updateCategoriesData();
-       
+        $fileName = 'General-PDF-' . $this->categoryNameSelected->category_name . '-Report' . '-' . $userName . '-' . $datenow . '.pdf';
+        
+        $pdf = PDF::loadView('emails.pdf-generalcategoriesreport', $data);
+        
+        Mail::send('emails.pdf-generalcategoriesreport', $data, function ($message) use ($data, $pdf, $fileName) {
+            $message->to($data['email'], $data['email']) // Usar $data['email'] en lugar de $data["email"]
+                ->subject($data['title'])
+                ->attachData($pdf->output(), $fileName);
+        });
     }
+
+    session()->flash('message', 'Email Sent Successfully.');
+    $this->closeModal2();
+    $this->resetInputFields2();
+    $this->dataSelect();
+    $this->updateCategoriesData();
+}
 
 }

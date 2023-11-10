@@ -36,4 +36,10 @@ public function income()
         return $this->hasMany(Subcategory::class, 'category_id');
     }
 
+    
+    public function assignedUsers() {
+    return $this->belongsToMany(User::class, 'categories_to_assigns', 'category_id', 'user_id_assign');
+    }
+
+
 }

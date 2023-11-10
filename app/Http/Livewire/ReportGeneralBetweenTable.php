@@ -185,47 +185,31 @@ public function resetFields3()
     }
 
 
-    // FUNCTION EXCEL FILE EMAIL TO USER
     public function emailStore3()
-    {
-        $validationRules = [
-    'emails_user3' => 'required|array', 
-    'emails_user3.*' => 'email|max:50'];
+{
+    $this->validate([
+        'emails_user3' => 'required|array',
+        'emails_user3.*' => 'email|max:50',
+        'date_start' => 'required',
+        'date_end' => 'required',
+    ], [
+        'emails_user3.required' => 'The :attribute field is required.',
+        'emails_user3.array' => 'The :attribute must be an array.',
+        'emails_user3.*.email' => 'The :attribute must be a valid email address.',
+        'emails_user3.*.max' => 'The :attribute may not be greater than :max characters.',
+        'date_start.required' => 'Please select a Date Start',
+        'date_end.required' => 'Please select a Date End',
+        // ... Otros mensajes personalizados aquí
+    ]);
 
-    $validatedData = $this->validate($validationRules);
-    
-    $validationRules = [
-    'emails_user3' => 'required|array',
-    'emails_user3.*' => 'email|max:50',
-    'date_start' => 'required', 
-    'date_end' => 'required', 
-];
-
-    $customMessages = [
-    
-    'date_start.required' => 'Please select a Date Start',
-    'date_end.required' => 'Please select a Date End',
-    
-    ];
-
-    $this->validate($validationRules, $customMessages);
-    
     $user = User::find($this->selectedUser3);
-
-    $data = [];
-    
-if ($user) {
-    $userName = $user->name; // Obtener el nombre del usuario si existe
-} else {
-   $userName = 'User Not Selected'; 
-}
+    $userName = $user ? $user->name : 'User Not Selected';
 
     $now = Carbon::now('America/Argentina/Buenos_Aires');
-    $datenow = $now->format('Y-m-d H:i:s');
-   
-    $data['user'] = $userName; 
-    $fileName = 'General-PDF-Report-Between-Dates-' . '-'.$userName. '-'. $datenow . '.pdf';
-    foreach ($this->emails_user3 as $email) {
+    $datenow = $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY, H:mm:ss');
+    $dateStartFormatted = $this->date_start ? Carbon::parse($this->date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') : null;
+    $dateEndFormatted = $this->date_end ? Carbon::parse($this->date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') : null;
+
     $data = [
         'incomeData3' => $this->incomeData3,
         'expenseData3' => $this->expenseData3,
@@ -235,34 +219,36 @@ if ($user) {
         'totalExpense3' => $this->totalExpense3,
         'totalIncomeCurrency3' => $this->totalIncomeCurrency3,
         'totalExpenseCurrency3' => $this->totalExpenseCurrency3,
-        'date_start' => $this->date_start,
-        'date_end' => $this->date_end,
+        'date_start' => $dateStartFormatted,
+        'date_end' => $dateEndFormatted,
         'categoryName' => $this->categoryName,
         'categoryName2' => $this->categoryName2,
         'user' => $userName,
-        'email' => $email, //emails arrays
         'title' => "Report General Between Dates",
         'date' => $datenow,
     ];
-   
 
+    foreach ($this->emails_user3 as $email) {
+        $data['email'] = $email; // Agregar la dirección de correo electrónico al array $data
 
-    $pdf = PDF::loadView('emails.pdf-generalbetweenreport', $data );
-
-    Mail::send('emails.pdf-generalbetweenreport', $data, function ($message) use ($data, $pdf, $fileName) {
-    $message->to($data["email"], $data["email"])
-        ->subject($data["title"])
-        ->attachData($pdf->output(), $fileName); // Asegúrate de pasar $fileName aquí
-    });
-
-       }
-        session()->flash('message',  'Email Sent Successfully.');
-        $this->closeModal3();
-        $this->resetInputFields3();
-        $this->dataSelect();
-         $this->updateBetweenData();
-       
+        $fileName = 'General-PDF-Report-Between-Dates-' . '-' . $userName . '-' . $datenow . '.pdf';
+        
+        $pdf = PDF::loadView('emails.pdf-generalbetweenreport', $data);
+        
+        Mail::send('emails.pdf-generalbetweenreport', $data, function ($message) use ($data, $pdf, $fileName) {
+            $message->to($data['email'], $data['email'])
+                ->subject($data['title'])
+                ->attachData($pdf->output(), $fileName);
+        });
     }
+
+    session()->flash('message', 'Email Sent Successfully.');
+    $this->closeModal3();
+    $this->resetInputFields3();
+    $this->dataSelect();
+    $this->updateBetweenData();
+}
+
 
 
 }

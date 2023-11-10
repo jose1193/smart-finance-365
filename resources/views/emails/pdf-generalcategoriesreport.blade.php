@@ -62,7 +62,8 @@
         <img src="https://smart-finance365.com/img/logo.png" width="170" alt="logo">
         <h5 class=" font-weight-bold" style="font-size:21px;">PDF {{ $title }} - {{ $user }}</h5>
 
-        <h6 class=" font-weight-bold" style="font-size:16px;">Report Date: <span style="color:#1d4ed8;">
+        <h6 class=" font-weight-bold" style="font-size:16px;text-transform: capitalize;">Report Date: <span
+                style="color:#1d4ed8;">
 
                 {{ $date }}
             </span></h6>

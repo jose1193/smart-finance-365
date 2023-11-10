@@ -71,7 +71,7 @@ public function mount()
 
     public function create()
     {
-         $this->authorize('manage admin');
+         
         $this->resetInputFields();
           $this->fetchData(); // Llama a la función fetchData para obtener los datos
     // Define el valor por defecto en la propiedad
@@ -99,7 +99,7 @@ public function mount()
        
 public function store()
 {
-    $this->authorize('manage admin');
+    
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',

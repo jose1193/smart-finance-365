@@ -59,7 +59,7 @@ class DatabaseSeeder extends Seeder
          // MAIN CATEGORIES
        $mainCategories = [
     'Income',
-    'Expenses',
+    'Expense',
     // Agrega más valores aquí si es necesario
 ];
 

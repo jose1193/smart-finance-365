@@ -62,7 +62,8 @@
         <img src="https://smart-finance365.com/img/logo.png" width="170" alt="logo">
         <h5 class=" font-weight-bold" style="font-size:21px;">PDF {{ $title }} - {{ $user }}</h5>
 
-        <h6 class=" font-weight-bold" style="font-size:16px;">Report Date: <span style="color:#1d4ed8;">
+        <h6 class=" font-weight-bold" style="font-size:16px;text-transform: capitalize;">Report Date: <span
+                style="color:#1d4ed8;">
 
                 {{ $date }}
             </span></h6>
@@ -73,12 +74,14 @@
                     <th>Nro</th>
                     <th>Main Category</th>
                     <th>Category</th>
+                    <th>Subcategory</th>
                     <th>Description</th>
                     <th>Month</th>
+                    <th>Date</th>
                     <th>Operation ARS</th>
-                    <th>Currency</th>
-                    <th>Total Currency</th>
-                    <th>Estatus</th>
+                    <th>Rate </th>
+                    <th>Total USD</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,10 +98,16 @@
                             {{ $item->category_title }}
                         </td>
                         <td>
+
+                        </td>
+                        <td>
                             {{ Str::words($item->operation_description, 2, '...') }}
                         </td>
                         <td>
                             {{ \Carbon\Carbon::create()->month($item->operation_month)->locale('en')->monthName }}
+                        </td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($item->operation_date)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
                         </td>
                         <td>
                             $

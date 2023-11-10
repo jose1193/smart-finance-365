@@ -31,10 +31,10 @@
                                  <i class="fa-solid fa-circle-dollar-to-slot mr-3"></i>
 
                                  <x-slot name="title">
-                                     {{ __('Currency Calculator') }}
+                                     {{ __('Rates Calculator') }}
                                  </x-slot>
                                  <a href="{{ route('calculator') }}">
-                                     <span>Currency Exchange Calculator </span></a>
+                                     <span>Rates Exchange Calculator </span></a>
                              </div>
 
                          </div>

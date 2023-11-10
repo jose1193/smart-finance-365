@@ -168,11 +168,18 @@
                                  </th>
                                  <th class="px-4 py-3">
                                      @if ($date_start)
-                                         <p>Date Start: {{ $date_start }}</p>
+                                         <p>Date Start:
+                                             <span class="text-green-700 ml-2">
+                                                 {{ \Carbon\Carbon::parse($date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                                             </span>
+                                         </p>
                                      @endif
 
                                      @if ($date_end)
-                                         <p>Date End: {{ $date_end }}</p>
+                                         <p>Date End:
+                                             <span class="text-green-700 ml-2">
+                                                 {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                         </p>
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">

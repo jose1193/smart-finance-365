@@ -25,32 +25,40 @@ class ExpensesCategories extends Component
 
     public function render()
     {
-      if (auth()->user()->hasRole('Admin')) {
-    // Si es un administrador, muestra todas las categorías
-    $data = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->where('main_categories.id', 2) // Filtrar por la categoría "Income"
-        ->where('category_name', 'like', '%' . $this->search . '%')
-        ->select('categories.*', 'main_categories.title as main_category_name')
+     if (auth()->user()->hasRole('Admin')) {
+    $searchTerm = $this->search;
+    // Relational Model
+    $data = Category::with('assignedUsers')
+        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        ->leftJoin('categories_to_assigns', 'categories.id', '=', 'categories_to_assigns.category_id')
+        ->leftJoin('users', 'categories_to_assigns.user_id_assign', '=', 'users.id')
+        ->where('main_categories.id', 2)
+        ->where(function ($query) use ($searchTerm) {
+            $query->where('categories.category_name', 'like', '%' . $searchTerm . '%')
+                ->orWhere('users.username', 'like', '%' . $searchTerm . '%')
+                ->orWhere('users.name', 'like', '%' . $searchTerm . '%');
+        })
+        ->select('categories.id', 'categories.category_name', 'main_categories.title as main_category_name')
+        ->groupBy('categories.id') // Agrupar por el ID de categoría
         ->orderBy('categories.id', 'desc')
         ->paginate(10);
-    } elseif (auth()->user()->hasRole('User')) {
+}
+elseif (auth()->user()->hasRole('User')) {
+    $searchTerm = $this->search;
+    $userId = auth()->id(); // Obtener el ID del usuario actual
+
     $data = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-    ->leftJoin('categories_to_assigns', function($join) {
+    ->leftJoin('categories_to_assigns', function($join) use ($userId) {
         $join->on('categories.id', '=', 'categories_to_assigns.category_id')
-            ->where('categories_to_assigns.user_id_assign', '=', auth()->user()->id);
+            ->where('categories_to_assigns.user_id_assign', $userId);
     })
-    ->where(function($query) {
-        $query->where('main_categories.id', 2) // Filtrar por la categoría "Income"
-            ->orWhere(function ($q) {
-                $q->where('main_categories.id', 2) // Filtrar por la categoría principal "1"
-                    ->where('categories_to_assigns.user_id_assign', '=', auth()->user()->id);
-            });
+    ->where('main_categories.id', 2)
+    ->where(function($query) use ($searchTerm) {
+        $query->where('categories.category_name', 'like', '%' . $searchTerm . '%');
     })
-    ->where('category_name', 'like', '%' . $this->search . '%')
     ->select('categories.*', 'main_categories.title as main_category_name')
     ->orderBy('categories.id', 'desc')
     ->paginate(10);
-
 
 }
 

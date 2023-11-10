@@ -195,42 +195,23 @@ public function resetFields1()
     
     }
 
-
-    // FUNCTION EXCEL FILE EMAIL TO USER
-    public function emailStore()
-    {
-        
-      
-    $validationRules = [
-    'emails_user' => 'required|array',
-    'emails_user.*' => 'email|max:50',
-    'selectedYear' => 'required', 
-];
-
-    $customMessages = [
-    'selectedYear.required' => 'Please select a year',
-    ];
-
-    $this->validate($validationRules, $customMessages);
-
-
+     // FUNCTION FILE EMAIL TO USER
+public function emailStore()
+{
+    $this->validate([
+        'emails_user' => 'required|array',
+        'emails_user.*' => 'email|max:50',
+        'selectedYear' => 'required', 
+    ], [
+        'selectedYear.required' => 'Please select a year',
+    ]);
 
     $user = User::find($this->selectedUser);
-
-    $data = [];
-    
-if ($user) {
-    $userName = $user->name; // Obtener el nombre del usuario si existe
-} else {
-   $userName = 'User Not Selected'; 
-}
+    $userName = $user ? $user->name : 'User Not Selected';
 
     $now = Carbon::now('America/Argentina/Buenos_Aires');
-    $datenow = $now->format('Y-m-d H:i:s');
-   
-    $data['user'] = $userName; 
-    $fileName = 'General-PDF-Report' . '-'.$userName. '-'. $datenow . '.pdf';
-    foreach ($this->emails_user as $email) {
+    $datenow = $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
+
     $data = [
         'incomeData' => $this->incomeData,
         'expenseData' => $this->expenseData,
@@ -244,29 +225,31 @@ if ($user) {
         'categoryName' => $this->categoryName,
         'categoryName2' => $this->categoryName2,
         'user' => $userName,
-        'email' => $email, //emails arrays
         'title' => "Report General",
         'date' => $datenow,
     ];
-   
-    
 
-    $pdf = PDF::loadView('emails.pdf-generalmainreport', $data );
+    foreach ($this->emails_user as $email) {
+        $data['email'] = $email; // Agregar la dirección de correo electrónico al array $data
 
-    Mail::send('emails.pdf-generalmainreport', $data, function ($message) use ($data, $pdf, $fileName) {
-    $message->to($data["email"], $data["email"])
-        ->subject($data["title"])
-        ->attachData($pdf->output(), $fileName); 
-    });
+        $fileName = 'General-PDF-Report-' . $userName . '-' . $datenow . '.pdf';
+
+        $pdf = PDF::loadView('emails.pdf-generalmainreport', $data);
+
+        Mail::send('emails.pdf-generalmainreport', $data, function ($message) use ($data, $pdf, $fileName) {
+            $message->to($data['email'], $data['email'])
+                ->subject($data['title'])
+                ->attachData($pdf->output(), $fileName);
+        });
     }
-       
-        session()->flash('message',  'Email Sent Successfully.');
-        $this->closeModal();
-        $this->resetInputFields();
-        $this->dataSelect();
-        $this->updateData();
-        
-    }
+
+    session()->flash('message', 'Email Sent Successfully.');
+    $this->closeModal();
+    $this->resetInputFields();
+    $this->dataSelect();
+    $this->updateData();
+}
+
 
 
    

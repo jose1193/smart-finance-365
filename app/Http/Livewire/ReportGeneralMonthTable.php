@@ -194,81 +194,71 @@ public function resetFields4()
     {
         $this->isOpen4 = false;
          $this->updateMonthData();
+           
     }
 
     private function resetInputFields3(){
         $this->emails_user4 = null;
     }
 
-    public function emailStore4()
-    {
-       $validationRules = [
-    'emails_user4' => 'required|array', 
-    'emails_user4.*' => 'email|max:50', 
-        
-    ];
-
-    $validatedData = $this->validate($validationRules);
-
-     $validationRules = [
-    'emails_user4' => 'required|array',
-    'emails_user4.*' => 'email|max:50',
-    'selectedMonth' => 'required', 
-    'selectedYear3' => 'required',
-   
     
-];
-
-    $customMessages = [
-   
-    'selectedYear3.required' => 'Please select a year',
-    'selectedMonth.required' => 'Please select a Month',  
-    ];
-
-    $this->validate($validationRules, $customMessages);
+public function emailStore4()
+{
     
+    $this->validate([
+        'emails_user4' => 'required|array',
+        'emails_user4.*' => 'email|max:50',
+        'selectedMonth' => 'required',
+        'selectedYear3' => 'required',
+    ], [
+        'selectedYear3.required' => 'Please select a year',
+        'selectedMonth.required' => 'Please select a Month',
+    ]);
+
     $user = User::find($this->selectedUser4);
 
     $data = [];
-    
+
     if ($user) {
-    $userName = $user->name; // Obtener el nombre del usuario si existe
+        $userName = $user->name;
     } else {
-   $userName = 'User Not Selected'; 
+        $userName = 'User Not Selected';
     }
 
     $now = Carbon::now('America/Argentina/Buenos_Aires');
-    $datenow = $now->format('Y-m-d H:i:s');
-   
-    $data['user'] = $userName; 
-    $fileName = 'General-PDF-Report' . '-'.$userName. '-'. $datenow . '.pdf';
+    $datenow = $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY, H:mm:ss');
+
+    $data['user'] = $userName;
+    $fileName = 'General-Month-PDF-Report' . '-' . $userName . '-' . $datenow . '.pdf';
+
     foreach ($this->emails_user4 as $email) {
-    $data = [
-        'operationsFetchMonths' => $this->operationsFetchMonths,
-        'totalMonthAmount' => $this->totalMonthAmount,
-        'totalMonthAmountCurrency' => $this->totalMonthAmountCurrency,
-        'selectedYear3' => $this->selectedYear3,
-        'user' => $userName,
-        'email' => $email, //emails arrays
-        'title' => "Report General Month",
-        'date' => $datenow,
-    ];
-   
+        $data = [
+            'operationsFetchMonths' => $this->operationsFetchMonths,
+            'totalMonthAmount' => $this->totalMonthAmount,
+            'totalMonthAmountCurrency' => $this->totalMonthAmountCurrency,
+            'selectedYear3' => $this->selectedYear3,
+            'user' => $userName,
+            'email' => $email,
+            'title' => "Report General Month",
+            'date' => $datenow,
+        ];
 
-    $pdf = PDF::loadView('emails.pdf-generalmonthreport', $data );
+        $pdf = PDF::loadView('emails.pdf-generalmonthreport', $data);
 
-    Mail::send('emails.pdf-generalmonthreport', $data, function ($message) use ($data, $pdf, $fileName) {
-    $message->to($data["email"], $data["email"])
-        ->subject($data["title"])
-        ->attachData($pdf->output(), $fileName); 
-    });
-        }
-        session()->flash('message',  'Email Sent Successfully.');
-        $this->closeModal4();
-        $this->resetInputFields3();
-        $this->dataSelect();
-        $this->updateMonthData();
+        Mail::send('emails.pdf-generalmonthreport', $data, function ($message) use ($data, $pdf, $fileName) {
+            $message->to($data["email"], $data["email"])
+                    ->subject($data["title"])
+                    ->attachData($pdf->output(), $fileName);
+        });
     }
+
+    session()->flash('message', 'Email Sent Successfully.');
+    $this->closeModal4();
+    $this->resetInputFields3();
+    $this->dataSelect();
+    
+}
+
    
 
 

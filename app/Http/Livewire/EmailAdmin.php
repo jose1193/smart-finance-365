@@ -5,15 +5,29 @@ use App\Models\AdminEmail;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+
 class EmailAdmin extends Component
 {
+    
     public  $name_support, $email, $data_id;
  public $search = '';
  
     public $isOpen = 0;
      protected $listeners = ['render','delete']; 
+
+  public function authorize()
+{
+    return true;
+}
+
+
    public function render()
 {
+   $user = auth()->user();
+        if (!$user || !$user->hasRole('Admin')) {
+            abort(403, 'This action is Forbidden.');
+        }
+
     $data = AdminEmail::where('user_id', auth()->user()->id)
         ->where(function ($query) {
             $query->where('name_support', 'like', '%' . $this->search . '%')
@@ -54,6 +68,8 @@ class EmailAdmin extends Component
 
 public function store()
 {
+    $this->authorize('manage admin');
+
    $validationRules = [
     'name_support' => 'required|string|max:20|',
     'email' => 'required|email|string|max:40',
@@ -114,7 +130,7 @@ if ($existingEmail && $existingEmail->id != $this->data_id) {
 
 public function edit($id)
     {
-        
+        $this->authorize('manage admin');
         $list = AdminEmail::findOrFail($id);
         $this->data_id = $id;
         $this->name_support = $list->name_support;
@@ -126,7 +142,7 @@ public function edit($id)
     
 public function delete($id)
     {
-         
+         $this->authorize('manage admin');
         EmailManagement::find($id)->delete();
         session()->flash('message', 'Data Deleted Successfully.');
     }

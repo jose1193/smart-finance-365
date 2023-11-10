@@ -286,7 +286,8 @@
                                                             class="block text-gray-700 text-sm font-bold mb-2">Category
                                                         </label>
                                                         <div wire:ignore>
-                                                            <select wire:model="category_id" id="select2CategoryId">
+                                                            <select wire:model="category_id" id="select2CategoryId"
+                                                                style="width: 100%">
                                                                 <option value="">
 
                                                                 </option>

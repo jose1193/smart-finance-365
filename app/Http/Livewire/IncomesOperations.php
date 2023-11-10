@@ -103,7 +103,7 @@ public function mount()
        
 public function store()
 {
-    $this->authorize('manage admin');
+    
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',

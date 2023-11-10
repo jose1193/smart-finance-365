@@ -35,16 +35,17 @@
               </div>
 
               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0">
-                  <select id="selectMonth" wire:model="selectedMonth" wire:change="updateMonthData"
-                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option value="">Select Month</option>
-                      @foreach ($this->months() as $month)
-                          <option value="{{ $month['number'] }}">{{ $month['number'] }} -
-                              {{ $month['name'] }}</option>
-                      @endforeach
-                  </select>
+                  <div wire:ignore>
+                      <select id="selectMonth" wire:model="selectedMonth" wire:change="updateMonthData"
+                          style="width: 100%">
+                          <option value="">Select Month</option>
+                          @foreach ($this->months() as $month)
+                              <option value="{{ $month['number'] }}">{{ $month['number'] }} -
+                                  {{ $month['name'] }}</option>
+                          @endforeach
+                      </select>
+                  </div>
               </div>
-
 
               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
                   <div wire:ignore>
@@ -134,7 +135,6 @@
                                                       });
                                                   });
                                               </script>
-
                                               @error('emails_user4')
                                                   <span class="text-red-500">{{ $message }}</span>
                                               @enderror
@@ -218,10 +218,10 @@
                                   <th class="px-4 py-3">Description</th>
                                   <th class="px-4 py-3">Month</th>
                                   <th class="px-4 py-3">Date</th>
-                                  <th class="px-4 py-3">ARS</th>
-                                  <th class="px-4 py-3">USD</th>
-                                  <th class="px-4 py-3">Total Operation USD</th>
-                                  <th class="px-4 py-3">Estatus</th>
+                                  <th class="px-4 py-3"> Operation ARS</th>
+                                  <th class="px-4 py-3">Rate ARS/USD</th>
+                                  <th class="px-4 py-3">Total In USD</th>
+                                  <th class="px-4 py-3">Status</th>
                               </tr>
                           </thead>
                           <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -270,7 +270,7 @@
                                               </span>
                                           @elseif ($item->operation_status === '3')
                                               <span
-                                                  class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
+                                                  class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
                                                   {{ $item->status_description }}
                                               </span>
                                           @elseif ($item->operation_status === '2')
@@ -281,10 +281,11 @@
                                           @else
                                               <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                               <span
-                                                  class="px-2 py-1 font-semibold leading-tight text-white bg-red-700 rounded-full dark:bg-gray-700 dark:text-gray-100">
+                                                  class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-gray-700 dark:text-gray-100">
                                                   {{ $item->status_description }}
                                               </span>
                                           @endif
+
                                       </td>
 
                                   </tr>

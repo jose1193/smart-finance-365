@@ -6,7 +6,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Livewire\WithPagination;
 use Livewire\Component;
-use Illuminate\Validation\Rule;
+use App\Policies\UserCrudPolicy;
 
 class UsersCrud extends Component
 {
@@ -20,9 +20,14 @@ class UsersCrud extends Component
 {
     return true;
 }
+
     public function render()
     {
-       
+      $user = auth()->user();
+        if (!$user || !$user->hasRole('Admin')) {
+            abort(403, 'This action is Forbidden.');
+        }
+
  $data = User::join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
     ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
     ->where(function($query) {
@@ -49,7 +54,7 @@ return view('livewire.users-crud', [
     
     public function create()
     {
-         $this->authorize('manage admin');
+        $this->authorize('manage admin');
         $this->resetInputFields();
         $this->openModal();
     }
@@ -104,7 +109,7 @@ return view('livewire.users-crud', [
 $user = User::find($this->data_id);
 
 if ($user) {
-    // El usuario ya existe, actualiza la información, pero no la contraseña si no se está actualizando
+   
     $userData = [
         'name' => $this->name,
         'username' => $this->username,

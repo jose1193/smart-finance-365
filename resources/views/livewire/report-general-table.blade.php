@@ -34,7 +34,7 @@
                     </div>
 
                     <!-- PANEL TAB ALPINE JS -->
-                    <div x-data="{ activeTab: '1' }">
+                    <div x-data="{ activeTab: '1' }" class="overflow-x-auto">
                         <ul class="flex border-b">
                             <li class="mr-2">
                                 <button

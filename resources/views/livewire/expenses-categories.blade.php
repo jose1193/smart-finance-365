@@ -52,11 +52,13 @@
                             <table class="w-full whitespace-no-wrap">
                                 <thead>
                                     <tr
-                                        class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
+                                        class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Item</th>
                                         <th class="px-4 py-3">Category</th>
-                                        <th class="px-4 py-3">Description</th>
+                                        <th class="px-4 py-3">Subcategory</th>
+                                        <th class="px-4 py-3">Assigned Users</th>
+                                        <th class="px-4 py-3">Date</th>
                                         @can('manage admin')
                                             <th class="px-4 py-3">Action</th>
                                         @endcan
@@ -64,7 +66,7 @@
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700  uppercase dark:text-gray-400">
+                                        <tr class="text-gray-700 text-center uppercase dark:text-gray-400">
                                             <td class="px-4 py-3 text-xs text-center">
 
                                                 {{ $loop->iteration }}
@@ -74,10 +76,20 @@
                                                 {{ $item->main_category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->category_name }}
+                                                {{ Str::words($item->category_name, 3, '...') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->category_description }}
+                                                subcategory
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                @if ($item->assignedUsers->isEmpty())
+                                                    ALL USERS
+                                                @else
+                                                    {{ $item->assignedUsers->pluck('username')->implode(', ') }}
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ \Carbon\Carbon::parse($item->created_at)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
                                             </td>
                                             @can('manage admin')
                                                 <td class="px-4 py-3 text-sm">
@@ -96,7 +108,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="5">
+                                            <td colspan="7">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
