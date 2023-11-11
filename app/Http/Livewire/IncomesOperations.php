@@ -26,6 +26,7 @@ public $operation_currency_total;
 public $isOpen = 0;
 protected $listeners = ['render','delete']; 
 
+
     public function authorize()
 {
     return true;
@@ -60,10 +61,10 @@ public function mount()
      ->orderBy('operations.id', 'desc')
      ->paginate(10);
 
-
      $this->categoriesRender = Category::where('main_category_id', 1)
                                   ->orderBy('id', 'asc')
                                   ->get();
+
 
     $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
                                   ->orderBy('id', 'asc')

@@ -47,7 +47,7 @@ class IncomeCategories extends Component
 }
 elseif (auth()->user()->hasRole('User')) {
     $searchTerm = $this->search;
-    $userId = auth()->id(); // Obtener el ID del usuario actual
+    $userId = auth()->id(); 
 
     $data = Category::join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->leftJoin('categories_to_assigns', function ($join) use ($userId) {

@@ -8,6 +8,7 @@ use App\Models\CategoriesToAssign;
 use Livewire\WithPagination;
 use Livewire\Component;
 
+
 class ExpensesCategories extends Component
 {
     public  $category_name, $category_description, $main_category_id, $data_id;

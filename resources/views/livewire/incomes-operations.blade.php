@@ -285,17 +285,17 @@
                                                         <label for="exampleFormControlInput2"
                                                             class="block text-gray-700 text-sm font-bold mb-2">Category
                                                         </label>
+
                                                         <div wire:ignore>
                                                             <select wire:model="category_id" id="select2CategoryId"
-                                                                style="width: 100%">
-                                                                <option value="">
-
-                                                                </option>
+                                                                style="width: 100%;">
+                                                                <option value=""></option>
                                                                 @foreach ($categoriesRender as $item)
                                                                     <option value="{{ $item->id }}">
                                                                         {{ $item->category_name }}
                                                                     </option>
                                                                 @endforeach
+
                                                             </select>
                                                         </div>
                                                         <script>

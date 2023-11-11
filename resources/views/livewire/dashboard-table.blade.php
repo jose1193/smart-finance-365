@@ -89,7 +89,7 @@
                                         </td>
 
                                         <td class="px-4 py-3 text-xs text-center">
-                                            {{ Str::words($item->operation_description, 2, '...') }}
+                                            {{ Str::words($item->operation_description, 1, '...') }}
                                         </td>
 
                                         <td class="px-4 py-3 text-xs text-center">
