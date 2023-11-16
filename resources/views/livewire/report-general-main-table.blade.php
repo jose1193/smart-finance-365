@@ -188,9 +188,9 @@
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
                                  <th class="px-4 py-3">Mes</th>
-                                 <th class="px-4 py-3">{{ $categoryName }} ARS</th>
+                                 <th class="px-4 py-3">{{ $categoryName }} </th>
                                  <th class="px-4 py-3"> Total Operation USD</th>
-                                 <th class="px-4 py-3">{{ $categoryName2 }} ARS</th>
+                                 <th class="px-4 py-3">{{ $categoryName2 }} </th>
                                  <th class="px-4 py-3"> Total Operation USD</th>
 
 

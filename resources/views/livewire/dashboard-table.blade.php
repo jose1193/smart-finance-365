@@ -33,9 +33,9 @@
 
                                     <th class="px-4 py-3">Description</th>
 
-                                    <th class="px-4 py-3">Amount ARS</th>
-                                    <th class="px-4 py-3">Currency Amount</th>
-                                    <th class="px-4 py-3">Total Exchange</th>
+                                    <th class="px-4 py-3">Operation</th>
+                                    <th class="px-4 py-3">Rate CONV/USD</th>
+                                    <th class="px-4 py-3">Total In USD</th>
                                     <th class="px-4 py-3">Status</th>
                                     <th class="px-4 py-3">Date</th>
                                     @can('manage admin')
@@ -218,11 +218,11 @@
                                                 <div class="mb-4">
                                                     <label for="operation_amount"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Amount ARS</label>
+                                                        Operation</label>
                                                     <input type="text" autocomplete="off" id="operation_amount"
                                                         wire:model="operation_amount"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                        placeholder="Enter Income Amount">
+                                                        placeholder="Enter Income Transaction Amount">
 
                                                     @error('operation_amount')
                                                         <span class="text-red-500">{{ $message }}</span>
@@ -232,7 +232,7 @@
                                                 <div class="mb-4">
                                                     <label for="operation_currency"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Rate ARS/USD </label>
+                                                        Rate USD </label>
 
 
                                                     <input type="text" autocomplete="off" id="operation_currency"

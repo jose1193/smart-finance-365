@@ -110,9 +110,14 @@ private function updateBetweenDataInternal()
     $this->showData3 = true;
 }
 
-
 private function fetchBetweenData($mainCategoryId, $month)
 {
+    // Verificar si las fechas están invertidas
+    if ($this->date_start && $this->date_end && $this->date_start > $this->date_end) {
+        session()->flash('error', 'Error: La fecha de inicio no puede ser posterior a la fecha de finalización.');
+        return collect(); // Devolver una colección vacía en caso de error
+    }
+
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->where('main_categories.id', $mainCategoryId);
@@ -121,11 +126,11 @@ private function fetchBetweenData($mainCategoryId, $month)
         $query->where('operations.user_id', $this->selectedUser3);
     }
 
-    if ($this->date_start) {
+    if ($this->date_start && $this->date_end) {
+        $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
+    } elseif ($this->date_start) {
         $query->whereDate('operations.operation_date', '>=', $this->date_start);
-    }
-
-    if ($this->date_end) {
+    } elseif ($this->date_end) {
         $query->whereDate('operations.operation_date', '<=', $this->date_end);
     }
 
@@ -140,6 +145,8 @@ private function fetchBetweenData($mainCategoryId, $month)
             ];
         });
 }
+
+
 
 // FUNCIONT TO EXPORT EXCEL 3
  public function exportToExcel3()

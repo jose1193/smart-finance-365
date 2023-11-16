@@ -218,8 +218,9 @@
                                   <th class="px-4 py-3">Description</th>
                                   <th class="px-4 py-3">Month</th>
                                   <th class="px-4 py-3">Date</th>
-                                  <th class="px-4 py-3"> Operation ARS</th>
-                                  <th class="px-4 py-3">Rate ARS/USD</th>
+                                  <th class="px-4 py-3">Coin</th>
+                                  <th class="px-4 py-3">Operation</th>
+                                  <th class="px-4 py-3">Rate CONV/USD</th>
                                   <th class="px-4 py-3">Total In USD</th>
                                   <th class="px-4 py-3">Status</th>
                               </tr>
@@ -249,7 +250,11 @@
                                           {{ $selectedMonthName }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ \Carbon\Carbon::parse($item->operation_date)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                                          {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
+
+                                      </td>
+                                      <td class="px-4 py-3 text-center">
+                                          coin
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           $

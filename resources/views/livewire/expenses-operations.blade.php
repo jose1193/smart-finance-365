@@ -56,8 +56,8 @@
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Description</th>
-                                        <th class="px-4 py-3">Amount ARS</th>
-                                        <th class="px-4 py-3">Rate ARS/USD</th>
+                                        <th class="px-4 py-3">Operation</th>
+                                        <th class="px-4 py-3">Rate CONV/USD</th>
                                         <th class="px-4 py-3">Total in USD</th>
                                         <th class="px-4 py-3">Status</th>
                                         <th class="px-4 py-3">Date</th>
@@ -204,11 +204,11 @@
                                                     <div class="mb-4">
                                                         <label for="operation_amount"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Amount ARS</label>
+                                                            Operation</label>
                                                         <input type="text" autocomplete="off"
                                                             id="operation_amount" wire:model="operation_amount"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            placeholder="Enter Expense Amount">
+                                                            placeholder="Enter Expense Transaction Amount">
 
                                                         @error('operation_amount')
                                                             <span class="text-red-500">{{ $message }}</span>
@@ -286,43 +286,80 @@
                                                         <label for="exampleFormControlInput2"
                                                             class="block text-gray-700 text-sm font-bold mb-2">Category
                                                         </label>
+
                                                         <div wire:ignore>
                                                             <select wire:model="category_id" id="select2CategoryId"
-                                                                style="width: 100%">
-                                                                <option value="">
-
-                                                                </option>
+                                                                style="width: 100%;">
+                                                                <option value=""></option>
                                                                 @foreach ($categoriesRender as $item)
                                                                     <option value="{{ $item->id }}">
-                                                                        {{ $item->category_name }}
-                                                                    </option>
+                                                                        {{ $item->category_name }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                        <script>
-                                                            document.addEventListener('livewire:load', function() {
-                                                                Livewire.hook('message.sent', () => {
-                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                                    $('#select2CategoryId').select2({
-                                                                        width: 'resolve' // need to override the changed default
-                                                                    });
-                                                                });
-                                                            });
 
-                                                            $(document).ready(function() {
-                                                                // Inicializa Select2
-                                                                $('#select2CategoryId').select2();
 
-                                                                // Escucha el cambio en Select2 y actualiza Livewire
-                                                                $('#select2CategoryId').on('change', function(e) {
-                                                                    @this.set('category_id', $(this).val());
-                                                                });
-                                                            });
-                                                        </script>
                                                         @error('category_id')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+                                                    @if ($subcategoryMessage)
+                                                        <p class="text-gray-600 mb-3">{{ $subcategoryMessage }}</p>
+                                                    @endif
+
+                                                    @if ($showSubcategories)
+                                                        <div class="mb-4">
+                                                            <label for="exampleFormControlInput2"
+                                                                class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
+
+                                                            <div wire:ignore>
+                                                                <select wire:model="subcategory_id"
+                                                                    id="select2SubcategoryId" style="width: 100%;">
+                                                                    <option value="none">N/A</option>
+                                                                    @foreach (\App\Models\Subcategory::whereIn('id', $subcategory_id)->get() as $subcategory)
+                                                                        <option value="{{ $subcategory->id }}">
+                                                                            {{ $subcategory->subcategory_name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            @if ($subcategoryMessage)
+                                                                <p class="text-gray-500 mb-3">
+                                                                    {{ $subcategoryMessage }}</p>
+                                                            @endif
+                                                        </div>
+                                                    @endif
+
+                                                    <script>
+                                                        document.addEventListener('livewire:load', function() {
+                                                            Livewire.hook('message.sent', () => {
+                                                                // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                $('#select2CategoryId, #select2SubcategoryId').select2({
+                                                                    width: 'resolve' // need to override the changed default
+                                                                });
+                                                            });
+                                                        });
+
+                                                        $(document).ready(function() {
+                                                            // Inicializa Select2
+                                                            $('#select2CategoryId').select2();
+
+                                                            // Escucha el cambio en Select2 y actualiza Livewire
+                                                            $('#select2CategoryId').on('change', function(e) {
+                                                                @this.set('category_id', $(this).val());
+                                                            });
+
+                                                            // Muestra el select2 de subcategorías al seleccionar una categoría
+                                                            @if ($showSubcategories)
+                                                                $('#select2SubcategoryId').select2();
+                                                            @endif
+
+                                                            // Escucha el cambio en Select2 de subcategorías y actualiza Livewire
+                                                            $('#select2SubcategoryId').on('change', function(e) {
+                                                                @this.set('subcategory_id', $(this).val());
+                                                            });
+                                                        });
+                                                    </script>
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"

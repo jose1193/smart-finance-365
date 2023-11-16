@@ -20,6 +20,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <!-- Styles -->
 
     <style>
@@ -195,7 +197,7 @@
                                                                 </div>
 
                                                                 <input type="password" id="password" name="password"
-                                                                    required autocomplete="current-password" autofocus
+                                                                    required autocomplete="off" autofocus
                                                                     autocomplete="off" id="input-group-1"
                                                                     class="bg-gray-50 border border-gray-300 px-5 py-3 mt-2 mb-2 text-gray-900 text-sm rounded-lg focus:ring-indigo-500
                                  focus:border-indigo-500 block w-full pl-10  p-2.5  dark:border-gray-700  dark:focus:border-indigo-400 focus:outline-none focus:ring focus:ring-opacity-40"

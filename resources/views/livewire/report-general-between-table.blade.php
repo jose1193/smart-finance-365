@@ -178,9 +178,16 @@
                                      @if ($date_end)
                                          <p>Date End:
                                              <span class="text-green-700 ml-2">
-                                                 {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                                 {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                                             </span>
                                          </p>
                                      @endif
+
+                                     @if ($date_start && $date_end && $date_start > $date_end)
+                                         <p class="text-red-700 mt-2">Error: La fecha de inicio no puede ser posterior a
+                                             la fecha de finalización.</p>
+                                     @endif
+
                                  </th>
                                  <th class="px-4 py-3">
 
@@ -196,9 +203,9 @@
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
                                  <th class="px-4 py-3">Mes</th>
-                                 <th class="px-4 py-3">{{ $categoryName }} ARS</th>
+                                 <th class="px-4 py-3">{{ $categoryName }} </th>
                                  <th class="px-4 py-3"> Total Operation USD</th>
-                                 <th class="px-4 py-3">{{ $categoryName2 }} ARS</th>
+                                 <th class="px-4 py-3">{{ $categoryName2 }} </th>
                                  <th class="px-4 py-3"> Total Operation USD</th>
 
                              </tr>

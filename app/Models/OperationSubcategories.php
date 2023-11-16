@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SubcategoryToAssign extends Model
+class OperationSubcategories extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['subcategory_id', 'user_id_subcategory', 'user_id_admin'];
+    protected $fillable = ['operation_id', 'subcategory_id', 'user_id_subcategory', 'user_id_admin'];
 
-    public function subCategory()
+    public function subcategoryToAssign()
     {
-        return $this->belongsTo(Subcategory::class, 'subcategory_id');
+        return $this->belongsTo(SubcategoryToAssign::class, 'subcategory_id', 'id');
     }
 
     public function users()
@@ -26,10 +26,4 @@ class SubcategoryToAssign extends Model
     {
         return $this->belongsTo(User::class, 'user_id_admin');
     }
-
-    public function operationSubcategories()
-    {
-        return $this->hasMany(OperationSubcategories::class, 'subcategory_id', 'id');
-    }
-
 }

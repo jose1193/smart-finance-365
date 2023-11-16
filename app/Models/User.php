@@ -120,4 +120,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(SubcategoryToAssign::class, 'user_id_admin');
     }
+
+    public function operationSubcategory()
+    {
+        return $this->hasMany(OperationSubcategories::class, 'user_id_subcategory');
+    }
+
+    public function operationSubcategoryAdmin()
+    {
+        return $this->hasMany(OperationSubcategories::class, 'user_id_admin');
+    }
+    
 }

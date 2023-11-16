@@ -4,6 +4,8 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Category;
+use App\Models\Subcategory;
+use App\Models\SubcategoryToAssign;
 use App\Models\StatuOptions;
 use App\Models\Operation;
 use Livewire\WithPagination;
@@ -22,6 +24,11 @@ public $operation_currency;
 public $operation_currency_total; 
 public $isOpen = 0;
 protected $listeners = ['render','delete']; 
+
+public $subcategory_id;
+public $subcategories;
+public $showSubcategories = false;
+public $subcategoryMessage;
 
     public function authorize()
 {
@@ -88,12 +95,13 @@ public function mount()
     public function closeModal()
     {
         $this->isOpen = false;
-          $this->reset();
-        $this->resetValidation(); 
+        $this->resetInputFields();
+        
     }
 
     private function resetInputFields(){
          $this->reset();
+         $this->resetValidation(); 
     }
 
        
@@ -178,10 +186,32 @@ public function edit($id)
          $this->updatedOperationAmount();
          
     }
-public function delete($id)
+
+    
+    public function delete($id)
     {
          $this->authorize('manage admin');
         Operation::find($id)->delete();
         session()->flash('message', 'Data Deleted Successfully.');
     }
+
+
+    public function updatedCategoryId($value)
+    {
+        // Lógica para obtener las subcategorías asignadas al usuario autenticado
+        $userSubcategories = SubcategoryToAssign::join('subcategories', 'subcategory_to_assigns.subcategory_id', '=', 'subcategories.id')
+            ->where('subcategory_to_assigns.user_id_subcategory', auth()->user()->id)
+            ->where('subcategories.category_id', $value)
+            ->pluck('subcategory_to_assigns.subcategory_id');
+
+        // Pasa las subcategorías asignadas a la vista
+        $this->subcategory_id = $userSubcategories->toArray(); // Convierte la colección a un array de IDs
+
+        // Muestra el select2 de subcategorías solo si hay subcategorías
+        $this->showSubcategories = $userSubcategories->isNotEmpty(); // Verifica si la colección no está vacía
+
+        // Pasa un mensaje informativo a la vista
+        $this->subcategoryMessage = $userSubcategories->isNotEmpty() ? null : 'The category has no registered subcategories. Please follow the registration process.';
+    }
+
 }
