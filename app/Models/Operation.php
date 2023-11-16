@@ -35,4 +35,9 @@ class Operation extends Model
     {
         return $this->belongsTo(StatuOptions::class, 'operation_status');
     }
+
+    public function operationSubcategories()
+    {
+        return $this->hasMany(OperationSubcategories::class, 'operation_id');
+    }
 }

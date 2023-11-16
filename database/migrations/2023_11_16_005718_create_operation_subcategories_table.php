@@ -25,10 +25,6 @@ return new class extends Migration
             ->constrained('users')
             ->onUpdate('cascade')
             ->onDelete('cascade');
-            $table->foreignId('user_id_admin')
-            ->constrained('users')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
             $table->timestamps();
         });
     }

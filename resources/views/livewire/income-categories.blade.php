@@ -78,7 +78,7 @@
                                                 {{ $item->main_category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->category_name, 2, '...') }}
+                                                {{ Str::words($item->category_name, 1, '...') }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -96,7 +96,7 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 @if (!empty($item->subcategory_name))
-                                                    {{ Str::words($item->subcategory_name, 2, '...') }}
+                                                    {{ Str::words($item->subcategory_name, 1, '...') }}
                                                 @else
                                                     unavailable
                                                 @endif
@@ -315,7 +315,7 @@
                                             <!--Modal title-->
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Assigning Users {{ $categoryNameSelected }} Category Income
+                                                Assigning Users {{ $categoryNameSelected }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"

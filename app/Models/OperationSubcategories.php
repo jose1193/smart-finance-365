@@ -9,7 +9,7 @@ class OperationSubcategories extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['operation_id', 'subcategory_id', 'user_id_subcategory', 'user_id_admin'];
+    protected $fillable = ['operation_id', 'subcategory_id', 'user_id_subcategory'];
 
     public function subcategoryToAssign()
     {
@@ -21,9 +21,10 @@ class OperationSubcategories extends Model
         return $this->belongsTo(User::class, 'user_id_subcategory');
     }
 
-
-    public function usersAdmin()
+public function operationSubcategories()
     {
-        return $this->belongsTo(User::class, 'user_id_admin');
+        return $this->belongsTo(Operation::class, 'operation_id');
     }
+
+
 }

@@ -55,6 +55,7 @@
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Category</th>
+                                        <th class="px-4 py-3">Subcategory</th>
                                         <th class="px-4 py-3">Description</th>
                                         <th class="px-4 py-3">Operation</th>
                                         <th class="px-4 py-3">Rate CONV/USD</th>
@@ -73,11 +74,15 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->category_name, 2, '...') }}
+                                                {{ Str::words($item->category_name, 1, '...') }}
+
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ Str::words($item->subcategory_name ?? 'N/A', 1, '...') }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs ">
-                                                {{ Str::words($item->operation_description, 2, '...') }}
+                                                {{ Str::words($item->operation_description, 1, '...') }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -139,7 +144,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="9">
+                                            <td colspan="10">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">

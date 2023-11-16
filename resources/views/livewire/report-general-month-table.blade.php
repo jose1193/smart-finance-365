@@ -208,6 +208,8 @@
                                   </th>
                                   <th class="px-4 py-3">
                                   </th>
+                                  <th class="px-4 py-3">
+                                  </th>
                               </tr>
                               <tr
                                   class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
@@ -238,13 +240,14 @@
                                       <td class="px-4 py-3 text-center">
                                           {{ $item->main_category_title }}</td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ $item->category_title }}
-                                      </td>
-                                      <td class="px-4 py-3 text-center">
+                                          {{ Str::words($item->category_title, 1, '...') }}
 
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->operation_description, 2, '...') }}
+                                          {{ Str::words($item->subcategory_name, 1, '...') }}
+                                      </td>
+                                      <td class="px-4 py-3 text-center">
+                                          {{ Str::words($item->operation_description, 1, '...') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ $selectedMonthName }}

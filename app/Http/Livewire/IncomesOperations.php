@@ -6,12 +6,13 @@ use Livewire\Component;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\SubcategoryToAssign;
+use App\Models\OperationSubcategories;
+use App\Models\CategoriesToAssign;
 use App\Models\StatuOptions;
 use App\Models\Operation;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- guzzle query api
-use App\Models\CategoriesToAssign;
 use Illuminate\Support\Facades\DB;
 
 class IncomesOperations extends Component
@@ -29,9 +30,9 @@ public $isOpen = 0;
 protected $listeners = ['render','delete']; 
 
 public $subcategory_id;
-public $subcategories;
 public $showSubcategories = false;
 public $subcategoryMessage;
+public $selectedCategoryId;
 
     public function authorize()
 {
@@ -57,19 +58,34 @@ public function mount()
     public function render()
     {
          $data = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-     ->join('users', 'operations.user_id', '=', 'users.id')
-      ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-     ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id') 
-     ->where('users.id', auth()->id())
-      ->where('categories.main_category_id', 1)
-     ->where('operations.operation_description', 'like', '%' . $this->search . '%')
-     ->select('operations.*', 'categories.category_name', 'statu_options.status_description')
-     ->orderBy('operations.id', 'desc')
-     ->paginate(10);
+    ->join('users', 'operations.user_id', '=', 'users.id')
+    ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
+    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
+    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
+    ->where('users.id', auth()->id())
+    ->where('categories.main_category_id', 1)
+    ->where('operations.operation_description', 'like', '%' . $this->search . '%')
+    ->select('operations.*', 'categories.category_name', 'statu_options.status_description', 'subcategories.subcategory_name')
+    ->orderBy('operations.id', 'desc')
+    ->paginate(10);
 
-     $this->categoriesRender = Category::where('main_category_id', 1)
-                                  ->orderBy('id', 'asc')
-                                  ->get();
+
+     $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
+    ->pluck('category_id');
+
+    $this->categoriesRender = Category::where('main_category_id', 1)
+    ->whereIn('id', $assignedCategories)
+    ->orWhere(function ($query) use ($assignedCategories) {
+        $query->whereNotIn('id', $assignedCategories)
+              ->whereNotExists(function ($subQuery) {
+                  $subQuery->select(DB::raw(1))
+                           ->from('categories_to_assigns')
+                           ->whereColumn('categories_to_assigns.category_id', 'categories.id');
+              });
+    })
+    ->orderBy('id', 'asc')
+    ->get();
 
 
     $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
@@ -109,6 +125,28 @@ public function mount()
     }
 
        
+public function edit($id)
+    {
+         $this->authorize('manage admin');
+        $list = Operation::findOrFail($id);
+        $this->data_id = $id;
+        $this->operation_description = $list->operation_description;
+        $this->operation_amount = number_format($list->operation_amount, 0, '.', ',');
+        $this->operation_currency = $list->operation_currency;
+        $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
+        $this->operation_status = $list->operation_status;
+        $this->category_id = $list->category_id;
+     
+        $this->openModal();
+        $this->updatedOperationAmount();
+       
+        $this->selectedCategoryId = $list->category_id;
+        $this->showSubcategories = true;
+        $this->updatedCategoryId($list->category_id);
+
+    }
+
+
 public function store()
 {
     
@@ -134,7 +172,6 @@ public function store()
     $validatedData['operation_year'] = $operationDate->format('Y');
 
    
-    
     // Elimina cualquier carácter no numérico, como comas y puntos
     $numericValue = str_replace(['.', ','], '', $validatedData['operation_amount']);
      // Para operation_currency_total, primero lo conviertes en un número decimal (float)
@@ -149,13 +186,67 @@ public function store()
     // Luego, lo redondeas al número entero más cercano
     $validatedData['operation_currency_total'] = (int)$numericValue2;
 
-    Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
+    $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
     session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
     
+    
+    
+      // Llamada a la función para asignar usuarios a operaciones subcategorías
+    $this->SubcategoryOperationAssignment($operation);
+
+
     $this->closeModal();
     $this->resetInputFields();
 }
+
+
+public function SubcategoryOperationAssignment(Operation $operation)
+{
+    // Obtener la subcategoría asociada a la categoría
+    $subcategories = Subcategory::find($this->subcategory_id);
+
+    if ($operation && $subcategories) {
+        if (in_array('all', $this->subcategory_id) || empty($this->subcategory_id)) {
+            // Eliminar las asignaciones existentes en OperationSubcategories
+            OperationSubcategories::where('operation_id', $operation->id)->delete();
+        } else {
+            // Obtener las subcategorías asociadas al usuario autenticado
+            $userSubcategories = SubcategoryToAssign::join('subcategories', 'subcategory_to_assigns.subcategory_id', '=', 'subcategories.id')
+                ->where('subcategory_to_assigns.user_id_subcategory', auth()->user()->id)
+                ->whereIn('subcategory_to_assigns.subcategory_id', $subcategories->pluck('id'))
+                ->pluck('subcategory_to_assigns.subcategory_id');
+
+            foreach ($subcategories as $subcategory) {
+                $subcategoryId = $subcategory->id;
+
+                // Verificar si la subcategoría está asignada al usuario
+                if ($userSubcategories->contains($subcategoryId)) {
+                    // Aquí se obtienen los valores necesarios de la instancia de $operation
+                    $operationId = $operation->id;
+
+                    // Registrar en OperationSubcategories
+                    OperationSubcategories::updateOrCreate(
+                        [
+                            'operation_id' => $operationId,
+                            'subcategory_id' => $subcategoryId,
+                            'user_id_subcategory' => auth()->user()->id,
+                        ]
+                    );
+                }
+            }
+        }
+
+        session()->flash('message', 'User Assignments for Subcategories Updated Successfully.');
+    } else {
+        session()->flash('error', 'Category or Subcategories not found.');
+    }
+
+    $this->resetInputFields();
+}
+
+
+
 
 public function updatedOperationAmount()
 {
@@ -173,22 +264,35 @@ public function updatedOperationAmount()
     }
 }
 
+  
+public function updatedCategoryId($value)
+{
+    // Lógica para obtener las subcategorías asignadas al usuario autenticado
+    $userSubcategories = SubcategoryToAssign::join('subcategories', 'subcategory_to_assigns.subcategory_id', '=', 'subcategories.id')
+        ->where('subcategory_to_assigns.user_id_subcategory', auth()->user()->id)
+        ->where('subcategories.category_id', $value)
+        ->pluck('subcategory_to_assigns.subcategory_id');
 
-public function edit($id)
-    {
-         $this->authorize('manage admin');
-        $list = Operation::findOrFail($id);
-        $this->data_id = $id;
-        $this->operation_description = $list->operation_description;
-        $this->operation_amount = number_format($list->operation_amount, 0, '.', ',');
-        $this->operation_currency = $list->operation_currency;
-        $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
-          $this->operation_status = $list->operation_status;
-         $this->category_id = $list->category_id;
-     
-        $this->openModal();
-        $this->updatedOperationAmount();
+    // Lógica para verificar si el usuario está asignado a alguna subcategoría
+    $isUserAssigned = $userSubcategories->isNotEmpty();
+
+    // Verificar si la categoría tiene subcategorías
+    $hasSubcategories = Subcategory::where('category_id', $value)->exists();
+
+    // Pasa las subcategorías asignadas a la vista
+    $this->subcategory_id = $userSubcategories->toArray(); // Convierte la colección a un array de IDs
+
+    // Muestra el select2 de subcategorías solo si hay subcategorías asignadas
+    $this->showSubcategories = $isUserAssigned && $hasSubcategories;
+
+    // Pasa un mensaje informativo a la vista
+    if ($isUserAssigned) {
+        $this->subcategoryMessage = null; // Usuario asignado, no se muestra mensaje
+    } else {
+        $this->subcategoryMessage = $hasSubcategories ? 'You are not assigned to any subcategory. Please choose from the available subcategories.' : 'The category has no registered subcategories. Please follow the registration process.';
     }
+}
+
 
 
     public function delete($id)
@@ -198,23 +302,5 @@ public function edit($id)
         session()->flash('message', 'Data Deleted Successfully.');
     }
 
-
-   public function updatedCategoryId($value)
-    {
-        // Lógica para obtener las subcategorías asignadas al usuario autenticado
-        $userSubcategories = SubcategoryToAssign::join('subcategories', 'subcategory_to_assigns.subcategory_id', '=', 'subcategories.id')
-            ->where('subcategory_to_assigns.user_id_subcategory', auth()->user()->id)
-            ->where('subcategories.category_id', $value)
-            ->pluck('subcategory_to_assigns.subcategory_id');
-
-        // Pasa las subcategorías asignadas a la vista
-        $this->subcategory_id = $userSubcategories->toArray(); // Convierte la colección a un array de IDs
-
-        // Muestra el select2 de subcategorías solo si hay subcategorías
-        $this->showSubcategories = $userSubcategories->isNotEmpty(); // Verifica si la colección no está vacía
-
-        // Pasa un mensaje informativo a la vista
-        $this->subcategoryMessage = $userSubcategories->isNotEmpty() ? null : 'The category has no registered subcategories. Please follow the registration process.';
-    }
 
 }

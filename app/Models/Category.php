@@ -17,6 +17,11 @@ public function income()
         return $this->hasMany(Income::class);
     }
 
+    public function operation()
+    {
+        return $this->hasMany(Operation::class);
+    }
+
     public function mainCategories()
     {
         return $this->belongsTo(MainCategories::class);
