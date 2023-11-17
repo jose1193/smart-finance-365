@@ -77,11 +77,11 @@
                                                 {{ Str::words($item->category_name, 1, '...') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->subcategory_name ?? 'N/A', 1, '...') }}
+                                                {{ Str::words($item->display_name, 2, '...') }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->operation_description, 1, '...') }}
+                                                {{ Str::words($item->operation_description, 2, '...') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
@@ -321,28 +321,16 @@
                                                                     id="select2SubcategoryId" style="width: 100%;">
                                                                     <option value="all">N/A</option>
                                                                     {{-- Display Assigned Subcategories --}}
-                                                                    @foreach ($subcategory_id as $subcategoryId)
+                                                                    @forelse ($subcategory_id as $subcategoryId)
                                                                         @php
                                                                             $subcategory = \App\Models\Subcategory::find($subcategoryId);
                                                                         @endphp
                                                                         <option value="{{ $subcategory->id }}">
                                                                             {{ $subcategory->subcategory_name }}
                                                                         </option>
-                                                                    @endforeach
+                                                                    @empty
+                                                                    @endforelse
 
-                                                                    {{-- Display Unassigned Subcategories (if any) --}}
-                                                                    @if (!empty($unassignedSubcategories))
-                                                                        @foreach ($unassignedSubcategories as $unassignedSubcategoryId)
-                                                                            @php
-                                                                                $unassignedSubcategory = \App\Models\Subcategory::find($unassignedSubcategoryId);
-                                                                            @endphp
-                                                                            <option
-                                                                                value="{{ $unassignedSubcategory->id }}">
-                                                                                {{ $unassignedSubcategory->subcategory_name }}
-
-                                                                            </option>
-                                                                        @endforeach
-                                                                    @endif
                                                                 </select>
 
                                                             </div>
