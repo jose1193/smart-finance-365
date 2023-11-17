@@ -264,7 +264,6 @@ public function updatedOperationAmount()
     }
 }
 
-  
 public function updatedCategoryId($value)
 {
     // Lógica para obtener las subcategorías asignadas al usuario autenticado
@@ -291,8 +290,7 @@ public function updatedCategoryId($value)
     } else {
         $this->subcategoryMessage = $hasSubcategories ? 'You are not assigned to any subcategory. Please choose from the available subcategories.' : 'The category has no registered subcategories. Please follow the registration process.';
     }
-}
-
+} 
 
 
     public function delete($id)
