@@ -85,11 +85,13 @@ public function mount()
                   $subQuery->select(DB::raw(2))
                            ->from('categories_to_assigns')
                            ->whereColumn('categories_to_assigns.category_id', 'categories.id');
-              });
+              })
+              ->where('main_category_id', 2); 
     })
     ->orderBy('id', 'asc')
     ->get();
 
+    
     $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
                                   ->orderBy('id', 'asc')
                                   ->get();

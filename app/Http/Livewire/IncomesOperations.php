@@ -90,10 +90,12 @@ public function mount()
                   $subQuery->select(DB::raw(1))
                            ->from('categories_to_assigns')
                            ->whereColumn('categories_to_assigns.category_id', 'categories.id');
-              });
+              })
+              ->where('main_category_id', 1); // Agregar esta condición para limitar a categorías de ingresos
     })
     ->orderBy('id', 'asc')
     ->get();
+
 
 
     $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
