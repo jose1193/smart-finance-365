@@ -32,6 +32,7 @@ public $subcategory_id;
 public $showSubcategories = false;
 public $subcategoryMessage;
 public $selectedCategoryId;
+public $unassignedSubcategories;
 
     public function authorize()
 {
@@ -257,36 +258,44 @@ public function updatedOperationAmount()
     }
 }
 
-    
+ 
+
+
 public function updatedCategoryId($value)
 {
-    // Lógica para obtener las subcategorías asignadas al usuario autenticado
-    $userSubcategories = SubcategoryToAssign::join('subcategories', 'subcategory_to_assigns.subcategory_id', '=', 'subcategories.id')
-        ->where('subcategory_to_assigns.user_id_subcategory', auth()->user()->id)
-        ->where('subcategories.category_id', $value)
-        ->pluck('subcategory_to_assigns.subcategory_id');
+    // Lógica para obtener las subcategorías asignadas al usuario autenticado en la categoría seleccionada
+    $userSubcategories = SubcategoryToAssign::where('user_id_subcategory', auth()->user()->id)
+        ->whereHas('subcategory', function ($query) use ($value) {
+            $query->where('category_id', $value);
+        })
+        ->pluck('subcategory_id');
 
-    // Lógica para verificar si el usuario está asignado a alguna subcategoría
-    $isUserAssigned = $userSubcategories->isNotEmpty();
+    // Lógica para obtener las subcategorías asignadas a la categoría, solo aquellas asignadas al usuario autenticado
+    $assignedSubcategories = Subcategory::where('category_id', $value)
+        ->whereIn('id', $userSubcategories)
+        ->pluck('id');
 
-    // Verificar si la categoría tiene subcategorías
-    $hasSubcategories = Subcategory::where('category_id', $value)->exists();
+    // Lógica para obtener las subcategorías sin asignación de usuarios
+    $unassignedSubcategories = $userSubcategories->diff($assignedSubcategories);
 
     // Pasa las subcategorías asignadas a la vista
-    $this->subcategory_id = $userSubcategories->toArray(); // Convierte la colección a un array de IDs
+    $this->subcategory_id = $assignedSubcategories->toArray();
+
+    // Pasa las subcategorías sin asignar a la vista si hay categorías sin asignaciones
+    $this->unassignedSubcategories = $unassignedSubcategories->toArray();
 
     // Muestra el select2 de subcategorías solo si hay subcategorías asignadas
-    $this->showSubcategories = $isUserAssigned && $hasSubcategories;
+    $this->showSubcategories = $assignedSubcategories->isNotEmpty();
 
-    // Pasa un mensaje informativo a la vista
-    if ($isUserAssigned) {
-        $this->subcategoryMessage = null; // Usuario asignado, no se muestra mensaje
-    } else {
-        $this->subcategoryMessage = $hasSubcategories ? 'You are not assigned to any subcategory. Please choose from the available subcategories.' : 'The category has no registered subcategories. Please follow the registration process.';
-    }
+    // Pasa un mensaje informativo a la vista para las subcategorías
+    $this->subcategoryMessage = $assignedSubcategories->isNotEmpty()
+        ? null  // Usuario asignado, no se muestra mensaje
+        : ($unassignedSubcategories->isNotEmpty()
+            ? 'The category has no subcategories assigned to you. Please follow the registration process.'
+            : (Subcategory::where('category_id', $value)->exists()
+                ? null
+                : 'The category has no registered subcategories. Please follow the registration process.'));
 }
-
-
 
 
     public function delete($id)
