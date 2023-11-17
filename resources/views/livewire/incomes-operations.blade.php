@@ -353,7 +353,7 @@
                                                         });
 
                                                         $(document).ready(function() {
-                                                            // Inicializa Select2
+                                                            // Inicializa Select2 para la categoría
                                                             $('#select2CategoryId').select2();
 
                                                             // Escucha el cambio en Select2 y actualiza Livewire
@@ -361,17 +361,20 @@
                                                                 @this.set('category_id', $(this).val());
                                                             });
 
-                                                            // Muestra el select2 de subcategorías al seleccionar una categoría
+                                                            // Inicializa Select2 para subcategorías solo si están visibles
                                                             @if ($showSubcategories)
                                                                 $('#select2SubcategoryId').select2();
-                                                            @endif
 
-                                                            // Escucha el cambio en Select2 de subcategorías y actualiza Livewire
-                                                            $('#select2SubcategoryId').on('change', function(e) {
-                                                                @this.set('subcategory_id', $(this).val());
-                                                            });
+                                                                // Escucha el cambio en Select2 de subcategorías y actualiza Livewire
+                                                                $('#select2SubcategoryId').on('change', function(e) {
+                                                                    @this.set('subcategory_id', $(this).val());
+                                                                });
+                                                            @endif
                                                         });
                                                     </script>
+
+
+
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
                                                             class="block text-gray-700 text-sm font-bold mb-2">Status
