@@ -270,11 +270,12 @@ public function SubcategoryAssignment(Category $storeCategory)
     foreach ($storeCategory->Subcategory as $index => $subcategory) {
         $selectedUsers = $this->user_id_assignSubcategory[$index] ?? [];
 
-        if (empty($selectedUsers) || in_array('all', $selectedUsers)) {
-        $this->deleteSubcategoryAssignments((object)$subcategory);
-    } else {
-        $this->processSubcategoryAssignments((object)$subcategory, $selectedUsers, $storeCategory->id, $assignedUsers);
-    }
+        // Check if 'All Users' is selected or array is empty
+        if (in_array('all', $selectedUsers) || empty($selectedUsers)) {
+            $this->deleteSubcategoryAssignments((object) $subcategory);
+        } else {
+            $this->processSubcategoryAssignments((object) $subcategory, $selectedUsers, $storeCategory->id, $assignedUsers);
+        }
     }
 
     $this->resetInputFields();
@@ -282,10 +283,14 @@ public function SubcategoryAssignment(Category $storeCategory)
 
 private function deleteSubcategoryAssignments($subcategory)
 {
-    SubcategoryToAssign::where('subcategory_id', $subcategory->id)->delete();
+    foreach ($subcategory as $subcategory) {
+        SubcategoryToAssign::where('subcategory_id', $subcategory->id)->delete();
+    }
+
     session()->flash('message', 'User Assignments Updated Successfully.');
     $this->resetInputFields();
 }
+
 
 private function processSubcategoryAssignments($subcategory, $selectedUsers, $categoryId, $assignedUsers)
 {
@@ -365,6 +370,7 @@ private function getUnassignedUsers($selectedUsers, $categoryAssignments, $assig
     // Inicializar propiedades
     $this->subcategory_name = $subcategories->pluck('subcategory_name')->toArray();
     $this->user_id_assignSubcategory = $userIdsSubcategory;
+    
 }
 
 
