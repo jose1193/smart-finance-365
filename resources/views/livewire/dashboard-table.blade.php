@@ -93,18 +93,18 @@
                                         </td>
 
                                         <td class="px-4 py-3 text-xs text-center">
-                                            $
-                                            {{ $formatted_amount = number_format($item->operation_amount, 0, '.', ',') }}
+
+                                            {{ number_format($item->operation_amount, 0, '.', ',') }}
+                                        </td>
+                                        <td class="px-4 py-3 text-xs text-center">
+
+
+                                            {{ $item->operation_currency }}
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
 
                                             $
-                                            {{ $formatted_amount = number_format($item->operation_currency, 0, '.', ',') }}
-                                        </td>
-                                        <td class="px-4 py-3 text-xs text-center">
-
-                                            $
-                                            {{ $formatted_amount = number_format($item->operation_currency_total, 0, '.', ',') }}
+                                            {{ number_format($item->operation_currency_total, 0, '.', ',') }}
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
 

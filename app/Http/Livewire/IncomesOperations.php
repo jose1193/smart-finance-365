@@ -45,6 +45,7 @@ public $operation_currency_type;
     return true;
 }
 
+
 public function render()
     {
        $data = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
@@ -105,7 +106,7 @@ public function render()
     {
     // Hacer la solicitud HTTP a la API de monedas
     $response = Http::get('http://api.currencylayer.com/list', [
-    'access_key' => '',
+    'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
     ]);
 
     // Si la llamada fue exitosa, parsea la respuesta
@@ -138,7 +139,7 @@ public function render()
     } else {
         // Realiza la solicitud HTTP para obtener la tasa de cambio de USD a la moneda seleccionada
         $response = Http::get('http://api.currencylayer.com/live', [
-            'access_key' => '',
+            'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
             'currencies' => $this->selectedCurrencyFrom,
             'source' => 'USD',
         ]);
@@ -243,7 +244,7 @@ public function updatedOperationAmount()
        
 public function edit($id)
     {
-         $this->authorize('manage admin');
+        $this->authorize('manage admin');
         $list = Operation::findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
@@ -350,7 +351,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
             }
         }
 
-        session()->flash('message', 'User Assignments for Subcategories Updated Successfully.');
+        session()->flash('message', 'Data Created Successfully.');
     } else {
         session()->flash('error', 'Category or Subcategories not found.');
     }
