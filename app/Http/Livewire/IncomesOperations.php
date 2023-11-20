@@ -242,7 +242,7 @@ public function updatedOperationAmount()
     }
 
        
-public function edit($id)
+    public function edit($id)
     {
         $this->authorize('manage admin');
         $list = Operation::findOrFail($id);
@@ -253,6 +253,7 @@ public function edit($id)
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
         $this->operation_status = $list->operation_status;
         $this->category_id = $list->category_id;
+        $this->selectedCurrencyFrom = $list->operation_currency_type;
      
         $this->openModal();
         $this->updatedOperationAmount();

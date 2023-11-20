@@ -61,7 +61,7 @@
                                         <th class="px-4 py-3">Operation</th>
                                         <th class="px-4 py-3">Rate CONV/USD</th>
                                         <th class="px-4 py-3">Total In USD</th>
-                                        <th class="px-4 py-3">Status</th>
+                                        <th class="px-4 py-3">State</th>
                                         <th class="px-4 py-3">Date</th>
                                         <th class="px-4 py-3">Action</th>
                                     </tr>

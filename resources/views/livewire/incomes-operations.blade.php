@@ -416,7 +416,7 @@
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Status
+                                                            class="block text-gray-700 text-sm font-bold mb-2">State
                                                         </label>
                                                         <select wire:model="operation_status"
                                                             class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
