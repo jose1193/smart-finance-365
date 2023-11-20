@@ -77,11 +77,12 @@
                     <th>Subcategory</th>
                     <th>Description</th>
                     <th>Month</th>
+                    <th>Currency</th>
                     <th>Date</th>
-                    <th>Operation ARS</th>
+                    <th>Operation</th>
                     <th>Rate </th>
                     <th>Total USD</th>
-                    <th>Status</th>
+                    <th>State</th>
                 </tr>
             </thead>
             <tbody>
@@ -110,12 +111,12 @@
                             {{ \Carbon\Carbon::parse($item->operation_date)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
                         </td>
                         <td>
-                            $
+
                             {{ number_format($item->operation_amount, 0, '.', ',') }}
                         </td>
                         <td>
-                            $
-                            {{ number_format($item->operation_currency, 0, '.', ',') }}
+
+                            {{ $item->operation_currency }}
                         </td>
                         <td>
                             {{ number_format($item->operation_currency_total, 0, '.', ',') }}

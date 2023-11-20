@@ -114,19 +114,28 @@
                                                class="block text-gray-700 text-sm font-bold mb-2">
                                                User Email:</label>
                                            <div wire:ignore>
-                                               <select multiple id="select2EmailsUser" style="width: 100%"
-                                                   wire:model="emails_user2">
+                                               @if (count($emails) > 0)
+                                                   <select multiple id="select2EmailsUser" style="width: 100%"
+                                                       wire:model="emails_user2">
 
-                                                   @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
-                                                       <optgroup label="{{ $nameUser }}">
-                                                           @foreach ($groupedEmails as $email)
-                                                               <option value="{{ $email->email }}">
-                                                                   {{ $email->email }}
-                                                               </option>
-                                                           @endforeach
-                                                       </optgroup>
-                                                   @endforeach
-                                               </select>
+                                                       @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
+                                                           <optgroup label="{{ $nameUser }}">
+                                                               @foreach ($groupedEmails as $email)
+                                                                   <option value="{{ $email->email }}">
+                                                                       {{ $email->email }}
+                                                                   </option>
+                                                               @endforeach
+                                                           </optgroup>
+                                                       @endforeach
+                                                   </select>
+                                               @else
+                                                   <a href="{{ route('emails') }}" target="_blank"
+                                                       class="text-blue-600 hover:text-blue-700 font-semibold"
+                                                       wire:click="closeModal2()">
+                                                       Click here to register your email and submit reports
+                                                   </a>
+
+                                               @endif
                                            </div>
 
                                            <script>

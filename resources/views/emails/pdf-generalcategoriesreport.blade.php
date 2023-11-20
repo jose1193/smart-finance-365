@@ -91,10 +91,10 @@
                             {{ \Carbon\Carbon::create()->month($i + 1)->format('F') }}
                         </td>
                         <td class="px-4 py-3 text-center">
-                            ${{ number_format($ArrayCategories[$i]['total'], 0, '.', ',') }}
+                            {{ number_format($ArrayCategories[$i]['total'], 0, '.', ',') }}
                         </td>
                         <td class="px-4 py-3 text-center">
-                            ${{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }}
+                            {{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }} $
                         </td>
                     </tr>
                 @endfor
@@ -111,10 +111,10 @@
                     </td>
 
                     <td>
-                        ${{ number_format($totalCategoriesRender, 0, '.', ',') }}
+                        {{ number_format($totalCategoriesRender, 0, '.', ',') }}
                     </td>
                     <td>
-                        {{ number_format($totalCategoriesRenderCurrency, 0, '.', ',') }}$
+                        {{ number_format($totalCategoriesRenderCurrency, 0, '.', ',') }} $
                     </td>
 
                 </tr>

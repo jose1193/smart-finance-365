@@ -85,14 +85,14 @@
                         <td> {{ $i }}</td>
                         <td>
                             {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
-                        <td>$
+                        <td>
                             {{ number_format($incomeData[$i - 1], 0, '.', ',') }}</td>
                         <td>
-                            {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }}$</td>
+                            {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }} $</td>
                         <td>
                             {{ number_format($expenseData[$i - 1], 0, '.', ',') }}</td>
                         <td>
-                            {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }}$</td>
+                            {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }} $</td>
                     </tr>
                 @endfor
                 <tr class="footTr">
@@ -107,17 +107,17 @@
                             Year Not Selected
                         @endif
                     </td>
-                    <td>$
+                    <td>
                         {{ number_format($totalIncome, 0, '.', ',') }}
                     </td>
                     <td>
-                        {{ number_format($totalIncomeCurrency, 0, '.', ',') }}$
+                        {{ number_format($totalIncomeCurrency, 0, '.', ',') }} $
                     </td>
-                    <td>$
+                    <td>
                         {{ number_format($totalExpense, 0, '.', ',') }}
                     </td>
                     <td>
-                        {{ number_format($totalExpenseCurrency, 0, '.', ',') }}$
+                        {{ number_format($totalExpenseCurrency, 0, '.', ',') }} $
                     </td>
 
                 </tr>

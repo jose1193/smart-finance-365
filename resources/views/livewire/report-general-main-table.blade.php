@@ -90,20 +90,29 @@
                                                  class="block text-gray-700 text-sm font-bold mb-2">
                                                  User Email:</label>
                                              <div wire:ignore>
-                                                 <select multiple id="selectEmailsUser" style="width: 100%"
-                                                     wire:model="emails_user">
+                                                 @if (count($emails) > 0)
+                                                     <select multiple id="selectEmailsUser" style="width: 100%"
+                                                         wire:model="emails_user">
 
 
-                                                     @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
-                                                         <optgroup label="{{ $nameUser }}">
-                                                             @foreach ($groupedEmails as $email)
-                                                                 <option value="{{ $email->email }}">
-                                                                     {{ $email->email }}
-                                                                 </option>
-                                                             @endforeach
-                                                         </optgroup>
-                                                     @endforeach
-                                                 </select>
+                                                         @foreach ($emails->groupBy('name') as $nameUser => $groupedEmails)
+                                                             <optgroup label="{{ $nameUser }}">
+                                                                 @foreach ($groupedEmails as $email)
+                                                                     <option value="{{ $email->email }}">
+                                                                         {{ $email->email }}
+                                                                     </option>
+                                                                 @endforeach
+                                                             </optgroup>
+                                                         @endforeach
+                                                     </select>
+                                                 @else
+                                                     <a href="{{ route('emails') }}" target="_blank"
+                                                         class="text-blue-600 hover:text-blue-700 font-semibold"
+                                                         wire:click="closeModal()">
+                                                         Click here to register your email and submit reports
+                                                     </a>
+
+                                                 @endif
                                              </div>
                                              <script>
                                                  document.addEventListener('livewire:load', function() {
@@ -223,18 +232,18 @@
                                  <td class="px-4 py-3 text-center font-semibold">
                                      Total
                                  </td>
-                                 <td class="px-4 py-3 text-center font-semibold">$
+                                 <td class="px-4 py-3 text-center font-semibold">
                                      {{ $formatted_amount = number_format($totalIncome, 0, '.', ',') }}
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ $formatted_amount = number_format($totalIncomeCurrency, 0, '.', ',') }}$
+                                     {{ $formatted_amount = number_format($totalIncomeCurrency, 0, '.', ',') }} $
                                  </td>
-                                 <td class="px-4 py-3 text-center font-semibold">$
+                                 <td class="px-4 py-3 text-center font-semibold">
                                      {{ $formatted_amount = number_format($totalExpense, 0, '.', ',') }}
 
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ $formatted_amount = number_format($totalExpenseCurrency, 0, '.', ',') }}$
+                                     {{ $formatted_amount = number_format($totalExpenseCurrency, 0, '.', ',') }} $
 
                                  </td>
 
