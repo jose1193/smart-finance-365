@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('operations', function (Blueprint $table) {
             $table->id();
              $table->string('operation_description');
+             $table->string('operation_currency_type');
              $table->string('operation_amount');
              $table->string('operation_currency');
              $table->string('operation_currency_total');

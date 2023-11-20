@@ -220,11 +220,11 @@
                                   <th class="px-4 py-3">Description</th>
                                   <th class="px-4 py-3">Month</th>
                                   <th class="px-4 py-3">Date</th>
-                                  <th class="px-4 py-3">Coin</th>
+                                  <th class="px-4 py-3">Currency</th>
                                   <th class="px-4 py-3">Operation</th>
                                   <th class="px-4 py-3">Rate CONV/USD</th>
                                   <th class="px-4 py-3">Total In USD</th>
-                                  <th class="px-4 py-3">Status</th>
+                                  <th class="px-4 py-3">State</th>
                               </tr>
                           </thead>
                           <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -244,7 +244,7 @@
 
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->subcategory_name, 1, '...') }}
+                                          {{ Str::words($item->subcategory_name, 1) ?: 'N/A' }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ Str::words($item->operation_description, 1, '...') }}
@@ -256,19 +256,20 @@
                                           {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
 
                                       </td>
+
                                       <td class="px-4 py-3 text-center">
-                                          coin
+                                          {{ $item->operation_currency_type }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          $
+
                                           {{ number_format($item->operation_amount, 0, '.', ',') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          $
-                                          {{ number_format($item->operation_currency, 0, '.', ',') }}
+
+                                          {{ $item->operation_currency }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ number_format($item->operation_currency_total, 0, '.', ',') }}
+                                          {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
                                           $</td>
                                       <td class="px-4 py-3 text-center">
                                           @if ($item->operation_status == '1')
@@ -315,20 +316,23 @@
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
                                   </td>
-                                  <td class="px-4 py-3 text-center font-semibold">$
+                                  <td class="px-4 py-3 text-center font-semibold">
+                                  </td>
+                                  <td class="px-4 py-3 text-center font-semibold">
+
+                                  </td>
+                                  <td class="px-4 py-3 text-center font-semibold">
+
+                                  </td>
+
+                                  <td class="px-4 py-3 text-center font-semibold">
                                       {{ number_format($totalMonthAmount, 0, '.', ',') }}
                                   </td>
-                                  <td class="px-4 py-3 text-center font-semibold">
-
+                                  <td class="px-4 py-3 text-center">
                                   </td>
-
-                                  <td class="px-4 py-3 text-center font-semibold">
+                                  <td class="px-4 py-3 text-center">
                                       {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
                                       $
-                                  </td>
-                                  <td class="px-4 py-3 text-center">
-                                  </td>
-                                  <td class="px-4 py-3 text-center">
                                   </td>
                                   <td class="px-4 py-3 text-center">
                                   </td>

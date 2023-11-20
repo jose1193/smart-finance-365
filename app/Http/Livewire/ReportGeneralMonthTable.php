@@ -153,6 +153,7 @@ private function fetchMonthData()
             'operations.operation_status as operation_status',
             'operations.operation_description',
             'operations.operation_date',
+            'operations.operation_currency_type',
             'main_categories.title as main_category_title',
             'subcategories.subcategory_name' 
         )

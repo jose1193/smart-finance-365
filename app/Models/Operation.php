@@ -10,6 +10,7 @@ class Operation extends Model
     use HasFactory;
     protected $fillable = [
         'operation_description',
+        'operation_currency_type',
         'operation_amount',
         'operation_currency',
         'operation_currency_total',

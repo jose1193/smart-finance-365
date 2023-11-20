@@ -204,14 +204,14 @@
                                      <td class="px-4 py-3 text-center"> {{ $i }}</td>
                                      <td class="px-4 py-3 text-center">
                                          {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
-                                     <td class="px-4 py-3 text-center">$
+                                     <td class="px-4 py-3 text-center">
                                          {{ number_format($incomeData[$i - 1], 0, '.', ',') }}</td>
                                      <td class="px-4 py-3 text-center">
-                                         {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }}$</td>
+                                         {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }} $</td>
                                      <td class="px-4 py-3 text-center">
                                          {{ number_format($expenseData[$i - 1], 0, '.', ',') }}</td>
                                      <td class="px-4 py-3 text-center">
-                                         {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }}$</td>
+                                         {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }} $</td>
                                  </tr>
                              @endfor
 

@@ -57,6 +57,7 @@
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Subcategory</th>
                                         <th class="px-4 py-3">Description</th>
+                                        <th class="px-4 py-3">Currency</th>
                                         <th class="px-4 py-3">Operation</th>
                                         <th class="px-4 py-3">Rate CONV/USD</th>
                                         <th class="px-4 py-3">Total In USD</th>
@@ -77,24 +78,29 @@
                                                 {{ Str::words($item->category_name, 1, '...') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->display_name, 2, '...') }}
+                                                {{ $item->display_name }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ Str::words($item->operation_description, 2, '...') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
+                                                {{ $item->operation_currency_type }}
 
-                                                $
-                                                {{ $formatted_amount = number_format($item->operation_amount, 0, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
-                                                $
-                                                {{ $formatted_amount = number_format($item->operation_currency, 0, '.', ',') }}
+
+                                                {{ number_format($item->operation_amount, 0, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $formatted_amount = number_format($item->operation_currency_total, 0, '.', ',') }}
+
+
+                                                {{ $item->operation_currency }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+
+                                                {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
                                                 $
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -204,74 +210,103 @@
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
                                                     <div class="mb-4">
                                                         <label for="operation_amount"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Operation</label>
+                                                            Select Conversion From</label>
+                                                        <div wire:ignore>
+                                                            <select wire:model="selectedCurrencyFrom"
+                                                                wire:change="showSelectedCurrency"
+                                                                id="selectedCurrencyFrom" style="width: 100%;">
+                                                                <option value="">Select Option</option>
+                                                                <option value="Blue-ARS">Argentine Peso (Blue-ARS)
+                                                                </option>
+                                                                @if ($listCurrencies)
+                                                                    @foreach ($listCurrencies['currencies'] as $codigo => $nombre)
+                                                                        <option value="{{ $codigo }}">
+                                                                            {{ $nombre }} ({{ $codigo }})
+                                                                        </option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+
+                                                            @error('selectedCurrencyFrom')
+                                                                <span class="text-red-500">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
 
 
-                                                        <input type="text" name="amountField" autocomplete="off"
-                                                            id="operation_amount" wire:model="operation_amount"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            placeholder="Enter Income Transaction Amount">
+
+                                                    <div class="mb-4">
+                                                        <label for="operation_amount"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Operation With <span
+                                                                class="text-blue-700">{{ $this->selectedCurrencyFrom }}</label>
 
 
+                                                        <div class="flex items-center relative">
+                                                            <input type="text" name="amountField"
+                                                                autocomplete="off" id="operation_amount"
+                                                                wire:model="operation_amount"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8"
+                                                                placeholder="Enter Income Transaction Amount">
+
+                                                            <span
+                                                                class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFrom }}</span>
+                                                        </div>
 
                                                         @error('operation_amount')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
 
+
                                                     <div class="mb-4">
                                                         <label for="operation_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Rate CONV/USD </label>
-
 
                                                         <input type="text" autocomplete="off"
                                                             id="operation_currency" wire:model="operation_currency"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             placeholder="">
 
+                                                        <input type="text" hidden
+                                                            wire:model="operation_currency_type" readonly>
+                                                        @error('operation_currency_type')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
                                                         @error('operation_currency')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
 
-                                                    <div class="mb-4">
+                                                    <div class="mb-4 relative">
                                                         <label for="operation_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Total in USD </label>
+                                                            Total in USD
+                                                        </label>
+
+                                                        <div class="flex items-center relative">
+                                                            <span
+                                                                class="absolute left-0 top-0 mt-2 ml-2 text-gray-500">$</span>
+
+                                                            <input type="text" name="totalbudget2"
+                                                                autocomplete="off" id="operation_currency_total"
+                                                                readonly wire:model="operation_currency_total"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-8"
+                                                                placeholder="">
 
 
-                                                        <input type="text" name="totalbudget2" autocomplete="off"
-                                                            id="operation_currency_total" readonly
-                                                            wire:model="operation_currency_total"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            placeholder="">
+                                                        </div>
+
                                                         @error('operation_currency_total')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
-                                                        <script>
-                                                            const amountField = document.getElementById('operation_amount');
-                                                            const totalBudgetField = document.getElementById('operation_currency_total');
-                                                            const dollarChangeValue = {{ $data2['blue']['value_sell'] ?? 0 }}; // Valor predeterminado 0 si no se encuentra
-
-                                                            amountField.addEventListener('input', function() {
-                                                                const formattedValue = amountField.value.replace(/[^0-9,.]/g,
-                                                                    ''); // Elimina todo excepto dígitos, comas y puntos
-                                                                const numericValue = parseFloat(formattedValue.replace(/,/, '').replace(/\./,
-                                                                    '.')); // Reemplaza comas por puntos y convierte en número
-
-                                                                if (!isNaN(numericValue)) {
-                                                                    const calculatedValue = (numericValue / dollarChangeValue).toFixed(2);
-                                                                    totalBudgetField.value = '$' + calculatedValue;
-                                                                } else {
-                                                                    totalBudgetField.value = ''; // Limpiar el campo si la entrada no es válida
-                                                                }
-                                                            });
-                                                        </script>
                                                     </div>
+
 
 
 
@@ -341,38 +376,46 @@
                                                         </div>
                                                     @endif
 
-
                                                     <script>
                                                         document.addEventListener('livewire:load', function() {
-                                                            Livewire.hook('message.sent', () => {
-                                                                // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                                $('#select2CategoryId, #select2SubcategoryId').select2({
-                                                                    width: 'resolve' // need to override the changed default
-                                                                });
+                                                            Livewire.hook('message.sent', function() {
+                                                                // Reapply Select2 after each Livewire update
+                                                                $('#selectedCurrencyFrom, #select2CategoryId, #select2SubcategoryId')
+                                                                    .select2({
+                                                                        width: 'resolve' // Override the changed default setting
+                                                                    });
                                                             });
                                                         });
 
                                                         $(document).ready(function() {
-                                                            // Inicializa Select2 para la categoría
+                                                            // Initialize Select2 for the element selectedCurrencyFrom
+                                                            $('#selectedCurrencyFrom').select2();
+
+                                                            // Listen for changes in Select2 of selectedCurrencyFrom and update Livewire
+                                                            $('#selectedCurrencyFrom').on('change', function(e) {
+                                                                @this.set('selectedCurrencyFrom', $(this).val());
+                                                                @this.call('showSelectedCurrency');
+                                                            });
+
+                                                            // Initialize Select2 for the category
                                                             $('#select2CategoryId').select2();
 
-                                                            // Escucha el cambio en Select2 y actualiza Livewire
+                                                            // Listen for changes in Select2 of the category and update Livewire
                                                             $('#select2CategoryId').on('change', function(e) {
                                                                 @this.set('category_id', $(this).val());
                                                             });
 
-                                                            // Inicializa Select2 para subcategorías solo si están visibles
+                                                            // Initialize Select2 for subcategories only if they are visible
                                                             @if ($showSubcategories)
                                                                 $('#select2SubcategoryId').select2();
 
-                                                                // Escucha el cambio en Select2 de subcategorías y actualiza Livewire
+                                                                // Listen for changes in Select2 of subcategories and update Livewire
                                                                 $('#select2SubcategoryId').on('change', function(e) {
                                                                     @this.set('subcategory_id', $(this).val());
                                                                 });
                                                             @endif
                                                         });
                                                     </script>
-
 
 
                                                     <div class="mb-4">
