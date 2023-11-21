@@ -102,9 +102,7 @@
                                             {{ $item->operation_currency }}
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
-
-                                            $
-                                            {{ number_format($item->operation_currency_total, 0, '.', ',') }}
+                                            {{ $item->operation_currency_total }} $
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
 

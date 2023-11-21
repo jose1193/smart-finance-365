@@ -372,46 +372,49 @@
                                                         </div>
                                                     @endif
 
+
                                                     <script>
                                                         document.addEventListener('livewire:load', function() {
-                                                            Livewire.hook('message.sent', function() {
-                                                                // Reapply Select2 after each Livewire update
-                                                                $('#selectedCurrencyFrom, #select2CategoryId, #select2SubcategoryId')
-                                                                    .select2({
-                                                                        width: 'resolve' // Override the changed default setting
-                                                                    });
+                                                            Livewire.hook('message.sent', () => {
+                                                                // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                applySelect2('#select2CategoryId, #select2SubcategoryId, #selectedCurrencyFrom');
                                                             });
                                                         });
 
                                                         $(document).ready(function() {
-                                                            // Initialize Select2 for the element selectedCurrencyFrom
-                                                            $('#selectedCurrencyFrom').select2();
-
-                                                            // Listen for changes in Select2 of selectedCurrencyFrom and update Livewire
-                                                            $('#selectedCurrencyFrom').on('change', function(e) {
-                                                                @this.set('selectedCurrencyFrom', $(this).val());
-                                                                @this.call('showSelectedCurrency');
-                                                            });
-
-                                                            // Initialize Select2 for the category
-                                                            $('#select2CategoryId').select2();
-
-                                                            // Listen for changes in Select2 of the category and update Livewire
-                                                            $('#select2CategoryId').on('change', function(e) {
+                                                            // Inicializa Select2 para category_id
+                                                            initializeSelect2('#select2CategoryId', function(e) {
                                                                 @this.set('category_id', $(this).val());
                                                             });
 
-                                                            // Initialize Select2 for subcategories only if they are visible
+                                                            // Muestra el select2 de subcategorías al seleccionar una categoría
                                                             @if ($showSubcategories)
-                                                                $('#select2SubcategoryId').select2();
-
-                                                                // Listen for changes in Select2 of subcategories and update Livewire
-                                                                $('#select2SubcategoryId').on('change', function(e) {
+                                                                initializeSelect2('#select2SubcategoryId', function(e) {
                                                                     @this.set('subcategory_id', $(this).val());
                                                                 });
                                                             @endif
+
+                                                            // Inicializa Select2 para selectedCurrencyFrom
+                                                            initializeSelect2('#selectedCurrencyFrom', function(e) {
+                                                                @this.set('selectedCurrencyFrom', $(this).val());
+                                                                @this.call('showSelectedCurrency');
+                                                            });
                                                         });
+
+                                                        function initializeSelect2(selector, onChangeCallback) {
+                                                            $(selector).select2();
+
+                                                            // Escucha el cambio en Select2 y ejecuta la devolución de llamada de cambio
+                                                            $(selector).on('change', onChangeCallback);
+                                                        }
+
+                                                        function applySelect2(selector) {
+                                                            $(selector).select2({
+                                                                width: 'resolve' // need to override the changed default
+                                                            });
+                                                        }
                                                     </script>
+
 
 
                                                     <div class="mb-4">

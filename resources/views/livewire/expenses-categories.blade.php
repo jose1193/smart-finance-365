@@ -77,7 +77,7 @@
                                                 {{ $item->main_category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->category_name, 1, '...') }}
+                                                {{ Str::words($item->category_name, 2, '...') }}
                                             </td>
 
                                             <td class="px-4 py-3 text-xs">
