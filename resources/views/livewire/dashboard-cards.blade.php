@@ -15,7 +15,7 @@
                  General Balance
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 {{ $formatted_amount = number_format($account_balance, 0, '.', ',') }} $
+                 {{ number_format($account_balance, 0, '.', ',') }} $
              </p>
          </div>
      </div>
@@ -51,10 +51,10 @@
          </div>
          <div>
              <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                 Unpaid
+                 Income
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 {{ number_format($unpaid, 0, '.', ',') }} $
+                 {{ number_format($income, 0, '.', ',') }} $
              </p>
          </div>
      </div>
@@ -69,10 +69,10 @@
          </div>
          <div>
              <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                 Paid
+                 Expense
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 {{ number_format($paid, 0, '.', ',') }} $
+                 {{ number_format($expense, 0, '.', ',') }} $
              </p>
          </div>
      </div>

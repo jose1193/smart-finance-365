@@ -29,7 +29,8 @@
                                 {{ __('Dashboard') }}
                             </x-slot>
                             <a href="{{ route('dashboard') }}">
-                                <span>Dashboard</span></a>
+                                <span>Dashboard</span></a> <span class=" ml-2 text-yellow-200 font-semibold">Operation
+                                {{ now()->format('F Y') }}</span>
                         </div>
 
                     </div>

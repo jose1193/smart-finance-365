@@ -184,6 +184,8 @@ elseif (auth()->user()->hasRole('User')) {
         $this->resetInputFields();
     }
 
+
+
 public function edit($id)
     {
        $this->authorize('manage admin');
@@ -205,6 +207,7 @@ public function edit($id)
     }
 
 
+  
 public function categoryAssignment()
 {
     $this->authorize('manage admin');
@@ -251,6 +254,8 @@ public function categoryAssignment()
         $this->closeModalUserAssignment();
         $this->resetInputFields();
 }
+
+
 
 
 public function SubcategoryAssignment(Category $storeCategory)
@@ -396,8 +401,6 @@ public function OpenModalUserAssignment($itemId)
     // Inicializar la propiedad con el mismo nombre
     $this->userAssignments = $userAssignments;
 }
-
-
 
 
     public function closeModalUserAssignment()

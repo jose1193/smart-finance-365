@@ -93,7 +93,7 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 @if (!empty($item->subcategory_name))
-                                                    {{ Str::words($item->subcategory_name, 1, '...') }}
+                                                    {{ Str::words($item->subcategory_name, 2, '...') }}
                                                 @else
                                                     unavailable
                                                 @endif
@@ -387,37 +387,41 @@
                                                     <div class="mb-4">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">
                                                             Subcategories:</label>
+                                                        <!-- Dentro de tu vista Blade -->
 
-                                                        @foreach ($subcategory_name as $index => $subcategory)
+
+                                                        @foreach ($userAssignments as $index => $assignment)
                                                             <div class="mb-4">
                                                                 <input type="text" autocomplete="off"
-                                                                    wire:model="subcategory_name.{{ $index }}"
+                                                                    wire:model="userAssignments.{{ $index }}.subcategory_name"
+                                                                    id="subcategory_{{ $index }}"
                                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                                     placeholder="Enter Subcategory" readonly>
                                                                 @error("subcategory_name.{$index}")
                                                                     <span class="text-red-500">{{ $message }}</span>
                                                                 @enderror
+
                                                             </div>
 
                                                             <div class="mb-4">
+                                                                <label
+                                                                    for="user_id_assignSubcategory_{{ $index }}"
+                                                                    class="block text-gray-700 text-sm font-bold mb-2">
+                                                                    Users Assign To <span class="text-emerald-700">
+                                                                        {{ $assignment['subcategory_name'] }}:</span>
+
+                                                                </label>
                                                                 <div wire:ignore>
                                                                     @php
                                                                         // Verificar si el índice existe en el array antes de acceder a él
                                                                         $selectedUsers = isset($this->user_id_assignSubcategory[$index]) ? (array) $this->user_id_assignSubcategory[$index] : [];
                                                                     @endphp
-
-                                                                    <label
-                                                                        for="user_id_assignSubcategory_{{ $index }}"
-                                                                        class="block text-gray-700 text-sm font-bold mb-2">
-                                                                        Users Assign To <span class="text-emerald-700">
-                                                                            {{ $subcategory_name[$index] }}:</span>
-
-                                                                    </label>
                                                                     <select multiple
-                                                                        wire:model="user_id_assignSubcategory.{{ $index }}"
+                                                                        wire:model="userAssignments.{{ $index }}.user_id_assignSubcategory"
                                                                         class="selectUserAssignSubcategory"
                                                                         data-index="{{ $index }}"
                                                                         style="width: 100%">
+
                                                                         <option value="all">All Users</option>
                                                                         @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
                                                                             <optgroup label="{{ $nameUser }}">
@@ -430,47 +434,47 @@
                                                                             </optgroup>
                                                                         @endforeach
                                                                     </select>
+
                                                                 </div>
-                                                                <script>
-                                                                    document.addEventListener('livewire:load', function() {
-                                                                        Livewire.hook('message.sent', () => {
-                                                                            // Vuelve a aplicar Select2 después de cada actualización de Livewire para el selectUserAssign
-                                                                            $('#selectUserAssign').select2({
-                                                                                width: 'resolve'
-                                                                            });
-
-                                                                            // Vuelve a aplicar Select2 después de cada actualización de Livewire para el selectUserAssignSubcategory
-                                                                            $('.selectUserAssignSubcategory').select2({
-                                                                                width: 'resolve'
-                                                                            });
-                                                                        });
-                                                                    });
-
-                                                                    $(document).ready(function() {
-                                                                        // Inicializa Select2 para el selectUserAssign
-                                                                        $('#selectUserAssign').select2();
-
-                                                                        // Inicializa Select2 para el selectUserAssignSubcategory
-                                                                        $('.selectUserAssignSubcategory').select2();
-
-                                                                        // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssign
-                                                                        $('#selectUserAssign').on('change', function(e) {
-                                                                            @this.set('user_id_assign', $(this).val());
-                                                                        });
-
-                                                                        // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
-                                                                        $('.selectUserAssignSubcategory').on('change', function(e) {
-                                                                            const index = $(this).data('index');
-                                                                            @this.set('user_id_assignSubcategory.' + index, $(this).val());
-                                                                        });
-                                                                    });
-                                                                </script>
-
-                                                                @error("user_id_assignSubcategory.{$index}")
-                                                                    <span class="text-red-500">{{ $message }}</span>
-                                                                @enderror
                                                             </div>
                                                         @endforeach
+
+
+                                                        <script>
+                                                            document.addEventListener('livewire:load', function() {
+                                                                Livewire.hook('message.sent', () => {
+                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire para el selectUserAssign
+                                                                    $('#selectUserAssign').select2({
+                                                                        width: 'resolve'
+                                                                    });
+
+                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire para el selectUserAssignSubcategory
+                                                                    $('.selectUserAssignSubcategory').select2({
+                                                                        width: 'resolve'
+                                                                    });
+                                                                });
+                                                            });
+
+                                                            $(document).ready(function() {
+                                                                // Inicializa Select2 para el selectUserAssign
+                                                                $('#selectUserAssign').select2();
+
+                                                                // Inicializa Select2 para el selectUserAssignSubcategory
+                                                                $('.selectUserAssignSubcategory').select2();
+
+                                                                // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssign
+                                                                $('#selectUserAssign').on('change', function(e) {
+                                                                    @this.set('user_id_assign', $(this).val());
+                                                                });
+
+                                                                // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
+                                                                $('.selectUserAssignSubcategory').on('change', function(e) {
+                                                                    const index = $(this).data('index');
+                                                                    @this.set('user_id_assignSubcategory.' + index, $(this).val());
+                                                                });
+                                                            });
+                                                        </script>
+
 
                                                     </div>
 
@@ -498,6 +502,7 @@
                             </div>
                         @endif
                         <!-- END MODAL SUBCATEGORY -->
+
                     </div>
 
 

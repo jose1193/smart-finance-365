@@ -88,7 +88,7 @@
                                                 @elseif (auth()->user()->hasRole('Admin'))
                                                     {{ $item->assignedUsers->pluck('username')->implode(', ') }}
                                                 @elseif ($item->assignedUsers->pluck('id')->contains(auth()->user()->id))
-                                                    Assigned to {{ auth()->user()->username }}
+                                                    {{ auth()->user()->username }}
                                                 @else
                                                     Not Assigned
                                                 @endif
@@ -96,7 +96,7 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 @if (!empty($item->subcategory_name))
-                                                    {{ Str::words($item->subcategory_name, 1, '...') }}
+                                                    {{ Str::words($item->subcategory_name, 2, '...') }}
                                                 @else
                                                     unavailable
                                                 @endif
@@ -109,7 +109,7 @@
                                                     @elseif (auth()->user()->hasRole('Admin'))
                                                         {{ $subcategory->assignedUsersSubcategory->pluck('username')->implode(', ') }}
                                                     @elseif ($subcategory->assignedUsersSubcategory->pluck('id')->contains(auth()->user()->id))
-                                                        Assigned to {{ auth()->user()->username }}
+                                                        {{ auth()->user()->username }}
                                                     @else
                                                     @endif
                                                 @endforeach
@@ -296,6 +296,7 @@
                             </div>
                         @endif
                         <!-- MODAL -->
+
 
                         <!-- MODAL SUBCATEGORY -->
                         @if ($showModal)
@@ -505,6 +506,7 @@
                             </div>
                         @endif
                         <!-- END MODAL SUBCATEGORY -->
+
                     </div>
 
 

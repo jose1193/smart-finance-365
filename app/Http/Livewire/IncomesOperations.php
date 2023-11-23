@@ -29,7 +29,7 @@ public $operation_currency_total;
 public $isOpen = 0;
 protected $listeners = ['render','delete','currencyChanged']; 
 
-public $subcategory_id;
+public $subcategory_id = [];
 public $showSubcategories = false;
 public $subcategoryMessage;
 public $selectedCategoryId;
@@ -134,7 +134,7 @@ public function render()
         $this->fetchData();
 
         if ($this->selectedCurrencyFrom === 'Blue-ARS' && isset($this->data2['blue']['value_sell'])) {
-        $this->operation_currency = number_format($this->data2['blue']['value_sell'], 0,".");
+        $this->operation_currency = $this->data2['blue']['value_sell'];
         $this->operation_currency_type = $this->selectedCurrencyFrom;
     } else {
         // Realiza la solicitud HTTP para obtener la tasa de cambio de USD a la moneda seleccionada
@@ -197,8 +197,7 @@ public function updatedOperationAmount()
             $this->operation_currency_total = number_format($result);
         }
     } else {
-        // Maneja el caso en el que los valores no sean numéricos, o la moneda sea cero, por ejemplo, asignando un valor predeterminado o mostrando un mensaje de error.
-        $this->operation_currency_total = number_format($cleanedValue, 0, '.', '.'); // O cualquier otro valor predeterminado
+          $this->operation_currency_total = $cleanedValue; 
     }
 }
 
@@ -254,7 +253,7 @@ public function updatedOperationAmount()
         $this->operation_status = $list->operation_status;
         $this->category_id = $list->category_id;
         $this->selectedCurrencyFrom = $list->operation_currency_type;
-     
+        $this->operation_currency_type=$list->operation_currency_type;
         $this->openModal();
         $this->updatedOperationAmount();
        
@@ -262,12 +261,13 @@ public function updatedOperationAmount()
         $this->showSubcategories = true;
         $this->updatedCategoryId($list->category_id);
 
+
     }
 
 
 public function store()
 {
-    
+   
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',
@@ -279,7 +279,7 @@ public function store()
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
     ];
-
+    
     $validatedData = $this->validate($validationRules);
 
     // Agregar user_id al array validado
@@ -292,12 +292,12 @@ public function store()
 
     // Elimina cualquier carácter no numérico, como comas y puntos
     $numericValue = str_replace(['.', ','], '', $validatedData['operation_amount']);
-
+    $numericValue2 = str_replace(['.', ','], '', $validatedData['operation_currency_total']);
     
 
     // Asigna la cadena, sin convertirla a un entero
     $validatedData['operation_amount'] = $numericValue;
-
+    $validatedData['operation_currency_total'] = $numericValue2;
    
      
 
@@ -306,59 +306,53 @@ public function store()
     session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
     
     
-    
-      // Llamada a la función para asignar usuarios a operaciones subcategorías
     $this->SubcategoryOperationAssignment($operation);
 
 
-    $this->closeModal();
-    $this->resetInputFields();
-}
 
+    $this->closeModal();
+   
+}
 
 public function SubcategoryOperationAssignment(Operation $operation)
 {
-    // Obtener la subcategoría asociada a la categoría
-    $subcategories = Subcategory::find($this->subcategory_id);
+    // Si $this->subcategory_id es una cadena, conviértela en un array
+    $subcategoryIds = is_array($this->subcategory_id) ? $this->subcategory_id : explode(',', $this->subcategory_id);
+
+    $subcategories = [];
+
+    // Verifica si hay elementos en el array de subcategorías
+    if (!empty($subcategoryIds)) {
+        // Obtén las subcategorías directamente del array
+        $subcategories = Subcategory::whereIn('id', $subcategoryIds)->get();
+    }
 
     if ($operation && $subcategories) {
-        if (in_array('all', $this->subcategory_id) || empty($this->subcategory_id)) {
-            // Eliminar las asignaciones existentes en OperationSubcategories
-            OperationSubcategories::where('operation_id', $operation->id)->delete();
-        } else {
-            // Obtener las subcategorías asociadas al usuario autenticado
-            $userSubcategories = SubcategoryToAssign::join('subcategories', 'subcategory_to_assigns.subcategory_id', '=', 'subcategories.id')
-                ->where('subcategory_to_assigns.user_id_subcategory', auth()->user()->id)
-                ->whereIn('subcategory_to_assigns.subcategory_id', $subcategories->pluck('id'))
-                ->pluck('subcategory_to_assigns.subcategory_id');
+        // Eliminar las asignaciones existentes en OperationSubcategories
+        OperationSubcategories::where('operation_id', $operation->id)->delete();
 
-            foreach ($subcategories as $subcategory) {
-                $subcategoryId = $subcategory->id;
+        foreach ($subcategories as $subcategory) {
+            $subcategoryId = $subcategory->id;
+            $operationId = $operation->id;
 
-                // Verificar si la subcategoría está asignada al usuario
-                if ($userSubcategories->contains($subcategoryId)) {
-                    // Aquí se obtienen los valores necesarios de la instancia de $operation
-                    $operationId = $operation->id;
-
-                    // Registrar en OperationSubcategories
-                    OperationSubcategories::updateOrCreate(
-                        [
-                            'operation_id' => $operationId,
-                            'subcategory_id' => $subcategoryId,
-                            'user_id_subcategory' => auth()->user()->id,
-                        ]
-                    );
-                }
-            }
+            OperationSubcategories::updateOrCreate(
+                [
+                    'operation_id' => $operationId,
+                    'subcategory_id' => $subcategoryId,
+                    'user_id_subcategory' => auth()->user()->id,
+                ]
+            );
         }
 
-        session()->flash('message', 'Data Created Successfully.');
+        session()->flash('message', 'Data Created Successfully');
     } else {
-        session()->flash('error', 'Category or Subcategories not found.');
+        // Manejar el caso en el que $operation o $subcategories es nulo o vacío
     }
 
     $this->resetInputFields();
 }
+
+
 
 
 

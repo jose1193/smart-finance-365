@@ -253,7 +253,7 @@
 
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->subcategory_name, 1) ?: 'N/A' }}
+                                          {{ Str::words($item->subcategory_name, 2) ?: 'N/A' }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ Str::words($item->operation_description, 1, '...') }}
@@ -326,9 +326,6 @@
                                   <td class="px-4 py-3 text-center font-semibold">
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
-                                  </td>
-                                  <td class="px-4 py-3 text-center font-semibold">
-
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
 

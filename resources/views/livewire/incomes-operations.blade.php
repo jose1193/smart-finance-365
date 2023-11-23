@@ -352,16 +352,17 @@
                                                                     id="select2SubcategoryId" style="width: 100%;">
                                                                     <option value="all">N/A</option>
                                                                     {{-- Display Assigned Subcategories --}}
-                                                                    @forelse ($subcategory_id as $subcategoryId)
-                                                                        @php
-                                                                            $subcategory = \App\Models\Subcategory::find($subcategoryId);
-                                                                        @endphp
-                                                                        <option value="{{ $subcategory->id }}">
-                                                                            {{ $subcategory->subcategory_name }}
-                                                                        </option>
-                                                                    @empty
-                                                                    @endforelse
-
+                                                                    @if (is_array($subcategory_id))
+                                                                        @forelse ($subcategory_id as $subcategoryId)
+                                                                            @php
+                                                                                $subcategory = \App\Models\Subcategory::find($subcategoryId);
+                                                                            @endphp
+                                                                            <option value="{{ $subcategory->id }}">
+                                                                                {{ $subcategory->subcategory_name }}
+                                                                            </option>
+                                                                        @empty
+                                                                        @endforelse
+                                                                    @endif
                                                                 </select>
 
                                                             </div>
