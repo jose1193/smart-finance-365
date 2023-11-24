@@ -40,14 +40,20 @@
 
 
 
-             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                 <input type="date" wire:model="date_start" wire:change="updateBetweenData"
-                     class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 " wire:ignore>
+                 <input type="text" id="myDatePicker" readonly wire:model="date_start"
+                     wire:change="updateBetweenData" placeholder="dd/mm/yyyy" autocomplete="off"
+                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+
              </div>
 
-             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                 <input type="date" wire:model="date_end" wire:change="updateBetweenData"
-                     class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 " wire:ignore>
+                 <input type="text" id="myDatePicker2" placeholder="dd/mm/yyyy" autocomplete="off" readonly
+                     wire:model="date_end" wire:change="updateBetweenData"
+                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+
              </div>
 
          </div>
@@ -163,6 +169,11 @@
              <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                  <div class="w-full overflow-x-auto">
                      <table class="w-full whitespace-no-wrap" id="tableId3">
+                         @if ($date_start && $date_end && $date_start > $date_end)
+                             <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
+                                 ser posterior a
+                                 la fecha de finalización.</p>
+                         @endif
                          <thead>
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
@@ -174,6 +185,7 @@
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">
+
                                      @if ($date_start)
                                          <p>Date Start:
                                              <span class="text-green-700 ml-2">
@@ -190,10 +202,7 @@
                                          </p>
                                      @endif
 
-                                     @if ($date_start && $date_end && $date_start > $date_end)
-                                         <p class="text-red-700 mt-2">Error: La fecha de inicio no puede ser posterior a
-                                             la fecha de finalización.</p>
-                                     @endif
+
 
                                  </th>
                                  <th class="px-4 py-3">
@@ -298,5 +307,34 @@
              // Lógica para manejar el evento de correo enviado
              // Esto podría ser un mensaje de confirmación al usuario, etc.
          });
+     });
+ </script>
+
+ <script>
+     document.addEventListener('livewire:load', function() {
+
+         flatpickr("#myDatePicker", {
+             locale: "es",
+             altInput: true,
+             altFormat: "j F, Y",
+             dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+             allowInput: true,
+             onClose: function(selectedDates1, dateStr1, instance1) {
+                 @this.set('date_start', dateStr1);
+             }
+         });
+
+         flatpickr("#myDatePicker2", {
+             locale: "es",
+             altInput: true,
+             altFormat: "j F, Y",
+             dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+             allowInput: true,
+             onClose: function(selectedDates, dateStr, instance) {
+                 @this.set('date_end', dateStr);
+             }
+         });
+
+
      });
  </script>

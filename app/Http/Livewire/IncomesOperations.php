@@ -40,6 +40,7 @@ public $quotes;
 public $operation_currency_type;
 
 
+
     public function authorize()
 {
     return true;
@@ -222,8 +223,11 @@ public function updatedOperationAmount()
     public function openModal()
     {
         $this->isOpen = true;
+        
         $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
         $this->fetchDataCurrencies();
+        
+        
         
        
     }
@@ -254,6 +258,7 @@ public function updatedOperationAmount()
         $this->category_id = $list->category_id;
         $this->selectedCurrencyFrom = $list->operation_currency_type;
         $this->operation_currency_type=$list->operation_currency_type;
+        $this->operation_date =  Carbon::parse($list->operation_date)->format('d/m/Y');
         $this->openModal();
         $this->updatedOperationAmount();
        
@@ -261,6 +266,7 @@ public function updatedOperationAmount()
         $this->showSubcategories = true;
         $this->updatedCategoryId($list->category_id);
 
+       
 
     }
 
@@ -268,13 +274,18 @@ public function updatedOperationAmount()
 public function store()
 {
    
+$fechaRecibida = $this->operation_date; 
+$fechaCarbon = Carbon::createFromFormat('d/m/Y', $fechaRecibida);
+$fechaEnFormato= $fechaCarbon->format('Y-m-d');
+$this->operation_date = $fechaEnFormato;
+
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',
         'operation_currency_type' => 'required',
         'operation_amount' => 'required',
-         'operation_currency' => 'required',
-          'operation_currency_total' => 'required',
+        'operation_currency' => 'required',
+        'operation_currency_total' => 'required',
         'operation_status' => 'required',
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
@@ -282,10 +293,12 @@ public function store()
     
     $validatedData = $this->validate($validationRules);
 
+  
     // Agregar user_id al array validado
     $validatedData['user_id'] = auth()->user()->id;
 
-    // Calcular el mes y el año a partir de expense_date usando Carbon
+
+    // Calcular el mes y el año  usando Carbon
     $operationDate = \Carbon\Carbon::createFromFormat('Y-m-d', $validatedData['operation_date']);
     $validatedData['operation_month'] = $operationDate->format('m');
     $validatedData['operation_year'] = $operationDate->format('Y');

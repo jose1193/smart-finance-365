@@ -131,7 +131,7 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->operation_date }}
+                                                {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
                                             </td>
                                             <td class="px-4 py-3 text-sm">
 
@@ -161,6 +161,7 @@
                             </table>
                             <div class="m-2 p-2">{{ $data->links() }}</div>
                         </div>
+
 
                         <!-- MODAL -->
                         @if ($isOpen)
@@ -266,7 +267,7 @@
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Rate CONV/USD </label>
 
-                                                        <input type="text" autocomplete="off"
+                                                        <input type="text" autocomplete="off" readonly
                                                             id="operation_currency" wire:model="operation_currency"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             placeholder="">
@@ -310,11 +311,16 @@
                                                         <label for="operation_date"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Date</label>
-                                                        <input type="date" wire:model="operation_date"
+
+                                                        <input type="text" readonly id="myDatePicker"
+                                                            autocomplete="off" wire:model="operation_date"
+                                                            placeholder="dd/mm/yyyy"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
                                                         @error('operation_date')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
+
                                                     </div>
 
                                                     <div class="mb-4">
@@ -499,6 +505,23 @@
                     );
                 }
             });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('modalOpened', function() {
+            flatpickr("#myDatePicker", {
+                locale: "es",
+                dateFormat: "d/m/Y", // Configura el formato de fecha deseado
+                allowInput: true,
+                onClose: function(selectedDates, dateStr, instance) {
+                    // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
+                    @this.set('operation_date', dateStr);
+                }
+            });
+
         });
     });
 </script>

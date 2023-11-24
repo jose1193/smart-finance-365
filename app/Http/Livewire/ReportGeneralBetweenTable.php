@@ -111,11 +111,10 @@ private function updateBetweenDataInternal()
 }
 
 private function fetchBetweenData($mainCategoryId, $month)
-{
+{ 
     // Verificar si las fechas están invertidas
     if ($this->date_start && $this->date_end && $this->date_start > $this->date_end) {
-        session()->flash('error', 'Error: La fecha de inicio no puede ser posterior a la fecha de finalización.');
-        return collect(); // Devolver una colección vacía en caso de error
+       
     }
 
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
@@ -143,7 +142,7 @@ private function fetchBetweenData($mainCategoryId, $month)
                 'operation_amount' => $group->sum('operation_amount'),
                 'operation_currency_total' => $group->sum('operation_currency_total')
             ];
-        });
+        });    
 }
 
 

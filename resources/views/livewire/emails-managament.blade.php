@@ -52,7 +52,7 @@
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Name</th>
                                         <th class="px-4 py-3">Email</th>
-
+                                        <th class="px-4 py-3">Date</th>
                                         <th class="px-4 py-3">Action</th>
                                     </tr>
                                 </thead>
@@ -70,7 +70,9 @@
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->email }}
                                             </td>
-
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}
+                                            </td>
                                             <td class="px-4 py-3 text-sm">
 
                                                 <button wire:click="edit({{ $item->id }})"
@@ -85,7 +87,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="4">
+                                            <td colspan="5">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">

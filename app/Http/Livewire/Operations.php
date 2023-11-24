@@ -250,6 +250,7 @@ public function edit($id)
         $this->category_id = $list->category_id;
         $this->selectedCurrencyFrom = $list->operation_currency_type;
         $this->operation_currency_type=$list->operation_currency_type;
+        $this->operation_date =  Carbon::parse($list->operation_date)->format('d/m/Y');
         $this->openModal();
         $this->updatedOperationAmount();
        
@@ -265,6 +266,10 @@ public function edit($id)
 public function store()
 {
  
+    $fechaRecibida = $this->operation_date; 
+    $fechaCarbon = Carbon::createFromFormat('d/m/Y', $fechaRecibida);
+    $fechaEnFormato= $fechaCarbon->format('Y-m-d');
+    $this->operation_date = $fechaEnFormato;
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',

@@ -114,7 +114,7 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}
+                                                {{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}
                                             </td>
                                             @can('manage admin')
                                                 <td class="px-4 py-3 text-sm">
