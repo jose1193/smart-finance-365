@@ -4,7 +4,7 @@
 
         <!-- COMPONENTS.WELCOME.BLADE.PHP -->
 
-        <!-- PANEL MAIN CATEGORIES -->
+        <!-- PANEL MAIN DASHBOARD -->
         <!--INCLUDE ALERTS MESSAGES-->
 
         <x-message-success />
@@ -36,7 +36,7 @@
                                     <th class="px-4 py-3">Operation</th>
                                     <th class="px-4 py-3">Rate CONV/USD</th>
                                     <th class="px-4 py-3">Total In USD</th>
-                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">State</th>
                                     <th class="px-4 py-3">Date</th>
                                     @can('manage admin')
                                         <th class="px-4 py-3">Action</th>
@@ -134,7 +134,7 @@
 
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
-                                            {{ $item->operation_date }}
+                                            {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
                                         </td>
 
                                         <td class="px-4 py-3 text-sm text-center">
@@ -177,14 +177,14 @@
                                 <!-- This element is to trick the browser into centering the modal contents. -->
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
-                                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg sm:w-full"
                                     role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                                     <div
                                         class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                         <!--Modal title-->
                                         <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                             id="exampleModalLabel">
-                                            Management
+                                            Income Management
                                         </h5>
                                         <!--Close button-->
                                         <button type="button" wire:click="closeModal()"
@@ -205,7 +205,7 @@
                                                         class="block text-gray-700 text-sm font-bold mb-2">
                                                         Description</label>
                                                     <input type="text" autocomplete="off"
-                                                        id="operation_description" name="operation_description"
+                                                        id="operation_description"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                         maxlength="50" placeholder="Enter Income Description"
                                                         wire:model="operation_description">
@@ -213,152 +213,229 @@
                                                         <span class="text-red-500">{{ $message }}</span>
                                                     @enderror
                                                 </div>
+
                                                 <div class="mb-4">
                                                     <label for="operation_amount"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Operation</label>
-                                                    <input type="text" autocomplete="off" id="operation_amount"
-                                                        wire:model="operation_amount"
-                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                        placeholder="Enter Income Transaction Amount">
+                                                        Select Conversion From</label>
+                                                    <div wire:ignore>
+                                                        <select wire:model="selectedCurrencyFrom"
+                                                            wire:change="showSelectedCurrency"
+                                                            id="selectedCurrencyFrom" style="width: 100%;">
+                                                            <option value="">Select Option</option>
+                                                            <option value="Blue-ARS">Argentine Peso (Blue-ARS)
+                                                            </option>
+                                                            @if ($listCurrencies)
+                                                                @foreach ($listCurrencies['currencies'] as $codigo => $nombre)
+                                                                    <option value="{{ $codigo }}">
+                                                                        {{ $nombre }} ({{ $codigo }})
+                                                                    </option>
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+
+                                                        @error('selectedCurrencyFrom')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <label for="operation_amount"
+                                                        class="block text-gray-700 text-sm font-bold mb-2">
+                                                        Operation With <span
+                                                            class="text-blue-700">{{ $this->selectedCurrencyFrom }}</label>
+
+
+                                                    <div class="flex items-center relative">
+                                                        <input type="text" name="amountField" autocomplete="off"
+                                                            id="operation_amount" wire:model="operation_amount"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8"
+                                                            placeholder="Enter Income Transaction Amount">
+
+                                                        <span
+                                                            class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFrom }}</span>
+                                                    </div>
 
                                                     @error('operation_amount')
                                                         <span class="text-red-500">{{ $message }}</span>
                                                     @enderror
                                                 </div>
 
+
                                                 <div class="mb-4">
                                                     <label for="operation_currency"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Rate USD </label>
+                                                        Rate CONV/USD </label>
 
-
-                                                    <input type="text" autocomplete="off" id="operation_currency"
-                                                        wire:model="operation_currency"
+                                                    <input type="text" autocomplete="off" readonly
+                                                        id="operation_currency" wire:model="operation_currency"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                         placeholder="">
 
+                                                    <input type="text" hidden wire:model="operation_currency_type"
+                                                        readonly>
+                                                    @error('operation_currency_type')
+                                                        <span class="text-red-500">{{ $message }}</span>
+                                                    @enderror
                                                     @error('operation_currency')
                                                         <span class="text-red-500">{{ $message }}</span>
                                                     @enderror
                                                 </div>
 
-                                                <div class="mb-4">
+                                                <div class="mb-4 relative">
                                                     <label for="operation_currency"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Total in USD </label>
+                                                        Total in USD
+                                                    </label>
+
+                                                    <div class="flex items-center relative">
+                                                        <span
+                                                            class="absolute left-0 top-0 mt-2 ml-2 text-gray-500">$</span>
+
+                                                        <input type="text" name="totalbudget2" autocomplete="off"
+                                                            id="operation_currency_total" readonly
+                                                            wire:model="operation_currency_total"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-8"
+                                                            placeholder="">
 
 
-                                                    <input type="text" name="totalbudget2" autocomplete="off"
-                                                        id="operation_currency_total" readonly
-                                                        wire:model="operation_currency_total"
-                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                        placeholder="">
+                                                    </div>
 
-                                                    <script>
-                                                        const amountField = document.getElementById('operation_amount');
-                                                        const totalBudgetField = document.getElementById('operation_currency_total');
-
-                                                        amountField.addEventListener('input', function() {
-                                                            const formattedValue = amountField.value.replace(/[^0-9,.]/g,
-                                                                ''); // Elimina todo excepto dígitos, comas y puntos
-                                                            const numericValue = parseFloat(formattedValue.replace(/,/, '').replace(/\./,
-                                                                '.')); // Reemplaza comas por puntos y convierte en número
-
-                                                            if (!isNaN(numericValue)) {
-                                                                const calculatedValue = (numericValue / dollarChangeValue).toFixed(2);
-                                                                totalBudgetField.value = '$' + calculatedValue;
-                                                            } else {
-                                                                totalBudgetField.value = ''; // Limpiar el campo si la entrada no es válida
-                                                            }
-                                                        });
-                                                    </script>
                                                     @error('operation_currency_total')
                                                         <span class="text-red-500">{{ $message }}</span>
                                                     @enderror
                                                 </div>
-
-                                                <script>
-                                                    // Obtenemos los elementos de los campos de entrada
-                                                    const amountField = document.getElementById('operation_amount');
-                                                    const totalBudgetField = document.getElementById('operation_currency_total');
-
-
-                                                    // Añadimos un event listener para detectar cambios en el campo "Amount"
-                                                    amountField.addEventListener('input', function() {
-                                                        const formattedValue = amountField.value.replace(/[^0-9,.]/g,
-                                                            ''); // Elimina todo excepto dígitos, comas y puntos
-                                                        const numericValue = parseFloat(formattedValue.replace(/,/, '').replace(/\./,
-                                                            '.')); // Reemplaza comas por puntos y convierte en número
-
-                                                        if (!isNaN(numericValue)) {
-                                                            const calculatedValue = (numericValue / dollarChangeValue).toFixed(2);
-                                                            totalBudgetField.value = '$' + calculatedValue;
-                                                        } else {
-                                                            totalBudgetField.value = ''; // Limpiar el campo si la entrada no es válida
-                                                        }
-                                                    });
-                                                </script>
 
 
                                                 <div class="mb-4">
                                                     <label for="operation_date"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
                                                         Date</label>
-                                                    <input type="date" wire:model="operation_date"
+
+                                                    <input type="text" readonly id="myDatePicker"
+                                                        autocomplete="off" wire:model="operation_date"
+                                                        placeholder="dd/mm/yyyy"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
                                                     @error('operation_date')
                                                         <span class="text-red-500">{{ $message }}</span>
                                                     @enderror
+
                                                 </div>
 
                                                 <div class="mb-4">
                                                     <label for="exampleFormControlInput2"
                                                         class="block text-gray-700 text-sm font-bold mb-2">Category
                                                     </label>
-                                                    <div wire:ignore>
-                                                        <select wire:model="category_id" id="select2DashCategoryId"
-                                                            style="width: 100%">
-                                                            <option value="">
 
-                                                            </option>
-                                                            @foreach ($categoriesRender as $item)
-                                                                <option value="{{ $item->id }}">
-                                                                    {{ $item->category_name }}
-                                                                </option>
+                                                    <div wire:ignore>
+                                                        <select wire:model="category_id" id="select2CategoryId"
+                                                            style="width: 100%;">
+                                                            <option value=""></option>
+                                                            @php
+                                                                $groupedCategories = $categoriesRender->groupBy('main_category_title');
+                                                            @endphp
+                                                            @foreach ($groupedCategories as $mainCategoryTitle => $categoryGroup)
+                                                                <optgroup label="{{ $mainCategoryTitle }}">
+                                                                    @foreach ($categoryGroup as $category)
+                                                                        <option value="{{ $category->id }}">
+                                                                            {{ $category->category_name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </optgroup>
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <script>
-                                                        document.addEventListener('livewire:load', function() {
-                                                            Livewire.hook('message.sent', () => {
-                                                                // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                                $('#select2DashCategoryId').select2({
-                                                                    width: 'resolve' // need to override the changed default
-                                                                });
-                                                            });
-                                                        });
-
-                                                        $(document).ready(function() {
-                                                            // Inicializa Select2
-                                                            $('#select2DashCategoryId').select2();
-
-                                                            // Escucha el cambio en Select2 y actualiza Livewire
-                                                            $('#select2DashCategoryId').on('change', function(e) {
-                                                                @this.set('category_id', $(this).val());
-                                                            });
-                                                        });
-                                                    </script>
-
 
                                                     @error('category_id')
                                                         <span class="text-red-500">{{ $message }}</span>
                                                     @enderror
                                                 </div>
 
+                                                @if ($subcategoryMessage)
+                                                    <p class="text-gray-500">{{ $subcategoryMessage }}</p>
+                                                @endif
+
+                                                @if ($showSubcategories)
+                                                    <div class="mb-4">
+                                                        <label for="exampleFormControlInput2"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
+                                                        <div wire:ignore>
+                                                            <select wire:model="subcategory_id"
+                                                                id="select2SubcategoryId" style="width: 100%;">
+                                                                <option value="">N/A</option>
+                                                                {{-- Display Assigned Subcategories --}}
+                                                                @if (is_array($subcategory_id))
+
+                                                                    @forelse ($subcategory_id as $subcategoryId)
+                                                                        @php
+                                                                            $subcategory = \App\Models\Subcategory::find($subcategoryId);
+                                                                        @endphp
+                                                                        <option value="{{ $subcategory->id }}">
+                                                                            {{ $subcategory->subcategory_name }}
+                                                                        </option>
+                                                                    @empty
+                                                                    @endforelse
+                                                                @endif
+                                                            </select>
+
+                                                        </div>
+                                                        @if ($subcategoryMessage)
+                                                            <p class="text-gray-500 mb-3">
+                                                                {{ $subcategoryMessage }}</p>
+                                                        @endif
+                                                    </div>
+                                                @endif
+
+
+                                                <script>
+                                                    document.addEventListener('livewire:load', function() {
+                                                        Livewire.hook('message.sent', () => {
+                                                            // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                            applySelect2('#select2CategoryId, #select2SubcategoryId, #selectedCurrencyFrom');
+                                                        });
+                                                    });
+
+                                                    $(document).ready(function() {
+                                                        // Inicializa Select2 para category_id
+                                                        initializeSelect2('#select2CategoryId', function(e) {
+                                                            @this.set('category_id', $(this).val());
+                                                        });
+
+                                                        // Muestra el select2 de subcategorías al seleccionar una categoría
+                                                        @if ($showSubcategories)
+                                                            initializeSelect2('#select2SubcategoryId', function(e) {
+                                                                @this.set('subcategory_id', $(this).val());
+                                                            });
+                                                        @endif
+
+                                                        // Inicializa Select2 para selectedCurrencyFrom
+                                                        initializeSelect2('#selectedCurrencyFrom', function(e) {
+                                                            @this.set('selectedCurrencyFrom', $(this).val());
+                                                            @this.call('showSelectedCurrency');
+                                                        });
+                                                    });
+
+                                                    function initializeSelect2(selector, onChangeCallback) {
+                                                        $(selector).select2();
+
+                                                        // Escucha el cambio en Select2 y ejecuta la devolución de llamada de cambio
+                                                        $(selector).on('change', onChangeCallback);
+                                                    }
+
+                                                    function applySelect2(selector) {
+                                                        $(selector).select2({
+                                                            width: 'resolve' // need to override the changed default
+                                                        });
+                                                    }
+                                                </script>
+
+
+
                                                 <div class="mb-4">
                                                     <label for="exampleFormControlInput2"
-                                                        class="block text-gray-700 text-sm font-bold mb-2">Status
+                                                        class="block text-gray-700 text-sm font-bold mb-2">State
                                                     </label>
                                                     <select wire:model="operation_status"
                                                         class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
@@ -407,7 +484,7 @@
         </main>
 
 
-        <!-- END PANEL MAIN CATEGORIES -->
+        <!-- END PANEL MAIN DASHBOARD -->
 
     </div>
 </div>
@@ -440,6 +517,22 @@
                     );
                 }
             });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('modalOpened', function() {
+            flatpickr("#myDatePicker", {
+                locale: "es",
+                dateFormat: "d/m/Y", // Configura el formato de fecha deseado
+                allowInput: true,
+                onClose: function(selectedDates, dateStr, instance) {
+                    // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
+                    @this.set('operation_date', dateStr);
+                }
+            });
+
         });
     });
 </script>

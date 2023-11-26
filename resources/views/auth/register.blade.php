@@ -234,7 +234,7 @@
                 passwordInput.setCustomValidity('');
             } else {
                 passwordInput.setCustomValidity(
-                    'The password must contain at least one uppercase, one lowercase, one number, and one special character'
+                    'La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial'
                 );
             }
         });
@@ -250,7 +250,7 @@
             $.validator.addMethod("customPassword", function(value, element) {
                     return /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).*$/.test(value);
                 },
-                "The password must contain at least one uppercase, one lowercase, one number, and one special character"
+                "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
             );
 
             $.validator.addMethod("soloLetras", function(value, element) {
@@ -283,10 +283,10 @@
                 },
                 messages: {
                     password: {
-                        required: "Please provide a password",
+                        required: "Por favor, proporcione una contraseña",
                     },
                     name: {
-                        soloLetras: "Please, enter only letters"
+                        soloLetras: "Por favor, introduzca solo letras"
                     }
                 },
                 submitHandler: function(form) {
@@ -310,8 +310,8 @@
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        if (response.message === 'Email is not available') {
-                            emailError.text('The email has already been taken.');
+                        if (response.message === 'Email no está disponible') {
+                            emailError.text('El correo electrónico ya ha sido tomado.');
                             submitButton.prop("disabled", true);
                         } else {
                             emailError.text('');

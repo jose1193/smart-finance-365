@@ -352,7 +352,7 @@
                                                             <div wire:ignore>
                                                                 <select wire:model="subcategory_id"
                                                                     id="select2SubcategoryId" style="width: 100%;">
-                                                                    <option value="all">N/A</option>
+                                                                    <option value="">N/A</option>
                                                                     {{-- Display Assigned Subcategories --}}
                                                                     @if (is_array($subcategory_id))
                                                                         @forelse ($subcategory_id as $subcategoryId)

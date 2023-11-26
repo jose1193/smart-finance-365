@@ -352,13 +352,13 @@
                                                         <div class="mb-4">
                                                             <label for="exampleFormControlInput2"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
-
                                                             <div wire:ignore>
                                                                 <select wire:model="subcategory_id"
                                                                     id="select2SubcategoryId" style="width: 100%;">
-                                                                    <option value="all">N/A</option>
+                                                                    <option value="">N/A</option>
                                                                     {{-- Display Assigned Subcategories --}}
                                                                     @if (is_array($subcategory_id))
+
                                                                         @forelse ($subcategory_id as $subcategoryId)
                                                                             @php
                                                                                 $subcategory = \App\Models\Subcategory::find($subcategoryId);
