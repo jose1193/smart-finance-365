@@ -2,42 +2,49 @@
      <!-- Chart JS -->
      <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-             <select wire:model="selectedUser6" wire:change="updateBudgetExpenseData"
-                 class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                 <option value="">Select User</option>
-                 @if (auth()->user()->hasRole('Admin'))
-                     @foreach ($users as $user)
-                         <option value="{{ $user->id }}">{{ $user->name }}
+             <div wire:ignore>
+                 <select wire:model="selectedUser6" id="selectUserChart6" wire:change="updateBudgetExpenseData"
+                     class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                     <option value="">Select User</option>
+                     @if (auth()->user()->hasRole('Admin'))
+                         @foreach ($users as $user)
+                             <option value="{{ $user->id }}">{{ $user->name }}
+                             </option>
+                         @endforeach
+                     @else
+                         <option value="{{ auth()->user()->id }}">
+                             {{ auth()->user()->name }}
                          </option>
-                     @endforeach
-                 @else
-                     <option value="{{ auth()->user()->id }}">
-                         {{ auth()->user()->name }}
-                     </option>
-                 @endif
+                     @endif
 
-             </select>
+                 </select>
+             </div>
          </div>
-
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0">
-             <select wire:model="selectedMonth2" wire:change="updateBudgetExpenseData"
-                 class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                 <option value="">Select Month</option>
-                 @foreach ($this->months() as $month)
-                     <option value="{{ $month['number'] }}">{{ $month['number'] }} -
-                         {{ $month['name'] }}</option>
-                 @endforeach
-             </select>
+             <div wire:ignore>
+                 <select wire:model="selectedMonth2" id="selectMonthChart2" wire:change="updateBudgetExpenseData"
+                     class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                     wire:ignore>
+                     <option value="">Select Month</option>
+                     @foreach ($this->months() as $month)
+                         <option value="{{ $month['number'] }}">{{ $month['number'] }} -
+                             {{ $month['name'] }}</option>
+                     @endforeach
+                 </select>
+             </div>
          </div>
+
 
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-             <select wire:model="selectedYear4" wire:change="updateBudgetExpenseData"
-                 class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                 <option value="">Select Year</option>
-                 @foreach ($years as $year)
-                     <option value="{{ $year }}">{{ $year }}</option>
-                 @endforeach
-             </select>
+             <div wire:ignore>
+                 <select wire:model="selectedYear5" id="selectYearChart5" wire:change="updateBudgetExpenseData"
+                     class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                     <option value="">Select Year</option>
+                     @foreach ($years as $year)
+                         <option value="{{ $year }}">{{ $year }}</option>
+                     @endforeach
+                 </select>
+             </div>
          </div>
 
 
@@ -143,16 +150,6 @@
 
                  </div>
              </div>
-             @if ($budget)
-                 <p>Presupuesto para el mes {{ $budget->budget_currency_total }}:</p>
-                 <ul>
-                     <li>User ID: {{ $budget->user_id }}</li>
-                     <!-- Otros campos del presupuesto -->
-                 </ul>
-             @else
-                 <p>No se encontró un presupuesto para el mes y usuario seleccionados.</p>
-             @endif
-
 
 
              <script>

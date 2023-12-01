@@ -33,7 +33,22 @@ class ReportGeneralBudgetsChart extends Component
     public $users;
    
     public $isOpen = 0;
+    protected $listeners = ['userSelectedChart5','YearSelectedChart4'];
 
+    public function userSelectedChart5($userId)
+    {
+        
+        
+        $this->selectedUser5 = $userId;
+        $this->updateChartBudgetData();
+    }
+
+    public function YearSelectedChart4($selectedYearId)
+    {
+       
+        $this->selectedYear4 = $selectedYearId;
+        $this->updateChartBudgetData();
+    }
     
     public function mount()
     {

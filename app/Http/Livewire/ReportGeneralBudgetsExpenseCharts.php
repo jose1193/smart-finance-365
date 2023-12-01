@@ -29,7 +29,30 @@ class ReportGeneralBudgetsExpenseCharts extends Component
     public $userNameSelected5;
     public $budget;
     public $budgetData;
-    
+    protected $listeners = ['userSelectedChart6','MonthSelectedBudget2','YearSelectedChart5'];
+
+    public function userSelectedChart6($userId)
+    {
+        // Aquí puedes ejecutar la lógica que desees con el $userId
+        $this->selectedUser6 = $userId;
+        $this->updateBudgetExpenseData();
+    }
+
+     public function MonthSelectedBudget2($selectedMonthId)
+    {
+       
+        $this->selectedMonth2 = $selectedMonthId;
+        $this->updateBudgetExpenseData();
+    }
+
+
+    public function YearSelectedChart5($selectedYear3Id)
+    {
+       
+        $this->selectedYear5 = $selectedYear3Id;
+        $this->updateBudgetExpenseData();
+    }
+
 public function months()
 {
     $months = [];

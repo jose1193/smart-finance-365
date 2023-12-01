@@ -24,6 +24,16 @@ class ReportGeneralBetweenCharts extends Component
     public $date_end;
     public $userNameSelected3;
 
+    protected $listeners = ['userSelectedChartBetween'];
+
+    public function userSelectedChartBetween($userId)
+    {
+        // Aquí puedes ejecutar la lógica que desees con el $userId
+        $this->selectedUser3 = $userId;
+        $this->updateBetweenData();
+    }
+
+
     public function mount()
     {
         $this->years = Operation::distinct()->pluck('operation_year');

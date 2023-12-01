@@ -4,7 +4,7 @@
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
 
              <div wire:ignore>
-                 <select wire:model="selectedUser" wire:change="updateChartData" id="selectUserChart"
+                 <select wire:model="selectedUser" wire:change="updateChartData" id="selectUserChart" style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                      <option value="">Select User</option>
                      @if (auth()->user()->hasRole('Admin'))
@@ -25,6 +25,7 @@
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
              <div wire:ignore>
                  <select wire:model="selectedYear" id="selectYearChart" wire:change="updateChartData"
+                     style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                      <option value="">Select Year</option>
                      @foreach ($years as $year)

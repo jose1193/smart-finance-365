@@ -28,6 +28,30 @@ class ReportGeneralMonthCharts extends Component
     public $budget;
     public $budgetData;
 
+    protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
+
+    public function userSelected4($userId)
+    {
+        // Aquí puedes ejecutar la lógica que desees con el $userId
+        $this->selectedUser4 = $userId;
+        $this->updateMonthData();
+    }
+
+     public function MonthSelected($selectedMonthId)
+    {
+       
+        $this->selectedMonth = $selectedMonthId;
+        $this->updateMonthData();
+    }
+
+
+    public function YearSelected3($selectedYear3Id)
+    {
+       
+        $this->selectedYear3 = $selectedYear3Id;
+        $this->updateMonthData();
+    }
+
 public function months()
 {
     $months = [];

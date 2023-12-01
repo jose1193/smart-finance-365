@@ -39,8 +39,30 @@ class ReportGeneralCategoriesCharts extends Component
     
     public $userNameSelected2;
    
+    protected $listeners = ['userSelectedChart2','YearSelectedChart2','categorySelected2'];
+
+    public function userSelectedChart2($userId)
+    {
+        
+        
+        $this->selectedUser2 = $userId;
+        $this->updateCategoriesData();
+    }
+
+    public function YearSelectedChart2($selectedYearId)
+    {
+       
+        $this->selectedYear2 = $selectedYearId;
+        $this->updateCategoriesData();
+    }
 
 
+    public function categorySelected2($categoryId)
+    {
+        
+        $this->selectedCategoryId = $categoryId;
+        $this->updateCategoriesData();
+    }
 
     public function mount()
     {

@@ -14,6 +14,22 @@ document.addEventListener("livewire:load", function () {
     var selectMonth = $("#selectMonth");
     var selectBudgetMonth = $("#selectBudgetMonth");
 
+    var selectUserChart = $("#selectUserChart");
+    var selectYearChart = $("#selectYearChart");
+    var selectUserChart2 = $("#selectUserChart2");
+    var selectYearChart2 = $("#selectYearChart2");
+    var selectYearChart3 = $("#selectYearChart3");
+    var selectCategoryChart = $("#selectCategoryChart");
+    var selectUserChart3 = $("#selectUserChart3");
+    var selectUserChart4 = $("#selectUserChart4");
+    var selectMonthChart = $("#selectMonthChart");
+    var selectUserChart5 = $("#selectUserChart5");
+    var selectYearChart4 = $("#selectYearChart4");
+    var selectUserChart6 = $("#selectUserChart6");
+    var selectUserChart6 = $("#selectUserChart6");
+    var selectMonthChart2 = $("#selectMonthChart2");
+    var selectYearChart5 = $("#selectYearChart5");
+
     var isDropdownOpen = false;
 
     function initializeSelect2(selectElement, eventName) {
@@ -55,4 +71,18 @@ document.addEventListener("livewire:load", function () {
     initializeSelect2(selectYear5, "YearSelected5");
     initializeSelect2(selectMonth, "MonthSelected");
     initializeSelect2(selectBudgetMonth, "MonthSelectedBudget");
+    initializeSelect2(selectUserChart, "userSelectedChart");
+    initializeSelect2(selectYearChart, "YearSelectedChart");
+    initializeSelect2(selectUserChart2, "userSelectedChart2");
+    initializeSelect2(selectYearChart2, "YearSelectedChart2");
+    initializeSelect2(selectCategoryChart, "categorySelected2");
+    initializeSelect2(selectUserChart3, "userSelectedChartBetween");
+    initializeSelect2(selectUserChart4, "userSelected4");
+    initializeSelect2(selectMonthChart, "MonthSelected");
+    initializeSelect2(selectYearChart3, "YearSelected3");
+    initializeSelect2(selectUserChart5, "userSelectedChart5");
+    initializeSelect2(selectYearChart4, "YearSelectedChart4");
+    initializeSelect2(selectUserChart6, "userSelectedChart6");
+    initializeSelect2(selectMonthChart2, "MonthSelectedBudget2");
+    initializeSelect2(selectYearChart5, "YearSelectedChart5");
 });

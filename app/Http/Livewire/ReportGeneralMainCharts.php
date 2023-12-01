@@ -29,8 +29,22 @@ class ReportGeneralMainCharts extends Component
    
     public $isOpen = 0;
     
-  
+    protected $listeners = ['userSelectedChart','YearSelectedChart'];
 
+    public function userSelectedChart($userId)
+    {
+        
+        
+        $this->selectedUser = $userId;
+        $this->updateChartData();
+    }
+
+    public function YearSelectedChart($selectedYearId)
+    {
+       
+        $this->selectedYear = $selectedYearId;
+        $this->updateChartData();
+    }
     
     public function mount()
     {
