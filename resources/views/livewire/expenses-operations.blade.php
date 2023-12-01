@@ -30,10 +30,10 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Expense Management') }}
+                                {{ __('Budget Expense Management') }}
                             </x-slot>
-                            <a href="{{ route('expense') }}">
-                                <span>Expense Management</span></a>
+                            <a href="">
+                                <span>Budget Expense Management</span></a>
                         </div>
 
                     </div>
@@ -54,6 +54,7 @@
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
+                                        <th class="px-4 py-3">Budget</th>
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Subcategory</th>
                                         <th class="px-4 py-3">Description</th>
@@ -72,6 +73,12 @@
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
+
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+
+                                                {{ isset($item->budget_currency_total) && $item->budget_currency_total != 0 ? number_format($item->budget_currency_total, 0, '.', ',') : 'N/A' }}
+
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -147,7 +154,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="11">
+                                            <td colspan="12">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -196,6 +203,60 @@
                                         <form autocomplete="off">
                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                                 <div class="">
+
+                                                    <div class="mb-4">
+                                                        <label for="exampleFormControlInput1"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Total Budget In USD:</label>
+                                                        <div wire:ignore>
+
+                                                            <select id="budget_id_select" style="width: 100%"
+                                                                wire:model="budget_id">
+                                                                <option value=""></option>
+                                                                @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
+                                                                    @php
+                                                                        $formattedDate = \Carbon\Carbon::parse($date)->isoFormat('D MMMM, YYYY');
+                                                                    @endphp
+
+                                                                    <optgroup label="{{ $formattedDate }}">
+                                                                        @foreach ($groupedBudgets as $budget)
+                                                                            <option value="{{ $budget->id }}"
+                                                                                @if ($budget->id == $budget_id) selected @endif>
+                                                                                {{ $budget->budget_currency_total }} $
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </optgroup>
+                                                                @endforeach
+
+                                                            </select>
+
+                                                        </div>
+
+                                                        <script>
+                                                            document.addEventListener('livewire:load', function() {
+                                                                Livewire.hook('message.sent', () => {
+                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                    $('#budget_id_select').select2({
+                                                                        width: 'resolve' // need to override the changed default
+                                                                    });
+                                                                });
+                                                            });
+
+                                                            $(document).ready(function() {
+                                                                // Inicializa Select2
+                                                                $('#budget_id_select').select2();
+
+                                                                // Escucha el cambio en Select2 y actualiza Livewire
+                                                                $('#budget_id_select').on('change', function(e) {
+                                                                    @this.set('budget_id', $(this).val());
+                                                                });
+                                                            });
+                                                        </script>
+                                                        @error('budget_id')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+
                                                     <div class="mb-4">
                                                         <label for="operation_description"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
@@ -321,7 +382,9 @@
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Category
+                                                            class="block text-gray-700 text-sm font-bold mb-2"> Expense
+                                                            Category
+
                                                         </label>
 
                                                         <div wire:ignore>

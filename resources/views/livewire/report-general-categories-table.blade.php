@@ -10,31 +10,24 @@
                <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
 
 
-                   @if (auth()->user()->hasRole('Admin'))
 
-                       <div wire:ignore>
-                           <select id="selectUser2" style="width: 100%" wire:model="selectedUser2"
-                               wire:change="updateCategoriesData" wire:ignore>
-                               <option value="">Select User</option>
 
-                               @foreach ($users as $user)
-                                   <option value="{{ $user->id }}">{{ $user->name }}
-                                   </option>
-                               @endforeach
-                           </select>
-                       </div>
-                   @else
-                       <select wire:model="selectedUser2" wire:change="updateCategoriesData"
-                           class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                   <div wire:ignore>
+                       <select id="selectUser2" style="width: 100%" wire:model="selectedUser2"
+                           wire:change="updateCategoriesData" wire:ignore>
                            <option value="">Select User</option>
 
-                           <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
-                           </option>
-
-
+                           @if (auth()->user()->hasRole('Admin'))
+                               @foreach ($users as $user)
+                                   <option value="{{ $user->id }}">{{ $user->name }}</option>
+                               @endforeach
+                           @else
+                               <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
+                               </option>
+                           @endif
                        </select>
+                   </div>
 
-                   @endif
 
 
                </div>
@@ -211,8 +204,7 @@
                                    </th>
                                    <th class="px-4 py-3">
                                    </th>
-                                   <th class="px-4 py-3">
-                                   </th>
+
                                </tr>
                                <tr
                                    class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
@@ -225,7 +217,7 @@
                                            Category Not Selected
                                        @endif
                                    </th>
-                                   <th class="px-4 py-3">Total Operation USD</th>
+
                                </tr>
                            </thead>
                            <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -237,9 +229,7 @@
                                        <td class="px-4 py-3 text-center">
                                            {{ \Carbon\Carbon::create()->month($i + 1)->format('F') }}
                                        </td>
-                                       <td class="px-4 py-3 text-center">
-                                           {{ number_format($ArrayCategories[$i]['total'], 0, '.', ',') }}
-                                       </td>
+
                                        <td class="px-4 py-3 text-center">
                                            {{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }} $
                                        </td>
@@ -255,10 +245,7 @@
                                    <td class="px-4 py-3 text-center font-semibold">
 
                                    </td>
-                                   <td class="px-4 py-3 text-center font-semibold">
-                                       {{ number_format($totalCategoriesRender, 0, '.', ',') }}
 
-                                   </td>
                                    <td class="px-4 py-3 text-center font-semibold">
                                        {{ number_format($totalCategoriesRenderCurrency, 0, '.', ',') }} $
 

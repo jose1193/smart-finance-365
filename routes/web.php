@@ -7,14 +7,10 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;// LARAVEL SOCIALITE
-use App\Http\Livewire\PrimaryCategories;
-use App\Http\Livewire\Teachers;
 use App\Http\Livewire\Categories;
 use App\Http\Livewire\IncomeCategories;
 use App\Http\Livewire\ExpensesCategories;
 use App\Http\Livewire\UsersCrud;
-use App\Http\Livewire\Incomes;
-use App\Http\Livewire\Expenses;
 use App\Http\Livewire\EmailsManagament;
 use App\Http\Livewire\GeneralChartForm;
 use App\Http\Livewire\DashboardTable;
@@ -29,6 +25,7 @@ use App\Http\Livewire\SupportContact;
 use App\Http\Livewire\EmailAdmin;
 use App\Http\Livewire\StatusCategories;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Livewire\Budgets;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,53 +49,52 @@ Route::get('/google-auth/redirect', function () {
 });
  
 
-
 Route::get('/google-auth/callback', function () {
     $googleUser = Socialite::driver('google')->user();
-    // Generar un número aleatorio de 3 dígitos
+
     $randomNumber = rand(100, 999);
-    // Elimina los espacios en blanco del nombre
     $nameWithoutSpaces = str_replace(' ', '', $googleUser->name);
-    $user = User::updateOrCreate([
-        'google_id' => $googleUser->id,
-    ], [
-        'name' => $googleUser->name,
-        'username' => $nameWithoutSpaces . $randomNumber,
-        'email' => $googleUser->email,
-        'email_verified_at' => now(),
-       
-       
-    ]);
- 
-   
 
- // Accede al token del usuario autenticado
-    $token = $googleUser->token;
+    // Check if user exists with the same email address
+    $existingUser = User::where('email', $googleUser->email)->first();
 
-
-   
-
-    Auth::login($user);
- 
-     //SEND EMAIL FORM CONTACT
-    if (isset($user) && $user->wasRecentlyCreated) {
-    // Verificar si el usuario ya tiene el rol por defecto asignado
-    $defaultRole = Role::find(2); // Reemplaza 2 con el ID del rol por defecto
-
-    if (!$user->hasRole($defaultRole)) {
-        // El usuario no tiene el rol por defecto, asígnalo
-        $user->assignRole($defaultRole);
+    if ($existingUser) {
+    if (!$existingUser->email_verified_at) {
+        // User exists but email isn't verified, set verification with DateNow
+        $existingUser->email_verified_at = now();
+        $existingUser->save();
     }
 
-}
-
- //END SEND EMAIL FORM CONTACT
- 
+    // Existing user with verified email, log them in
+    Auth::login($existingUser);
     return redirect('/dashboard');
-  
+} else {
+        $user = User::updateOrCreate([
+    'google_id' => $googleUser->id,
+    ], [
+    'name' => $googleUser->name,
+    'username' => $nameWithoutSpaces . $randomNumber,
+    'email' => $googleUser->email,
+    'email_verified_at' => now(), 
+    ], function ($user) {
+    if ($user->wasRecentlyCreated) {
+        $user->email_verified_at = now();
+    }
+    });
 
 
+        // Assign default role if not already assigned
+        $defaultRole = Role::find(2); // Reemplaza 2 con el ID del rol por defecto
+        if (!$user->hasRole($defaultRole)) {
+            $user->assignRole($defaultRole);
+        }
+
+        // Log in the newly created user
+        Auth::login($user);
+        return redirect('/dashboard');
+    }
 });
+
 
 
 ///------------- END ROUTE GOOGLE AUTH ---------///
@@ -112,14 +108,13 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    Route::get('main-categories', PrimaryCategories::class)->name('main-categories');
-    Route::get('teachers', Teachers::class)->name('teachers');
+    
+    
     Route::get('categories', Categories::class)->name('categories');
     Route::get('income-categories', IncomeCategories::class)->name('income-categories');
     Route::get('expenses-categories', ExpensesCategories::class)->name('expenses-categories');
     Route::get('users', UsersCrud::class)->name('users');
-       //Route::get('income', Incomes::class)->name('incomes');
-       //Route::get('expense', Expenses::class)->name('expense');
+      
     Route::get('emails', EmailsManagament::class)->name('emails');
     Route::get('general-charts', GeneralChartForm::class)->name('general-charts');
     Route::get('dashboard-table', DashboardTable::class)->name('dashboard-table');
@@ -135,4 +130,7 @@ Route::middleware([
     Route::get('support-contact', SupportContact::class)->name('support-contact');
     Route::get('admin-email-support', EmailAdmin::class)->name('admin-email-support');
     Route::get('options-categories', StatusCategories::class)->name('options-categories');
+    Route::get('budgets', Budgets::class)->name('budgets');
+
+    //Route::get('expense/{budget}', Operations::class)->name('expense');
 });

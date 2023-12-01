@@ -47,7 +47,7 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
     <!--  end Flatpickr DATE -->
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         main {
             font-family: 'Roboto', sans-serif;
@@ -56,6 +56,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <!-- Styles -->
+
+    <!--  CHART JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!--  END CHART JS -->
 
     <style>
         ::-webkit-scrollbar {

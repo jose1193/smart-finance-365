@@ -1,8 +1,8 @@
- <div x-show="activeTab === '4'">
+ <div x-show="activeTab === '6'">
      <!-- Chart JS -->
      <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-             <select wire:model="selectedUser4" wire:change="updateMonthData"
+             <select wire:model="selectedUser6" wire:change="updateBudgetExpenseData"
                  class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                  <option value="">Select User</option>
                  @if (auth()->user()->hasRole('Admin'))
@@ -20,7 +20,7 @@
          </div>
 
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0">
-             <select wire:model="selectedMonth" wire:change="updateMonthData"
+             <select wire:model="selectedMonth2" wire:change="updateBudgetExpenseData"
                  class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                  <option value="">Select Month</option>
                  @foreach ($this->months() as $month)
@@ -31,7 +31,7 @@
          </div>
 
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-             <select wire:model="selectedYear3" wire:change="updateMonthData"
+             <select wire:model="selectedYear4" wire:change="updateBudgetExpenseData"
                  class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                  <option value="">Select Year</option>
                  @foreach ($years as $year)
@@ -42,21 +42,21 @@
 
 
      </div>
-     @if ($showChart4)
+     @if ($showChart6)
          <div class="my-10 flex justify-end space-x-2">
              <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
                  wire:click="exportToExcel" wire:loading.attr="disabled">
                  <span class="font-semibold"><i class="fa-regular fa-image px-1"></i></span>
                  Download
              </x-button>
-             <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50" wire:click="resetFields4"
+             <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50" wire:click="resetFields6"
                  wire:loading.attr="disabled">
                  <span class="font-semibold"><i class="fa-solid fa-power-off px-1"></i></span>
                  Reset Fields
              </x-button>
          </div>
-         <div id="chart-container3" class="my-5"
-             wire:key="chart-{{ $selectedUser4 }}-{{ $selectedMonth }}-{{ $selectedYear3 }}-{{ uniqid() }}">
+         <div id="chart-container6" class="my-5"
+             wire:key="chart-{{ $selectedUser6 }}-{{ $selectedMonth2 }}-{{ $selectedYear4 }}-{{ uniqid() }}">
 
 
              <div class="grid gap-6 mb-8 md:grid-cols-2">
@@ -65,14 +65,14 @@
                          Bars
                      </h4>
 
-                     <canvas id="myChartGeneral4" height="200"></canvas>
+                     <canvas id="myChartGeneral6" height="200"></canvas>
                      <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
                          <!-- Chart legend -->
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-blue-600 rounded-full"></span>
                              <span class="font-semibold">
-                                 @if ($userNameSelected4)
-                                     {{ $userNameSelected4->name }}
+                                 @if ($userNameSelected5)
+                                     {{ $userNameSelected5->name }}
                                  @else
                                  @endif
                              </span>
@@ -87,14 +87,14 @@
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
                              <span class="font-semibold"> <span class="font-semibold">
-                                     @if ($selectedMonthName)
-                                         {{ $selectedMonthName }}
+                                     @if ($selectedMonthName2)
+                                         {{ $selectedMonthName2 }}
                                      @endif
                                  </span></span>
                          </div>
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-green-600 rounded-full"></span>
-                             <span class="font-semibold"> {{ $selectedYear3 }}</span>
+                             <span class="font-semibold"> {{ $selectedYear4 }}</span>
                          </div>
                      </div>
 
@@ -106,15 +106,15 @@
                      <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
                          Lines
                      </h4>
-                     <canvas id="line4" height="200"></canvas>
+                     <canvas id="line6" height="200"></canvas>
                      <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
                          <!-- Chart legend -->
 
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-blue-600 rounded-full"></span>
                              <span class="font-semibold">
-                                 @if ($userNameSelected4)
-                                     {{ $userNameSelected4->name }}
+                                 @if ($userNameSelected5)
+                                     {{ $userNameSelected5->name }}
                                  @else
                                  @endif
                              </span>
@@ -130,24 +130,33 @@
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
                              <span class="font-semibold">
-                                 @if ($selectedMonthName)
-                                     {{ $selectedMonthName }}
+                                 @if ($selectedMonthName2)
+                                     {{ $selectedMonthName2 }}
                                  @endif
                              </span>
                          </div>
                          <div class="flex items-center">
                              <span class="inline-block w-3 h-3 mr-1 bg-green-600 rounded-full"></span>
-                             <span class="font-semibold"> {{ $selectedYear3 }}</span>
+                             <span class="font-semibold"> {{ $selectedYear4 }}</span>
                          </div>
                      </div>
 
                  </div>
              </div>
+             @if ($budget)
+                 <p>Presupuesto para el mes {{ $budget->budget_currency_total }}:</p>
+                 <ul>
+                     <li>User ID: {{ $budget->user_id }}</li>
+                     <!-- Otros campos del presupuesto -->
+                 </ul>
+             @else
+                 <p>No se encontró un presupuesto para el mes y usuario seleccionados.</p>
+             @endif
 
 
 
              <script>
-                 var ctx = document.getElementById('myChartGeneral4').getContext('2d');
+                 var ctx = document.getElementById('myChartGeneral6').getContext('2d');
 
                  var dataBar = {
                      labels: [
@@ -263,7 +272,7 @@
                  };
 
                  // Cambia esto al ID de tu elemento de gráfico en el HTML
-                 const lineCtx = document.getElementById("line4");
+                 const lineCtx = document.getElementById("line6");
                  window.myLine = new Chart(lineCtx, lineConfig);
              </script>
 

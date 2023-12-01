@@ -50,8 +50,7 @@ public function updateChartData()
 {
     $this->updateChartDataInternal();
 
-    // Emite un evento para notificar que los datos se han actualizado
-    $this->emit('dataUpdated');
+    
 }
 
 
@@ -94,7 +93,7 @@ private function fetchChartData($mainCategoryId, $month)
 
     return $query
         ->whereMonth('operations.operation_date', $month)
-        ->sum('operations.operation_amount');
+        ->sum('operations.operation_currency_total');
 }
 
 
@@ -106,5 +105,7 @@ public function resetFields1()
    
     $this->showChart = false;
 }
+
+
 
 }

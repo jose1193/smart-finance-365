@@ -30,10 +30,10 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Income Management') }}
+                                {{ __('Budget Management') }}
                             </x-slot>
-                            <a href="{{ route('incomes') }}">
-                                <span>Income Management</span></a>
+                            <a href="{{ route('budgets') }}">
+                                <span>Budget Management</span></a>
                         </div>
 
                     </div>
@@ -54,84 +54,49 @@
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
-                                        <th class="px-4 py-3">Category</th>
-                                        <th class="px-4 py-3">Subcategory</th>
-                                        <th class="px-4 py-3">Description</th>
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <th class="px-4 py-3">User</th>
+                                        @endif
+                                        <th class="px-4 py-3">Budget</th>
                                         <th class="px-4 py-3">Currency</th>
-                                        <th class="px-4 py-3">Operation</th>
                                         <th class="px-4 py-3">Rate CONV/USD</th>
                                         <th class="px-4 py-3">Total In USD</th>
-                                        <th class="px-4 py-3">Status</th>
                                         <th class="px-4 py-3">Date</th>
                                         <th class="px-4 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-xs text-center  uppercase dark:text-gray-400">
+                                        <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
 
                                             </td>
+                                            @if (auth()->user()->hasRole('Admin'))
+                                                <td class="px-4 py-3 text-center">
+                                                    {{ $item->name }}
+                                                </td>
+                                            @endif
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->category_name, 1, '...') }}
+                                                {{ number_format($item->budget_operation, 0, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->display_name }}
+                                                {{ $item->budget_currency_type }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->operation_description, 2, '...') }}
+                                                {{ $item->budget_currency }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->operation_currency_type }}
-
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-
-
-                                                {{ number_format($item->operation_amount, 0, '.', ',') }}
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-
-
-                                                {{ $item->operation_currency }}
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-
-                                                {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
+                                                {{ $item->budget_currency_total < 1 ? $item->budget_currency_total : number_format($item->budget_currency_total) }}
                                                 $
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-
-                                                @if ($item->operation_status == '1')
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                                                        {{ $item->status_description }}
-                                                    </span>
-                                                @elseif ($item->operation_status == '3')
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
-                                                        {{ $item->status_description }}
-                                                    </span>
-                                                @elseif ($item->operation_status == '2')
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
-                                                        {{ $item->status_description }}
-                                                    </span>
-                                                @else
-                                                    <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-700 dark:text-red-100">
-                                                        {{ $item->status_description }}
-                                                    </span>
-                                                @endif
-
 
                                             </td>
+
                                             <td class="px-4 py-3 text-xs">
-                                                {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
+                                                {{ \Carbon\Carbon::parse($item->budget_date)->format('d/m/Y') }}
                                             </td>
                                             <td class="px-4 py-3 text-sm">
 
@@ -147,7 +112,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="11">
+                                            <td colspan="8">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -161,8 +126,6 @@
                             </table>
                             <div class="m-2 p-2">{{ $data->links() }}</div>
                         </div>
-
-
                         <!-- MODAL -->
                         @if ($isOpen)
                             <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
@@ -181,7 +144,7 @@
                                             <!--Modal title-->
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Income Management
+                                                Budget Management
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -198,22 +161,71 @@
                                         <form autocomplete="off">
                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                                 <div class="">
+
                                                     <div class="mb-4">
-                                                        <label for="operation_description"
+                                                        <label for="exampleFormControlInput1"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Description</label>
-                                                        <input type="text" autocomplete="off"
-                                                            id="operation_description"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            maxlength="50" placeholder="Enter Income Description"
-                                                            wire:model="operation_description">
-                                                        @error('operation_description')
+                                                            User Email:</label>
+                                                        @if (auth()->user()->hasRole('Admin'))
+                                                            <div wire:ignore>
+                                                                <select id="select4EmailsUser" style="width: 100%"
+                                                                    wire:model="user_id">
+                                                                    <option></option>
+                                                                    @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
+                                                                        <optgroup label="{{ $nameUser }}">
+                                                                            @foreach ($groupedEmails as $email)
+                                                                                <option value="{{ $email->id }}"
+                                                                                    @if ($user_id == $email->id) selected @endif>
+                                                                                    {{ $email->email }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            <script>
+                                                                document.addEventListener('livewire:load', function() {
+                                                                    Livewire.hook('message.sent', () => {
+                                                                        // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                        $('#select4EmailsUser').select2({
+                                                                            width: 'resolve' // need to override the changed default
+                                                                        });
+                                                                    });
+                                                                });
+
+                                                                $(document).ready(function() {
+                                                                    // Inicializa Select2
+                                                                    $('#select4EmailsUser').select2();
+
+                                                                    // Escucha el cambio en Select2 y actualiza Livewire
+                                                                    $('#select4EmailsUser').on('change', function(e) {
+                                                                        @this.set('user_id', $(this).val());
+                                                                    });
+                                                                });
+                                                            </script>
+                                                        @else
+                                                            <select wire:model="user_id"
+                                                                class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                                <option value="">
+
+                                                                </option>
+
+                                                                <option value="{{ auth()->user()->id }}">
+                                                                    {{ auth()->user()->name }}
+                                                                </option>
+
+
+                                                            </select>
+
+                                                        @endif
+                                                        @error('user_id')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
 
                                                     <div class="mb-4">
-                                                        <label for="operation_amount"
+                                                        <label for="selectedCurrencyFrom"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Select Conversion From</label>
                                                         <div wire:ignore>
@@ -239,169 +251,36 @@
                                                     </div>
 
                                                     <div class="mb-4">
-                                                        <label for="operation_amount"
+                                                        <label for="budget_operation"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Operation With <span
                                                                 class="text-blue-700">{{ $this->selectedCurrencyFrom }}</label>
 
 
                                                         <div class="flex items-center relative">
-                                                            <input type="text" name="amountField"
-                                                                autocomplete="off" id="operation_amount"
-                                                                wire:model="operation_amount"
+                                                            <input type="text" autocomplete="off"
+                                                                id="operation_amount" wire:model="budget_operation"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8"
-                                                                placeholder="Enter Income Transaction Amount">
+                                                                placeholder="Enter Budget Operation">
 
                                                             <span
                                                                 class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFrom }}</span>
                                                         </div>
 
-                                                        @error('operation_amount')
+                                                        @error('budget_operation')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
-
-
-                                                    <div class="mb-4">
-                                                        <label for="operation_currency"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Rate CONV/USD </label>
-
-                                                        <input type="text" autocomplete="off" readonly
-                                                            id="operation_currency" wire:model="operation_currency"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            placeholder="">
-
-                                                        <input type="text" hidden
-                                                            wire:model="operation_currency_type" readonly>
-                                                        @error('operation_currency_type')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-                                                        @error('operation_currency')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="mb-4 relative">
-                                                        <label for="operation_currency"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Total in USD
-                                                        </label>
-
-                                                        <div class="flex items-center relative">
-                                                            <span
-                                                                class="absolute left-0 top-0 mt-2 ml-2 text-gray-500">$</span>
-
-                                                            <input type="text" name="totalbudget2"
-                                                                autocomplete="off" id="operation_currency_total"
-                                                                readonly wire:model="operation_currency_total"
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-8"
-                                                                placeholder="">
-
-
-                                                        </div>
-
-                                                        @error('operation_currency_total')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-
-
-                                                    <div class="mb-4">
-                                                        <label for="operation_date"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Date</label>
-
-                                                        <input type="text" readonly id="myDatePicker"
-                                                            autocomplete="off" wire:model="operation_date"
-                                                            placeholder="dd/mm/yyyy"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
-                                                        @error('operation_date')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-
-                                                    </div>
-
-                                                    <div class="mb-4">
-                                                        <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Income
-                                                            Category
-                                                        </label>
-
-                                                        <div wire:ignore>
-                                                            <select wire:model="category_id" id="select2CategoryId"
-                                                                style="width: 100%;">
-                                                                <option value=""></option>
-                                                                @foreach ($categoriesRender as $item)
-                                                                    <option value="{{ $item->id }}">
-                                                                        {{ $item->category_name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-
-                                                        @error('category_id')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-
-                                                    @if ($subcategoryMessage)
-                                                        <p class="text-gray-500">{{ $subcategoryMessage }}</p>
-                                                    @endif
-
-                                                    @if ($showSubcategories)
-                                                        <div class="mb-4">
-                                                            <label for="exampleFormControlInput2"
-                                                                class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
-                                                            <div wire:ignore>
-                                                                <select wire:model="subcategory_id"
-                                                                    id="select2SubcategoryId" style="width: 100%;">
-                                                                    <option value="">N/A</option>
-                                                                    {{-- Display Assigned Subcategories --}}
-                                                                    @if (is_array($subcategory_id))
-
-                                                                        @forelse ($subcategory_id as $subcategoryId)
-                                                                            @php
-                                                                                $subcategory = \App\Models\Subcategory::find($subcategoryId);
-                                                                            @endphp
-                                                                            <option value="{{ $subcategory->id }}">
-                                                                                {{ $subcategory->subcategory_name }}
-                                                                            </option>
-                                                                        @empty
-                                                                        @endforelse
-                                                                    @endif
-                                                                </select>
-
-                                                            </div>
-                                                            @if ($subcategoryMessage)
-                                                                <p class="text-gray-500 mb-3">
-                                                                    {{ $subcategoryMessage }}</p>
-                                                            @endif
-                                                        </div>
-                                                    @endif
-
 
                                                     <script>
                                                         document.addEventListener('livewire:load', function() {
                                                             Livewire.hook('message.sent', () => {
                                                                 // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                                applySelect2('#select2CategoryId, #select2SubcategoryId, #selectedCurrencyFrom');
+                                                                applySelect2('#selectedCurrencyFrom');
                                                             });
                                                         });
 
                                                         $(document).ready(function() {
-                                                            // Inicializa Select2 para category_id
-                                                            initializeSelect2('#select2CategoryId', function(e) {
-                                                                @this.set('category_id', $(this).val());
-                                                            });
-
-                                                            // Muestra el select2 de subcategorías al seleccionar una categoría
-                                                            @if ($showSubcategories)
-                                                                initializeSelect2('#select2SubcategoryId', function(e) {
-                                                                    @this.set('subcategory_id', $(this).val());
-                                                                });
-                                                            @endif
-
                                                             // Inicializa Select2 para selectedCurrencyFrom
                                                             initializeSelect2('#selectedCurrencyFrom', function(e) {
                                                                 @this.set('selectedCurrencyFrom', $(this).val());
@@ -418,30 +297,65 @@
 
                                                         function applySelect2(selector) {
                                                             $(selector).select2({
-                                                                width: 'resolve' // need to override the changed default
+                                                                width: 'resolve' // necesitas anular el valor predeterminado cambiado
                                                             });
                                                         }
                                                     </script>
+                                                    <div class="mb-4">
+                                                        <label for="budget_currency"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Rate CONV/USD </label>
 
+                                                        <input type="text" autocomplete="off" id="budget_currency"
+                                                            wire:model="budget_currency" readonly
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                            placeholder="">
+
+                                                        <input type="text" hidden wire:model="budget_currency_type"
+                                                            readonly>
+                                                        @error('budget_currency_type')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                        @error('budget_currency')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+
+                                                    <div class="mb-4 relative">
+                                                        <label for="budget_currency"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Total in USD
+                                                        </label>
+
+                                                        <div class="flex items-center relative">
+                                                            <span
+                                                                class="absolute left-0 top-0 mt-2 ml-2 text-gray-500">$</span>
+
+                                                            <input type="text" autocomplete="off"
+                                                                id="budget_currency_total" readonly
+                                                                wire:model="budget_currency_total"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-8"
+                                                                placeholder="">
+
+
+                                                        </div>
+
+                                                        @error('budget_currency_total')
+                                                            <span class="text-red-500">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
 
 
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">State
-                                                        </label>
-                                                        <select wire:model="operation_status"
-                                                            class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                            <option value="">
+                                                        <label for="budget_date"
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            Date</label>
+                                                        <input type="text" id="myDatePicker" readonly
+                                                            wire:model="budget_date" placeholder="dd/mm/yyyy"
+                                                            autocomplete="off"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
 
-                                                            </option>
-                                                            @foreach ($statusOptionsRender as $item)
-                                                                <option value="{{ $item->id }}">
-                                                                    {{ $item->status_description }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-
-                                                        @error('operation_status')
+                                                        @error('budget_date')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
@@ -484,9 +398,12 @@
 
 </div>
 
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id) {
+            console.log('Evento "deleteData" emitido con ID: ' + id);
             Swal.fire({
                 title: 'Are you sure you want to delete this item?',
                 text: "You won't be able to revert this!",
@@ -497,7 +414,7 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.emitTo('incomes-operations', 'delete',
+                    Livewire.emitTo('budgets', 'delete',
                         id); // Envía el Id al método delete
                     Swal.fire(
                         'Deleted!',
@@ -519,7 +436,7 @@
                 allowInput: true,
                 onClose: function(selectedDates, dateStr, instance) {
                     // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
-                    @this.set('operation_date', dateStr);
+                    @this.set('budget_date', dateStr);
                 }
             });
 

@@ -217,8 +217,7 @@
                                   </th>
                                   <th class="px-4 py-3">
                                   </th>
-                                  <th class="px-4 py-3">
-                                  </th>
+
                               </tr>
                               <tr
                                   class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
@@ -249,7 +248,7 @@
                                       <td class="px-4 py-3 text-center">
                                           {{ $item->main_category_title }}</td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->category_title, 1, '...') }}
+                                          {{ Str::words($item->category_title, 2, '...') }}
 
                                       </td>
                                       <td class="px-4 py-3 text-center">
@@ -333,19 +332,15 @@
                                   <td class="px-4 py-3 text-center font-semibold">
 
                                   </td>
-                                  <td class="px-4 py-3 text-center font-semibold">
 
-                                  </td>
-                                  <td class="px-4 py-3 text-center font-semibold">
 
-                                  </td>
 
                                   <td class="px-4 py-3 text-center font-semibold">
-                                      {{ number_format($totalMonthAmount, 0, '.', ',') }}
+
                                   </td>
                                   <td class="px-4 py-3 text-center">
                                   </td>
-                                  <td class="px-4 py-3 text-center">
+                                  <td class="px-4 py-3 text-center font-semibold">
                                       {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
                                       $
                                   </td>

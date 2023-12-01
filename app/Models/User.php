@@ -135,5 +135,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(Subcategory::class, 'user_id_subcategory', 'subcategory_id');
     }
+
+    public function budgets()
+    {
+        return $this->hasMany(Budget::class);
+    }
     
 }

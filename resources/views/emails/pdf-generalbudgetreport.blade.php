@@ -73,25 +73,57 @@
                 <tr>
                     <th>Nro</th>
                     <th>Mes</th>
+                    <th>Budget</th>
                     <th>Income</th>
-
                     <th>Expense</th>
-
+                    <th>% Budget</th>
+                    <th>Savings</th>
+                    <th>% Save</th>
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $totalSavings = 0;
+                @endphp
                 @for ($i = 1; $i <= 12; $i++)
                     <tr>
                         <td> {{ $i }}</td>
                         <td>
                             {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
-
+                        <td>
+                            {{ number_format($budgetDataCurrency[$i - 1], 0, '.', ',') }} $</td>
                         <td>
                             {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }} $</td>
+                        <td
+                            style="{{ $expenseDataCurrency[$i - 1] > $budgetDataCurrency[$i - 1] ? 'color: red;' : '' }}">
+                            {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }} $
+                        </td>
 
-                        <td>
-                            {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }} $</td>
+                        <td
+                            style="{{ $budgetDataCurrency[$i - 1] > 0 && $expenseDataCurrency[$i - 1] / $budgetDataCurrency[$i - 1] > 100 ? 'color: red;' : '' }}">
+                            @if ($budgetDataCurrency[$i - 1] > 0)
+                                {{ number_format(($expenseDataCurrency[$i - 1] / $budgetDataCurrency[$i - 1]) * 100, 2) }}%
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                        <td
+                            style="{{ $incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1] < 0 ? 'color: red;' : '' }}">
+                            {{ number_format($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1], 0) }}
+                            $
+                        </td>
+                        <td class="px-4 py-3 text-center"
+                            style="{{ $incomeDataCurrency[$i - 1] > 0 && ($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1]) / $incomeDataCurrency[$i - 1] < 0 ? 'color: red;' : '' }}">
+                            @if ($incomeDataCurrency[$i - 1] > 0)
+                                {{ number_format((($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1]) / $incomeDataCurrency[$i - 1]) * 100, 2) }}%
+                            @else
+                                N/A
+                            @endif
+                        </td>
                     </tr>
+                    @php
+                        $totalSavings += $incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1];
+                    @endphp
                 @endfor
                 <tr class="footTr">
                     <td>
@@ -99,19 +131,33 @@
 
                     </td>
                     <td>
-                        @if ($selectedYear)
-                            {{ $selectedYear }}
+                        @if ($selectedYear4)
+                            {{ $selectedYear4 }}
                         @else
                             Year Not Selected
                         @endif
                     </td>
+                    <td>
+                        {{ number_format($totalBudgetCurrency, 0, '.', ',') }} $
 
+                    </td>
                     <td>
                         {{ number_format($totalIncomeCurrency, 0, '.', ',') }} $
                     </td>
 
                     <td>
                         {{ number_format($totalExpenseCurrency, 0, '.', ',') }} $
+                    </td>
+                    <td>
+
+
+                    </td>
+                    <td style="{{ $totalSavings < 0 ? 'color: red;' : '' }}">
+                        {{ number_format($totalSavings, 0, '.', ',') }} $
+                    </td>
+                    <td>
+
+
                     </td>
 
                 </tr>

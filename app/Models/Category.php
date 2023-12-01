@@ -46,5 +46,8 @@ public function income()
     return $this->belongsToMany(User::class, 'categories_to_assigns', 'category_id', 'user_id_assign');
     }
 
-
+    public function budgetExpenses()
+    {
+        return $this->hasMany(BudgetExpense::class);
+    }
 }

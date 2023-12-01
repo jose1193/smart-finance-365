@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('operations', function (Blueprint $table) {
             $table->id();
-             $table->string('operation_description');
-             $table->string('operation_currency_type');
-             $table->string('operation_amount');
-             $table->string('operation_currency');
-             $table->string('operation_currency_total');
-             $table->string('operation_date');
-             $table->string('operation_month');
-             $table->string('operation_year');
-             $table->foreignId('operation_status')
+            $table->string('operation_description');
+            $table->string('operation_currency_type');
+            $table->string('operation_amount');
+            $table->string('operation_currency');
+            $table->string('operation_currency_total');
+            $table->string('operation_date');
+            $table->string('operation_month');
+            $table->string('operation_year');
+            $table->foreignId('operation_status')
             ->constrained('statu_options')
             ->onUpdate('cascade')
             ->onDelete('cascade');

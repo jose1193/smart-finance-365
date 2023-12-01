@@ -80,17 +80,17 @@ private function fetchBetweenData($mainCategoryId, $month)
         $query->where('operations.user_id', $this->selectedUser3);
     }
 
-    if ($this->date_start) {
+    if ($this->date_start && $this->date_end) {
+        $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
+    } elseif ($this->date_start) {
         $query->whereDate('operations.operation_date', '>=', $this->date_start);
-    }
-
-    if ($this->date_end) {
+    } elseif ($this->date_end) {
         $query->whereDate('operations.operation_date', '<=', $this->date_end);
     }
 
     return $query
         ->whereMonth('operations.operation_date', $month)
-        ->sum('operations.operation_amount');
+        ->sum('operations.operation_currency_total');
 }
 
 
@@ -98,8 +98,8 @@ private function fetchBetweenData($mainCategoryId, $month)
 
 public function resetFields3()
 {
-    $this->selectedUser = null;
-    $this->selectedYear = null;
+    $this->selectedUser3 = null;
+   
     $this->date_start = null;
     $this->date_end = null;
     $this->showChart3 = false;

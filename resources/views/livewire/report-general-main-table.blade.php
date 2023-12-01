@@ -7,32 +7,19 @@
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
 
 
-                 @if (auth()->user()->hasRole('Admin'))
-
-                     <div wire:ignore>
-                         <select id="selectUser" style="width: 100%" wire:model="selectedUser" wire:change="updateData"
-                             wire:ignore>
-                             <option value="">Select User</option>
-
+                 <div wire:ignore>
+                     <select id="selectUser" style="width: 100%" wire:model="selectedUser" wire:change="updateData"
+                         wire:ignore>
+                         @if (auth()->user()->hasRole('Admin'))
                              @foreach ($users as $user)
-                                 <option value="{{ $user->id }}">{{ $user->name }}
-                                 </option>
+                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                              @endforeach
-                         </select>
-                     </div>
-                 @else
-                     <select wire:model="selectedUser" wire:change="updateData"
-                         class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                         <option value="">Select User</option>
-
-                         <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
-                         </option>
-
-
+                         @else
+                             <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
+                             </option>
+                         @endif
                      </select>
-
-                 @endif
-
+                 </div>
 
              </div>
 
@@ -188,19 +175,16 @@
                                  </th>
                                  <th class="px-4 py-3">
                                  </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
+
                              </tr>
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
                                  <th class="px-4 py-3">Mes</th>
                                  <th class="px-4 py-3">{{ $categoryName }} </th>
-                                 <th class="px-4 py-3"> Total Operation USD</th>
+
                                  <th class="px-4 py-3">{{ $categoryName2 }} </th>
-                                 <th class="px-4 py-3"> Total Operation USD</th>
+
 
 
                              </tr>
@@ -213,12 +197,10 @@
                                      <td class="px-4 py-3 text-center"> {{ $i }}</td>
                                      <td class="px-4 py-3 text-center">
                                          {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
-                                     <td class="px-4 py-3 text-center">
-                                         {{ number_format($incomeData[$i - 1], 0, '.', ',') }}</td>
+
                                      <td class="px-4 py-3 text-center">
                                          {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }} $</td>
-                                     <td class="px-4 py-3 text-center">
-                                         {{ number_format($expenseData[$i - 1], 0, '.', ',') }}</td>
+
                                      <td class="px-4 py-3 text-center">
                                          {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }} $</td>
                                  </tr>
@@ -232,16 +214,11 @@
                                  <td class="px-4 py-3 text-center font-semibold">
                                      Total
                                  </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-                                     {{ $formatted_amount = number_format($totalIncome, 0, '.', ',') }}
-                                 </td>
+
                                  <td class="px-4 py-3 text-center font-semibold">
                                      {{ $formatted_amount = number_format($totalIncomeCurrency, 0, '.', ',') }} $
                                  </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-                                     {{ $formatted_amount = number_format($totalExpense, 0, '.', ',') }}
 
-                                 </td>
                                  <td class="px-4 py-3 text-center font-semibold">
                                      {{ $formatted_amount = number_format($totalExpenseCurrency, 0, '.', ',') }} $
 

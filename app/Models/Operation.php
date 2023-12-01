@@ -41,4 +41,10 @@ class Operation extends Model
     {
         return $this->hasMany(OperationSubcategories::class, 'operation_id');
     }
+
+  public function budgetExpenses()
+    {
+        return $this->hasMany(BudgetExpense::class, 'operation_id');
+    }
+
 }

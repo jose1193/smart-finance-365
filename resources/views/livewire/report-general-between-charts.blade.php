@@ -3,56 +3,97 @@
       <div id="between-dates-chart-table">
           <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10 ">
               <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                  <select wire:model="selectedUser3" wire:change="updateBetweenData"
-                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option value="">Select User</option>
-                      @if (auth()->user()->hasRole('Admin'))
-                          @foreach ($users as $user)
-                              <option value="{{ $user->id }}">{{ $user->name }}
+                  <div wire:ignore>
+                      <select wire:model="selectedUser3" id="selectUserChart3" wire:change="updateBetweenData"
+                          class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="">Select User</option>
+                          @if (auth()->user()->hasRole('Admin'))
+                              @foreach ($users as $user)
+                                  <option value="{{ $user->id }}">{{ $user->name }}
+                                  </option>
+                              @endforeach
+                          @else
+                              <option value="{{ auth()->user()->id }}">
+                                  {{ auth()->user()->name }}
                               </option>
-                          @endforeach
-                      @else
-                          <option value="{{ auth()->user()->id }}">
-                              {{ auth()->user()->name }}
-                          </option>
-                      @endif
-                  </select>
+                          @endif
+                      </select>
+                  </div>
               </div>
 
 
+              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 " wire:ignore>
+                  <input type="text" id="myDatePicker" readonly wire:model="date_start"
+                      wire:change="updateBetweenData" placeholder="dd/mm/yyyy" autocomplete="off"
+                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
 
-              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                  <input type="date" wire:model="date_start" wire:change="updateBetweenData"
-                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+
               </div>
 
-              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                  <input type="date" wire:model="date_end" wire:change="updateBetweenData"
-                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 " wire:ignore>
+                  <input type="text" id="myDatePicker2" placeholder="dd/mm/yyyy" autocomplete="off" readonly
+                      wire:model="date_end" wire:change="updateBetweenData"
+                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
               </div>
 
           </div>
+          @if ($date_start)
+              <p>Date Start:
+                  <span class="text-green-700 ml-2 font-semibold">
+                      {{ \Carbon\Carbon::parse($date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                  </span>
+              </p>
+          @endif
 
+          @if ($date_end)
+              <p>Date End:
+                  <span class="text-green-700 ml-2 font-semibold">
+                      {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                  </span>
+              </p>
+          @endif
+          @if ($date_start && $date_end && $date_start > $date_end)
+              <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
+                  ser posterior a
+                  la fecha de finalización.</p>
+          @endif
           @if ($showChart3)
-              <div id="chart-container" class="my-5"
-                  wire:key="chart-{{ $selectedUser3 }}-{{ $date_start }}-{{ $date_end }}">
+              <div class="my-10 flex justify-end space-x-2">
+
+                  <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
+                      wire:click="exportToExcel" wire:loading.attr="disabled">
+                      <span class="font-semibold"><i class="fa-regular fa-image px-1"></i></span>
+                      Download
+                  </x-button>
+                  <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50"
+                      wire:click="resetFields3" wire:loading.attr="disabled">
+                      <span class="font-semibold"><i class="fa-solid fa-power-off px-1"></i></span>
+                      Reset Fields
+                  </x-button>
+              </div>
+              <div id="chart-container3" class="my-5"
+                  wire:key="chart-{{ $selectedUser3 }}-{{ $date_start }}-{{ $date_end }}-{{ uniqid() }}">
 
                   <div class="grid gap-6 mb-8 md:grid-cols-2">
                       <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
                           <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
                               Bars
                           </h4>
-                          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                          <canvas id="myChartGeneral" height="200"></canvas>
+
+                          <canvas id="myChartGeneral3" height="200"></canvas>
                           <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
                               <!-- Chart legend -->
                               <div class="flex items-center">
                                   <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
-                                  <span class="font-semibold">{{ $totalIncome = array_sum($incomeData3) }}</span>
+                                  <span
+                                      class="font-semibold">{{ $totalIncomeFormatted = number_format(array_sum($incomeData3), 0, '.', ',') }}
+                                      $</span>
                               </div>
                               <div class="flex items-center">
                                   <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                                  <span class="font-semibold">{{ $totalExpense = array_sum($expenseData3) }}</span>
+                                  <span
+                                      class="font-semibold">{{ $totalExpenseFormatted = number_format(array_sum($expenseData3), 0, '.', ',') }}
+                                      $</span>
                               </div>
                           </div>
 
@@ -67,7 +108,7 @@
                           <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
                               Lines
                           </h4>
-                          <canvas id="line" height="200"></canvas>
+                          <canvas id="line3" height="200"></canvas>
                           <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
                               <!-- Chart legend -->
                               <div class="flex items-center">
@@ -85,7 +126,7 @@
                       </div>
                   </div>
                   <script>
-                      var ctx = document.getElementById('myChartGeneral').getContext('2d');
+                      var ctx = document.getElementById('myChartGeneral3').getContext('2d');
 
                       var dataBar = {
                           labels: [
@@ -201,7 +242,7 @@
                       };
 
                       // Cambia esto al ID de tu elemento de gráfico en el HTML
-                      const lineCtx = document.getElementById("line");
+                      const lineCtx = document.getElementById("line3");
                       window.myLine = new Chart(lineCtx, lineConfig);
                   </script>
 
@@ -219,3 +260,31 @@
       </div>
       <!-- END REPORT GENERAL BETWEEN DATE TABLE  -->
   </div>
+  <script>
+      document.addEventListener('livewire:load', function() {
+
+          flatpickr("#myDatePicker", {
+              locale: "es",
+              altInput: true,
+              altFormat: "j F, Y",
+              dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+              allowInput: true,
+              onClose: function(selectedDates1, dateStr1, instance1) {
+                  @this.set('date_start', dateStr1);
+              }
+          });
+
+          flatpickr("#myDatePicker2", {
+              locale: "es",
+              altInput: true,
+              altFormat: "j F, Y",
+              dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+              allowInput: true,
+              onClose: function(selectedDates, dateStr, instance) {
+                  @this.set('date_end', dateStr);
+              }
+          });
+
+
+      });
+  </script>

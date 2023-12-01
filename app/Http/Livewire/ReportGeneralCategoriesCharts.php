@@ -149,15 +149,15 @@ private function fetchCategoriesData($mainCategoryId, $month)
 
     return $query
         ->whereMonth('operations.operation_date', $month)
-        ->sum('operations.operation_amount');
+        ->sum('operations.operation_currency_total');
 }
 
 
 
 public function resetFields2()
 {
-    $this->selectedUser = null;
-    $this->selectedYear = null;
+    $this->selectedUser2 = null;
+    $this->selectedYear2 = null;
     $this->selectedCategoryId = null;
     $this->showChart2 = false;
 }

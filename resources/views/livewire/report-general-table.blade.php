@@ -64,6 +64,21 @@
                                     Months
                                 </button>
                             </li>
+
+                            <li class="mr-2">
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
+                                    @click="activeTab = '5'" :class="{ 'bg-blue-700': activeTab === '5' }">
+                                    Budget
+                                </button>
+                            </li>
+                            <li class="mr-2">
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
+                                    @click="activeTab = '6'" :class="{ 'bg-blue-700': activeTab === '6' }">
+                                    Budget Expenses
+                                </button>
+                            </li>
                         </ul>
 
                         <div class="mt-7">
@@ -91,7 +106,13 @@
                             <!-- Livewire/ReportGeneralMonthTable.php  -->
                             @livewire('report-general-month-table')
 
+                            <!-- REPORT BUDGETS TABLE  -->
+                            <!-- Livewire/ReportGeneralBudgetsTable.php  -->
+                            @livewire('report-general-budgets-table')
 
+                            <!-- REPORT BUDGETS MONTH TABLE  -->
+                            <!-- Livewire/ReportGeneralBudgetsMonthTable.php  -->
+                            @livewire('report-general-budgets-month-table')
 
                         </div>
                     </div>

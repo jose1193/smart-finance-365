@@ -74,9 +74,9 @@
                     <th>Nro</th>
                     <th>Mes</th>
                     <th>Income</th>
-                    <th>USD</th>
+
                     <th>Expense</th>
-                    <th>USD</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -85,12 +85,10 @@
                         <td> {{ $i }}</td>
                         <td>
                             {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
-                        <td>
-                            {{ number_format($incomeData3[$i - 1], 0, '.', ',') }}</td>
+
                         <td>
                             {{ number_format($incomeDataCurrency3[$i - 1], 0, '.', ',') }} $</td>
-                        <td>
-                            {{ number_format($expenseData3[$i - 1], 0, '.', ',') }}</td>
+
                         <td>
                             {{ number_format($expenseDataCurrency3[$i - 1], 0, '.', ',') }} $</td>
                     </tr>
@@ -109,15 +107,11 @@
                             <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_end }}</p>
                         @endif
                     </td>
-                    <td>
-                        {{ number_format($totalIncome3, 0, '.', ',') }}
-                    </td>
+
                     <td>
                         {{ number_format($totalIncomeCurrency3, 0, '.', ',') }} $
                     </td>
-                    <td>
-                        {{ number_format($totalExpense3, 0, '.', ',') }}
-                    </td>
+
                     <td>
                         {{ number_format($totalExpenseCurrency3, 0, '.', ',') }} $
                     </td>
