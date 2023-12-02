@@ -34,6 +34,8 @@ public function authorize()
     public function render()
 {
     $this->users = User::orderBy('id', 'asc')->get();
+    // Inicializa $user_id con el primer usuario si hay al menos uno
+    $this->user_id = $this->users->isNotEmpty() ? $this->users->first()->id : null;
 
     $query = Budget::join('users', 'budgets.user_id', '=', 'users.id')
         ->select('budgets.*', 'users.name')

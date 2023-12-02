@@ -97,8 +97,12 @@ public $budget_id;
                                   ->get();
        
     $this->budgets = Budget::where('user_id', auth()->id())
-            ->orderBy('id', 'desc')
-            ->get();
+        ->orderBy('id', 'desc')
+        ->get();
+
+    // Inicializa $budget_id con el primer presupuesto si hay al menos uno
+    $this->budget_id = $this->budgets->isNotEmpty() ? $this->budgets->first()->id : null;
+
 
         return view('livewire.expenses-operations', [
             'data' => $data]);
@@ -318,10 +322,7 @@ public function store()
 
     // Asigna la cadena, sin convertirla a un entero
     $validatedData['operation_amount'] = $numericValue;
-    $validatedData['operation_currency_total'] = $numericValue2;
-
-   
-     
+    $validatedData['operation_currency_total'] = $numericValue2;  
 
     $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
