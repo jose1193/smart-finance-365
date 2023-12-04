@@ -171,7 +171,7 @@ public function resetFields6()
 {
     $this->selectedUser6 = null;
     $this->selectedMonth2 = null;
-    $this->selectedYear4 = null;
+    $this->selectedYear5 = null;
     $this->showChart6 = false;
 }
 

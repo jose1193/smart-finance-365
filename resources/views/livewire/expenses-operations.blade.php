@@ -212,7 +212,7 @@
 
                                                             <select id="budget_id_select" style="width: 100%"
                                                                 wire:model="budget_id">
-
+                                                                <option></option>
                                                                 @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
                                                                     @php
                                                                         $formattedDate = \Carbon\Carbon::parse($date)->isoFormat('D MMMM, YYYY');

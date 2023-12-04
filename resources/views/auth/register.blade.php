@@ -253,9 +253,10 @@
                 "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
             );
 
-            $.validator.addMethod("soloLetras", function(value, element) {
-                return this.optional(element) || /^[A-Za-z]+$/.test(value);
-            }, "Please, enter only letters");
+            $.validator.addMethod("soloLetrasConEspacios", function(value, element) {
+                return this.optional(element) || /^[A-Za-z\s]+$/.test(value);
+            }, "Por favor, introduzca solo letras");
+
 
             var form = $("#form");
             var submitButton = $("#SubmitForm");
@@ -269,7 +270,7 @@
                         required: true,
                         minlength: 4,
                         maxlength: 20,
-                        soloLetras: true
+                        soloLetrasConEspacios: true
                     },
                     email: {
                         required: true,

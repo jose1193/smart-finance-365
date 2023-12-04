@@ -100,9 +100,7 @@ public $budget_id;
         ->orderBy('id', 'desc')
         ->get();
 
-    // Inicializa $budget_id con el primer presupuesto si hay al menos uno
-    $this->budget_id = $this->budgets->isNotEmpty() ? $this->budgets->first()->id : null;
-
+    
 
         return view('livewire.expenses-operations', [
             'data' => $data]);
