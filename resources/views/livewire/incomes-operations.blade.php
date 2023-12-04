@@ -348,80 +348,84 @@
                                                     @if ($subcategoryMessage)
                                                         <p class="text-gray-500">{{ $subcategoryMessage }}</p>
                                                     @endif
+                                                    <div id="subcategory-container" class="my-5"
+                                                        wire:key="subcategory-{{ $category_id }}">
 
-                                                    @if ($showSubcategories)
-                                                        <div class="mb-4">
-                                                            <label for="exampleFormControlInput2"
-                                                                class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
-                                                            <div wire:ignore>
-                                                                <select wire:model="subcategory_id"
-                                                                    id="select2SubcategoryId" style="width: 100%;">
-                                                                    <option value="">N/A</option>
-                                                                    {{-- Display Assigned Subcategories --}}
-                                                                    @if (is_array($subcategory_id))
+                                                        @if ($showSubcategories)
+                                                            <div class="mb-4">
+                                                                <label for="exampleFormControlInput2"
+                                                                    class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
+                                                                <div wire:ignore>
+                                                                    <select wire:model="subcategory_id"
+                                                                        id="select2SubcategoryId"
+                                                                        style="width: 100%;">
+                                                                        <option value="">N/A</option>
+                                                                        {{-- Display Assigned Subcategories --}}
+                                                                        @if (is_array($subcategory_id))
 
-                                                                        @forelse ($subcategory_id as $subcategoryId)
-                                                                            @php
-                                                                                $subcategory = \App\Models\Subcategory::find($subcategoryId);
-                                                                            @endphp
-                                                                            <option value="{{ $subcategory->id }}">
-                                                                                {{ $subcategory->subcategory_name }}
-                                                                            </option>
-                                                                        @empty
-                                                                        @endforelse
-                                                                    @endif
-                                                                </select>
+                                                                            @forelse ($subcategory_id as $subcategoryId)
+                                                                                @php
+                                                                                    $subcategory = \App\Models\Subcategory::find($subcategoryId);
+                                                                                @endphp
+                                                                                <option
+                                                                                    value="{{ $subcategory->id }}">
+                                                                                    {{ $subcategory->subcategory_name }}
+                                                                                </option>
+                                                                            @empty
+                                                                            @endforelse
+                                                                        @endif
+                                                                    </select>
 
+                                                                </div>
+                                                                @if ($subcategoryMessage)
+                                                                    <p class="text-gray-500 mb-3">
+                                                                        {{ $subcategoryMessage }}</p>
+                                                                @endif
                                                             </div>
-                                                            @if ($subcategoryMessage)
-                                                                <p class="text-gray-500 mb-3">
-                                                                    {{ $subcategoryMessage }}</p>
-                                                            @endif
-                                                        </div>
-                                                    @endif
-
-
-                                                    <script>
-                                                        document.addEventListener('livewire:load', function() {
-                                                            Livewire.hook('message.sent', () => {
-                                                                // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                                applySelect2('#select2CategoryId, #select2SubcategoryId, #selectedCurrencyFrom');
-                                                            });
-                                                        });
-
-                                                        $(document).ready(function() {
-                                                            // Inicializa Select2 para category_id
-                                                            initializeSelect2('#select2CategoryId', function(e) {
-                                                                @this.set('category_id', $(this).val());
-                                                            });
-
-                                                            // Muestra el select2 de subcategorías al seleccionar una categoría
-                                                            @if ($showSubcategories)
-                                                                initializeSelect2('#select2SubcategoryId', function(e) {
-                                                                    @this.set('subcategory_id', $(this).val());
+                                                        @endif
+                                                        <script>
+                                                            document.addEventListener('livewire:load', function() {
+                                                                Livewire.hook('message.sent', () => {
+                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                    applySelect2('#select2CategoryId, #select2SubcategoryId, #selectedCurrencyFrom');
                                                                 });
-                                                            @endif
-
-                                                            // Inicializa Select2 para selectedCurrencyFrom
-                                                            initializeSelect2('#selectedCurrencyFrom', function(e) {
-                                                                @this.set('selectedCurrencyFrom', $(this).val());
-                                                                @this.call('showSelectedCurrency');
                                                             });
-                                                        });
 
-                                                        function initializeSelect2(selector, onChangeCallback) {
-                                                            $(selector).select2();
+                                                            $(document).ready(function() {
+                                                                // Inicializa Select2 para category_id
+                                                                initializeSelect2('#select2CategoryId', function(e) {
+                                                                    @this.set('category_id', $(this).val());
+                                                                });
 
-                                                            // Escucha el cambio en Select2 y ejecuta la devolución de llamada de cambio
-                                                            $(selector).on('change', onChangeCallback);
-                                                        }
+                                                                // Muestra el select2 de subcategorías al seleccionar una categoría
+                                                                @if ($showSubcategories)
+                                                                    initializeSelect2('#select2SubcategoryId', function(e) {
+                                                                        @this.set('subcategory_id', $(this).val());
+                                                                    });
+                                                                @endif
 
-                                                        function applySelect2(selector) {
-                                                            $(selector).select2({
-                                                                width: 'resolve' // need to override the changed default
+                                                                // Inicializa Select2 para selectedCurrencyFrom
+                                                                initializeSelect2('#selectedCurrencyFrom', function(e) {
+                                                                    @this.set('selectedCurrencyFrom', $(this).val());
+                                                                    @this.call('showSelectedCurrency');
+                                                                });
                                                             });
-                                                        }
-                                                    </script>
+
+                                                            function initializeSelect2(selector, onChangeCallback) {
+                                                                $(selector).select2();
+
+                                                                // Escucha el cambio en Select2 y ejecuta la devolución de llamada de cambio
+                                                                $(selector).on('change', onChangeCallback);
+                                                            }
+
+                                                            function applySelect2(selector) {
+                                                                $(selector).select2({
+                                                                    width: 'resolve' // need to override the changed default
+                                                                });
+                                                            }
+                                                        </script>
+                                                    </div>
+
 
 
 
