@@ -83,15 +83,7 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
-                                                @if ($item->assignedUsers->count() === 0)
-                                                    All Users
-                                                @elseif (auth()->user()->hasRole('Admin'))
-                                                    {{ $item->assignedUsers->pluck('username')->implode(', ') }}
-                                                @elseif ($item->assignedUsers->pluck('id')->contains(auth()->user()->id))
-                                                    {{ auth()->user()->username }}
-                                                @else
-                                                    Not Assigned
-                                                @endif
+                                                {{ $item->assigned_text }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -256,8 +248,7 @@
                                                         </label>
                                                         <select wire:model="main_category_id"
                                                             class="block w-full mt-1 text-sm dark:text-gray-700 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                                            <option value="">
-
+                                                            <option>
                                                             </option>
                                                             @foreach ($mainCategoriesRender as $item)
                                                                 <option value="{{ $item->id }}">
@@ -392,7 +383,6 @@
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">
                                                             Subcategories:</label>
                                                         <!-- Dentro de tu vista Blade -->
-
 
                                                         @foreach ($userAssignments as $index => $assignment)
                                                             <div class="mb-4">

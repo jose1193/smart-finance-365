@@ -55,42 +55,59 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
             ->orWhere('subcategories.subcategory_name', 'like', '%' . $searchTerm . '%');
     })
     ->select(
-        'categories.id',
-        'categories.category_name',
-        'main_categories.title as main_category_name',
-        'subcategories.subcategory_name',
-        'users.id as user_id',
-        'users.username as assigned_username',
-        'users.name as assigned_name'
-    ) 
-    ->groupBy('categories.id', 'categories.category_name', 'main_categories.title', 'subcategories.subcategory_name', 'users.id', 'users.username', 'users.name')
+    'categories.id',
+    'categories.category_name',
+    'main_categories.title as main_category_name',
+    'subcategories.subcategory_name',
+    \DB::raw('CASE 
+        WHEN COUNT(users.id) = 0 THEN "All Users"
+        WHEN COUNT(users.id) > 0 AND ' . auth()->user()->hasRole('Admin') . ' THEN GROUP_CONCAT(users.username)
+        WHEN COUNT(users.id) > 0 AND EXISTS (SELECT 1 FROM categories_to_assigns WHERE category_id = categories.id AND user_id_assign = ' . auth()->user()->id . ') THEN "' . auth()->user()->username . '"
+        ELSE "Not Assigned" 
+    END as assigned_text')
+)
+->groupBy('categories.id', 'categories.category_name', 'main_categories.title', 'subcategories.subcategory_name')
+
     ->orderBy('categories.id', 'desc')
     ->paginate(10);
 
 
 
          }
-elseif (auth()->user()->hasRole('User')) {
+
+    elseif (auth()->user()->hasRole('User')) {
     $searchTerm = $this->search;
     $userId = auth()->id(); 
 
-   $data = Category::with(['assignedUsers', 'Subcategory'])
-    ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-    ->leftJoin('categories_to_assigns', function ($join) use ($userId) {
-        $join->on('categories.id', '=', 'categories_to_assigns.category_id')
-            ->where('categories_to_assigns.user_id_assign', $userId);
-    })
-    ->leftJoin('subcategories', 'categories.id', '=', 'subcategories.category_id')
-    ->where('main_categories.id', 1)
-    ->where(function ($query) use ($searchTerm) {
-        $query->where('categories.category_name', 'like', '%' . $searchTerm . '%');
-    })
-    ->select('categories.*', 'main_categories.title as main_category_name', 'subcategories.subcategory_name')
-    ->addSelect(\DB::raw('CASE WHEN categories_to_assigns.user_id_assign = ' . $userId . ' THEN 1 ELSE 0 END as assigned'))
-    ->orderBy('categories.id', 'desc')
-    ->paginate(10);
-
+    $data = Category::with(['assignedUsers', 'Subcategory'])
+        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        ->leftJoin('categories_to_assigns', function ($join) use ($userId) {
+            $join->on('categories.id', '=', 'categories_to_assigns.category_id')
+                ->where('categories_to_assigns.user_id_assign', $userId);
+        })
+        ->leftJoin('subcategories', 'categories.id', '=', 'subcategories.category_id')
+        ->leftJoin('users', 'categories_to_assigns.user_id_assign', '=', 'users.id') // Agregado este join
+        ->where('main_categories.id', 1)
+        ->where(function ($query) use ($searchTerm) {
+            $query->where('categories.category_name', 'like', '%' . $searchTerm . '%');
+        })
+        ->select(
+            'categories.id',
+            'categories.category_name',
+            'main_categories.title as main_category_name',
+            'subcategories.subcategory_name',
+            \DB::raw('CASE 
+                WHEN COUNT(users.id) = 0 THEN "All Users"
+                WHEN COUNT(users.id) > 0 AND ' . auth()->user()->hasRole('User') . ' THEN GROUP_CONCAT(users.username)
+                WHEN COUNT(users.id) > 0 AND EXISTS (SELECT 1 FROM categories_to_assigns WHERE category_id = categories.id AND user_id_assign = ' . auth()->user()->id . ') THEN "' . auth()->user()->username . '"
+                ELSE "Not Assigned" 
+            END as assigned_text')
+        )
+        ->groupBy('categories.id', 'categories.category_name', 'main_categories.title', 'subcategories.subcategory_name')
+        ->orderBy('categories.id', 'desc')
+        ->paginate(10);
 }
+
 
         $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
         $this->users = User::orderBy('id', 'desc')->get();
@@ -275,7 +292,7 @@ public function SubcategoryAssignment(Category $storeCategory)
 
     foreach ($storeCategory->Subcategory as $index => $subcategory) {
         $selectedUsers = $this->user_id_assignSubcategory[$index] ?? [];
-     
+   
         // Check if 'All Users' is selected or array is empty
         if (in_array('all', $selectedUsers) || empty($selectedUsers)) {
             $this->deleteSubcategoryAssignments((object) $subcategory);
@@ -364,16 +381,12 @@ private function getUnassignedUsers($selectedUsers, $categoryAssignments, $assig
 
 
 
-
 public function OpenModalUserAssignment($itemId)
 {
     $this->selectedItemId = $itemId;  
-    $category = Category::find($this->selectedItemId);
+    $category = Category::with('Subcategory')->find($this->selectedItemId);
     $this->categoryNameSelected = $category ? $category->category_name : null;
     $this->showModal = true;
-
-    // Obtener todas las subcategorías asociadas a la categoría
-    $subcategories = Subcategory::where('category_id', $itemId)->get();
 
     // Obtener asignaciones de usuarios para la categoría
     $categoriesToAssign = CategoriesToAssign::where('category_id', $itemId)->get();
@@ -382,24 +395,25 @@ public function OpenModalUserAssignment($itemId)
     // Obtener asignaciones de usuarios para cada subcategoría con sus correos electrónicos
     $userAssignments = [];
 
-    foreach ($subcategories as $subcategory) {
+    foreach ($category->Subcategory as $subcategory) {
         $subcategoryAssignments = SubcategoryToAssign::where('subcategory_id', $subcategory->id)->get();
         $userIdsSubcategory = $subcategoryAssignments->pluck('user_id_subcategory')->toArray();
 
         // Obtener usuarios asignados a la subcategoría
-        $usersInSubcategory = User::whereIn('id', $userIdsSubcategory)->get();
+        $usersInSubcategory = User::whereIn('id', $userIdsSubcategory)->get(['id', 'name']); // Selecciona solo los campos necesarios
 
         // Guardar información en el array $userAssignments
         $userAssignments[] = [
             'subcategory_name' => $subcategory->subcategory_name,
             'users' => $usersInSubcategory,
-        'user_id_assignSubcategory' => $userIdsSubcategory, // Actualiza aquí
+            'user_id_assignSubcategory' => $userIdsSubcategory,
         ];
-
     }
 
     // Inicializar la propiedad con el mismo nombre
     $this->userAssignments = $userAssignments;
+    
+   
 }
 
 
