@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class ExpensesCategories extends Component
 {
+    use WithPagination;
+    
     public  $category_name, $category_description, $main_category_id, $data_id;
     public $search = '';
     public $mainCategoriesRender;

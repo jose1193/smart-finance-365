@@ -29,12 +29,12 @@ class IncomeCategories extends Component
     public $user_id_assignSubcategory = [];
     public $userAssignments = [];
   
+    use WithPagination;
 
     public function authorize()
 {
     return true;
 }
-
 
     public function render()
     {

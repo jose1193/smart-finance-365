@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 
 class Operations extends Component
 {
+    use WithPagination;
+    
 public  $operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
 public $search = '';
 public $categoriesRender;

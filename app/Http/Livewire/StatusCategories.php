@@ -8,6 +8,8 @@ use Livewire\WithPagination;
 
 class StatusCategories extends Component
 {
+    use WithPagination;
+    
  public  $mainCategories, $main_category_id, $status_description, $data_id;
  public $search = '';
   public $isOpen = 0;

@@ -8,12 +8,15 @@ use Livewire\WithPagination;
 
 class EmailAdmin extends Component
 {
+    use WithPagination;
     
-    public  $name_support, $email, $data_id;
+ public  $name_support, $email, $data_id;
  public $search = '';
  
     public $isOpen = 0;
-     protected $listeners = ['render','delete']; 
+    protected $listeners = ['render','delete']; 
+
+    
 
   public function authorize()
 {

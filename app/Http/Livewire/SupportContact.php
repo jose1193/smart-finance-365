@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Mail;
 
 class SupportContact extends Component
 {
+    use WithPagination;
+    
     public  $name, $email,$emailFrom, $subject,$message,$user_id,$data_id;
     public $search = '';
     public $isOpen = 0;

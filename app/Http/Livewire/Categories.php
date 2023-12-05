@@ -8,6 +8,8 @@ use Livewire\Component;
 
 class Categories extends Component
 {
+    use WithPagination;
+    
      public  $category_name, $category_description, $main_category_id, $user_id, $data_id;
  public $search = '';
  public $mainCategoriesRender;

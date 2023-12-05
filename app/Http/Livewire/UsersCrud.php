@@ -10,6 +10,8 @@ use App\Policies\UserCrudPolicy;
 
 class UsersCrud extends Component
 {
+    use WithPagination;
+    
  public  $name,$username, $email,$password,$role, $data_id;
  public $search = '';
  public $rolesRender;

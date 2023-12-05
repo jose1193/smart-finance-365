@@ -25,6 +25,8 @@ public $selectedCurrencyFrom;
 public $listCurrencies;
 public $quotes;
 
+use WithPagination;
+
 public function authorize()
 {
     return true;

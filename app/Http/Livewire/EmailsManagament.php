@@ -7,8 +7,11 @@ use Livewire\WithPagination;
 
 class EmailsManagament extends Component
 {
-    public  $name, $email, $data_id;
- public $search = '';
+
+use WithPagination;
+
+public  $name, $email, $data_id;
+public $search = '';
  
     public $isOpen = 0;
      protected $listeners = ['render','delete']; 
