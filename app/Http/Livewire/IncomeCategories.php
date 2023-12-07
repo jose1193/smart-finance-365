@@ -76,7 +76,7 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
          }
 
     elseif (auth()->user()->hasRole('User')) {
-    $searchTerm = $this->search;
+     $searchTerm = $this->search;
     $userId = auth()->id(); 
 
     $data = Category::with(['assignedUsers', 'Subcategory'])
@@ -86,7 +86,7 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
                 ->where('categories_to_assigns.user_id_assign', $userId);
         })
         ->leftJoin('subcategories', 'categories.id', '=', 'subcategories.category_id')
-        ->leftJoin('users', 'categories_to_assigns.user_id_assign', '=', 'users.id') // Agregado este join
+        ->leftJoin('users', 'categories_to_assigns.user_id_assign', '=', 'users.id')
         ->where('main_categories.id', 1)
         ->where(function ($query) use ($searchTerm) {
             $query->where('categories.category_name', 'like', '%' . $searchTerm . '%');
@@ -97,10 +97,9 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
             'main_categories.title as main_category_name',
             'subcategories.subcategory_name',
             \DB::raw('CASE 
-                WHEN COUNT(users.id) = 0 THEN "All Users"
-                WHEN COUNT(users.id) > 0 AND ' . auth()->user()->hasRole('User') . ' THEN GROUP_CONCAT(users.username)
-                WHEN COUNT(users.id) > 0 AND EXISTS (SELECT 1 FROM categories_to_assigns WHERE category_id = categories.id AND user_id_assign = ' . auth()->user()->id . ') THEN "' . auth()->user()->username . '"
-                ELSE "Not Assigned" 
+                WHEN NOT EXISTS (SELECT 1 FROM categories_to_assigns WHERE category_id = categories.id) THEN "All Users"
+                WHEN EXISTS (SELECT 1 FROM categories_to_assigns WHERE category_id = categories.id AND user_id_assign = ' . auth()->user()->id . ') THEN "' . auth()->user()->username . '"
+                ELSE "NoAssigned"
             END as assigned_text')
         )
         ->groupBy('categories.id', 'categories.category_name', 'main_categories.title', 'subcategories.subcategory_name')
@@ -307,20 +306,20 @@ public function SubcategoryAssignment(Category $storeCategory)
 
 private function deleteSubcategoryAssignments($subcategories)
 {
-    // Ensure $subcategories is an array
-    if (!is_array($subcategories)) {
-        $subcategories = [$subcategories];
+    // Ensure $subcategories is a collection
+    if (!$subcategories instanceof \Illuminate\Database\Eloquent\Collection) {
+        // If it's not a collection, create one
+        $subcategories = collect([$subcategories]);
     }
 
-    // Loop through each subcategory in the array
-    foreach ($subcategories as $subcategory) {
+    // Loop through each subcategory in the collection
+    $subcategories->each(function ($subcategory) {
         // Check if the subcategory object has the 'id' property
-        if (isset($subcategory->id)) {
+        if ($subcategory->id) {
             // Delete entries in the SubcategoryToAssign table where subcategory_id matches the subcategory id
             SubcategoryToAssign::where('subcategory_id', $subcategory->id)->delete();
         }
-    }
-
+    });
 }
 
 

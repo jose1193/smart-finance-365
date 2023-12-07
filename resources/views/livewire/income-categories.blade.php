@@ -95,19 +95,31 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
+                                                @php
+                                                    $assignedUsernames = [];
 
-                                                @foreach ($item->Subcategory as $subcategory)
-                                                    @if ($subcategory->assignedUsersSubcategory->isEmpty())
-                                                    @elseif (auth()->user()->hasRole('Admin'))
-                                                        {{ $subcategory->assignedUsersSubcategory->pluck('username')->implode(', ') }}
-                                                    @elseif ($subcategory->assignedUsersSubcategory->pluck('id')->contains(auth()->user()->id))
-                                                        {{ auth()->user()->username }}
-                                                    @else
-                                                    @endif
-                                                @endforeach
+                                                    foreach ($item->Subcategory as $subcategory) {
+                                                        $assignedUsers = $subcategory->assignedUsersSubcategory;
 
+                                                        if (!$assignedUsers->isEmpty()) {
+                                                            if (
+                                                                auth()
+                                                                    ->user()
+                                                                    ->hasRole('Admin')
+                                                            ) {
+                                                                // Include all assigned usernames for Admin
+                                                                $assignedUsernames = array_merge($assignedUsernames, $assignedUsers->pluck('username')->toArray());
+                                                            } elseif ($assignedUsers->pluck('id')->contains(auth()->user()->id)) {
+                                                                // Include the user's own username for non-Admin users
+                                                                $assignedUsernames[] = auth()->user()->username;
+                                                            }
+                                                        }
+                                                    }
+                                                @endphp
 
+                                                {{ implode(', ', array_unique($assignedUsernames)) }}
                                             </td>
+
                                             <td class="px-4 py-3 text-xs">
                                                 {{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}
                                             </td>
