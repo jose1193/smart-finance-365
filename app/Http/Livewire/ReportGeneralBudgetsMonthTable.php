@@ -161,7 +161,7 @@ private function fetchMonthData()
         'operations.operation_currency_type',
         'main_categories.title as main_category_title',
         'subcategories.subcategory_name',
-        'budgets.budget_operation as budget_operation',
+        'budgets.budget_currency_total as budget_operation',
         'budget_expenses.budget_id',
     )
     ->orderBy('operations.id', 'desc')

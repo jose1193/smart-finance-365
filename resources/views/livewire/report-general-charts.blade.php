@@ -80,7 +80,7 @@
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '6'" :class="{ 'bg-blue-700': activeTab === '6' }">
-                                    Budget Expenses
+                                    Budget Expense
                                 </button>
                             </li>
                         </ul>

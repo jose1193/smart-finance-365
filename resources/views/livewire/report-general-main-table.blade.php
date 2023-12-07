@@ -11,10 +11,13 @@
                      <select id="selectUser" style="width: 100%" wire:model="selectedUser" wire:change="updateData"
                          wire:ignore>
                          @if (auth()->user()->hasRole('Admin'))
+                             <option value="">Select User</option>
                              @foreach ($users as $user)
                                  <option value="{{ $user->id }}">{{ $user->name }}</option>
                              @endforeach
                          @else
+                             <option value="">Select User</option>
+
                              <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
                              </option>
                          @endif

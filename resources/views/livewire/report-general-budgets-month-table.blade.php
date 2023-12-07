@@ -204,15 +204,23 @@
                                              $budgetOperation = $item->budget_operation;
                                          @endphp
                                      @endforeach
-                                     Budget {{ $budgetOperation }} $
+                                     <span class="text-emerald-600">Budget
+                                         {{ number_format(floatval($budgetOperation), 0, '.', ',') }} $</span>
 
                                  </th>
                                  <th class="px-4 py-3">
                                      @php
+                                         // Supongamos que $budgetOperation y $totalMonthAmountCurrency son tus variables
+                                         $budgetOperation = intval($budgetOperation); // o floatval si es un número con decimales
+                                         $totalMonthAmountCurrency = intval($totalMonthAmountCurrency);
+
                                          $remainingBudget = $budgetOperation - $totalMonthAmountCurrency;
+
                                          $formattedRemainingBudget = number_format($remainingBudget, 0, '.', ',');
+
                                          $colorClass = $remainingBudget < 0 ? 'text-red-500' : ($remainingBudget === 0 ? 'text-blue-500' : 'text-emerald-600');
                                      @endphp
+
 
                                      <span class="{{ $colorClass }}">
                                          Remaining Budget {{ $formattedRemainingBudget }} $
