@@ -35,9 +35,14 @@ public function authorize()
 
     public function render()
 {
+    if (auth()->user()->hasRole('Admin')) {
     $this->users = User::orderBy('id', 'asc')->get();
-    // Inicializa $user_id con el primer usuario si hay al menos uno
     $this->user_id = $this->users->isNotEmpty() ? $this->users->first()->id : null;
+    } 
+    else {
+    $this->user_id = auth()->id();
+    }
+
 
     $query = Budget::join('users', 'budgets.user_id', '=', 'users.id')
         ->select('budgets.*', 'users.name')
@@ -236,23 +241,25 @@ public function updatedBudgetOperation()
     
 public function store()
 {
- 
+
     $fechaRecibida = $this->budget_date; 
     $fechaCarbon = Carbon::createFromFormat('d/m/Y', $fechaRecibida);
-    $fechaEnFormato= $fechaCarbon->format('Y-m-d');
+    $fechaEnFormato = $fechaCarbon->format('Y-m-d');
     $this->budget_date = $fechaEnFormato;
 
     // Validación personalizada para verificar el límite máximo por fecha
     $existingRecord = Budget::where('user_id', auth()->user()->id)
-        ->where('budget_date', $fechaEnFormato)
-        ->first();
+    ->whereYear('budget_date', $fechaCarbon->year)
+    ->whereMonth('budget_date', $fechaCarbon->month)
+    ->first();
 
     if ($existingRecord && !$this->data_id) {
-        // Si se está intentando insertar y ya hay un registro para la fecha, emite un mensaje de error
-        session()->flash('error', 'Solo se permite un registro por fecha.');
-        $this->closeModal();
-        
+    // Si se está intentando insertar y ya hay un registro para la fecha, emite un mensaje de error
+    session()->flash('error', 'Solo se permite un registro por Mes.');
+    $this->closeModal();
     }
+
+
 
     else {
     $validationRules = [
@@ -266,7 +273,7 @@ public function store()
     
     $validatedData = $this->validate($validationRules);
 
-
+  
     // Calcular el mes y el año a partir de expense_date usando Carbon
     $operationDate = \Carbon\Carbon::createFromFormat('Y-m-d', $validatedData['budget_date']);
     $validatedData['budget_month'] = $operationDate->format('m');

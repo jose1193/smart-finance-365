@@ -32,5 +32,10 @@ class Subcategory extends Model
         return $this->belongsToMany(User::class, 'subcategory_to_assigns', 'subcategory_id', 'user_id_subcategory');
     }
 
+     // Relación hasMany con OperationSubcategories
+    public function operationSubcategories()
+    {
+        return $this->hasMany(OperationSubcategories::class, 'subcategory_id');
+    }
     
 }

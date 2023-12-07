@@ -76,82 +76,9 @@
                      </h4>
 
                      <canvas id="myChartGeneral6" height="200"></canvas>
-                     <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
-                         <!-- Chart legend -->
-                         <div class="flex items-center">
-                             <span class="inline-block w-3 h-3 mr-1 bg-blue-600 rounded-full"></span>
-                             <span class="font-semibold">
-                                 @if ($userNameSelected5)
-                                     {{ $userNameSelected5->name }}
-                                 @else
-                                 @endif
-                             </span>
-                         </div>
-                         <div class="flex items-center">
-                             <span class="font-semibold text-gray-700 dark:text-gray-300 px-3">Total Month</span>
-                             <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                             <span class="font-semibold">
-                                 {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }} $
-                             </span>
-                         </div>
-                         <div class="flex items-center">
-                             <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
-                             <span class="font-semibold"> <span class="font-semibold">
-                                     @if ($selectedMonthName2)
-                                         {{ $selectedMonthName2 }}
-                                     @endif
-                                 </span></span>
-                         </div>
-                         <div class="flex items-center">
-                             <span class="inline-block w-3 h-3 mr-1 bg-green-600 rounded-full"></span>
-                             <span class="font-semibold"> {{ $selectedYear4 }}</span>
-                         </div>
-                     </div>
-
 
                  </div>
 
-
-                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-                     <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
-                         Lines
-                     </h4>
-                     <canvas id="line6" height="200"></canvas>
-                     <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
-                         <!-- Chart legend -->
-
-                         <div class="flex items-center">
-                             <span class="inline-block w-3 h-3 mr-1 bg-blue-600 rounded-full"></span>
-                             <span class="font-semibold">
-                                 @if ($userNameSelected5)
-                                     {{ $userNameSelected5->name }}
-                                 @else
-                                 @endif
-                             </span>
-                         </div>
-                         <div class="flex items-center">
-                             <span class="font-semibold text-gray-700 dark:text-gray-300 px-3">Total Month</span>
-                             <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
-                             <span class="font-semibold">
-                                 {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }} $
-
-                             </span>
-                         </div>
-                         <div class="flex items-center">
-                             <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                             <span class="font-semibold">
-                                 @if ($selectedMonthName2)
-                                     {{ $selectedMonthName2 }}
-                                 @endif
-                             </span>
-                         </div>
-                         <div class="flex items-center">
-                             <span class="inline-block w-3 h-3 mr-1 bg-green-600 rounded-full"></span>
-                             <span class="font-semibold"> {{ $selectedYear4 }}</span>
-                         </div>
-                     </div>
-
-                 </div>
              </div>
 
 
@@ -209,74 +136,8 @@
                      data: dataBar,
                      options: options
                  });
-
-
-
-                 /**
-                  * For usage, visit Chart.js docs https://www.chartjs.org/docs/latest/
-                  */
-                 const lineConfig = {
-                     type: "line",
-                     data: {
-                         labels: [
-
-                             @foreach ($operationsFetchMonths as $item)
-                                 "{{ Str::words($item->category_title, 2, '...') }}",
-                             @endforeach
-
-                         ],
-                         datasets: [{
-                                 label: "{{ $categoryName }}",
-                                 backgroundColor: "#0694a2",
-                                 borderColor: "#0694a2",
-                                 data: [
-                                     @foreach ($operationsFetchMonths as $item)
-                                         {{ $item->operation_currency_total }},
-                                     @endforeach
-                                 ],
-                                 fill: false,
-                             },
-
-                         ],
-                     },
-                     options: {
-                         responsive: true,
-                         legend: {
-                             display: false,
-                         },
-                         tooltips: {
-                             mode: "index",
-                             intersect: false,
-                         },
-                         hover: {
-                             mode: "nearest",
-                             intersect: true,
-                         },
-                         scales: {
-                             x: {
-                                 display: true,
-                                 scaleLabel: {
-                                     display: true,
-                                     labelString: "Month",
-                                 },
-                             },
-                             y: {
-                                 display: true,
-                                 scaleLabel: {
-                                     display: true,
-                                     labelString: "Value",
-                                 },
-                             },
-                         },
-                     },
-                 };
-
-                 // Cambia esto al ID de tu elemento de gráfico en el HTML
-                 const lineCtx = document.getElementById("line6");
-                 window.myLine = new Chart(lineCtx, lineConfig);
              </script>
 
          </div>
-
      @endif
  </div>

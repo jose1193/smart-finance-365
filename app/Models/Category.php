@@ -24,7 +24,7 @@ public function income()
 
     public function mainCategories()
     {
-        return $this->belongsTo(MainCategories::class);
+        return $this->belongsTo(MainCategories::class, 'main_category_id');
     }
     public function users()
     {

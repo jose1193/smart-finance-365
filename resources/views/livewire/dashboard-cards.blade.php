@@ -12,7 +12,7 @@
          </div>
          <div>
              <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                 General Balance
+                 {{ $this->labelBudget }}
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
                  {{ number_format($account_balance, 0, '.', ',') }} $
@@ -31,7 +31,7 @@
          </div>
          <div>
              <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                 Total Operations
+                 {{ $this->labelCountOperation }}
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
                  {{ $total_users_operations }}
@@ -51,7 +51,7 @@
          </div>
          <div>
              <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                 Income
+                 {{ $this->labelIncome }}
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
                  {{ number_format($income, 0, '.', ',') }} $
@@ -69,7 +69,7 @@
          </div>
          <div>
              <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                 Expense
+                 {{ $this->labelExpense }}
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
                  {{ number_format($expense, 0, '.', ',') }} $

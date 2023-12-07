@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class OperationSubcategories extends Model
 {
     use HasFactory;
@@ -21,10 +22,14 @@ class OperationSubcategories extends Model
         return $this->belongsTo(User::class, 'user_id_subcategory');
     }
 
-public function operationSubcategories()
+    public function operationSubcategories()
     {
         return $this->belongsTo(Operation::class, 'operation_id');
     }
 
-
+    // Nueva relación directa con Subcategory
+    public function subcategory()
+    {
+        return $this->belongsTo(Subcategory::class, 'subcategory_id', 'id');
+    }
 }

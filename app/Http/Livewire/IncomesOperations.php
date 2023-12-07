@@ -384,10 +384,6 @@ public function SubcategoryOperationAssignment(Operation $operation)
 }
 
 
-
-
-
-
 public function updatedCategoryId($value)
 {
     $userId = auth()->user()->id;
@@ -412,6 +408,7 @@ public function updatedCategoryId($value)
         ? null
         : 'The category has no subcategories. Please follow the registration process.';
 }
+
 
 
 

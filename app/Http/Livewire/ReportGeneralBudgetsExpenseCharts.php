@@ -123,15 +123,18 @@ private function fetchTotalMonthAmount()
 
 private function fetchMonthData()
 {
-    $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses'])
-        ->join('categories', 'operations.category_id', '=', 'categories.id')
-        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
-        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
-        ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
-        ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
-        ->Join('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id') 
+    $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses']) 
+    ->join('categories', 'operations.category_id', '=', 'categories.id')
+    ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
+    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
+    ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
+    ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
+    ->leftJoin('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id')
+    ->whereHas('category.mainCategories', function ($query) {
+    $query->where('id', 2); // Utiliza la clave foránea correcta
+    })
         ->when($this->selectedUser6, function ($query, $selectedUser6) {
             return $query->where('operations.user_id', $selectedUser6);
         })

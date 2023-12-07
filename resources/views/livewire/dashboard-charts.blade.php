@@ -69,19 +69,6 @@
         </script>
 
 
-        <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
-            <!-- Chart legend -->
-            <div class="flex items-center">
-                <span class="inline-block w-3 h-3 mr-1 bg-teal-500 rounded-full"></span>
-                <span class="font-semibold">{{ $totalIncome = array_sum($incomeData) }}</span>
-            </div>
-            <div class="flex items-center">
-                <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                <span class="font-semibold">{{ $totalExpense = array_sum($expenseData) }}</span>
-            </div>
-        </div>
-
-
 
     </div>
 
@@ -92,17 +79,7 @@
             Lines
         </h4>
         <canvas id="line"></canvas>
-        <div class="flex justify-center mt-4 space-x-3 text-sm text-gray-600 dark:text-gray-400">
-            <!-- Chart legend -->
-            <div class="flex items-center">
-                <span class="inline-block w-3 h-3 mr-1 bg-teal-600 rounded-full"></span>
-                <span class="font-semibold">{{ $categoryName }}</span>
-            </div>
-            <div class="flex items-center">
-                <span class="inline-block w-3 h-3 mr-1 bg-purple-600 rounded-full"></span>
-                <span class="font-semibold">{{ $categoryName2 }}</span>
-            </div>
-        </div>
+
         <script>
             /**
              * For usage, visit Chart.js docs https://www.chartjs.org/docs/latest/

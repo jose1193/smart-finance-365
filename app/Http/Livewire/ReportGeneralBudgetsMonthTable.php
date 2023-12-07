@@ -127,47 +127,48 @@ private function fetchTotalMonthAmount()
 
 private function fetchMonthData()
 {
-    $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses']) 
-        ->join('categories', 'operations.category_id', '=', 'categories.id')
-        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
-        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
-        ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
-        ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
-        ->Join('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id') 
-        ->when($this->selectedUser6, function ($query, $selectedUser6) {
-            // Filtrar por usuario seleccionado
-            return $query->where('operations.user_id', $selectedUser6);
-        })
-        ->when($this->selectedMonthBudget, function ($query, $selectedMonthBudget) {
-            // Filtrar por mes seleccionado
-            return $query->whereMonth('operations.operation_date', $selectedMonthBudget);
-        })
-        ->when($this->selectedYear5, function ($query, $selectedYear5) {
-            // Filtrar por año seleccionado
-            return $query->whereYear('operations.operation_date', $selectedYear5);
-        })
-        ->select(
-            'operations.operation_amount',
-            'operations.operation_currency',
-            'operations.operation_currency_total',
-            'categories.category_name as category_title',
-            'statu_options.status_description as status_description',
-            'operations.operation_status as operation_status',
-            'operations.operation_description',
-            'operations.operation_date',
-            'operations.operation_currency_type',
-            'main_categories.title as main_category_title',
-            'subcategories.subcategory_name',
-            'budgets.budget_operation as budget_operation',
-            'budget_expenses.budget_id',
-        )
-        
-        ->orderBy('operations.id', 'desc')
-        ->get();
+   $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses']) 
+    ->join('categories', 'operations.category_id', '=', 'categories.id')
+    ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
+    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
+    ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
+    ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
+    ->leftJoin('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id')
+    ->whereHas('category.mainCategories', function ($query) {
+    $query->where('id', 2); // Utiliza la clave foránea correcta
+    })
+
+    ->when($this->selectedUser6, function ($query, $selectedUser6) {
+        return $query->where('operations.user_id', $selectedUser6);
+    })
+    ->when($this->selectedMonthBudget, function ($query, $selectedMonthBudget) {
+        return $query->whereMonth('operations.operation_date', $selectedMonthBudget);
+    })
+    ->when($this->selectedYear5, function ($query, $selectedYear5) {
+        return $query->whereYear('operations.operation_date', $selectedYear5);
+    })
+    ->select(
+        'operations.operation_amount',
+        'operations.operation_currency',
+        'operations.operation_currency_total',
+        'categories.category_name as category_title',
+        'statu_options.status_description as status_description',
+        'operations.operation_status as operation_status',
+        'operations.operation_description',
+        'operations.operation_date',
+        'operations.operation_currency_type',
+        'main_categories.title as main_category_title',
+        'subcategories.subcategory_name',
+        'budgets.budget_operation as budget_operation',
+        'budget_expenses.budget_id',
+    )
+    ->orderBy('operations.id', 'desc')
+    ->get();
 
     return $query;
+
 }
 
 
