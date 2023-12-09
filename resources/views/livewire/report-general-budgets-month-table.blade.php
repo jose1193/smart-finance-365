@@ -93,7 +93,7 @@
                                                  User Email:</label>
                                              <div wire:ignore>
                                                  @if (count($emails) > 0)
-                                                     <select multiple id="select4EmailsUser" style="width: 100%"
+                                                     <select multiple id="select5EmailsUser" style="width: 100%"
                                                          wire:model="emails_user6">
 
 
@@ -117,26 +117,23 @@
                                                  @endif
                                              </div>
 
+
                                              <script>
-                                                 document.addEventListener('livewire:load', function() {
-                                                     Livewire.hook('message.sent', () => {
-                                                         // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                         $('#select4EmailsUser').select2({
-                                                             width: 'resolve' // need to override the changed default
-                                                         });
-                                                     });
-                                                 });
-
                                                  $(document).ready(function() {
-                                                     // Inicializa Select2
-                                                     $('#select4EmailsUser').select2();
+                                                     $('#select5EmailsUser').select2();
 
-                                                     // Escucha el cambio en Select2 y actualiza Livewire
-                                                     $('#select4EmailsUser').on('change', function(e) {
-                                                         @this.set('emails_user6', $(this).val());
+                                                     // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
+                                                     $('#select5EmailsUser').on('change', function(e) {
+                                                         const selectedEmails = $(this).val();
+                                                         const index = $(this).data('index');
+                                                         @this.set('emails_user6', selectedEmails);
+
+                                                         // Add this line to refresh the Livewire component without reloading the page
+                                                         @this.call('updateBudgetMonthData');
                                                      });
                                                  });
                                              </script>
+
                                              @error('emails_user6')
                                                  <span class="text-red-500">{{ $message }}</span>
                                              @enderror
@@ -227,18 +224,9 @@
                                      </span>
                                  </th>
 
-                                 <th class="px-4 py-3">
+                                 <th class="px-4 py-3" colspan="7">
                                  </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
+
 
                              </tr>
                              <tr
@@ -309,7 +297,7 @@
                                              </span>
                                          @elseif ($item->operation_status == '3')
                                              <span
-                                                 class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
+                                                 class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-700">
                                                  {{ $item->status_description }}
                                              </span>
                                          @elseif ($item->operation_status == '2')
@@ -332,34 +320,13 @@
 
                              <!-- Fila adicional para mostrar el nombre del usuario -->
                              <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
-                                 <td class="px-4 py-3 text-center font-semibold">
-
-                                 </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-
-                                 </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-
-
-                                 </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-                                 </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-                                 </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-                                 </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
-
-                                 </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
+                                 <td class="px-4 py-3 text-center font-semibold" colspan="10">
 
                                  </td>
 
-                                 <td class="px-4 py-3 text-center font-semibold">
 
-                                 </td>
-                                 <td class="px-4 py-3 text-center">
-                                 </td>
+
+
                                  <td class="px-4 py-3 text-center font-semibold">
                                      {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
                                      $

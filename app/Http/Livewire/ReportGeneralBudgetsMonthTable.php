@@ -230,6 +230,8 @@ public function emailStore6()
         'selectedMonthBudget.required' => 'Please select a Month',
     ]);
 
+    $this->updateBudgetMonthData();
+
     $user = User::find($this->selectedUser6);
 
     $data = [];
@@ -251,16 +253,18 @@ public function emailStore6()
             'operationsFetchMonths' => $this->operationsFetchMonths,
             'totalMonthAmount' => $this->totalMonthAmount,
             'totalMonthAmountCurrency' => $this->totalMonthAmountCurrency,
+            'userNameSelected4' => $this->userNameSelected4,
             'selectedYear5' => $this->selectedYear5,
+            'selectedMonthName' => $this->selectedMonthName,
             'user' => $userName,
             'email' => $email,
-            'title' => "Report General Budget Month",
+            'title' => "Report General Month Budget",
             'date' => $datenow,
         ];
 
         $pdf = PDF::loadView('emails.pdf-generalbudgetmonthreport', $data);
 
-        Mail::send('emails.pdf-generalmonthreport', $data, function ($message) use ($data, $pdf, $fileName) {
+        Mail::send('emails.pdf-generalbudgetmonthreport', $data, function ($message) use ($data, $pdf, $fileName) {
             $message->to($data["email"], $data["email"])
                     ->subject($data["title"])
                     ->attachData($pdf->output(), $fileName);

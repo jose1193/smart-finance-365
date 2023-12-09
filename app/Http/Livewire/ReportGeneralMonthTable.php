@@ -213,7 +213,7 @@ public function resetFields4()
     
 public function emailStore4()
 {
-    
+   
     $this->validate([
         'emails_user4' => 'required|array',
         'emails_user4.*' => 'email|max:50',
@@ -223,6 +223,7 @@ public function emailStore4()
         'selectedYear3.required' => 'Please select a year',
         'selectedMonth.required' => 'Please select a Month',
     ]);
+    $this->updateMonthData();
 
     $user = User::find($this->selectedUser4);
 
@@ -239,7 +240,8 @@ public function emailStore4()
 
     $data['user'] = $userName;
     $fileName = 'General-Month-PDF-Report' . '-' . $userName . '-' . $datenow . '.pdf';
-
+    
+   
     foreach ($this->emails_user4 as $email) {
         $data = [
             'operationsFetchMonths' => $this->operationsFetchMonths,
@@ -264,11 +266,9 @@ public function emailStore4()
     session()->flash('message', 'Email Sent Successfully.');
     $this->closeModal4();
     $this->resetInputFields3();
-    $this->dataSelect();
+      
     
 }
-
-   
 
 
 }

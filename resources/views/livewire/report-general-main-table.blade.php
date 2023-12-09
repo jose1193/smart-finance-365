@@ -174,10 +174,9 @@
                                          Year Not Selected
                                      @endif
                                  </th>
-                                 <th class="px-4 py-3">
+                                 <th class="px-4 py-3" colspan="2">
                                  </th>
-                                 <th class="px-4 py-3">
-                                 </th>
+
 
                              </tr>
                              <tr

@@ -173,18 +173,9 @@
                                          Year Not Selected
                                      @endif
                                  </th>
-                                 <th class="px-4 py-3">
+                                 <th class="px-4 py-3" colspan="6">
                                  </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
-                                 <th class="px-4 py-3">
-                                 </th>
+
                              </tr>
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">

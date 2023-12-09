@@ -196,11 +196,10 @@
 
 
                                  </th>
-                                 <th class="px-4 py-3">
+                                 <th class="px-4 py-3" colspan="2">
 
                                  </th>
-                                 <th class="px-4 py-3">
-                                 </th>
+
 
                              </tr>
                              <tr
@@ -235,13 +234,10 @@
 
                              <!-- Fila adicional para mostrar el nombre del usuario -->
                              <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
-                                 <td class="px-4 py-3 text-center font-semibold">
+                                 <td class="px-4 py-3 text-center font-semibold" colspan="2">
 
                                  </td>
-                                 <td class="px-4 py-3 text-center font-semibold">
 
-
-                                 </td>
 
                                  <td class="px-4 py-3 text-center font-semibold">
                                      {{ number_format($totalIncomeCurrency3, 0, '.', ',') }} $

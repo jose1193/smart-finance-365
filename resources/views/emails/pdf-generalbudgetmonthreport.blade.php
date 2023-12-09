@@ -70,6 +70,7 @@
         <br>
         <table class="customTable">
             <thead>
+
                 <tr>
                     <th>Nro</th>
                     <th>Main Category</th>
@@ -77,10 +78,10 @@
                     <th>Subcategory</th>
                     <th>Description</th>
                     <th>Month</th>
-                    <th>Currency</th>
                     <th>Date</th>
+                    <th>Currency</th>
                     <th>Operation</th>
-                    <th>Rate </th>
+                    <th>Rate CONV/USD</th>
                     <th>Total USD</th>
                     <th>State</th>
                 </tr>
@@ -99,7 +100,7 @@
                             {{ $item->category_title }}
                         </td>
                         <td>
-
+                            {{ Str::words($item->subcategory_name, 2) ?: 'N/A' }}
                         </td>
                         <td>
                             {{ Str::words($item->operation_description, 2, '...') }}
@@ -108,7 +109,10 @@
                             {{ \Carbon\Carbon::create()->month($item->operation_month)->locale('en')->monthName }}
                         </td>
                         <td>
-                            {{ \Carbon\Carbon::parse($item->operation_date)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                            {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
+                        </td>
+                        <td>
+                            {{ $item->operation_currency_type }}
                         </td>
                         <td>
 
@@ -119,31 +123,33 @@
                             {{ $item->operation_currency }}
                         </td>
                         <td>
-                            {{ number_format($item->operation_currency_total, 0, '.', ',') }}
-                            $</td>
+                            {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
+                            $
+                        </td>
                         <td>
-                            @if ($item->operation_status === '1')
+                            @if ($item->operation_status == '1')
                                 <span
-                                    class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
+                                    style="padding: 0.25rem 0.5rem; font-weight: 600; line-height: 1.5; color: #2f855a; background-color: #9ae6b4; border-radius: 0.375rem;">
                                     {{ $item->status_description }}
                                 </span>
-                            @elseif ($item->operation_status === '3')
+                            @elseif ($item->operation_status == '3')
                                 <span
-                                    class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
+                                    style="padding: 0.25rem 0.5rem; font-weight: 600; line-height: 1.5; color: #2f855a; background-color: #9ae6b4; border-radius: 0.375rem;">
                                     {{ $item->status_description }}
                                 </span>
-                            @elseif ($item->operation_status === '2')
+                            @elseif ($item->operation_status == '2')
                                 <span
-                                    class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
+                                    style="padding: 0.25rem 0.5rem; font-weight: 600; line-height: 1.5; color: #ed8936; background-color: #fbd38d; border-radius: 0.375rem;">
                                     {{ $item->status_description }}
                                 </span>
                             @else
                                 <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                 <span
-                                    class="px-2 py-1 font-semibold leading-tight text-white bg-red-700 rounded-full dark:bg-gray-700 dark:text-gray-100">
+                                    style="padding: 0.25rem 0.5rem; font-weight: 600; line-height: 1.5; color: #c53030; background-color: #feb2b2; border-radius: 0.375rem;">
                                     {{ $item->status_description }}
                                 </span>
                             @endif
+
                         </td>
                     </tr>
                 @endforeach
@@ -153,24 +159,45 @@
 
                     </td>
                     <td>
-                        @if ($selectedYear3)
-                            {{ $selectedYear3 }}
+                        @if ($selectedYear5)
+                            {{ $selectedYear5 }}
                         @else
                             Year Not Selected
                         @endif
                     </td>
                     <td>
-                    </td>
-                    <td>
-                    </td>
-                    <td>$
-                        {{ number_format($totalMonthAmount, 0, '.', ',') }}
-                    </td>
-                    <td>
+                        @php
+                            $budgetOperation = ''; // Inicializamos la variable fuera del bucle
+                        @endphp
+
+                        @foreach ($operationsFetchMonths as $item)
+                            @php
+                                $budgetOperation = $item->budget_operation;
+                            @endphp
+                        @endforeach
+                        <span class="text-emerald-600">Budget
+                            {{ number_format(floatval($budgetOperation), 0, '.', ',') }} $</span>
 
                     </td>
                     <td>
+                        @php
+                            // Supongamos que $budgetOperation y $totalMonthAmountCurrency son tus variables
+                            $budgetOperation = intval($budgetOperation); // o floatval si es un número con decimales
+                            $totalMonthAmountCurrency = intval($totalMonthAmountCurrency);
 
+                            $remainingBudget = $budgetOperation - $totalMonthAmountCurrency;
+
+                            $formattedRemainingBudget = number_format($remainingBudget, 0, '.', ',');
+
+                            $colorClass = $remainingBudget < 0 ? 'text-red-500' : ($remainingBudget === 0 ? 'text-blue-500' : 'text-emerald-600');
+                        @endphp
+
+
+                        <span class="{{ $colorClass }}">
+                            Remaining Budget {{ $formattedRemainingBudget }} $
+                        </span>
+                    </td>
+                    <td colspan="6">
                     </td>
                     <td>
                         {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
