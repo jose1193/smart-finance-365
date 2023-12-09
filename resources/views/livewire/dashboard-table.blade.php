@@ -362,24 +362,38 @@
                                                         <label for="exampleFormControlInput2"
                                                             class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
                                                         <div wire:ignore>
-                                                            <select wire:model="subcategory_id"
+                                                            <select wire:model="registeredSubcategoryItem"
                                                                 id="select2SubcategoryId" style="width: 100%;">
                                                                 <option value="">N/A</option>
                                                                 {{-- Display Assigned Subcategories --}}
-                                                                @if (is_array($subcategory_id))
+                                                                @if (is_array($subcategory_id) && count($subcategory_id) > 0)
+                                                                    @php
+                                                                        $subcategories = \App\Models\Subcategory::whereIn('id', $subcategory_id)->get();
+                                                                    @endphp
 
-                                                                    @forelse ($subcategory_id as $subcategoryId)
-                                                                        @php
-                                                                            $subcategory = \App\Models\Subcategory::find($subcategoryId);
-                                                                        @endphp
-                                                                        <option value="{{ $subcategory->id }}">
-                                                                            {{ $subcategory->subcategory_name }}
+                                                                    {{-- Find the selected subcategory --}}
+                                                                    @php
+                                                                        $selectedSubcategory = $subcategories->where('id', $registeredSubcategoryItem)->first();
+                                                                    @endphp
+
+                                                                    {{-- Display the selected subcategory first --}}
+                                                                    @if ($selectedSubcategory)
+                                                                        <option
+                                                                            value="{{ $selectedSubcategory->id }}">
+                                                                            {{ $selectedSubcategory->subcategory_name }}
                                                                         </option>
-                                                                    @empty
-                                                                    @endforelse
+                                                                    @endif
+
+                                                                    {{-- Display the rest of the subcategories --}}
+                                                                    @foreach ($subcategories as $subcategory)
+                                                                        @if ($subcategory->id !== $registeredSubcategoryItem)
+                                                                            <option value="{{ $subcategory->id }}">
+                                                                                {{ $subcategory->subcategory_name }}
+                                                                            </option>
+                                                                        @endif
+                                                                    @endforeach
                                                                 @endif
                                                             </select>
-
                                                         </div>
                                                         @if ($subcategoryMessage)
                                                             <p class="text-gray-500 mb-3">

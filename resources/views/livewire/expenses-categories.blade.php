@@ -423,6 +423,7 @@
 
                                                                 </label>
                                                                 <div wire:ignore>
+
                                                                     @php
                                                                         // Verificar si el índice existe en el array antes de acceder a él
                                                                         $selectedUsers = isset($this->user_id_assignSubcategory[$index]) ? (array) $this->user_id_assignSubcategory[$index] : [];

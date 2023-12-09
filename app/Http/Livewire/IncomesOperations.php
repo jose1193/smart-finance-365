@@ -41,6 +41,7 @@ public $listCurrencies;
 public $quotes;
 public $operation_currency_type;
 
+public $registeredSubcategoryItem;
 
     public function authorize()
 {
@@ -265,8 +266,11 @@ public function updatedOperationAmount()
        
         $this->selectedCategoryId = $list->category_id;
         $this->showSubcategories = true;
-        $this->updatedCategoryId($list->category_id);
 
+        $registeredSubcategory = $list->operationSubcategories->first();
+        $this->updatedCategoryId($list->category_id, optional($registeredSubcategory)->subcategory_id);
+
+    
 
     }
 
@@ -384,16 +388,25 @@ public function SubcategoryOperationAssignment(Operation $operation)
 }
 
 
-public function updatedCategoryId($value)
+public function updatedCategoryId($value,$registeredSubcategoryId = null)
 {
     $userId = auth()->user()->id;
 
-    // Lógica para obtener las subcategorías asignadas al usuario autenticado en la categoría seleccionada
+    // Lógica para obtener la subcategoría registrada en OperationSubcategories
+    $operationSubcategory = SubcategoryToAssign::where('user_id_subcategory', $userId)
+        ->where('subcategory_id', $value)
+        ->first();
+
+    // Lógica para obtener las demás subcategorías asignadas al usuario autenticado en la categoría seleccionada
     $userSubcategories = SubcategoryToAssign::where('user_id_subcategory', $userId)
+        ->where('subcategory_id', '!=', $value)
         ->whereHas('subCategory', function ($query) use ($value) {
             $query->where('category_id', $value);
         })
         ->pluck('subcategory_id');
+
+    // Lógica para obtener todas las subcategorías en la categoría seleccionada (independientemente de la asignación a usuarios)
+    $allSubcategories = Subcategory::where('category_id', $value)->pluck('id');
 
     // Lógica para obtener todas las subcategorías en la categoría seleccionada (independientemente de la asignación a usuarios)
     $allSubcategories = Subcategory::where('category_id', $value)->pluck('id');
@@ -407,8 +420,10 @@ public function updatedCategoryId($value)
     $this->subcategoryMessage = $this->showSubcategories
         ? null
         : 'The category has no subcategories. Please follow the registration process.';
+    
+    // Configura la subcategoría registrada como seleccionada
+    $this->registeredSubcategoryItem = $registeredSubcategoryId;
 }
-
 
 
 

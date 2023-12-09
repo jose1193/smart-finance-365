@@ -38,6 +38,9 @@ public $listCurrencies;
 public $quotes;
 public $operation_currency_type;
 
+public $registeredSubcategoryItem;
+public $user_id;
+public $registeredSubcategory;
     public function authorize()
 {
     return true;
@@ -356,12 +359,39 @@ public function SubcategoryOperationAssignment(Operation $operation)
 }
 
 
+public function edit($id)
+    {
+        $this->authorize('manage admin');
+       $list = Operation::findOrFail($id);
+        $this->data_id = $id;
+        $this->operation_description = $list->operation_description;
+        $this->operation_amount = number_format($list->operation_amount, 0, '.', ',');
+        $this->operation_currency = $list->operation_currency;
+        $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
+        $this->operation_status = $list->operation_status;
+        $this->category_id = $list->category_id;
+        $this->selectedCurrencyFrom = $list->operation_currency_type;
+        $this->operation_currency_type=$list->operation_currency_type;
+        $this->operation_date =  Carbon::parse($list->operation_date)->format('d/m/Y');
+        $this->openModal();
+        $this->updatedOperationAmount();
+       
+        $this->selectedCategoryId = $list->category_id;
+        $this->showSubcategories = true;
+        
+        $this->registeredSubcategory = $list->operationSubcategories->first();
+        $this->user_id = $list->user_id;
+        $this->updatedCategoryId($list->category_id);
+
+
+    }
+
+
 public function updatedCategoryId($value)
-{
-    $userId = auth()->user()->id;
+    {
 
     // Lógica para obtener las subcategorías asignadas al usuario autenticado en la categoría seleccionada
-    $userSubcategories = SubcategoryToAssign::where('user_id_subcategory', $userId)
+    $userSubcategories = SubcategoryToAssign::where('user_id_subcategory', $this->user_id)
         ->whereHas('subCategory', function ($query) use ($value) {
             $query->where('category_id', $value);
         })
@@ -379,31 +409,11 @@ public function updatedCategoryId($value)
     $this->subcategoryMessage = $this->showSubcategories
         ? null
         : 'The category has no subcategories. Please follow the registration process.';
+
+    // Configura la subcategoría registrada como seleccionada
+   $this->registeredSubcategoryItem = $this->registeredSubcategory ? $this->registeredSubcategory->subcategory_id : null;
+
 }
-
-
-public function edit($id)
-    {
-        $this->authorize('manage admin');
-        $list = Operation::findOrFail($id);
-        $this->data_id = $id;
-        $this->operation_description = $list->operation_description;
-        $this->operation_amount = number_format($list->operation_amount, 0, '.', ',');
-        $this->operation_currency = $list->operation_currency;
-        $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
-        $this->operation_status = $list->operation_status;
-        $this->category_id = $list->category_id;
-        $this->selectedCurrencyFrom = $list->operation_currency_type;
-        $this->operation_currency_type=$list->operation_currency_type;
-        $this->operation_date =  Carbon::parse($list->operation_date)->format('d/m/Y');
-        $this->openModal();
-        $this->updatedOperationAmount();
-       
-        $this->selectedCategoryId = $list->category_id;
-        $this->showSubcategories = true;
-        $this->updatedCategoryId($list->category_id);
-    }
-
 
 public function delete($id)
     {

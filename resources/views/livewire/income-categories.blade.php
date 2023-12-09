@@ -351,6 +351,7 @@
                                                         <label for="exampleFormControlInput1"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             User Assign To Category</label>
+
                                                         <div wire:ignore>
                                                             <select multiple wire:model="user_id_assign"
                                                                 id="selectUserAssign" style="width: 100%">
@@ -396,6 +397,7 @@
                                                             Subcategories:</label>
                                                         <!-- Dentro de tu vista Blade -->
 
+
                                                         @foreach ($userAssignments as $index => $assignment)
                                                             <div class="mb-4">
                                                                 <input type="text" autocomplete="off"
@@ -417,17 +419,20 @@
                                                                         {{ $assignment['subcategory_name'] }}:</span>
 
                                                                 </label>
+
+                                                                @php
+                                                                    // Verificar si el índice existe en el array antes de acceder a él
+                                                                    $selectedUsers = isset($this->user_id_assignSubcategory[$index]) ? (array) $this->user_id_assignSubcategory[$index] : [];
+                                                                @endphp
                                                                 <div wire:ignore>
-                                                                    @php
-                                                                        // Verificar si el índice existe en el array antes de acceder a él
-                                                                        $selectedUsers = isset($this->user_id_assignSubcategory[$index]) ? (array) $this->user_id_assignSubcategory[$index] : [];
-                                                                    @endphp
-                                                                    <select multiple
+                                                                    <!-- Tu vista Blade -->
+
+                                                                    <select
                                                                         wire:model="userAssignments.{{ $index }}.user_id_assignSubcategory"
                                                                         class="selectUserAssignSubcategory"
                                                                         data-index="{{ $index }}"
-                                                                        style="width: 100%">
-
+                                                                        style="width: 100%"
+                                                                        id="taskSelect{{ $index }}" multiple>
                                                                         <option value="all">All Users</option>
                                                                         @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
                                                                             <optgroup label="{{ $nameUser }}">
@@ -445,33 +450,20 @@
                                                             </div>
                                                         @endforeach
 
-
                                                         <script>
                                                             document.addEventListener('livewire:load', function() {
                                                                 Livewire.hook('message.sent', () => {
-                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire para el selectUserAssign
-                                                                    $('#selectUserAssign').select2({
-                                                                        width: 'resolve'
-                                                                    });
-
                                                                     // Vuelve a aplicar Select2 después de cada actualización de Livewire para el selectUserAssignSubcategory
                                                                     $('.selectUserAssignSubcategory').select2({
-                                                                        width: 'resolve'
+                                                                        width: 'resolve',
+                                                                        multiple: true // Asegúrate de que está habilitado el modo de selección múltiple
                                                                     });
                                                                 });
                                                             });
 
                                                             $(document).ready(function() {
-                                                                // Inicializa Select2 para el selectUserAssign
-                                                                $('#selectUserAssign').select2();
-
                                                                 // Inicializa Select2 para el selectUserAssignSubcategory
                                                                 $('.selectUserAssignSubcategory').select2();
-
-                                                                // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssign
-                                                                $('#selectUserAssign').on('change', function(e) {
-                                                                    @this.set('user_id_assign', $(this).val());
-                                                                });
 
                                                                 // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
                                                                 $('.selectUserAssignSubcategory').on('change', function(e) {
@@ -480,7 +472,6 @@
                                                                 });
                                                             });
                                                         </script>
-
 
                                                     </div>
 

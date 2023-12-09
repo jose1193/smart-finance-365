@@ -45,6 +45,8 @@ public $operation_currency_type;
 public $budgets;
 public $budget_id;
 
+public $registeredSubcategoryItem;
+
     public function authorize()
 {
     return true;
@@ -258,9 +260,8 @@ public function updatedOperationAmount()
 public function edit($id)
     {
         $this->authorize('manage admin');
-        // Realizar un join para obtener la información relacionada
-        $list = Operation::join('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
-        ->join('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
+        $list = Operation::leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
+        ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
         ->findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
@@ -268,7 +269,12 @@ public function edit($id)
         $this->operation_currency = $list->operation_currency;
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
         $this->operation_status = $list->operation_status;
-        $this->category_id = $list->category_id;
+
+        // Obtener la información de la operación con posible categoría nula
+        $operation = Operation::with('category', 'operationSubcategories')->findOrFail($id);
+       
+        $this->category_id = $operation->category->id;
+
         $this->selectedCurrencyFrom = $list->operation_currency_type;
         $this->operation_currency_type=$list->operation_currency_type;
         $this->operation_date =  Carbon::parse($list->operation_date)->format('d/m/Y');
@@ -277,7 +283,11 @@ public function edit($id)
        
         $this->selectedCategoryId = $list->category_id;
         $this->showSubcategories = true;
-        $this->updatedCategoryId($list->category_id);
+
+       // Obtener la subcategoría asociada, si existe
+        $registeredSubcategory = $operation->operationSubcategories->first();
+        
+         $this->updatedCategoryId($this->category_id, optional($registeredSubcategory)->subcategory_id);
 
         // Asignar el budget_id
         $this->budget_id = $list->budget_id;
@@ -400,7 +410,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
 }
 
 
-public function updatedCategoryId($value)
+public function updatedCategoryId($value,$registeredSubcategoryId = null)
 {
     $userId = auth()->user()->id;
 
@@ -423,6 +433,9 @@ public function updatedCategoryId($value)
     $this->subcategoryMessage = $this->showSubcategories
         ? null
         : 'The category has no subcategories. Please follow the registration process.';
+
+    // Configura la subcategoría registrada como seleccionada
+    $this->registeredSubcategoryItem = $registeredSubcategoryId;
 }
 
 
