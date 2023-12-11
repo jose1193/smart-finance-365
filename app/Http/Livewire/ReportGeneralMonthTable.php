@@ -110,7 +110,7 @@ private function updateMonthDataInternal()
         $selectedDate = Carbon::create()->month($this->selectedMonth);
         $this->selectedMonthName = $selectedDate->format('F');
     } else {
-        $this->selectedMonthName = ''; // Establecer en blanco si $this->selectedMonth está vacío
+        $this->selectedMonthName = ''; 
     }
 }
 

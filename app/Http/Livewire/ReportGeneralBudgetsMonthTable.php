@@ -106,12 +106,15 @@ private function updateBudgetMonthDataInternal()
     $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
     
     $this->showData6 = true;
+
     if ($this->selectedMonthBudget) {
-    $selectedDate = Carbon::create()->month($this->selectedMonthBudget);
-    $this->selectedMonthName = $selectedDate->format('F');
+        $selectedDate = Carbon::create()->month($this->selectedMonthBudget);
+        $this->selectedMonthName = $selectedDate->format('F');
+    } else {
+        $this->selectedMonthName = ''; 
+    }
 }
 
-}
 
 
 private function fetchTotalMonthAmountCurrency()
