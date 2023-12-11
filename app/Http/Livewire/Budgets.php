@@ -74,17 +74,19 @@ public function authorize()
     $this->data2 = $response->json();
     }
 
-
-        public function fetchDataCurrencies()
-    {
+public function fetchDataCurrencies()
+{
     // Hacer la solicitud HTTP a la API de monedas
     $response = Http::get('http://api.currencylayer.com/list', [
-    'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
+        'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
     ]);
 
     // Si la llamada fue exitosa, parsea la respuesta
     if ($response->successful()) {
         $this->listCurrencies = json_decode($response->body(), true);
+
+        // Excluir la moneda Argentine Peso (ARS)
+        unset($this->listCurrencies['currencies']['ARS']);
 
         // Devuelve el array de monedas
         return $this->listCurrencies['currencies'];
@@ -123,6 +125,7 @@ public function authorize()
 
     if (isset($data['quotes']) && isset($data['quotes'][$quoteKey])) {
     $rawValue = $data['quotes'][$quoteKey];
+
 
     // Ajuste para manejar la conversión y el redondeo
     $roundedValue = round($rawValue, 2);
