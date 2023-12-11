@@ -449,29 +449,32 @@
                                                                 </div>
                                                             </div>
                                                         @endforeach
-
                                                         <script>
-                                                            document.addEventListener('livewire:load', function() {
-                                                                Livewire.hook('message.sent', () => {
-                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire para el selectUserAssignSubcategory
-                                                                    $('.selectUserAssignSubcategory').select2({
-                                                                        width: 'resolve',
-                                                                        multiple: true // Asegúrate de que está habilitado el modo de selección múltiple
-                                                                    });
-                                                                });
-                                                            });
-
                                                             $(document).ready(function() {
-                                                                // Inicializa Select2 para el selectUserAssignSubcategory
+                                                                // Inicializa select2 antes de asignar los valores iniciales
                                                                 $('.selectUserAssignSubcategory').select2();
+
+                                                                // Asigna los valores iniciales después de inicializar el select2
+                                                                $('.selectUserAssignSubcategory').each(function() {
+                                                                    const index = $(this).data('index');
+                                                                    const initialValue = @this.get('user_id_assignSubcategory.' + index);
+                                                                    $(this).val(initialValue).trigger(
+                                                                    'change'); // Dispara el evento change para actualizar el select2
+                                                                });
 
                                                                 // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
                                                                 $('.selectUserAssignSubcategory').on('change', function(e) {
+                                                                    const selectedValues = $(this).val();
                                                                     const index = $(this).data('index');
-                                                                    @this.set('user_id_assignSubcategory.' + index, $(this).val());
+
+                                                                    // Assuming 'index' is a variable available in your Livewire component
+                                                                    @this.set('user_id_assignSubcategory.' + index, selectedValues);
                                                                 });
                                                             });
                                                         </script>
+
+
+
 
                                                     </div>
 

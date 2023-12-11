@@ -16,41 +16,47 @@ class DashboardCards extends Component
     public function render()
     {
  
-
-      if (auth()->user()->hasRole('Admin')) {
-    $currentMonth = Carbon::now()->month; 
+    $currentMonth = now()->month;
+    $currentYear = Carbon::now()->year; 
     $currentMonth2 = Carbon::now()->format('F');
     
+    if (auth()->user()->hasRole('Admin')) {
+   
+    
     $this->labelBudget = 'Total Users Budget  ' . $currentMonth2;
-    $this->labelCountOperation = 'Total Users Operations '. $currentMonth2;
-    $this->labelIncome = 'Total Users Income '. $currentMonth2;
-    $this->labelExpense = 'Total Users Expense '. $currentMonth2;
+    $this->labelCountOperation = 'Total Users Operations ';
+    $this->labelIncome = 'Total Users Income ';
+    $this->labelExpense = 'Total Users Expense ';
 
     $this->income = Operation::whereHas('category', function ($query) {
         $query->where('main_category_id', 1); // 1 es el ID de la categoría 'income'
     })
     ->whereMonth('created_at', $currentMonth) // Filtra por el mes actual
+     ->whereYear('created_at',  $currentYear) 
     ->sum('operation_currency_total');
 
     $this->expense = Operation::whereHas('category', function ($query) {
         $query->where('main_category_id', 2); // 2 es el ID de la categoría 'expense'
     })
     ->whereMonth('created_at', $currentMonth) // Filtra por el mes actual
+     ->whereYear('created_at',$currentYear) // Filtra por el año actual
     ->sum('operation_currency_total');
 
-    $this->account_balance = Budget::whereMonth('created_at', $currentMonth)->sum('budget_currency_total');
+   $this->account_balance = Budget::whereYear('budget_date', $currentYear)
+    ->whereMonth('budget_date', $currentMonth)
+    ->sum('budget_currency_total');
 
-    $this->total_users_operations = Operation::whereMonth('created_at', $currentMonth)->count();
+
+    $this->total_users_operations = Operation::whereMonth('created_at', $currentMonth)
+     ->whereYear('created_at',  $currentYear) ->count();
 
    
 }
-else {
-    $currentMonth = Carbon::now()->month;
-    $currentMonth2 = Carbon::now()->format('F');
+ else {
     $this->labelBudget = 'General Budget ' . $currentMonth2; 
-    $this->labelCountOperation = 'Total Operations '.  $currentMonth2;
-    $this->labelIncome = ' Income '. $currentMonth2;
-    $this->labelExpense = 'Expense '. $currentMonth2;
+    $this->labelCountOperation = 'Total Operations ';
+    $this->labelIncome = ' Income ';
+    $this->labelExpense = 'Expense ';
 
   
 // Calcula la suma de 'operation_currency_total' para la categoría 'income' (ID 1)
@@ -59,6 +65,7 @@ $this->income = Operation::where('user_id', auth()->id())
         $query->where('main_category_id', 1); // 1 es el ID de la categoría 'income'
     })
     ->whereMonth('created_at', $currentMonth) // Filtra por el mes actual
+     ->whereYear('created_at',  $currentYear) 
     ->sum('operation_currency_total');
 
 // Calcula la suma de 'operation_currency_total' para la categoría 'expense' (ID 2)
@@ -67,15 +74,19 @@ $this->expense = Operation::where('user_id', auth()->id())
         $query->where('main_category_id', 2); // 2 es el ID de la categoría 'expense'
     })
     ->whereMonth('created_at', $currentMonth) // Filtra por el mes actual
+     ->whereYear('created_at',  $currentYear) 
     ->sum('operation_currency_total');
 
-$this->account_balance = Budget::where('user_id', auth()->id())
-    ->whereMonth('created_at', $currentMonth) // Filtra por el mes actual
-    ->sum('budget_currency_total');
+$account_balance = Budget::where('user_id', auth()->user()->id)
+->whereMonth('budget_date',  $currentMonth) // Filtra por el mes actual
+->whereYear('budget_date',  $currentYear) // Filtra por el año actual
+->firstOrFail();
+$this->account_balance = $account_balance->budget_currency_total; 
 
 
 $this->total_users_operations = Operation::where('user_id', auth()->id())
     ->whereMonth('created_at', $currentMonth) // Filtra por el mes actual
+     ->whereYear('created_at',  $currentYear) 
     ->count();
 }
 
