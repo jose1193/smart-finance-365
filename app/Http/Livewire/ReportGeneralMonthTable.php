@@ -105,12 +105,16 @@ private function updateMonthDataInternal()
     $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
     
     $this->showData4 = true;
+    
     if ($this->selectedMonth) {
-    $selectedDate = Carbon::create()->month($this->selectedMonth);
-    $this->selectedMonthName = $selectedDate->format('F');
+        $selectedDate = Carbon::create()->month($this->selectedMonth);
+        $this->selectedMonthName = $selectedDate->format('F');
+    } else {
+        $this->selectedMonthName = ''; // Establecer en blanco si $this->selectedMonth está vacío
+    }
 }
 
-}
+
 
 
 private function fetchTotalMonthAmountCurrency()
@@ -138,6 +142,7 @@ private function fetchMonthData()
         })
         ->when($this->selectedMonth, function ($query, $selectedMonth) {
             // Filtrar por mes seleccionado
+           
             return $query->whereMonth('operations.operation_date', $selectedMonth);
         })
         ->when($this->selectedYear3, function ($query, $selectedYear3) {
