@@ -167,7 +167,20 @@
                       </div>
                   </div>
               @endif
-
+              <div class="my-10 flex justify-end space-x-2">
+                  <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                      <select wire:model="main_category_id" wire:change="updateMonthData"
+                          class="block w-full mt-1 text-sm dark:text-gray-700 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                          <option value="">All Categories
+                          </option>
+                          @foreach ($mainCategoriesRender as $item)
+                              <option value="{{ $item->id }}">
+                                  {{ $item->title }}
+                              </option>
+                          @endforeach
+                      </select>
+                  </div>
+              </div>
               <!-- Tables -->
               <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                   <div class="w-full overflow-x-auto">

@@ -190,40 +190,41 @@
                                          Year Not Selected
                                      @endif
                                  </th>
+                                 @if ($selectedMonthName)
+                                     <th class="px-4 py-3 hidden ">
 
-                                 <th class="px-4 py-3">
-                                     @php
-                                         $budgetOperation = ''; // Inicializamos la variable fuera del bucle
-                                     @endphp
-
-                                     @foreach ($operationsFetchMonths as $item)
                                          @php
-                                             $budgetOperation = $item->budget_operation;
+                                             $budgetOperation = '';
                                          @endphp
-                                     @endforeach
-                                     <span class="text-emerald-600">Budget
-                                         {{ number_format(floatval($budgetOperation), 0, '.', ',') }} $</span>
 
-                                 </th>
-                                 <th class="px-4 py-3">
-                                     @php
-                                         // Supongamos que $budgetOperation y $totalMonthAmountCurrency son tus variables
-                                         $budgetOperation = intval($budgetOperation); // o floatval si es un número con decimales
-                                         $totalMonthAmountCurrency = intval($totalMonthAmountCurrency);
+                                         @foreach ($operationsFetchMonths as $item)
+                                             @php
+                                                 $budgetOperation = $item->budget_operation;
+                                             @endphp
+                                         @endforeach
+                                         <span class="text-emerald-600">Budget
+                                             {{ number_format(floatval($budgetOperation), 0, '.', ',') }} $</span>
 
-                                         $remainingBudget = $budgetOperation - $totalMonthAmountCurrency;
+                                     </th>
+                                     <th class="px-4 py-3 hidden">
+                                         @php
 
-                                         $formattedRemainingBudget = number_format($remainingBudget, 0, '.', ',');
+                                             $budgetOperation = intval($budgetOperation);
+                                             $totalMonthAmountCurrency = intval($totalMonthAmountCurrency);
 
-                                         $colorClass = $remainingBudget < 0 ? 'text-red-500' : ($remainingBudget === 0 ? 'text-blue-500' : 'text-emerald-600');
-                                     @endphp
+                                             $remainingBudget = $budgetOperation - $totalMonthAmountCurrency;
+
+                                             $formattedRemainingBudget = number_format($remainingBudget, 0, '.', ',');
+
+                                             $colorClass = $remainingBudget < 0 ? 'text-red-500' : ($remainingBudget === 0 ? 'text-blue-500' : 'text-emerald-600');
+                                         @endphp
 
 
-                                     <span class="{{ $colorClass }}">
-                                         Remaining Budget {{ $formattedRemainingBudget }} $
-                                     </span>
-                                 </th>
-
+                                         <span class="{{ $colorClass }}">
+                                             Remaining Budget {{ $formattedRemainingBudget }} $
+                                         </span>
+                                     </th>
+                                 @endif
                                  <th class="px-4 py-3" colspan="7">
                                  </th>
 
@@ -232,6 +233,7 @@
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
+                                 <th class="px-4 py-3">Budget</th>
                                  <th class="px-4 py-3">Main Category</th>
                                  <th class="px-4 py-3">Category</th>
                                  <th class="px-4 py-3">Subcategory</th>
@@ -253,7 +255,11 @@
                                      <td class="px-4 py-3 text-center">
                                          {{ $loop->iteration }}
                                      </td>
+                                     <td class="px-4 py-3 text-center ">
+                                         {{ isset($item->date)? \Carbon\Carbon::parse($item->date)->locale('es')->isoFormat('MMMM YYYY') . ' - ': '' }}
+                                         {{ isset($item->budget_operation) && $item->budget_operation != 0 ? number_format($item->budget_operation, 0, '.', ',') . ' $' : 'N/A' }}
 
+                                     </td>
 
                                      <td class="px-4 py-3 text-center">
                                          {{ $item->main_category_title }}</td>
@@ -320,7 +326,7 @@
 
                              <!-- Fila adicional para mostrar el nombre del usuario -->
                              <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
-                                 <td class="px-4 py-3 text-center font-semibold" colspan="10">
+                                 <td class="px-4 py-3 text-center font-semibold" colspan="11">
 
                                  </td>
 

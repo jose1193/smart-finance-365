@@ -31,6 +31,8 @@ class ReportGeneralMonthTable extends Component
     public $totalMonthAmount;
     public $selectedMonthName;
     public $totalMonthAmountCurrency;
+
+    public $main_category_id;
     
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
@@ -94,6 +96,7 @@ public function dataSelect()
 
 public function updateMonthData()
 {
+     $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
     $this->updateMonthDataInternal();
 }
 
@@ -127,27 +130,29 @@ private function fetchTotalMonthAmount()
     return $this->operationsFetchMonths->sum('operation_amount');
 }
 
-
 private function fetchMonthData()
 {
-    $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories']) 
+    $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories'])
         ->join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
-        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
+        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
+        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
         ->when($this->selectedUser4, function ($query, $selectedUser4) {
             // Filtrar por usuario seleccionado
             return $query->where('operations.user_id', $selectedUser4);
         })
         ->when($this->selectedMonth, function ($query, $selectedMonth) {
             // Filtrar por mes seleccionado
-           
             return $query->whereMonth('operations.operation_date', $selectedMonth);
         })
         ->when($this->selectedYear3, function ($query, $selectedYear3) {
             // Filtrar por año seleccionado
             return $query->whereYear('operations.operation_date', $selectedYear3);
+        })
+        ->when($this->main_category_id !== null && $this->main_category_id !== '', function ($query) {
+            // Filtrar por main_category_id si está presente y no es una cadena vacía
+            return $query->where('main_categories.id', $this->main_category_id);
         })
         ->select(
             'operations.operation_amount',
@@ -160,13 +165,15 @@ private function fetchMonthData()
             'operations.operation_date',
             'operations.operation_currency_type',
             'main_categories.title as main_category_title',
-            'subcategories.subcategory_name' 
+            'subcategories.subcategory_name'
         )
         ->orderBy('operations.id', 'desc')
         ->get();
 
     return $query;
 }
+
+
 
 
 

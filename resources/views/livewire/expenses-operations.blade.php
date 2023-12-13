@@ -76,9 +76,8 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-
-                                                {{ isset($item->budget_currency_total) && $item->budget_currency_total != 0 ? number_format($item->budget_currency_total, 0, '.', ',') : 'N/A' }}
-
+                                                {{ isset($item->date)? \Carbon\Carbon::parse($item->date)->locale('es')->isoFormat('MMMM [de] YYYY') . ' - ': '' }}
+                                                {{ isset($item->budget_currency_total) && $item->budget_currency_total != 0 ? number_format($item->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -207,28 +206,30 @@
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput1"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Total Budget In USD:</label>
+                                                            Select a Budget:</label>
                                                         <div wire:ignore>
-
                                                             <select id="budget_id_select" style="width: 100%"
                                                                 wire:model="budget_id">
                                                                 <option></option>
+
                                                                 @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
                                                                     @php
-                                                                        $formattedDate = \Carbon\Carbon::parse($date)->isoFormat('D MMMM, YYYY');
+                                                                        $formattedDate = \Carbon\Carbon::parse($date)
+                                                                            ->locale('es')
+                                                                            ->isoFormat('MMMM [de] YYYY');
+
                                                                     @endphp
 
-                                                                    <optgroup label="{{ $formattedDate }}">
-                                                                        @foreach ($groupedBudgets as $budget)
-                                                                            <option value="{{ $budget->id }}"
-                                                                                @if ($budget->id == $budget_id) selected @endif>
-                                                                                {{ $budget->budget_currency_total }} $
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </optgroup>
+                                                                    @foreach ($groupedBudgets as $budget)
+                                                                        <option value="{{ $budget->id }}"
+                                                                            @if ($budget->id == $budget_id) selected @endif>
+                                                                            {{ $formattedDate }} -
+                                                                            {{ $budget->budget_currency_total }}
+                                                                        </option>
+                                                                    @endforeach
                                                                 @endforeach
-
                                                             </select>
+
 
                                                         </div>
 

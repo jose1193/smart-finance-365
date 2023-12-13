@@ -72,6 +72,7 @@ public $registeredSubcategoryItem;
         'statu_options.status_description',
         DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name'),
         'budget_expenses.operation_id as budget_expense_operation_id',
+        'budgets.budget_date as date',
         'budgets.id as budget_id'
     )
     ->orderBy('operations.id', 'desc')

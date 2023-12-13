@@ -100,11 +100,12 @@ public function render()
         public function fetchData()
     {
     // Hacer la solicitud HTTP a la API de monedas
-    $response = Http::get('https://api.bluelytics.com.ar/v2/latest'); // Reemplaza con la URL correcta de la API
+    $response = Http::get('https://api.bluelytics.com.ar/v2/latest'); 
     $this->data2 = $response->json();
     }
 
 
+    
         public function fetchDataCurrencies()
 {
     // Hacer la solicitud HTTP a la API de monedas
