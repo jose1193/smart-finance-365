@@ -397,7 +397,6 @@
                                                             Subcategories:</label>
                                                         <!-- Dentro de tu vista Blade -->
 
-
                                                         @foreach ($userAssignments as $index => $assignment)
                                                             <div class="mb-4">
                                                                 <input type="text" autocomplete="off"
@@ -420,10 +419,7 @@
 
                                                                 </label>
 
-                                                                @php
-                                                                    // Verificar si el índice existe en el array antes de acceder a él
-                                                                    $selectedUsers = isset($this->user_id_assignSubcategory[$index]) ? (array) $this->user_id_assignSubcategory[$index] : [];
-                                                                @endphp
+
                                                                 <div wire:ignore>
                                                                     <!-- Tu vista Blade -->
 
@@ -431,8 +427,7 @@
                                                                         wire:model="userAssignments.{{ $index }}.user_id_assignSubcategory"
                                                                         class="selectUserAssignSubcategory"
                                                                         data-index="{{ $index }}"
-                                                                        style="width: 100%"
-                                                                        id="taskSelect{{ $index }}" multiple>
+                                                                        style="width: 100%" multiple="multiple">
                                                                         <option value="all">All Users</option>
                                                                         @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
                                                                             <optgroup label="{{ $nameUser }}">
@@ -451,27 +446,21 @@
                                                         @endforeach
                                                         <script>
                                                             $(document).ready(function() {
-                                                                // Inicializa select2 antes de asignar los valores iniciales
+
+                                                                // Inicializa Select2 para el selectUserAssignSubcategory
                                                                 $('.selectUserAssignSubcategory').select2();
 
-                                                                // Asigna los valores iniciales después de inicializar el select2
-                                                                $('.selectUserAssignSubcategory').each(function() {
-                                                                    const index = $(this).data('index');
-                                                                    const initialValue = @this.get('user_id_assignSubcategory.' + index);
-                                                                    $(this).val(initialValue).trigger(
-                                                                    'change'); // Dispara el evento change para actualizar el select2
-                                                                });
 
-                                                                // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
                                                                 $('.selectUserAssignSubcategory').on('change', function(e) {
-                                                                    const selectedValues = $(this).val();
                                                                     const index = $(this).data('index');
+                                                                    console.log('Selected value for index ' + index + ':', $(this).val());
 
-                                                                    // Assuming 'index' is a variable available in your Livewire component
-                                                                    @this.set('user_id_assignSubcategory.' + index, selectedValues);
+                                                                    @this.set('user_id_assignSubcategory.' + index, $(this).val());
                                                                 });
+
                                                             });
                                                         </script>
+
 
 
 

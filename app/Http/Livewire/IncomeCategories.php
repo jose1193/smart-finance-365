@@ -29,12 +29,14 @@ class IncomeCategories extends Component
     public $user_id_assignSubcategory = [];
     public $userAssignments = [];
   
+    
     use WithPagination;
 
     public function authorize()
 {
     return true;
 }
+
 
     public function render()
     {
@@ -289,9 +291,10 @@ public function SubcategoryAssignment(Category $storeCategory)
         return;
     }
 
-    foreach ($storeCategory->Subcategory as $index => $subcategory) {
+
+  foreach ($storeCategory->Subcategory as $index => $subcategory) {
         $selectedUsers = $this->user_id_assignSubcategory[$index] ?? [];
-   
+     
         // Check if 'All Users' is selected or array is empty
         if (in_array('all', $selectedUsers) || empty($selectedUsers)) {
             $this->deleteSubcategoryAssignments((object) $subcategory);
@@ -300,10 +303,10 @@ public function SubcategoryAssignment(Category $storeCategory)
         }
     }
 
-    $this->resetInputFields();
+
 }
 
-
+// DELETE ALL USERS IF EMPTY OR VALUE ALL USERS
 private function deleteSubcategoryAssignments($subcategories)
 {
     // Ensure $subcategories is a collection
@@ -336,6 +339,8 @@ private function processSubcategoryAssignments($subcategory, $selectedUsers, $ca
         $unassignedUsernamesString = implode(', ', $unassignedUsers);
         session()->flash('error', "Users not assigned to the category '$subcategory->subcategory_name' - Usernames: $unassignedUsernamesString");
     } else {
+
+        //ELIMINAR USUARIOS DESELECCIONADOS
         SubcategoryToAssign::where('subcategory_id', $subcategory->id)
             ->whereNotIn('user_id_subcategory', $selectedUsers)
             ->delete();
@@ -343,11 +348,14 @@ private function processSubcategoryAssignments($subcategory, $selectedUsers, $ca
         $this->updateOrCreateUserAssignments($subcategory->id, $selectedUsers);
         session()->flash('message', 'User Assignments Updated Successfully.');
     }
+    $this->resetInputFields();
 }
+
 
 private function updateOrCreateUserAssignments($subcategoryId, $selectedUsers)
 {
     foreach ($selectedUsers as $userId) {
+        
         SubcategoryToAssign::updateOrCreate(
             ['subcategory_id' => $subcategoryId, 'user_id_subcategory' => $userId],
             ['user_id_admin' => auth()->user()->id]
@@ -382,6 +390,7 @@ private function getUnassignedUsers($selectedUsers, $categoryAssignments, $assig
 
 public function OpenModalUserAssignment($itemId)
 {
+    
     $this->selectedItemId = $itemId;  
     $category = Category::with('Subcategory')->find($this->selectedItemId);
     $this->categoryNameSelected = $category ? $category->category_name : null;
@@ -391,8 +400,7 @@ public function OpenModalUserAssignment($itemId)
     $categoriesToAssign = CategoriesToAssign::where('category_id', $itemId)->get();
     $this->user_id_assign = $categoriesToAssign->isNotEmpty() ? $categoriesToAssign->pluck('user_id_assign')->toArray() : [];
 
-    // Obtener asignaciones de usuarios para cada subcategoría con sus correos electrónicos
-    $userAssignments = [];
+
 
     foreach ($category->Subcategory as $subcategory) {
         $subcategoryAssignments = SubcategoryToAssign::where('subcategory_id', $subcategory->id)->get();
@@ -400,20 +408,18 @@ public function OpenModalUserAssignment($itemId)
 
         // Obtener usuarios asignados a la subcategoría
         $usersInSubcategory = User::whereIn('id', $userIdsSubcategory)->get(['id', 'name']); // Selecciona solo los campos necesarios
-
+        
         // Guardar información en el array $userAssignments
-        $userAssignments[] = [
+        $this->userAssignments [] = [
             'subcategory_name' => $subcategory->subcategory_name,
             'users' => $usersInSubcategory,
             'user_id_assignSubcategory' => $userIdsSubcategory,
         ];
     }
 
-    // Inicializar la propiedad con el mismo nombre
-    $this->userAssignments = $userAssignments;
-    
    
 }
+
 
 
     public function closeModalUserAssignment()
