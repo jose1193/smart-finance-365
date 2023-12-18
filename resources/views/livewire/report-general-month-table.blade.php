@@ -167,27 +167,61 @@
                       </div>
                   </div>
               @endif
-              <div class="my-10 flex justify-end space-x-2">
-                  <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
-                      <select wire:model="main_category_id" wire:change="updateMonthData"
-                          class="block w-full mt-1 text-sm dark:text-gray-700 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                          <option value="">All Categories
-                          </option>
-                          @foreach ($mainCategoriesRender as $item)
-                              <option value="{{ $item->id }}">
-                                  {{ $item->title }}
-                              </option>
-                          @endforeach
-                      </select>
-                  </div>
-              </div>
+
               <!-- Tables -->
+              @if ($date_start && $date_end && $date_start > $date_end)
+                  <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
+                      ser posterior a
+                      la fecha de finalización.</p>
+              @endif
               <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                   <div class="w-full overflow-x-auto">
                       <table class="w-full whitespace-no-wrap " id="tableId4">
                           <thead>
                               <tr
                                   class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+
+                                  <th class="px-4 py-3 " colspan="3">
+                                      <div class="  w-2/3 space-x-3">
+
+                                          <input wire:ignore type="text" id="myDatePicker3"
+                                              wire:model.lazy="date_start" wire:change="updateMonthData"
+                                              placeholder="dd/mm/yyyy" autocomplete="off"
+                                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+
+                                          <input wire:ignore type="date" id="myDatePicker4"
+                                              wire:model.lazy="date_end" wire:change="updateMonthData"
+                                              placeholder="dd/mm/yyyy" autocomplete="off"
+                                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+
+                                          <select wire:model="main_category_id" wire:change="updateMonthData"
+                                              class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                                              <option value="">All Categories
+                                              </option>
+                                              @foreach ($mainCategoriesRender as $item)
+                                                  <option value="{{ $item->id }}">
+                                                      {{ $item->title }}
+                                                  </option>
+                                              @endforeach
+                                          </select>
+
+                                      </div>
+
+                                  </th>
+
+
+
+                                  <th class="px-4 py-3" colspan="9">
+
+                                  </th>
+
+
+                              </tr>
+                              <tr
+                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+
                                   <th class="px-4 py-3">
                                       @if ($userNameSelected4)
                                           {{ $userNameSelected4->name }}
@@ -318,6 +352,7 @@
                               </tr>
                           </tbody>
                       </table>
+
                   </div>
 
               </div>
@@ -346,7 +381,35 @@
           });
       </script>
 
+      <script>
+          document.addEventListener('livewire:load', function() {
+              Livewire.on('initializeFlatpickr', function() {
+                  flatpickr("#myDatePicker3", {
+                      locale: "es",
+                      altInput: true,
+                      altFormat: "j F, Y",
+                      dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                      allowInput: true,
+                      onClose: function(selectedDates1, dateStr1, instance1) {
+                          @this.set('date_start', dateStr1);
+                      }
+                  });
 
+                  flatpickr("#myDatePicker4", {
+                      locale: "es",
+                      altInput: true,
+                      altFormat: "j F, Y",
+                      dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                      allowInput: true,
+                      onClose: function(selectedDates, dateStr, instance) {
+                          @this.set('date_end', dateStr);
+                      }
+                  });
+
+              });
+
+          });
+      </script>
 
       <!-- END REPORT MONTHS TABLE  -->
   </div>

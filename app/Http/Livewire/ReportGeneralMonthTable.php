@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use PDF;
 use Illuminate\Support\Facades\Auth;
+use Livewire\WithPagination;
 
 class ReportGeneralMonthTable extends Component
 {
@@ -33,6 +34,8 @@ class ReportGeneralMonthTable extends Component
     public $totalMonthAmountCurrency;
 
     public $main_category_id;
+    public $date_start;
+    public $date_end;
     
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
@@ -95,9 +98,10 @@ public function dataSelect()
   // REPORT GENERAL MONTH TABLE
 
 public function updateMonthData()
-{
+{  $this->emit('initializeFlatpickr');
      $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
     $this->updateMonthDataInternal();
+     
 }
 
 private function updateMonthDataInternal()
@@ -115,6 +119,8 @@ private function updateMonthDataInternal()
     } else {
         $this->selectedMonthName = ''; 
     }
+  
+     
 }
 
 
@@ -132,6 +138,7 @@ private function fetchTotalMonthAmount()
 
 private function fetchMonthData()
 {
+    
     $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories'])
         ->join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
@@ -153,6 +160,17 @@ private function fetchMonthData()
         ->when($this->main_category_id !== null && $this->main_category_id !== '', function ($query) {
             // Filtrar por main_category_id si está presente y no es una cadena vacía
             return $query->where('main_categories.id', $this->main_category_id);
+        })->when($this->date_start && $this->date_end, function ($query) {
+            // Filtrar por rango de fechas si se proporcionan ambas fechas
+            return $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
+        })
+        ->when($this->date_start && !$this->date_end, function ($query) {
+            // Filtrar por fecha de inicio si se proporciona solo la fecha de inicio
+            return $query->whereDate('operations.operation_date', '>=', $this->date_start);
+        })
+        ->when(!$this->date_start && $this->date_end, function ($query) {
+            // Filtrar por fecha de fin si se proporciona solo la fecha de fin
+            return $query->whereDate('operations.operation_date', '<=', $this->date_end);
         })
         ->select(
             'operations.operation_amount',
@@ -172,9 +190,6 @@ private function fetchMonthData()
 
     return $query;
 }
-
-
-
 
 
 
@@ -209,6 +224,7 @@ public function resetFields4()
     {
         $this->isOpen4 = true;
          $this->updateMonthData();
+         
     }
 
     public function closeModal4()
