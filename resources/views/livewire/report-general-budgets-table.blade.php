@@ -1,4 +1,4 @@
- <div x-show="activeTab === '5'">
+ <div x-show="activeTab === '1'">
      <div id="report-table">
          <!--INCLUDE ALERTS MESSAGES-->
          <x-message-success />
@@ -152,11 +152,43 @@
              @endif
 
              <!-- Tables -->
+             @if ($date_start && $date_end && $date_start > $date_end)
+                 <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
+                     ser posterior a
+                     la fecha de finalización.</p>
+             @endif
              <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                  <div class="w-full overflow-x-auto">
                      <table class="w-full whitespace-no-wrap" id="tableId">
                          <thead>
+                             <tr
+                                 class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
 
+                                 <th class="px-4 py-3 " colspan="3">
+                                     <div class="  w-2/3 space-x-3">
+
+                                         <input wire:ignore type="text" id="myDatePicker5"
+                                             wire:model.lazy="date_start" wire:change="updateDataBudget"
+                                             placeholder="dd/mm/yyyy" autocomplete="off"
+                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+
+                                         <input wire:ignore type="text" id="myDatePicker6" wire:model.lazy="date_end"
+                                             wire:change="updateDataBudget" placeholder="dd/mm/yyyy" autocomplete="off"
+                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                                     </div>
+
+                                 </th>
+
+
+
+                                 <th class="px-4 py-3" colspan="9">
+
+                                 </th>
+
+
+                             </tr>
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">
@@ -174,6 +206,21 @@
                                      @endif
                                  </th>
                                  <th class="px-4 py-3" colspan="6">
+                                     @if ($date_start)
+                                         <p>Date Start:
+                                             <span class="text-green-700 ml-2">
+                                                 {{ \Carbon\Carbon::parse($date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                                             </span>
+                                         </p>
+                                     @endif
+
+                                     @if ($date_end)
+                                         <p>Date End:
+                                             <span class="text-green-700 ml-2">
+                                                 {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                                             </span>
+                                         </p>
+                                     @endif
                                  </th>
 
                              </tr>
@@ -306,5 +353,34 @@
              // Lógica para manejar el evento de correo enviado
              // Esto podría ser un mensaje de confirmación al usuario, etc.
          });
+     });
+ </script>
+ <script>
+     document.addEventListener('livewire:load', function() {
+         Livewire.on('initializeFlatpickr2', function() {
+             flatpickr("#myDatePicker5", {
+                 locale: "es",
+                 altInput: true,
+                 altFormat: "j F, Y",
+                 dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                 allowInput: true,
+                 onClose: function(selectedDates1, dateStr1, instance1) {
+                     @this.set('date_start', dateStr1);
+                 }
+             });
+
+             flatpickr("#myDatePicker6", {
+                 locale: "es",
+                 altInput: true,
+                 altFormat: "j F, Y",
+                 dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                 allowInput: true,
+                 onClose: function(selectedDates, dateStr, instance) {
+                     @this.set('date_end', dateStr);
+                 }
+             });
+
+         });
+
      });
  </script>

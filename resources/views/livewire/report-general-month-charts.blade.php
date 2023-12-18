@@ -1,4 +1,4 @@
- <div x-show="activeTab === '4'">
+ <div x-show="activeTab === '3'">
      <!-- Chart JS -->
      <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -46,6 +46,7 @@
              </div>
          </div>
 
+
      </div>
      @if ($showChart4)
          <div class="my-10 flex justify-end space-x-2">
@@ -60,6 +61,54 @@
                  Reset Fields
              </x-button>
          </div>
+         <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+
+                 <div wire:ignore>
+                     <input type="text" id="myDatePicker3" wire:model.lazy="date_start" wire:change="updateMonthData"
+                         placeholder="dd/mm/yyyy" autocomplete="off"
+                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                 </div>
+
+             </div>
+
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                 <div wire:ignore>
+                     <input type="text" id="myDatePicker4" wire:model.lazy="date_end" wire:change="updateMonthData"
+                         placeholder="dd/mm/yyyy" autocomplete="off"
+                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                 </div>
+             </div>
+
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                 <select wire:model="main_category_id" wire:change="updateMonthData"
+                     class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                     <option value="">All Categories
+                     </option>
+                     @foreach ($mainCategoriesRender as $item)
+                         <option value="{{ $item->id }}">
+                             {{ $item->title }}
+                         </option>
+                     @endforeach
+                 </select>
+             </div>
+         </div>
+         @if ($date_start)
+             <p>Date Start:
+                 <span class="text-green-700 ml-2 capitalize">
+                     {{ \Carbon\Carbon::parse($date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                 </span>
+             </p>
+         @endif
+
+         @if ($date_end)
+             <p>Date End:
+                 <span class="text-green-700 ml-2 capitalize">
+                     {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                 </span>
+             </p>
+         @endif
          <div id="chart-container3" class="my-5"
              wire:key="chart-{{ $selectedUser4 }}-{{ $selectedMonth }}-{{ $selectedYear3 }}-{{ uniqid() }}">
 
@@ -90,7 +139,7 @@
                      ],
 
                      datasets: [{
-                             label: "{!! $budgetData !!}",
+                             label: "",
                              backgroundColor: "#7C3AED",
                              borderColor: "#7C3AED",
                              data: [
@@ -137,3 +186,32 @@
          </div>
      @endif
  </div>
+ <script>
+     document.addEventListener('livewire:load', function() {
+         Livewire.on('initializeFlatpickr', function() {
+             flatpickr("#myDatePicker3", {
+                 locale: "es",
+                 altInput: true,
+                 altFormat: "j F, Y",
+                 dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                 allowInput: true,
+                 onClose: function(selectedDates1, dateStr1, instance1) {
+                     @this.set('date_start', dateStr1);
+                 }
+             });
+
+             flatpickr("#myDatePicker4", {
+                 locale: "es",
+                 altInput: true,
+                 altFormat: "j F, Y",
+                 dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                 allowInput: true,
+                 onClose: function(selectedDates, dateStr, instance) {
+                     @this.set('date_end', dateStr);
+                 }
+             });
+
+         });
+
+     });
+ </script>

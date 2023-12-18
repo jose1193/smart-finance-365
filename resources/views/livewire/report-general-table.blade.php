@@ -50,32 +50,20 @@
                                     Categories
                                 </button>
                             </li>
-                            <li class="mr-2">
-                                <button
-                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                                    @click="activeTab = '3'" :class="{ 'bg-blue-700': activeTab === '3' }">
-                                    Between Dates
-                                </button>
-                            </li>
-                            <li class="mr-2">
-                                <button
-                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                                    @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
-                                    Months
-                                </button>
-                            </li>
 
                             <li class="mr-2">
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                                    @click="activeTab = '5'" :class="{ 'bg-blue-700': activeTab === '5' }">
-                                    Budget
+                                    @click="activeTab = '3'" :class="{ 'bg-blue-700': activeTab === '3' }">
+                                    Months
                                 </button>
                             </li>
+
+
                             <li class="mr-2">
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                                    @click="activeTab = '6'" :class="{ 'bg-blue-700': activeTab === '6' }">
+                                    @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
                                     Budget Expense
                                 </button>
                             </li>
@@ -85,21 +73,9 @@
 
                             <!-- REPORT GENERAL TABLE  -->
 
-                            <!-- Livewire/ReportGeneralMainTable.php  -->
-                            @livewire('report-general-main-table')
-
-
-
-
                             <!-- REPORT GENERAL CATEGORIES TABLE  -->
                             <!-- Livewire/ReportGeneralCategoriesTable.php  -->
                             @livewire('report-general-categories-table')
-
-
-
-                            <!-- REPORT GENERAL BETWEEN DATE TABLE  -->
-                            <!-- Livewire/ReportGeneralBetweenTable.php  -->
-                            @livewire('report-general-between-table')
 
 
                             <!-- REPORT MONTHS TABLE  -->

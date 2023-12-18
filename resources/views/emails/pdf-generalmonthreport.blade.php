@@ -163,7 +163,17 @@
                             Year Not Selected
                         @endif
                     </td>
-                    <td colspan="8">
+                    <td>
+                        @if ($date_start)
+                            <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_start }} </p>
+                        @endif
+
+                        @if ($date_end)
+                            -
+                            <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_end }}</p>
+                        @endif
+                    </td>
+                    <td colspan="6">
                     </td>
 
                     <td>

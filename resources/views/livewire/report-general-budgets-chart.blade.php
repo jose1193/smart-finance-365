@@ -1,4 +1,4 @@
- <div x-show="activeTab === '5'">
+ <div x-show="activeTab === '1'">
      <!-- Chart JS -->
      <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -51,6 +51,48 @@
                  Reset Fields
              </x-button>
          </div>
+         @if ($date_start && $date_end && $date_start > $date_end)
+             <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
+                 ser posterior a
+                 la fecha de finalización.</p>
+         @endif
+         <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+
+                 <div wire:ignore>
+                     <input type="text" id="myDatePicker5" wire:model.lazy="date_start"
+                         wire:change="updateChartBudgetData" placeholder="dd/mm/yyyy" autocomplete="off"
+                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                 </div>
+
+             </div>
+
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                 <div wire:ignore>
+                     <input type="text" id="myDatePicker6" wire:model.lazy="date_end"
+                         wire:change="updateChartBudgetData" placeholder="dd/mm/yyyy" autocomplete="off"
+                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                 </div>
+             </div>
+
+
+         </div>
+         @if ($date_start)
+             <p>Date Start:
+                 <span class="text-green-700 ml-2 capitalize">
+                     {{ \Carbon\Carbon::parse($date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                 </span>
+             </p>
+         @endif
+
+         @if ($date_end)
+             <p>Date End:
+                 <span class="text-green-700 ml-2 capitalize">
+                     {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                 </span>
+             </p>
+         @endif
          <div id="chart-container5" class="my-5"
              wire:key="chart-{{ $selectedUser5 }}-{{ $selectedYear4 }}-{{ uniqid() }}">
 
@@ -134,3 +176,32 @@
 
 
  </div>
+ <script>
+     document.addEventListener('livewire:load', function() {
+         Livewire.on('initializeFlatpickr2', function() {
+             flatpickr("#myDatePicker5", {
+                 locale: "es",
+                 altInput: true,
+                 altFormat: "j F, Y",
+                 dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                 allowInput: true,
+                 onClose: function(selectedDates1, dateStr1, instance1) {
+                     @this.set('date_start', dateStr1);
+                 }
+             });
+
+             flatpickr("#myDatePicker6", {
+                 locale: "es",
+                 altInput: true,
+                 altFormat: "j F, Y",
+                 dateFormat: "Y-m-d", // Set to the format you expect the backend to receive
+                 allowInput: true,
+                 onClose: function(selectedDates, dateStr, instance) {
+                     @this.set('date_end', dateStr);
+                 }
+             });
+
+         });
+
+     });
+ </script>

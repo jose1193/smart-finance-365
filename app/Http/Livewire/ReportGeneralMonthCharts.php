@@ -28,6 +28,11 @@ class ReportGeneralMonthCharts extends Component
     public $budget;
     public $budgetData;
 
+    public $main_category_id;
+    public $date_start;
+    public $date_end;
+    public $mainCategoriesRender;
+
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
     public function userSelected4($userId)
@@ -70,7 +75,7 @@ public function months()
         
         $this->years = Operation::distinct()->pluck('operation_year');
          $this->users = User::orderBy('id', 'desc')->get();
-       
+       $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
        
          
     }
@@ -82,11 +87,11 @@ public function months()
 
 
     
-
   // REPORT GENERAL MONTH CHART
 
 public function updateMonthData()
 {
+    $this->emit('initializeFlatpickr');
     $this->updateMonthDataInternal();
     
 }
@@ -141,6 +146,19 @@ private function fetchMonthData()
     // Aplicar filtro por año si está seleccionado
     if ($this->selectedYear3) {
         $query->whereYear('operations.operation_date', $this->selectedYear3);
+    }
+
+    // Aplicar filtro por fechas
+     if ($this->date_start && $this->date_end) {
+        $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
+    } elseif ($this->date_start) {
+        $query->whereDate('operations.operation_date', '>=', $this->date_start);
+    } elseif ($this->date_end) {
+        $query->whereDate('operations.operation_date', '<=', $this->date_end);
+    }
+
+    if ($this->main_category_id !== null && $this->main_category_id !== '') {
+    $query->where('main_categories.id', $this->main_category_id);
     }
 
     $this->budget = Budget::where('budget_month', $this->selectedMonth)

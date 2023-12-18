@@ -45,6 +45,9 @@ class ReportGeneralBudgetsTable extends Component
     public $budgetDataCurrency = [];
     public $totalBudgetCurrency = [];
 
+    public $date_start;
+    public $date_end;
+
     protected $listeners = ['userSelected5','YearSelected4'];
 
     public function mount() {
@@ -87,6 +90,7 @@ class ReportGeneralBudgetsTable extends Component
    // REPORT GENERAL TABLE
 public function updateDataBudget()
 {
+    $this->emit('initializeFlatpickr2');
     $this->updateDataBudgetInternal();
   
 
@@ -145,6 +149,14 @@ private function fetchData($mainCategoryId, $month)
     if ($this->selectedYear4) {
         $query->whereYear('operations.operation_date', $this->selectedYear4);
     }
+ 
+    if ($this->date_start && $this->date_end) {
+        $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
+    } elseif ($this->date_start) {
+        $query->whereDate('operations.operation_date', '>=', $this->date_start);
+    } elseif ($this->date_end) {
+        $query->whereDate('operations.operation_date', '<=', $this->date_end);
+    }
 
    $data = [
         'operation_amount' => $query
@@ -193,7 +205,8 @@ public function resetFields5()
 {
     $this->selectedUser5 = null;
     $this->selectedYear4 = null;
-   
+    $this->date_start = null;
+    $this->date_end = null;
     $this->showData = false;
 }
 
@@ -239,6 +252,8 @@ public function emailStore5()
 
     $now = Carbon::now('America/Argentina/Buenos_Aires');
     $datenow = $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
+    $dateStartFormatted = $this->date_start ? Carbon::parse($this->date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') : null;
+    $dateEndFormatted = $this->date_end ? Carbon::parse($this->date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') : null;
 
     $data = [
         'incomeData' => $this->incomeData,
@@ -257,6 +272,8 @@ public function emailStore5()
         'user' => $userName,
         'title' => "Report General Budget",
         'date' => $datenow,
+        'date_start' => $dateStartFormatted,
+        'date_end' => $dateEndFormatted,
     ];
 
     foreach ($this->emails_user5 as $email) {

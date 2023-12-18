@@ -1,4 +1,4 @@
-  <div x-show="activeTab === '4'">
+  <div x-show="activeTab === '3'">
       <!-- REPORT MONTHS TABLE  -->
       <div id="report-table">
           <!--INCLUDE ALERTS MESSAGES-->
@@ -190,7 +190,7 @@
                                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
 
 
-                                          <input wire:ignore type="date" id="myDatePicker4"
+                                          <input wire:ignore type="text" id="myDatePicker4"
                                               wire:model.lazy="date_end" wire:change="updateMonthData"
                                               placeholder="dd/mm/yyyy" autocomplete="off"
                                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -242,8 +242,27 @@
                                       @else
                                           Year Not Selected
                                       @endif
+
                                   </th>
-                                  <th class="px-4 py-3" colspan="9">
+                                  <th class="px-4 py-3">
+                                      @if ($date_start)
+                                          <p>Date Start:
+                                              <span class="text-green-700 ml-2">
+                                                  {{ \Carbon\Carbon::parse($date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                                              </span>
+                                          </p>
+                                      @endif
+
+                                      @if ($date_end)
+                                          <p>Date End:
+                                              <span class="text-green-700 ml-2">
+                                                  {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                                              </span>
+                                          </p>
+                                      @endif
+                                  </th>
+                                  <th class="px-4 py-3" colspan="8">
+
                                   </th>
 
 

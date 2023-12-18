@@ -53,33 +53,20 @@
                                     Categories
                                 </button>
                             </li>
+
                             <li class="mr-2">
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '3'" :class="{ 'bg-blue-700': activeTab === '3' }">
-                                    Between Dates
+                                    Months
                                 </button>
                             </li>
+
 
                             <li class="mr-2">
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
-                                    Months
-                                </button>
-                            </li>
-                            <li class="mr-2">
-                                <button
-                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                                    @click="activeTab = '5'" :class="{ 'bg-blue-700': activeTab === '5' }">
-                                    Budget
-                                </button>
-                            </li>
-
-                            <li class="mr-2">
-                                <button
-                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
-                                    @click="activeTab = '6'" :class="{ 'bg-blue-700': activeTab === '6' }">
                                     Budget Expense
                                 </button>
                             </li>
@@ -89,14 +76,9 @@
 
                             <!-- REPORT GENERAL CHARTS  -->
 
-                            <!-- Livewire/ReportGeneralMainCharts.php  -->
-                            @livewire('report-general-main-charts')
 
                             <!-- Livewire/ReportGeneralCategoriesCharts.php  -->
                             @livewire('report-general-categories-charts')
-
-                            <!-- Livewire/ReportGeneralBetweenCharts.php  -->
-                            @livewire('report-general-between-charts')
 
                             <!-- Livewire/ReportGeneralMonthCharts.php  -->
                             @livewire('report-general-month-charts')

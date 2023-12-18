@@ -1,4 +1,4 @@
- <div x-show="activeTab === '6'">
+ <div x-show="activeTab === '4'">
      <!-- Chart JS -->
      <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -94,7 +94,7 @@
                      ],
 
                      datasets: [{
-                             label: "{!! $budgetData !!}",
+                             label: "",
                              backgroundColor: "#7C3AED",
                              borderColor: "#7C3AED",
                              data: [

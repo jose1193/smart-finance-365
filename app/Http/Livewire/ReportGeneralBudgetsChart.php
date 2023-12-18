@@ -35,6 +35,9 @@ class ReportGeneralBudgetsChart extends Component
     public $isOpen = 0;
     protected $listeners = ['userSelectedChart5','YearSelectedChart4'];
 
+    public $date_start;
+    public $date_end;
+
     public function userSelectedChart5($userId)
     {
         
@@ -66,6 +69,7 @@ class ReportGeneralBudgetsChart extends Component
      
 public function updateChartBudgetData()
 {
+    $this->emit('initializeFlatpickr2');
     $this->updateChartBudgetDataInternal();
 
 }
@@ -123,6 +127,14 @@ private function fetchData($mainCategoryId, $month)
 
     if ($this->selectedYear4) {
         $query->whereYear('operations.operation_date', $this->selectedYear4);
+    }
+
+     if ($this->date_start && $this->date_end) {
+        $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
+    } elseif ($this->date_start) {
+        $query->whereDate('operations.operation_date', '>=', $this->date_start);
+    } elseif ($this->date_end) {
+        $query->whereDate('operations.operation_date', '<=', $this->date_end);
     }
 
    $data = [

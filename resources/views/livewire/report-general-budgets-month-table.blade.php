@@ -1,4 +1,4 @@
- <div x-show="activeTab === '6'">
+ <div x-show="activeTab === '4'">
      <!-- REPORT MONTHS TABLE  -->
      <div id="report-table">
          <!--INCLUDE ALERTS MESSAGES-->

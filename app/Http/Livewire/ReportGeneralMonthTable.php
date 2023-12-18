@@ -199,8 +199,11 @@ private function fetchMonthData()
  public function exportToExcel4()
 {
     // Lógica para exportar la tabla a Excel
- $this->updateMonthData();
-    $this->emit('exportTableToExcel4');
+$this->updateMonthData();
+$this->emit('exportTableToExcel4');
+
+
+
 }
 
 //FUNCTION RESET FIELDS REPORT GENERAL
@@ -211,7 +214,9 @@ public function resetFields4()
     $this->selectedUser4 = null;
     $this->selectedYear3 = null;
     $this->selectedMonth = null;
-    
+    $this->date_start = null;
+    $this->date_end = null;
+    $this->main_category_id = null;
     $this->showData4 = false;
 }
 
@@ -265,6 +270,8 @@ public function emailStore4()
 
     $now = Carbon::now('America/Argentina/Buenos_Aires');
     $datenow = $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY, H:mm:ss');
+    $dateStartFormatted = $this->date_start ? Carbon::parse($this->date_start)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') : null;
+    $dateEndFormatted = $this->date_end ? Carbon::parse($this->date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') : null;
 
     $data['user'] = $userName;
     $fileName = 'General-Month-PDF-Report' . '-' . $userName . '-' . $datenow . '.pdf';
@@ -280,6 +287,8 @@ public function emailStore4()
             'email' => $email,
             'title' => "Report General Month",
             'date' => $datenow,
+            'date' => $datenow,
+            'date_start' => $dateStartFormatted,
         ];
 
         $pdf = PDF::loadView('emails.pdf-generalmonthreport', $data);
