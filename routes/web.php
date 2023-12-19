@@ -26,6 +26,8 @@ use App\Http\Livewire\EmailAdmin;
 use App\Http\Livewire\StatusCategories;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Livewire\Budgets;
+use App\Http\Livewire\IncomesOperationsAdmin;
+use App\Http\Livewire\OperationsAdmin;
 
 /*
 |--------------------------------------------------------------------------
@@ -131,6 +133,8 @@ Route::middleware([
     Route::get('admin-email-support', EmailAdmin::class)->name('admin-email-support');
     Route::get('options-categories', StatusCategories::class)->name('options-categories');
     Route::get('budgets', Budgets::class)->name('budgets');
+    Route::get('incomes-admin', IncomesOperationsAdmin::class)->name('incomes-admin');
+    Route::get('expenses-admin', OperationsAdmin::class)->name('expenses-admin');
 
     //Route::get('expense/{budget}', Operations::class)->name('expense');
 });

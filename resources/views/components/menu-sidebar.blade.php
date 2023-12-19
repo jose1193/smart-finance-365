@@ -167,19 +167,35 @@
                                  Budget
                              </a>
                          </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('incomes') }}">
-                                 Income
-                             </a>
-                         </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expense') }}">
-                                 Expense
-                             </a>
-                         </li>
+                         @role('User')
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('incomes') }}">
+                                     Income
+                                 </a>
+                             </li>
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('expense') }}">
+                                     Expense
+                                 </a>
+                             </li>
+                         @endrole
 
+                         @can('manage admin')
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('incomes-admin') }}">
+                                     Income Admin
+                                 </a>
+                             </li>
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('expenses-admin') }}">
+                                     Expense Admin
+                                 </a>
+                             </li>
+                         @endcan
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('emails') }}">
@@ -446,17 +462,35 @@
                                  Budget
                              </a>
                          </li>
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('incomes') }}">Income</a>
-                         </li>
 
-                         <li
-                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                             <a class="w-full" href="{{ route('expense') }}">
-                                 Expense
-                             </a>
-                         </li>
+                         @role('User')
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('incomes') }}">Income</a>
+                             </li>
+
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('expense') }}">Expense</a>
+                             </li>
+                         @endrole
+
+
+                         @can('manage admin')
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('incomes-admin') }}">
+                                     Income Admin
+                                 </a>
+                             </li>
+                             <li
+                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                 <a class="w-full" href="{{ route('expenses-admin') }}">
+                                     Expense Admin
+                                 </a>
+                             </li>
+                         @endcan
+
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('emails') }}">

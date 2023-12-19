@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
+use App\Models\User;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\SubcategoryToAssign;
@@ -17,7 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- guzzle query api
 use Illuminate\Support\Facades\DB;
 
-class Operations extends Component
+class OperationsAdmin extends Component
 {
     use WithPagination;
     
@@ -30,7 +31,7 @@ public $data2;
 public $operation_currency; 
 public $operation_currency_total; 
 public $isOpen = 0;
-protected $listeners = ['render','delete','currencyChanged']; 
+protected $listeners = ['render','delete','currencyChanged','userSelected8']; 
 
 public $subcategory_id = [];
 public $showSubcategories = false;
@@ -47,15 +48,54 @@ public $budget_id;
 
 public $registeredSubcategoryItem;
 
+public $selectedUser8;
+public $users;
+public $showData = false;
+public $data;
+public $user_selected;
+
     public function authorize()
 {
     return true;
 }
 
-
-    public function render()
+public function userSelected8($userId)
     {
-    $data = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+        $this->selectedUser8 = $userId;
+         $this->updateDataExpense();
+       
+    }
+
+    public function mount()
+    
+    { 
+        $this->users = User::orderBy('id', 'desc')->get();
+    }
+
+     public function render()
+    {
+       
+        return view('livewire.operations-admin');
+    }
+
+   
+
+// SHOW USER DATA TABLE
+public function updateDataExpense() 
+
+{
+
+ $this->showData= true;
+ $this->emit('reinitDataTable');
+  $this->data = $this->updateDataExpenseOperations();
+   
+}
+
+
+public function updateDataExpenseOperations() 
+    {
+      
+    $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
     ->join('users', 'operations.user_id', '=', 'users.id')
     ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
     ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
@@ -63,7 +103,7 @@ public $registeredSubcategoryItem;
     ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
     ->leftJoin('budget_expenses', 'budget_expenses.operation_id', '=', 'operations.id')
     ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
-    ->where('users.id', auth()->id())
+    ->where('users.id', $this->selectedUser8)
     ->where('categories.main_category_id', 2)
     ->where('operations.operation_description', 'like', '%' . $this->search . '%')
     ->select(
@@ -76,7 +116,7 @@ public $registeredSubcategoryItem;
         'budgets.id as budget_id'
     )
     ->orderBy('operations.id', 'desc')
-    ->paginate(10);
+    ->get();
 
 
     $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
@@ -101,14 +141,12 @@ public $registeredSubcategoryItem;
                                   ->orderBy('id', 'asc')
                                   ->get();
        
-    $this->budgets = Budget::where('user_id', auth()->id())
+    $this->budgets = Budget::where('user_id', $this->selectedUser8)
         ->orderBy('id', 'desc')
         ->get();
 
-    
-
-        return view('livewire.expenses-operations', [
-            'data' => $data]);
+  
+        return $query;
     }
 
 
@@ -237,8 +275,8 @@ public function updatedOperationAmount()
     {
          
         $this->authorize('manage admin');
-        $this->resetInputFields();
         $this->openModal();
+        $this->updateDataExpense();
     }
 
     public function openModal()
@@ -246,18 +284,31 @@ public function updatedOperationAmount()
         $this->isOpen = true;
         $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
         $this->fetchDataCurrencies();
+         $this->user_selected = User::where('id', $this->selectedUser8)->get();
     }
 
     public function closeModal()
     {
         $this->isOpen = false;
         $this->resetInputFields();
-        
+       
     }
 
     private function resetInputFields(){
-         $this->reset();
+        $this->reset([
+        'operation_description',
+        'selectedCurrencyFrom',
+        'operation_amount',
+        'operation_currency',
+        'operation_currency_type',
+        'operation_currency_total',
+        'operation_date',
+        'category_id',
+        'subcategory_id',
+       
+    ]);
          $this->resetValidation(); 
+           $this->updateDataExpense();
     }
 
        
@@ -301,7 +352,7 @@ public function edit($id)
 public function store()
 {
  
-   // Custom validation for operation_date
+// Custom validation for operation_date
     if (empty($this->operation_date)) {
         $this->addError('operation_date', 'The date field is required.');
     } else {
@@ -473,6 +524,7 @@ public function BudgetExpense($budgetId, Operation $operation)
          $this->authorize('manage admin');
         Operation::find($id)->delete();
         session()->flash('message', 'Data Deleted Successfully.');
+        $this->updateDataExpense();
     }
 
 

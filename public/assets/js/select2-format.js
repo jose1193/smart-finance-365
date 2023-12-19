@@ -5,6 +5,8 @@ document.addEventListener("livewire:load", function () {
     var selectUser4 = $("#selectUser4");
     var selectUser5 = $("#selectUser5");
     var selectUser6 = $("#selectUser6");
+    var selectUser7 = $("#selectUser7");
+    var selectUser8 = $("#selectUser8");
     var selectCategory = $("#selectCategory");
     var selectYear = $("#selectYear");
     var selectYear2 = $("#selectYear2");
@@ -63,6 +65,8 @@ document.addEventListener("livewire:load", function () {
     initializeSelect2(selectUser4, "userSelected4");
     initializeSelect2(selectUser5, "userSelected5");
     initializeSelect2(selectUser6, "userSelected6");
+    initializeSelect2(selectUser7, "userSelected7");
+    initializeSelect2(selectUser8, "userSelected8");
     initializeSelect2(selectCategory, "categorySelected");
     initializeSelect2(selectYear, "YearSelected");
     initializeSelect2(selectYear2, "YearSelected2");
