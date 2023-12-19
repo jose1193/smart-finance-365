@@ -65,7 +65,10 @@ public $registeredSubcategoryItem;
     ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
     ->where('users.id', auth()->id())
     ->where('categories.main_category_id', 2)
-    ->where('operations.operation_description', 'like', '%' . $this->search . '%')
+    ->where(function ($query) {
+        $query->where('categories.category_name', 'like', '%' . $this->search . '%')
+              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%');
+    })
     ->select(
         'operations.*',
         'categories.category_name','budgets.budget_currency_total',

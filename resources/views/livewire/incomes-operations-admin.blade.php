@@ -76,7 +76,10 @@
                         <!-- Tables -->
                         <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                             <div class="w-full overflow-x-auto">
-                                <table class="w-full whitespace-no-wrap" id="miTabla">
+
+                                <table class="w-full
+                                    whitespace-no-wrap"
+                                    wire:key="miTablaKey-{{ $selectedUser7 }}-{{ uniqid() }}" id="miTabla">
                                     <thead>
                                         <tr
                                             class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
@@ -186,7 +189,6 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-
                             </div>
 
 
@@ -596,6 +598,16 @@
                 }
             });
 
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('reinitDataTable', function() {
+            $('#miTabla').DataTable().destroy();
+            $('#miTabla').DataTable();
         });
     });
 </script>

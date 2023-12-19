@@ -59,7 +59,10 @@ public function render()
     ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
     ->where('users.id', auth()->id())
     ->where('categories.main_category_id', 1)
-    ->where('operations.operation_description', 'like', '%' . $this->search . '%')
+    ->where(function ($query) {
+        $query->where('categories.category_name', 'like', '%' . $this->search . '%')
+              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%');
+    })
     ->select(
         'operations.*',
         'categories.category_name',
