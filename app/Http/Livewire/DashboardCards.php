@@ -42,9 +42,10 @@ class DashboardCards extends Component
      ->whereYear('created_at',$currentYear) // Filtra por el año actual
     ->sum('operation_currency_total');
 
-   $this->account_balance = Budget::whereYear('budget_date', $currentYear)
+ $this->account_balance = Budget::whereYear('budget_date', $currentYear)
     ->whereMonth('budget_date', $currentMonth)
-    ->sum('budget_currency_total');
+    ->sum('budget_currency_total') ?? 0;
+
 
 
     $this->total_users_operations = Operation::whereMonth('created_at', $currentMonth)
@@ -78,10 +79,17 @@ $this->expense = Operation::where('user_id', auth()->id())
     ->sum('operation_currency_total');
 
 $account_balance = Budget::where('user_id', auth()->user()->id)
-->whereMonth('budget_date',  $currentMonth) // Filtra por el mes actual
-->whereYear('budget_date',  $currentYear) // Filtra por el año actual
-->firstOrFail();
-$this->account_balance = $account_balance->budget_currency_total; 
+    ->whereMonth('budget_date', $currentMonth)
+    ->whereYear('budget_date', $currentYear)
+    ->first();
+
+if ($account_balance) {
+    $this->account_balance = $account_balance->budget_currency_total;
+} else {
+    // Manejar la situación en la que no hay presupuesto
+    $this->account_balance = 0; // O cualquier otro valor predeterminado que desees
+}
+
 
 
 $this->total_users_operations = Operation::where('user_id', auth()->id())
