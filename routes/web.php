@@ -55,7 +55,7 @@ Route::get('/google-auth/callback', function () {
     $googleUser = Socialite::driver('google')->user();
 
     $randomNumber = rand(100, 999);
-    $nameWithoutSpaces = str_replace(' ', '', $googleUser->name);
+   $nameWithoutSpaces = strtolower(str_replace(' ', '', $googleUser->name));
 
     // Check if user exists with the same email address
     $existingUser = User::where('email', $googleUser->email)->first();
@@ -78,6 +78,7 @@ Route::get('/google-auth/callback', function () {
     'username' => $nameWithoutSpaces . $randomNumber,
     'email' => $googleUser->email,
     'email_verified_at' => now(), 
+    'password' => bcrypt('finance123=')
     ], function ($user) {
     if ($user->wasRecentlyCreated) {
         $user->email_verified_at = now();

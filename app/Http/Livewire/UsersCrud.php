@@ -18,6 +18,7 @@ class UsersCrud extends Component
  public $isOpen = 0;
  protected $listeners = ['render','delete']; 
 
+
  public function authorize()
 {
     return true;
@@ -86,25 +87,30 @@ return view('livewire.users-crud', [
     $this->authorize('manage admin');
     
     $this->validate([
-    'name' => 'required|string|max:20|regex:/^[A-Za-z\s]+$/',
-    'username' => ['required', 'unique:users,username,' . $this->data_id, 'regex:/^\S*$/'],
+    'name' => 'required|string|max:60|regex:/^[A-Za-z\s]+$/',
+    'username' => ['required', 'unique:users,username,' . $this->data_id, 'regex:/^[^\s]+$/','max:60'],
     'email' => 'required|email|unique:users,email,' . $this->data_id,
-     'role' => 'required',
+    'role' => 'required',
+   'password' => 'required|string|min:8|max:15|regex:/^[^\s]+$/',
 ], [
     'name' => [
-    'required' => 'El campo nombre es obligatorio',
-    'string' => 'El campo nombre debe ser una cadena de texto',
-    'max' => 'El campo nombre no debe superar los 40 caracteres',
-    'regex' => 'El campo nombre solo debe contener letras',
-],
+        'required' => 'El campo nombre es obligatorio',
+        'string' => 'El campo nombre debe ser una cadena de texto',
+        'max' => 'El campo nombre no debe superar los 40 caracteres',
+        'regex' => 'El campo nombre solo debe contener letras',
+    ],
     'email.required' => 'El campo correo electrónico es obligatorio',
     'email.email' => 'Por favor, ingrese una dirección de correo electrónico válida',
     'email.unique' => 'Esta dirección de Email ya ha sido registrada',
     'email.max' => 'El campo Email no debe superar los 50 caracteres',
     'username.required' => 'El campo nombre de usuario es obligatorio',
     'username.unique' => 'Este nombre de usuario ya está en uso',
-    'username.max' => 'El campo nombre de usuario no debe superar los 20 caracteres',
+    'username.max' => 'El campo nombre de usuario no debe superar los 40 caracteres',
     'username.regex' => 'El campo Username no debe tener espacios',
+    'password.required' => 'El campo contraseña es obligatorio',
+    'password.string' => 'La contraseña debe ser una cadena de texto',
+    'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+    'password.regex' => 'La contraseña no debe tener espacios',
 ]);
 
 // Verificar si el usuario existe antes de realizar la actualización
@@ -114,7 +120,7 @@ if ($user) {
    
     $userData = [
         'name' => $this->name,
-        'username' => $this->username,
+        'username' => strtolower(str_replace(' ', '', $this->username)), // Convertir a minúsculas y quitar espacios
         'email' => $this->email,
         'email_verified_at' => now(),
     ];
@@ -131,12 +137,12 @@ if ($user) {
     $user->syncRoles([$role->name]);
 } else {
     // Generar una contraseña predeterminada si es un nuevo usuario
-    $password = $this->username;
+    $password = $this->password;
 
     // Crear el usuario con la contraseña predeterminada
     $user = User::updateOrCreate(['id' => $this->data_id], [
         'name' => $this->name,
-        'username' => $this->username,
+        'username' => strtolower(str_replace(' ', '', $this->username)), // Convertir a minúsculas y quitar espacios
         'email' => $this->email,
         'email_verified_at' => now(),
         'password' => bcrypt($password),
@@ -149,7 +155,7 @@ if ($user) {
     
     \Mail::send('emails.NewMailUserCrud', [
         'name' => $this->name,
-        'username' => $this->username,
+        'username' => strtolower(str_replace(' ', '', $this->username)),
         'email' => $this->email,
         'password' => $password,
         'role' => $role->name,
@@ -177,7 +183,7 @@ session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Dat
     $this->name = $user->name;
     $this->username = $user->username;
     $this->email = $user->email;
-    
+    $this->password = $user->password;
 
     // Obtener el rol del usuario y establecerlo en una propiedad del componente
     $this->role = $user->roles->first()->id; // Asigna el ID del rol
