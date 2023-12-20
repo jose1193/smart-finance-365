@@ -297,6 +297,8 @@ public function updatedOperationAmount()
         'operation_date',
         'category_id',
         'subcategory_id',
+        'registeredSubcategoryItem',
+        'operation_status',
        
     ]);
          $this->resetValidation(); 
