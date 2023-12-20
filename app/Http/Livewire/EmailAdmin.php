@@ -94,7 +94,7 @@ $customMessages = [
 
     
 if ($existingEmail && $existingEmail->id != $this->data_id) {
-    session()->flash('error', 'The email already exists in the database.');
+    session()->flash('info', 'The email already exists in the database.');
 } else {
     // Asignar el ID del usuario a los datos validados
     $validatedData['user_id'] = auth()->user()->id;
@@ -107,7 +107,7 @@ if ($existingEmail && $existingEmail->id != $this->data_id) {
             // Si es una edición, permite cambiar el correo siempre que el nuevo correo no exista
             $existingOtherEmail = AdminEmail::where('email', $this->email)->where('id', '!=', $this->data_id)->first();
             if ($existingOtherEmail) {
-                session()->flash('error', 'Email already exists for another record.');
+                session()->flash('info', 'Email already exists for another record.');
             } else {
                 // Actualiza tanto el email como el name_support
                 AdminEmail::where('id', $this->data_id)->update([
@@ -122,7 +122,7 @@ if ($existingEmail && $existingEmail->id != $this->data_id) {
             session()->flash('message', 'Data Created Successfully.');
         }
     } else {
-        session()->flash('error', 'Only one email can be registered.');
+        session()->flash('info', 'Only one email can be registered.');
     }
 }
 

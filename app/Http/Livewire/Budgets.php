@@ -257,8 +257,8 @@ public function store()
     ->first();
 
     if ($existingRecord && !$this->data_id) {
-    // Si se está intentando insertar y ya hay un registro para la fecha, emite un mensaje de error
-    session()->flash('error', 'Solo se permite un registro por Mes.');
+    // Si se está intentando insertar y ya hay un registro para la fecha, emite un mensaje de info
+    session()->flash('info', 'Solo se permite un registro por Mes.');
     $this->closeModal();
     }
 
