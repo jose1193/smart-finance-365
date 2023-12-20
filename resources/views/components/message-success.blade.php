@@ -26,7 +26,7 @@
                             $date = new \DateTime();
                             $date->setTimezone(new \DateTimeZone('America/Argentina/Buenos_Aires')); //GMT
                             $datetime = $date->format('H:i A');
-                            
+
                         @endphp
                         {{ $datetime }}
 
@@ -57,25 +57,14 @@
     </script>
 @endif
 
-@if ($errors->any())
-    <script>
-        let errors = @json($errors->all());
 
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            html: '<div class="text-red-500">' + errors.join('<br>') + '</div>',
-            footer: '<a href="">Web Application</a>'
-        });
-    </script>
-@endif
 
-@if (session('error'))
+@if (session('info'))
     <script>
         Swal.fire({
-            icon: 'error',
+            icon: 'info',
             title: 'Oops...',
-            html: '<div class="text-red-500">{{ session('error') }}</div>',
+            html: '<div class="text-red-500">{{ session('info') }}</div>',
             footer: '<a href="">Web Application</a>'
         });
     </script>

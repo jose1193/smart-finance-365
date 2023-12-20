@@ -392,7 +392,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
         }
     } else {
         // Manejar el caso en el que $operation es nulo
-        session()->flash('error', __('Invalid operation'));
+        session()->flash('info', __('Invalid operation'));
     }
 
     $this->resetInputFields();

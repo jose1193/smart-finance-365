@@ -464,7 +464,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
         }
     } else {
         // Manejar el caso en el que $operation es nulo
-        session()->flash('error', __('Invalid operation'));
+        session()->flash('info', __('Invalid operation'));
     }
 
     $this->resetInputFields();
@@ -516,7 +516,7 @@ public function BudgetExpense($budgetId, Operation $operation)
         session()->flash('message', __('Data Created Successfully'));
     } else {
        
-        //session()->flash('error', __('Invalid operation or budget'));
+        //session()->flash('info', __('Invalid operation or budget'));
     }
 }
 

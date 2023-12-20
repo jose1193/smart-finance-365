@@ -263,7 +263,7 @@ public function categoryAssignment()
     }
         
     } else {
-        session()->flash('error', 'Category not found.');
+        session()->flash('info', 'Category not found.');
     }
 
     // Llamada a la función para asignar usuarios a subcategorías
@@ -279,7 +279,7 @@ public function categoryAssignment()
 public function SubcategoryAssignment(Category $storeCategory)
 {
     if (!$storeCategory || $storeCategory->Subcategory->isEmpty()) {
-        session()->flash('error', 'Invalid category or no subcategories found.');
+        session()->flash('info', 'Invalid category or no subcategories found.');
         return;
     }
 
@@ -337,7 +337,7 @@ private function processSubcategoryAssignments($subcategory, $selectedUsers, $ca
 
     if (!empty($unassignedUsers)) {
         $unassignedUsernamesString = implode(', ', $unassignedUsers);
-        session()->flash('error', "Users not assigned to the category '$subcategory->subcategory_name' - Usernames: $unassignedUsernamesString");
+        session()->flash('info', "Users not assigned to the category '$subcategory->subcategory_name' - Usernames: $unassignedUsernamesString");
     } else {
 
         //ELIMINAR USUARIOS DESELECCIONADOS
