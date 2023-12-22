@@ -108,7 +108,7 @@ public $registeredSubcategoryItem;
         ->orderBy('id', 'desc')
         ->get();
 
-    
+     
 
         return view('livewire.expenses-operations', [
             'data' => $data]);
@@ -297,7 +297,8 @@ public function edit($id)
          $this->updatedCategoryId($this->category_id, optional($registeredSubcategory)->subcategory_id);
 
         // Asignar el budget_id
-        $this->budget_id = $list->budget_id;
+       $this->budget_id = $list->budget_id ? $list->budget_id : 'na';
+
         
     }
 
@@ -329,6 +330,7 @@ if (empty($this->operation_date)) {
         'operation_status' => 'required',
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
+        
     ];
     
     $validatedData = $this->validate($validationRules);
@@ -458,23 +460,28 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
 
 public function BudgetExpense($budgetId, Operation $operation)
 {
-    
-     
     $operationId = $operation->id;
     $categoryId = $operation->category_id;
-    if ($budgetId && $operationId) {
-       
-        BudgetExpense::updateOrCreate(
-            ['operation_id' => $operationId,'budget_id' => $budgetId,'category_id' => $categoryId],
-           
-        );
 
-        session()->flash('message', __('Data Created Successfully'));
+    if ($operationId) {
+        // Verifica si $budgetId está vacío o es igual a 'NO'
+        if (empty($budgetId) || $budgetId === 'na') {
+            // Elimina la entrada existente si $budgetId está vacío o es 'NO'
+            BudgetExpense::where(['operation_id' => $operationId])->delete();
+            session()->flash('message', __('Data Deleted Successfully'));
+        } else {
+            // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
+            BudgetExpense::updateOrCreate(
+                ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
+                // Puedes agregar aquí otros campos que desees actualizar o crear
+            );
+            session()->flash('message', __('Data Created/Updated Successfully'));
+        }
     } else {
-       
-        //session()->flash('info', __('Invalid operation or budget'));
+        // session()->flash('info', __('Invalid operation'));
     }
 }
+
 
 
     public function delete($id)

@@ -183,7 +183,7 @@
 
                                         @empty
                                             <tr class="text-center">
-                                                <td colspan="12">
+                                                <td colspan="13">
                                                     <div class="grid justify-items-center w-full mt-5">
                                                         <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                             role="alert">
@@ -282,7 +282,7 @@
                                                                 class="shadow capitalize appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                                 style="width: 100%" wire:model="budget_id">
                                                                 <option></option>
-
+                                                                <option value="na">N/A</option>
                                                                 @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
                                                                     @php
                                                                         $formattedDate = \Carbon\Carbon::parse($date)
@@ -295,7 +295,7 @@
                                                                         <option value="{{ $budget->id }}"
                                                                             @if ($budget->id == $budget_id) selected @endif>
                                                                             {{ $formattedDate }} -
-                                                                            {{ $budget->budget_currency_total }}
+                                                                            {{ $budget->budget_currency_total }} $
                                                                         </option>
                                                                     @endforeach
                                                                 @endforeach

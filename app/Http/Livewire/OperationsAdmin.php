@@ -93,6 +93,14 @@ public function updateBudgetSelect($userSelected)
 
 public function refreshBudget()
 {
+    // Consulta para obtener el presupuesto correspondiente al user_id seleccionado
+    $budget = Budget::where('user_id', $this->user_selected)
+        ->orderBy('id', 'desc')
+        ->first();
+
+    // Asigna el valor de $this->budget_id basado en la existencia del presupuesto
+    $this->budget_id = $budget ? $budget->id : 'na';
+
     $this->budgets = Budget::where('user_id', $this->user_selected)
         ->orderBy('id', 'desc')
         ->get();
@@ -365,6 +373,7 @@ public function updatedOperationAmount()
     {
         $this->isOpen = false;
         $this->resetInputFields();
+        
        
     }
 
@@ -415,15 +424,16 @@ public function edit($id)
         $this->updatedOperationAmount();
        
         $this->selectedCategoryId = $list->category_id;
-        $this->showSubcategories = true;
+        
 
          // Asignar el user id
         $defaultValue = Operation::findOrFail($id);
         $this->user_selected = isset($list->user_id) ? $list->user_id : $defaultValue->user_id;
       
 
-        
-        $this->budget_id = $list->budget_id;
+       $this->budget_id = $list->budget_id ? $list->budget_id : 'na';
+
+
        // Obtener la subcategoría asociada, si existe
         $registeredSubcategory = $operation->operationSubcategories->first();
         
@@ -432,6 +442,8 @@ public function edit($id)
        
      
     }
+
+
 
 public function store()
 {
@@ -462,6 +474,8 @@ if (empty($this->operation_date)) {
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
         'user_selected' => 'required',
+         'budget_id' => 'required',
+         
     ];
     
     $validatedData = $this->validate($validationRules);
@@ -513,11 +527,8 @@ $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
 
 public function SubcategoryOperationAssignment(Operation $operation)
 {
-   
-      // Si $this->subcategory_id es una cadena, conviértela en un array
+    // Si $this->subcategory_id es una cadena, conviértela en un array
     $subcategoryIds = is_array($this->subcategory_id) ? $this->subcategory_id : explode(',', $this->subcategory_id);
-
-    $subcategories = [];
 
     $subcategories = Subcategory::whereIn('id', $subcategoryIds)->get();
 
@@ -529,7 +540,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
 
             // Determina las subcategorías que deben eliminarse
             $subcategoriesToDelete = array_diff($existingSubcategories, $subcategoryIds);
-            
+
             // Elimina las subcategorías que ya no están presentes
             if (!empty($subcategoriesToDelete)) {
                 OperationSubcategories::where('operation_id', $operation->id)
@@ -537,7 +548,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
                     ->delete();
             }
 
-            // Agrega o actualiza las asignaciones en OperationSubcategories
+            // Actualiza el campo user_id_subcategory en lugar de eliminar y crear nuevo
             foreach ($subcategories as $subcategory) {
                 $subcategoryId = $subcategory->id;
                 $operationId = $operation->id;
@@ -546,7 +557,9 @@ public function SubcategoryOperationAssignment(Operation $operation)
                     [
                         'operation_id' => $operationId,
                         'subcategory_id' => $subcategoryId,
-                        'user_id_subcategory' => auth()->user()->id,
+                    ],
+                    [
+                        'user_id_subcategory' => $operation->user_id,
                     ]
                 );
             }
@@ -555,8 +568,6 @@ public function SubcategoryOperationAssignment(Operation $operation)
         } else {
             // Si no se proporcionan nuevas subcategorías, simplemente eliminar las existentes
             OperationSubcategories::where('operation_id', $operation->id)->delete();
-            
-           
         }
     } else {
         // Manejar el caso en el que $operation es nulo
@@ -565,6 +576,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
 
     $this->resetInputFields();
 }
+
 
 
 public function updatedCategoryId($value,$registeredSubcategoryId = null)
@@ -595,26 +607,31 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     $this->registeredSubcategoryItem = $registeredSubcategoryId;
 }
 
-
 public function BudgetExpense($budgetId, Operation $operation)
 {
-    
-     
     $operationId = $operation->id;
     $categoryId = $operation->category_id;
-    if ($budgetId && $operationId) {
-       
-        BudgetExpense::updateOrCreate(
-            ['operation_id' => $operationId,'budget_id' => $budgetId,'category_id' => $categoryId],
-           
-        );
-
-        session()->flash('message', __('Data Created Successfully'));
+    $operationUser = $operation->user_id;
+    
+    if ($operationId) {
+        // Verifica si $budgetId es "na" para eliminar la entrada
+        if ($budgetId === 'na') {
+            BudgetExpense::where(['operation_id' => $operationId])->delete();
+            session()->flash('message', __('Data Deleted Successfully'));
+        } else {
+            // Si $budgetId tiene otro valor, realiza un updateOrCreate
+            BudgetExpense::updateOrCreate(
+                ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
+                // Puedes agregar aquí otros campos que desees actualizar o crear
+            );
+            session()->flash('message', __('Data Created/Updated Successfully'));
+        }
     } else {
-       
-        //session()->flash('info', __('Invalid operation or budget'));
+        // session()->flash('info', __('Invalid operation'));
     }
 }
+
+
 
 
     public function delete($id)
