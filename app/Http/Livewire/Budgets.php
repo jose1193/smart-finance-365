@@ -244,26 +244,43 @@ public function updatedBudgetOperation()
     
 public function store()
 {
+$fechaRecibida = $this->budget_date;
 
-    $fechaRecibida = $this->budget_date; 
-    $fechaCarbon = Carbon::createFromFormat('d/m/Y', $fechaRecibida);
-    $fechaEnFormato = $fechaCarbon->format('Y-m-d');
-    $this->budget_date = $fechaEnFormato;
+// Verificar si la fecha está vacía
+if (empty($fechaRecibida)) {
+     $validationRules = [
+       
+        'budget_date' => 'required',
+    ];
+    
+    $validatedData = $this->validate($validationRules);
+    // Si la validación pasa, puedes continuar con el procesamiento
+    $fechaRecibida = $validatedData['budget_date'];
+
+    
+} else {
+    // Verificar si la fecha está en formato 'd/m/Y' o 'Y-m-d'
+    if (strpos($fechaRecibida, '/') !== false) {
+        // Convertir la fecha a formato 'Y-m-d' si está en formato 'd/m/Y'
+        $fechaCarbon = Carbon::createFromFormat('d/m/Y', $fechaRecibida);
+        $this->budget_date = $fechaCarbon->format('Y-m-d');
+    } else {
+        // La fecha ya está en formato 'Y-m-d', no es necesario hacer ninguna conversión
+        $this->budget_date = $fechaRecibida;
+        $fechaCarbon = Carbon::parse($this->budget_date); // Parse the existing date
+    }
 
     // Validación personalizada para verificar el límite máximo por fecha
     $existingRecord = Budget::where('user_id', auth()->user()->id)
-    ->whereYear('budget_date', $fechaCarbon->year)
-    ->whereMonth('budget_date', $fechaCarbon->month)
-    ->first();
+        ->whereYear('budget_date', $fechaCarbon instanceof Carbon ? $fechaCarbon->year : null)
+        ->whereMonth('budget_date', $fechaCarbon instanceof Carbon ? $fechaCarbon->month : null)
+        ->first();
 
     if ($existingRecord && !$this->data_id) {
-    // Si se está intentando insertar y ya hay un registro para la fecha, emite un mensaje de info
-    session()->flash('info', 'Solo se permite un registro por Mes.');
-    $this->closeModal();
+        // Si se está intentando insertar y ya hay un registro para la fecha, emite un mensaje de info
+        session()->flash('info', 'Solo se permite un registro por Mes.');
+        $this->closeModal();
     }
-
-
-
     else {
     $validationRules = [
         'user_id' => 'required',
@@ -271,7 +288,7 @@ public function store()
         'budget_operation' => 'required',
         'budget_currency' => 'required',
         'budget_currency_total' => 'required',
-        'budget_date' => 'required|date',
+        'budget_date' => 'required',
     ];
     
     $validatedData = $this->validate($validationRules);
@@ -298,6 +315,7 @@ public function store()
 
     $this->closeModal();
    
+}
 }
 }
 

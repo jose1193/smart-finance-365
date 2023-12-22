@@ -285,14 +285,20 @@ public function updatedOperationAmount()
 public function store()
 {
    
-    // Custom validation for operation_date
-    if (empty($this->operation_date)) {
-        $this->addError('operation_date', 'The date field is required.');
+       // Custom validation for operation_date
+if (empty($this->operation_date)) {
+    $this->addError('operation_date', 'The date field is required.');
+} else {
+    // Verificar si la fecha tiene el formato 'Y-m-d'
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->operation_date)) {
+        // Si ya está en el formato 'Y-m-d', no es necesario convertirlo
+        
     } else {
-        // Convert and format the date if it's not empty
+        // Convertir y formatear la fecha si no tiene el formato 'Y-m-d'
         $fechaCarbon = Carbon::createFromFormat('d/m/Y', $this->operation_date);
         $this->operation_date = $fechaCarbon->format('Y-m-d');
     }
+}
 
 
     $validationRules = [

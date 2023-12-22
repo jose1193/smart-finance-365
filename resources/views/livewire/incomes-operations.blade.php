@@ -311,12 +311,12 @@
                                                         <label for="operation_date"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Date</label>
-
-                                                        <input type="text" readonly id="myDatePicker"
-                                                            autocomplete="off" wire:model="operation_date"
-                                                            placeholder="dd/mm/yyyy"
-                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
+                                                        <div wire:ignore>
+                                                            <input type="text" readonly id="myDatePicker"
+                                                                autocomplete="off" wire:model="operation_date"
+                                                                placeholder="dd/mm/yyyy"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                        </div>
                                                         @error('operation_date')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -535,11 +535,15 @@
         Livewire.on('modalOpened', function() {
             flatpickr("#myDatePicker", {
                 locale: "es",
-                dateFormat: "d/m/Y", // Configura el formato de fecha deseado
+
                 allowInput: true,
+                altInput: true,
+                altFormat: "l, F j, Y",
+                dateFormat: "d/m/Y",
                 onClose: function(selectedDates, dateStr, instance) {
                     // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
                     @this.set('operation_date', dateStr);
+                    console.log(dateStr);
                 }
             });
 

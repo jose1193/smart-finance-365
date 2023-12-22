@@ -146,7 +146,13 @@
                                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122">
                              </path>
                          </svg>
-                         <span class="ml-4">Management</span>
+                         <span class="ml-4">
+                             @role('User')
+                                 Management
+                             @else
+                                 Management All Users
+                             @endrole
+                         </span>
                      </span>
                      <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                          <path fill-rule="evenodd"
@@ -167,35 +173,32 @@
                                  Budget
                              </a>
                          </li>
-                         @role('User')
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('incomes') }}">
-                                     Income
-                                 </a>
-                             </li>
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('expense') }}">
-                                     Expense
-                                 </a>
-                             </li>
-                         @endrole
 
-                         @can('manage admin')
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('incomes-admin') }}">
-                                     Income Admin
-                                 </a>
-                             </li>
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('expenses-admin') }}">
-                                     Expense Admin
-                                 </a>
-                             </li>
-                         @endcan
+                         <li
+                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                             <a class="w-full"
+                                 @role('User')
+            href="{{ route('incomes') }}"
+        @else
+            href="{{ route('incomes-admin') }}"
+        @endrole>
+                                 Income
+                             </a>
+                         </li>
+
+
+                         <li
+                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                             <a class="w-full"
+                                 @role('User')
+            href="{{ route('expense') }}"
+        @else
+            href="{{ route('expenses-admin') }}"
+        @endrole>
+                                 Expense
+                             </a>
+                         </li>
+
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
                              <a class="w-full" href="{{ route('emails') }}">
@@ -441,7 +444,12 @@
                                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122">
                              </path>
                          </svg>
-                         <span class="ml-4">Management</span>
+                         <span class="ml-4"> @role('User')
+                                 Management
+                             @else
+                                 Management All Users
+                             @endrole
+                         </span>
                      </span>
                      <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                          <path fill-rule="evenodd"
@@ -463,33 +471,31 @@
                              </a>
                          </li>
 
-                         @role('User')
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('incomes') }}">Income</a>
-                             </li>
+                         <li
+                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                             <a class="w-full"
+                                 @role('User')
+            href="{{ route('incomes') }}"
+        @else
+            href="{{ route('incomes-admin') }}"
+        @endrole>
+                                 Income
+                             </a>
+                         </li>
 
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('expense') }}">Expense</a>
-                             </li>
-                         @endrole
 
+                         <li
+                             class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                             <a class="w-full"
+                                 @role('User')
+            href="{{ route('expense') }}"
+        @else
+            href="{{ route('expenses-admin') }}"
+        @endrole>
+                                 Expense
+                             </a>
+                         </li>
 
-                         @can('manage admin')
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('incomes-admin') }}">
-                                     Income Admin
-                                 </a>
-                             </li>
-                             <li
-                                 class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
-                                 <a class="w-full" href="{{ route('expenses-admin') }}">
-                                     Expense Admin
-                                 </a>
-                             </li>
-                         @endcan
 
                          <li
                              class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">

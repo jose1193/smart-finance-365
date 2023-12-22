@@ -80,6 +80,7 @@
                                             class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                             <th class="px-4 py-3">Nro</th>
                                             <th class="px-4 py-3">Budget</th>
+                                            <th class="px-4 py-3">Username</th>
                                             <th class="px-4 py-3">Category</th>
                                             <th class="px-4 py-3">Subcategory</th>
                                             <th class="px-4 py-3">Description</th>
@@ -103,6 +104,10 @@
                                                 <td class="px-4 py-3 text-xs">
                                                     {{ isset($item->date)? \Carbon\Carbon::parse($item->date)->locale('es')->isoFormat('MMMM [de] YYYY') . ' - ': '' }}
                                                     {{ isset($item->budget_currency_total) && $item->budget_currency_total != 0 ? number_format($item->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
+
+                                                </td>
+                                                <td class="px-4 py-3 text-xs">
+                                                    {{ $item->username }}
 
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
@@ -232,19 +237,37 @@
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
                                                                 User</label>
 
-                                                            <select
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                                wire:model="user_selected">
+                                                            <div wire:ignore>
+                                                                <select id="users_select"
+                                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                                    wire:model="user_selected"
+                                                                    wire:change="updateCategoryUser">
+                                                                    <option></option>
+                                                                    @foreach ($users->groupBy('email') as $nameUser => $groupedEmails)
+                                                                        <optgroup label="{{ $nameUser }}">
+                                                                            @foreach ($groupedEmails as $email)
+                                                                                <option value="{{ $email->id }}">
+                                                                                    {{ $email->username }}</option>
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
 
-                                                                @foreach ($user_selected->groupBy('email') as $nameUser => $groupedEmails)
-                                                                    <optgroup label="{{ $nameUser }}">
-                                                                        @foreach ($groupedEmails as $email)
-                                                                            <option value="{{ $email->id }}">
-                                                                                {{ $email->username }}</option>
-                                                                        @endforeach
-                                                                    </optgroup>
-                                                                @endforeach
-                                                            </select>
+                                                            <script>
+                                                                $(document).ready(function() {
+                                                                    $('#users_select').select2();
+
+                                                                    // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
+                                                                    $('#users_select').on('change', function(e) {
+                                                                        const selectedEmails = $(this).val();
+                                                                        const index = $(this).data('index');
+                                                                        @this.set('user_selected', selectedEmails);
+                                                                        @this.call('updateCategoryUser');
+                                                                        @this.call('updateBudgetUser');
+                                                                    });
+                                                                });
+                                                            </script>
 
                                                             @error('user_selected')
                                                                 <span class="text-red-500">{{ $message }}</span>
@@ -254,31 +277,32 @@
                                                             <label for="exampleFormControlInput1"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
                                                                 Select a Budget:</label>
-                                                            <div wire:ignore>
-                                                                <select id="budget_id_select" style="width: 100%"
-                                                                    wire:model="budget_id">
-                                                                    <option></option>
 
-                                                                    @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
-                                                                        @php
-                                                                            $formattedDate = \Carbon\Carbon::parse($date)
-                                                                                ->locale('es')
-                                                                                ->isoFormat('MMMM [de] YYYY');
+                                                            <select
+                                                                class="shadow capitalize appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                                style="width: 100%" wire:model="budget_id">
+                                                                <option></option>
 
-                                                                        @endphp
+                                                                @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
+                                                                    @php
+                                                                        $formattedDate = \Carbon\Carbon::parse($date)
+                                                                            ->locale('es')
+                                                                            ->isoFormat('MMMM [de] YYYY');
 
-                                                                        @foreach ($groupedBudgets as $budget)
-                                                                            <option value="{{ $budget->id }}"
-                                                                                @if ($budget->id == $budget_id) selected @endif>
-                                                                                {{ $formattedDate }} -
-                                                                                {{ $budget->budget_currency_total }}
-                                                                            </option>
-                                                                        @endforeach
+                                                                    @endphp
+
+                                                                    @foreach ($groupedBudgets as $budget)
+                                                                        <option value="{{ $budget->id }}"
+                                                                            @if ($budget->id == $budget_id) selected @endif>
+                                                                            {{ $formattedDate }} -
+                                                                            {{ $budget->budget_currency_total }}
+                                                                        </option>
                                                                     @endforeach
-                                                                </select>
+                                                                @endforeach
+                                                            </select>
 
 
-                                                            </div>
+
 
                                                             <script>
                                                                 document.addEventListener('livewire:load', function() {
@@ -438,16 +462,16 @@
 
                                                             </label>
 
-                                                            <div wire:ignore>
-                                                                <select wire:model="category_id"
-                                                                    id="select2CategoryId" style="width: 100%;">
-                                                                    <option value=""></option>
-                                                                    @foreach ($categoriesRender as $item)
-                                                                        <option value="{{ $item->id }}">
-                                                                            {{ $item->category_name }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
+                                                            <select wire:model="category_id"
+                                                                class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray"
+                                                                style="width: 100%; max-height: 200px; overflow-y: auto;">
+                                                                <option value=""></option>
+                                                                @foreach ($categoriesRender as $item)
+                                                                    <option value="{{ $item->id }}">
+                                                                        {{ $item->category_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
 
 
                                                             @error('category_id')
@@ -646,11 +670,15 @@
         Livewire.on('modalOpened', function() {
             flatpickr("#myDatePicker", {
                 locale: "es",
-                dateFormat: "d/m/Y", // Configura el formato de fecha deseado
+
                 allowInput: true,
+                altInput: true,
+                altFormat: "l, F j, Y",
+                dateFormat: "d/m/Y",
                 onClose: function(selectedDates, dateStr, instance) {
                     // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
                     @this.set('operation_date', dateStr);
+                    console.log(dateStr);
                 }
             });
 

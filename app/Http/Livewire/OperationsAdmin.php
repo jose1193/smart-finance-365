@@ -31,7 +31,7 @@ public $data2;
 public $operation_currency; 
 public $operation_currency_total; 
 public $isOpen = 0;
-protected $listeners = ['render','delete','currencyChanged','userSelected8']; 
+protected $listeners = ['render','delete','currencyChanged','userSelected8','userSelectedUpdated' => 'updateSelect','updateDataExpenseOperations' => 'updateDataExpense','userSelectedBudgetUpdated' => 'updateBudgetSelect',]; 
 
 public $subcategory_id = [];
 public $showSubcategories = false;
@@ -54,6 +54,10 @@ public $showData = false;
 public $data;
 public $user_selected;
 
+ protected $rules = [
+        'user_selected' => 'required', 
+    ];
+
     public function authorize()
 {
     return true;
@@ -65,6 +69,76 @@ public function userSelected8($userId)
          $this->updateDataExpense();
        
     }
+
+     // CHANGE USER BUDGET
+  public function updateBudgetUser()
+{
+    
+    $this->refreshBudget($this->user_selected);
+    $this->category_id = null;
+   $this->showSubcategories = false; 
+    $this->emit('userSelectedBudgetUpdated', $this->user_selected);
+     
+}
+
+
+public function updateBudgetSelect($userSelected)
+{
+    $this->user_selected = $userSelected;
+  
+    $this->refreshBudget(); 
+    
+}
+
+
+public function refreshBudget()
+{
+    $this->budgets = Budget::where('user_id', $this->user_selected)
+        ->orderBy('id', 'desc')
+        ->get();
+    
+}
+ // END CHANGE USER BUDGET
+ 
+ // CHANGE USER CATEGORY ASSIGNED
+public function updateCategoryUser()
+{
+    $this->refreshCategories($this->user_selected);
+    $this->category_id = null;
+   $this->showSubcategories = false; 
+    $this->emit('userSelectedUpdated', $this->user_selected);
+     
+}
+
+public function updateSelect($userSelected)
+{
+    $this->user_selected = $userSelected;
+  
+    $this->refreshCategories(); 
+    
+}
+
+public function refreshCategories()
+{
+    $assignedCategories = CategoriesToAssign::where('user_id_assign', $this->user_selected)
+        ->pluck('category_id');
+
+    $this->categoriesRender = Category::where('main_category_id', 2)
+        ->whereIn('id', $assignedCategories)
+        ->orWhere(function ($query) use ($assignedCategories) {
+            $query->whereNotIn('id', $assignedCategories)
+                  ->whereNotExists(function ($subQuery) {
+                      $subQuery->select(DB::raw(2))
+                               ->from('categories_to_assigns')
+                               ->whereColumn('categories_to_assigns.category_id', 'categories.id');
+                  })
+                  ->where('main_category_id', 2); 
+        })
+        ->orderBy('id', 'asc')
+        ->get();
+    
+}
+ // END FUNCTION CHANGE USER CATEGORY ASSIGNED
 
     public function mount()
     
@@ -107,7 +181,7 @@ public function updateDataExpenseOperations()
     ->where('categories.main_category_id', 2)
     ->where('operations.operation_description', 'like', '%' . $this->search . '%')
     ->select(
-        'operations.*',
+        'operations.*', 'users.username',
         'categories.category_name','budgets.budget_currency_total',
         'statu_options.status_description',
         DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name'),
@@ -284,7 +358,7 @@ public function updatedOperationAmount()
         $this->isOpen = true;
         $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
         $this->fetchDataCurrencies();
-         $this->user_selected = User::where('id', $this->selectedUser8)->get();
+        
     }
 
     public function closeModal()
@@ -304,11 +378,13 @@ public function updatedOperationAmount()
         'operation_currency_total',
         'operation_date',
         'category_id',
-        'subcategory_id',
         'registeredSubcategoryItem',
         'operation_status',
+         'user_selected',
+         'budget_id',
        
     ]);
+     $this->showSubcategories = false; 
          $this->resetValidation(); 
            $this->updateDataExpense();
     }
@@ -341,27 +417,39 @@ public function edit($id)
         $this->selectedCategoryId = $list->category_id;
         $this->showSubcategories = true;
 
+         // Asignar el user id
+        $defaultValue = Operation::findOrFail($id);
+        $this->user_selected = isset($list->user_id) ? $list->user_id : $defaultValue->user_id;
+      
+
+        
+        $this->budget_id = $list->budget_id;
        // Obtener la subcategoría asociada, si existe
         $registeredSubcategory = $operation->operationSubcategories->first();
         
          $this->updatedCategoryId($this->category_id, optional($registeredSubcategory)->subcategory_id);
 
-        // Asignar el budget_id
-        $this->budget_id = $list->budget_id;
-        
+       
+     
     }
 
 public function store()
 {
  
 // Custom validation for operation_date
-    if (empty($this->operation_date)) {
-        $this->addError('operation_date', 'The date field is required.');
+if (empty($this->operation_date)) {
+    $this->addError('operation_date', 'The date field is required.');
+} else {
+    // Verificar si la fecha tiene el formato 'Y-m-d'
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->operation_date)) {
+        // Si ya está en el formato 'Y-m-d', no es necesario convertirlo
+       
     } else {
-        // Convert and format the date if it's not empty
+        // Convertir y formatear la fecha si no tiene el formato 'Y-m-d'
         $fechaCarbon = Carbon::createFromFormat('d/m/Y', $this->operation_date);
         $this->operation_date = $fechaCarbon->format('Y-m-d');
     }
+}
 
     $validationRules = [
       
@@ -373,12 +461,15 @@ public function store()
         'operation_status' => 'required',
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
+        'user_selected' => 'required',
     ];
     
     $validatedData = $this->validate($validationRules);
 
+    
     // Agregar user_id al array validado
-    $validatedData['user_id'] = auth()->user()->id;
+    $validatedData['user_id'] = $this->user_selected ?? $this->selectedUser8;
+
     $validatedData['budget_id'] = $this->budget_id;
 
     // Calcular el mes y el año a partir de expense_date usando Carbon
@@ -395,6 +486,9 @@ public function store()
     $validatedData['operation_amount'] = $numericValue;
     $validatedData['operation_currency_total'] = $numericValue2;  
 
+    // SEND UPDATE USER  RENDER
+    $this->selectedUser8 = $validatedData['user_id']; 
+
     $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
     session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
@@ -408,11 +502,13 @@ public function store()
 $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
 
 
-
-   
-
     $this->closeModal();
     $this->resetInputFields();
+
+    // UPDATE USER  RENDER
+   $this->emit('updateDataExpenseOperations');
+
+   
 }
 
 public function SubcategoryOperationAssignment(Operation $operation)
