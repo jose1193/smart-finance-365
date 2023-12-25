@@ -437,7 +437,8 @@
                                                                         <select wire:model="registeredSubcategoryItem"
                                                                             id="select2SubcategoryId"
                                                                             style="width: 100%;">
-                                                                            <option value="">N/A</option>
+                                                                            <option value=""></option>
+                                                                            <option value="N/A">N/A</option>
                                                                             {{-- Display Assigned Subcategories --}}
                                                                             @if (is_array($subcategory_id) && count($subcategory_id) > 0)
                                                                                 @php
@@ -469,6 +470,22 @@
                                                                             @endif
                                                                         </select>
 
+                                                                        <script>
+                                                                            $(document).ready(function() {
+                                                                                $('#select2SubcategoryId').select2();
+
+                                                                                // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
+                                                                                $('#select2SubcategoryId').on('change', function(e) {
+                                                                                    const selectedData = $(this).val();
+                                                                                    const index = $(this).data('index');
+                                                                                    @this.set('subcategory_id', selectedData);
+                                                                                    @this.call('updateSubCategoryUser');
+                                                                                });
+                                                                            });
+                                                                        </script>
+                                                                        <input type="hidden" readonly
+                                                                            wire:model="registeredSubcategoryItem"
+                                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
 
                                                                     </div>
                                                                     @if ($subcategoryMessage)

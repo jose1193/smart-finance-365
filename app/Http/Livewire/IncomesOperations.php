@@ -100,6 +100,17 @@ public function render()
     }
 
 
+    
+      // SELECT SUBCATEGORY_ID TO REGISTERSUBCATEGORYITEM
+
+    public function updateSubCategoryUser()
+    {
+        // Asigna el valor de subcategory_id a registeredSubcategoryItem
+        $this->registeredSubcategoryItem = $this->subcategory_id;
+    }
+
+     // END SELECT SUBCATEGORY_ID TO REGISTERSUBCATEGORYITEM
+
         public function fetchData()
     {
     // Hacer la solicitud HTTP a la API de monedas
@@ -351,54 +362,28 @@ if (empty($this->operation_date)) {
 
 public function SubcategoryOperationAssignment(Operation $operation)
 {
-   
-      // Si $this->subcategory_id es una cadena, conviértela en un array
-    $subcategoryIds = is_array($this->subcategory_id) ? $this->subcategory_id : explode(',', $this->subcategory_id);
+    // Verificar si $this->registeredSubcategoryItem no es 'N/A' y no está vacío
+    if ($this->registeredSubcategoryItem != 'N/A' && !empty($this->registeredSubcategoryItem)) {
+        // Buscar una subcategoría existente para la operación
+        $existingSubcategory = OperationSubcategories::where('operation_id', $operation->id)->first();
 
-    $subcategories = [];
-
-    $subcategories = Subcategory::whereIn('id', $subcategoryIds)->get();
-
-    if ($operation) {
-        // Eliminar las asignaciones existentes en OperationSubcategories solo si hay nuevas subcategorías
-        if ($subcategories->isNotEmpty()) {
-            // Obtén las subcategorías existentes para esta operación
-            $existingSubcategories = OperationSubcategories::where('operation_id', $operation->id)->pluck('subcategory_id')->toArray();
-
-            // Determina las subcategorías que deben eliminarse
-            $subcategoriesToDelete = array_diff($existingSubcategories, $subcategoryIds);
-            
-            // Elimina las subcategorías que ya no están presentes
-            if (!empty($subcategoriesToDelete)) {
-                OperationSubcategories::where('operation_id', $operation->id)
-                    ->whereIn('subcategory_id', $subcategoriesToDelete)
-                    ->delete();
-            }
-
-            // Agrega o actualiza las asignaciones en OperationSubcategories
-            foreach ($subcategories as $subcategory) {
-                $subcategoryId = $subcategory->id;
-                $operationId = $operation->id;
-
-                OperationSubcategories::updateOrCreate(
-                    [
-                        'operation_id' => $operationId,
-                        'subcategory_id' => $subcategoryId,
-                        'user_id_subcategory' => auth()->user()->id,
-                    ]
-                );
-            }
-
-            session()->flash('message', __('Data Updated Successfully'));
+        if ($existingSubcategory) {
+            // Si la subcategoría ya existe, actualizarla
+            $existingSubcategory->update([
+                'subcategory_id' => $this->registeredSubcategoryItem,
+                'user_id_subcategory' => $operation->user_id,
+            ]);
         } else {
-            // Si no se proporcionan nuevas subcategorías, simplemente eliminar las existentes
-            OperationSubcategories::where('operation_id', $operation->id)->delete();
-            
-           
+            // Si no existe, crear una nueva subcategoría
+            OperationSubcategories::create([
+                'operation_id' => $operation->id,
+                'subcategory_id' => $this->registeredSubcategoryItem,
+                'user_id_subcategory' => $operation->user_id,
+            ]);
         }
     } else {
-        // Manejar el caso en el que $operation es nulo
-        session()->flash('info', __('Invalid operation'));
+        // Si $this->registeredSubcategoryItem es 'N/A' o está vacío, eliminar registros en OperationSubcategories
+        OperationSubcategories::where('operation_id', $operation->id)->delete();
     }
 
     $this->resetInputFields();
