@@ -591,7 +591,7 @@
                                                                                 {{-- Mostrar la opción "-- Remove All User --" solo si hay usuarios --}}
                                                                                 @if (count($assignment['users']) > 0)
                                                                                     <option value="removedAll">--
-                                                                                        Remove All User --</option>
+                                                                                        Remove All Users --</option>
                                                                                 @endif
                                                                                 @foreach ($assignment['users'] as $user)
                                                                                     <option
