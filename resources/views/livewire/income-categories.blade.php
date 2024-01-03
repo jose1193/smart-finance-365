@@ -317,13 +317,15 @@
                                         <div
                                             class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                             <!--Modal title-->
-                                            <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
+                                            <div class="text-center"></div>
+                                            <h5 class=" text-xl font-medium leading-normal text-gray-700 text-center dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Assigning Users {{ $categoryNameSelected }}
+                                                Assigning Users To <span
+                                                    class="text-emerald-700 capitalize">{{ $categoryNameSelected }}</span>
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
-                                                class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                                class="p-0.5 bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white rounded-full box-content  border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                                                 data-te-modal-dismiss aria-label="Close">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -349,8 +351,10 @@
                                                     </div>
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">
-                                                            User Assign To Category</label>
+                                                            class="block text-gray-700 text-sm font-bold mb-2 capitalize">
+                                                            Users Assigned to
+                                                            <span class="text-emerald-600">
+                                                                {{ $categoryNameSelected }}</span></label>
 
                                                         <div wire:ignore>
                                                             <select multiple wire:model="user_id_assign"
@@ -366,7 +370,6 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
-
                                                         <script>
                                                             document.addEventListener('livewire:load', function() {
                                                                 Livewire.hook('message.sent', () => {
@@ -383,107 +386,260 @@
 
                                                                 // Escucha el cambio en Select2 y actualiza Livewire
                                                                 $('#selectUserAssign').on('change', function(e) {
-                                                                    @this.set('user_id_assign', $(this).val());
+                                                                    // Obtiene el valor seleccionado
+                                                                    var selectedUserIds = $(this).val();
+                                                                    // Guarda el estado inicial del Select2 al cargar la página
+                                                                    var initialSelectedValues = $('#selectUserAssign').val();
+                                                                    if (selectedUserIds && selectedUserIds.includes('all')) {
+                                                                        // Muestra un mensaje de confirmación con SweetAlert2
+                                                                        Swal.fire({
+                                                                            title: 'Confirm',
+                                                                            text: 'Are you sure you select all users?',
+                                                                            icon: 'warning',
+                                                                            showCancelButton: true,
+                                                                            confirmButtonText: 'Yes, select all',
+                                                                            cancelButtonText: 'Cancel',
+                                                                            confirmButtonColor: '#3085d6',
+                                                                            cancelButtonColor: '#d33',
+                                                                        }).then((result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                // Confirma la selección y ejecuta la función Livewire
+                                                                                @this.set('user_id_assign', ['all']); // Set the value to 'all'
+                                                                                @this.call('categoryAssignment');
+                                                                                // Reinicia el valor del selectUserAssign
+                                                                                $('#selectUserAssign').val(null).trigger('change');
+
+                                                                            } else {
+                                                                                // Excluye 'all' del conjunto de valores seleccionados
+                                                                                var filteredValues = initialSelectedValues.filter(val => val !== 'all');
+                                                                                $('#selectUserAssign').val(filteredValues).trigger('change');
+                                                                                // Revierte la selección en Select2 y no ejecuta la acción de Livewire en caso de cancelación
+                                                                                initialSelectedValues = selectedUserIds;
+                                                                            }
+                                                                        });
+                                                                    } else {
+                                                                        // Actualiza Livewire con los nuevos valores
+                                                                        @this.set('user_id_assign', selectedUserIds);
+
+                                                                        // Llama a la función categoryAssignment
+                                                                        @this.call('categoryAssignment');
+                                                                    }
+                                                                });
+
+                                                                // Escucha el evento de eliminación en Select2 y actualiza Livewire
+                                                                $('#selectUserAssign').on('select2:unselect', function(e) {
+                                                                    // Llama a la función categoryAssignment
+                                                                    @this.call('categoryAssignment');
                                                                 });
                                                             });
                                                         </script>
+
+
+
+
+                                                        <!--INCLUDE ALERTS MESSAGES-->
+
+                                                        <x-message-assigned />
+
+
+
+                                                        <!-- END INCLUDE ALERTS MESSAGES-->
+
+
                                                         @error('user_id_assign')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
                                                     </div>
 
                                                     <div class="mb-4">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Subcategories:</label>
-                                                        <!-- Dentro de tu vista Blade -->
 
-                                                        @foreach ($userAssignments as $index => $assignment)
-                                                            <div class="mb-4">
-                                                                <input type="text" autocomplete="off"
-                                                                    wire:model="userAssignments.{{ $index }}.subcategory_name"
-                                                                    id="subcategory_{{ $index }}"
-                                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                                    placeholder="Enter Subcategory" readonly>
-                                                                @error("subcategory_name.{$index}")
-                                                                    <span class="text-red-500">{{ $message }}</span>
-                                                                @enderror
-
-                                                            </div>
-
-                                                            <div class="mb-4">
-                                                                <label
-                                                                    for="user_id_assignSubcategory_{{ $index }}"
-                                                                    class="block text-gray-700 text-sm font-bold mb-2">
-                                                                    Users Assign To <span class="text-emerald-700">
-                                                                        {{ $assignment['subcategory_name'] }}:</span>
-
-                                                                </label>
+                                                        @if ($userAssignments && count($userAssignments) > 0)
+                                                            <label
+                                                                class="block text-gray-700 text-lg font-bold mb-2 text-end">
+                                                                Subcategories:
+                                                            </label>
 
 
-                                                                <div wire:ignore>
-                                                                    <!-- Tu vista Blade -->
+                                                            @foreach ($userAssignments as $index => $assignment)
+                                                                <!-- Dentro de tu vista Blade -->
+                                                                <div class="flex flex-wrap">
+                                                                    <!-- Primer div de la izquierda -->
+                                                                    <div
+                                                                        class="flex-none w-1/2 border-r border-gray-700 mb-7">
+                                                                        <label
+                                                                            for="user_id_assignSubcategory_{{ $index }}"
+                                                                            class="block text-gray-700 text-sm font-bold mb-2 capitalize">
+                                                                            {{ $index + 1 }}) Select Users To assign
+                                                                            :
 
-                                                                    <select
-                                                                        wire:model="userAssignments.{{ $index }}.user_id_assignSubcategory"
-                                                                        class="selectUserAssignSubcategory"
-                                                                        data-index="{{ $index }}"
-                                                                        style="width: 100%" multiple="multiple">
-                                                                        <option value="all">All Users</option>
-                                                                        @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
-                                                                            <optgroup label="{{ $nameUser }}">
-                                                                                @foreach ($groupedEmails as $email)
+                                                                        </label>
+
+                                                                        <!-- Segundo select que se actualiza según las selecciones del primer select -->
+
+                                                                        <div class="flex items-center">
+
+                                                                            <select x-data="{ borderClass: '' }"
+                                                                                x-init="Livewire.on('sessionAssigned', () => {
+                                                                                    borderClass = 'border-green-700';
+                                                                                    setTimeout(() => {
+                                                                                        borderClass = '';
+                                                                                    }, 7000);
+                                                                                });
+                                                                                Livewire.on('sessionRemoved', () => {
+                                                                                    borderClass = 'border-red-700';
+                                                                                    setTimeout(() => {
+                                                                                        borderClass = '';
+                                                                                    }, 7000);
+                                                                                });"
+                                                                                wire:model="selectedUserId.{{ $index }}"
+                                                                                id="users_selectCategoryId_{{ $index }}"
+                                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2 "
+                                                                                :class="borderClass"
+                                                                                wire:loading.attr="disabled">
+
+                                                                                <option value="">-- Select a
+                                                                                    User
+                                                                                    --</option>
+
+
+                                                                                @php
+                                                                                    $sortedUserIds = collect($user_id_assign)->sortDesc();
+                                                                                @endphp
+                                                                                @foreach ($sortedUserIds as $userId)
+                                                                                    @if ($userId !== 'all')
+                                                                                        @php
+                                                                                            $user = $users->firstWhere('id', $userId);
+                                                                                        @endphp
+                                                                                        <option
+                                                                                            value="{{ $userId }}">
+                                                                                            {{ $user->username ?? 'User Unavailable' }}
+                                                                                        </option>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </select>
+
+
+
+                                                                            <button
+                                                                                class="relative bg-teal-600 duration-500 ease-in-out hover:bg-teal-700 text-white text-sm font-bold py-1 px-2 rounded mr-6"
+                                                                                wire:click.prevent="AssignToSubCategoryUser('{{ $assignment['subcategory_name'] }}', '{{ $selectedUserId[$index] ?? '' }}')"
+                                                                                wire:loading.attr="disabled"
+                                                                                :disabled="!$selectedUserId || !isset(
+                                                                                        $selectedUserId[$index]) ||
+                                                                                    !
+                                                                                    $selectedUserId[$index]">
+                                                                                <i class="fa-solid fa-arrow-right"></i>
+                                                                            </button>
+
+                                                                            @error("selectedUserId.{$index}")
+                                                                                <span
+                                                                                    class="text-red-500">{{ $message }}</span>
+                                                                            @enderror
+                                                                        </div>
+
+                                                                        <!-- Contenido del primer div va aquí -->
+                                                                    </div>
+
+                                                                    <!-- Segundo div de la derecha -->
+                                                                    <div class="flex-none w-1/2 ">
+                                                                        <label
+                                                                            for="user_id_assignSubcategory_{{ $index }}"
+                                                                            id="subcategory_{{ $index }}"
+                                                                            class="block text-gray-700 text-sm font-bold mb-2 text-right">
+                                                                            <span class="text-teal-700 capitalize">
+                                                                                {{ $index + 1 }})
+                                                                                {{ $assignment['subcategory_name'] }}</span>
+
+                                                                        </label>
+                                                                        <!-- Contenido del segundo div va aquí -->
+                                                                        <div class="flex items-center">
+
+                                                                            <!-- Your Blade file with Livewire component -->
+                                                                            <select x-data="{ borderClassSubcategory: '' }"
+                                                                                x-init="Livewire.on('sessionAssignedSubcategory', () => {
+                                                                                    borderClassSubcategory = 'border-green-700';
+                                                                                    setTimeout(() => {
+                                                                                        borderClassSubcategory = '';
+                                                                                    }, 7000);
+                                                                                });
+                                                                                Livewire.on('sessionRemovedSubcategory', () => {
+                                                                                    borderClassSubcategory = 'border-red-700';
+                                                                                    setTimeout(() => {
+                                                                                        borderClassSubcategory = '';
+                                                                                    }, 7000);
+                                                                                });
+                                                                                Livewire.on('sessionRemoved', () => {
+                                                                                    borderClassSubcategory = 'border-red-700';
+                                                                                    setTimeout(() => {
+                                                                                        borderClassSubcategory = '';
+                                                                                    }, 7000);
+                                                                                });"
+                                                                                wire:model="selectedUserIdDelete.{{ $index }}"
+                                                                                data-index="{{ $index }}"
+                                                                                id="selectedUserIdDelete.{{ $index }}"
+                                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ml-5 mr-2"
+                                                                                :class="borderClassSubcategory"
+                                                                                wire:loading.attr="disabled">
+
+                                                                                <option value="">-- Select a
+                                                                                    User
+                                                                                    --</option>
+                                                                                {{-- Mostrar la opción "-- Remove All User --" solo si hay usuarios --}}
+                                                                                @if (count($assignment['users']) > 0)
+                                                                                    <option value="removedAll">--
+                                                                                        Remove All User --</option>
+                                                                                @endif
+                                                                                @foreach ($assignment['users'] as $user)
                                                                                     <option
-                                                                                        value="{{ $email->id }}">
-                                                                                        {{ $email->email }}
+                                                                                        value="{{ is_object($user) ? $user->id : $user['id'] }}">
+                                                                                        {{ optional($user)['username'] ?? 'User Unavailable' }}
                                                                                     </option>
                                                                                 @endforeach
-                                                                            </optgroup>
-                                                                        @endforeach
-                                                                    </select>
 
+
+                                                                            </select>
+
+                                                                            @if (count($assignment['users']) > 0)
+                                                                                <button
+                                                                                    class="relative bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white text-sm font-bold py-1 px-2 rounded mr-0"
+                                                                                    wire:click.prevent="$emit('deleteDataUserSubcategory','{{ $assignment['subcategory_name'] }}', '{{ $selectedUserIdDelete[$index] ?? '' }}')"
+                                                                                    wire:loading.attr="disabled"
+                                                                                    :disabled="!$selectedUserIdDelete || !
+                                                                                        isset(
+                                                                                            $selectedUserIdDelete[
+                                                                                                $index]) || !
+                                                                                        $selectedUserIdDelete[
+                                                                                            $index]">
+                                                                                    <i class="fa-solid fa-trash"></i>
+                                                                                </button>
+                                                                            @endif
+
+                                                                        </div>
+                                                                        @error("subcategory_name.{$index}")
+                                                                            <span
+                                                                                class="text-red-500">{{ $message }}</span>
+                                                                        @enderror
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        @endforeach
-                                                        <script>
-                                                            $(document).ready(function() {
+                                                                <!-- END DIV -->
+                                                            @endforeach
 
-                                                                // Inicializa Select2 para el selectUserAssignSubcategory
-                                                                $('.selectUserAssignSubcategory').select2();
-
-
-                                                                $('.selectUserAssignSubcategory').on('change', function(e) {
-                                                                    const index = $(this).data('index');
-                                                                    console.log('Selected value for index ' + index + ':', $(this).val());
-
-                                                                    @this.set('user_id_assignSubcategory.' + index, $(this).val());
-                                                                });
-
-                                                            });
-                                                        </script>
-
-
-
-
+                                                        @endif
 
                                                     </div>
 
 
                                                 </div>
                                             </div>
+
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                                 <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                                    <button type="button" wire:click.prevent="categoryAssignment()"
-                                                        wire:loading.attr="disabled" wire:target="categoryAssignment"
+                                                    <button type="button"wire:click="closeModalUserAssignment()"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                                         Finish
                                                     </button>
                                                 </span>
-                                                <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-                                                    <button wire:click="closeModalUserAssignment()" type="button"
-                                                        class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Cancel
-                                                    </button>
-                                                </span>
+
                                             </div>
                                         </form>
                                     </div>
@@ -532,5 +688,52 @@
                 }
             });
         });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Livewire.on('deleteDataUserSubcategory', function(subcategoryName, selectedUserIdDelete) {
+            if (selectedUserIdDelete) {
+                showDeleteConfirmation(subcategoryName, selectedUserIdDelete);
+            } else {
+                showUserNotSelectedAlert();
+            }
+        });
+
+        function showDeleteConfirmation(subcategoryName, selectedUserIdDelete) {
+            Swal.fire({
+                title: 'Are you sure you want to delete this item?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteItem(subcategoryName, selectedUserIdDelete);
+                }
+            });
+        }
+
+        function deleteItem(subcategoryName, selectedUserIdDelete) {
+            Livewire.emitTo('income-categories', 'deleteSubcategoryAssignments', subcategoryName,
+                selectedUserIdDelete);
+            Swal.fire(
+                'Deleted!',
+                'Your Data has been deleted.',
+                'success'
+            );
+        }
+
+        function showUserNotSelectedAlert() {
+            Swal.fire({
+                title: 'Please select a user first',
+                icon: 'info',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        }
     });
 </script>

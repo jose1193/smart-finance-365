@@ -19,9 +19,10 @@ class ExpensesCategories extends Component
     public $search = '';
     public $mainCategoriesRender;
     public $isOpen = 0;
-    protected $listeners = ['render','delete'];
+     protected $listeners = ['render','delete','deleteSubcategoryAssignments'];
     public $users;
     public $user_id_assign = [];
+    public $selectedUsers = [];
 
     public $selectedItemId;
     public $showModal = false;
@@ -29,6 +30,9 @@ class ExpensesCategories extends Component
     public $subcategory_name = [];
     public $user_id_assignSubcategory = [];
     public $userAssignments = [];
+
+    public $selectedUserId;
+    public $selectedUserIdDelete;
 
     public function authorize()
 {
@@ -221,157 +225,222 @@ public function edit($id)
 
    
 
+ // USER ASSIGNMENT TO REGISTER CATEGORY AND SUBCATEGORY ITEM
+
 public function categoryAssignment()
 {
     $this->authorize('manage admin');
 
-    $this->validate([
-        'user_id_assign' => 'required|array',
-        'user_id_assign.*' => 'required|max:100',
-        'categoryNameSelected' => 'required|string|max:50',
-    ], [
-        'user_id_assign.required' => 'El ID de usuario asignado en Categoria es obligatorio.',
-        'user_id_assign.array' => 'El ID de usuario asignado debe ser un array.',
-        'user_id_assign.*.required' => 'El ID de usuario asignado es obligatorio.',
-        'user_id_assign.*.max' => 'El ID de usuario asignado no debe superar los 100 caracteres.',
-    ]);
-
     $storeCategory = Category::firstOrNew(['category_name' => $this->categoryNameSelected]);
-     $storeCategory->save();
 
     if ($storeCategory) {
-        if (in_array('all', $this->user_id_assign)) {
-            CategoriesToAssign::where('category_id', $storeCategory->id)->delete();
-        } else {
-        // Eliminar usuarios deseleccionados
-        CategoriesToAssign::where('category_id', $storeCategory->id)
-            ->whereNotIn('user_id_assign', $this->user_id_assign)
-            ->delete();
-
-        // Actualizar o crear asignaciones de usuarios
-        foreach ($this->user_id_assign as $userId) {
-            CategoriesToAssign::updateOrCreate(
-                ['category_id' => $storeCategory->id, 'user_id_assign' => $userId],
-                ['user_id_admin' => auth()->user()->id]
-            );
-        }
-    }
-        
+        $this->handleUserAssignment($storeCategory);
     } else {
         session()->flash('info', 'Category not found.');
     }
-
-    // Llamada a la función para asignar usuarios a subcategorías
-       $this->SubcategoryAssignment($storeCategory);
-
-        $this->closeModalUserAssignment();
-        $this->resetInputFields();
 }
 
-
-public function SubcategoryAssignment(Category $storeCategory)
+private function handleUserAssignment($storeCategory)
 {
-    if (!$storeCategory || $storeCategory->Subcategory->isEmpty()) {
-        session()->flash('info', 'Invalid category or no subcategories found.');
-        return;
+    if (in_array('all', $this->user_id_assign)) {
+        $this->deleteAllAssignments($storeCategory);
+    } else {
+        $this->deleteUnselectedUsers($storeCategory);
+        $this->updateOrCreateAssignments($storeCategory);
     }
-
-    $storeCategory = Category::with('assignedUsers')->find($storeCategory->id);
-    $assignedUsers = $storeCategory->assignedUsers;
-
-     if (empty($this->user_id_assign) || in_array('all', $this->user_id_assign)) {
-        $this->deleteSubcategoryAssignments($storeCategory->Subcategory);
-        return;
-    }
-
-    foreach ($storeCategory->Subcategory as $index => $subcategory) {
-        $selectedUsers = $this->user_id_assignSubcategory[$index] ?? [];
-     
-        // Check if 'All Users' is selected or array is empty
-        if (in_array('all', $selectedUsers) || empty($selectedUsers)) {
-            $this->deleteSubcategoryAssignments((object) $subcategory);
-        } else {
-            $this->processSubcategoryAssignments((object) $subcategory, $selectedUsers, $storeCategory->id, $assignedUsers);
-        }
-    }
-
-    $this->resetInputFields();
 }
 
-
-private function deleteSubcategoryAssignments($subcategories)
+private function deleteAllAssignments($storeCategory)
 {
-    // Ensure $subcategories is a collection
-    if (!$subcategories instanceof \Illuminate\Database\Eloquent\Collection) {
-        // If it's not a collection, create one
-        $subcategories = collect([$subcategories]);
-    }
+    $categoryAssignmentsExist = CategoriesToAssign::where('category_id', $storeCategory->id)->exists();
 
-    // Loop through each subcategory in the collection
-    $subcategories->each(function ($subcategory) {
-        // Check if the subcategory object has the 'id' property
-        if ($subcategory->id) {
-            // Delete entries in the SubcategoryToAssign table where subcategory_id matches the subcategory id
+    if ($categoryAssignmentsExist) {
+        CategoriesToAssign::where('category_id', $storeCategory->id)->delete();
+
+        $subcategories = $storeCategory->subCategory;
+        foreach ($subcategories as $subcategory) {
             SubcategoryToAssign::where('subcategory_id', $subcategory->id)->delete();
         }
-    });
-}
 
-
-
-private function processSubcategoryAssignments($subcategory, $selectedUsers, $categoryId, $assignedUsers)
-{
-    $unassignedUsers = $this->getUnassignedUsers(
-        $selectedUsers,
-        $this->getUserAssignments($categoryId, $selectedUsers),
-        $assignedUsers
-    );
-
-    if (!empty($unassignedUsers)) {
-        $unassignedUsernamesString = implode(', ', $unassignedUsers);
-        session()->flash('info', "Users not assigned to the category '$subcategory->subcategory_name' - Usernames: $unassignedUsernamesString");
+        session()->flash('removed', 'Users have been removed!');
+        $this->reset(['selectedUserId', 'user_id_assign','selectedUserIdDelete']);
+        
+        $this->user_id_assign = 'All Users';
+        
+        // Refresh the modal or any other necessary action
+    $this->resfreschModalUserAssignment($storeCategory->id);
+         $this->emit('sessionRemoved');
     } else {
-        SubcategoryToAssign::where('subcategory_id', $subcategory->id)
-            ->whereNotIn('user_id_subcategory', $selectedUsers)
-            ->delete();
-
-        $this->updateOrCreateUserAssignments($subcategory->id, $selectedUsers);
-        session()->flash('message', 'User Assignments Updated Successfully.');
+        // Puedes agregar un mensaje de flash específico si no hay asignaciones en CategoriesToAssign
+        session()->flash('noAssignments', 'No user assignments found for this category!');
     }
 }
 
-private function updateOrCreateUserAssignments($subcategoryId, $selectedUsers)
+
+private function deleteUnselectedUsers($storeCategory)
 {
-    foreach ($selectedUsers as $userId) {
-        SubcategoryToAssign::updateOrCreate(
-            ['subcategory_id' => $subcategoryId, 'user_id_subcategory' => $userId],
+    
+    $deletedCategories = CategoriesToAssign::where('category_id', $storeCategory->id)
+        ->whereNotIn('user_id_assign', $this->user_id_assign)
+        ->delete();
+
+    $deletedSubcategories = SubcategoryToAssign::whereIn('subcategory_id', $storeCategory->subCategory->pluck('id'))
+        ->whereNotIn('user_id_subcategory', $this->user_id_assign)
+        ->delete();
+
+    if ($deletedCategories || $deletedSubcategories) {
+        
+        // Refresh the modal or any other necessary action
+    $this->resfreschModalUserAssignment($storeCategory->id);
+            session()->flash('removed', "User has been removed!");
+       $this->emit('sessionRemoved'); 
+    }
+}
+
+
+
+
+private function updateOrCreateAssignments($storeCategory)
+{
+     
+    $isCreate = false;
+
+    foreach ($this->user_id_assign as $userId) {
+        
+        $result = CategoriesToAssign::updateOrCreate(
+            ['category_id' => $storeCategory->id, 'user_id_assign' => $userId],
             ['user_id_admin' => auth()->user()->id]
         );
+
+        if ($result->wasRecentlyCreated) {
+            $isCreate = true; // Indica que al menos una asignación fue creada
+        }
+
+        
+    }
+
+        if ($isCreate) {
+           
+        session()->flash('assigned', 'User assigned successfully!');
+        $this->emit('sessionAssigned');
     }
 }
 
 
-private function getUserAssignments($categoryId, $selectedUsers)
+
+
+public function AssignToSubCategoryUser($subcategoryName, $selectedUserId)
 {
-    return CategoriesToAssign::where('category_id', $categoryId)
-        ->whereIn('user_id_assign', $selectedUsers)
-        ->pluck('user_id_assign')
-        ->toArray();
-}
+   
+    // Validate the selectedUserId
+    $this->validate([
+        'selectedUserId' => 'required|exists:users,id', // Assuming your users table has an 'id' column
+    ]);
 
+    // Now, you can proceed with finding the subcategory
+    $subcategory = Subcategory::where('subcategory_name', $subcategoryName)->first();
 
+    if ($subcategory) {
+        // Check if the user is already assigned to the subcategory
+        $existingAssignment = SubcategoryToAssign::where('subcategory_id', $subcategory->id)
+            ->where('user_id_subcategory', $selectedUserId)
+            ->exists();
 
-// Función para obtener usuarios no asignados
-private function getUnassignedUsers($selectedUsers, $categoryAssignments, $assignedUsers) {
-    $unassignedUsers = array_diff($selectedUsers, $categoryAssignments);
+        if ($existingAssignment) {
+            // User is already assigned to the subcategory
+            session()->flash('info', 'User is already assigned to this subcategory.');
+        } else {
+             // Find the user by ID
+            $user = User::find($selectedUserId);
+            // User is not assigned, perform the assignment
+            SubcategoryToAssign::updateOrCreate(
+                ['subcategory_id' => $subcategory->id, 'user_id_subcategory' => $selectedUserId],
+                ['user_id_admin' => auth()->user()->id]
+            );
 
-    // Verificar si el usuario autenticado está asignado
-    if ($assignedUsers->contains('id', auth()->user()->id)) {
-        $unassignedUsers = array_diff($unassignedUsers, [auth()->user()->username]);
+            
+          
+            $this->emit('sessionAssignedSubcategory');
+
+            session()->flash('assignedSubcategory',"User $user->username assigned to subcategory successfully" );
+            
+        }
+    } else {
+        // Subcategory not found
+        session()->flash('info', 'Subcategory not found.');
     }
 
-    return User::whereIn('id', $unassignedUsers)->pluck('username')->toArray();
+    // Refresh the modal or any other necessary action
+    $this->resfreschModalUserAssignment($subcategory->category_id);
 }
+
+
+
+public function resfreschModalUserAssignment($itemId)
+{
+    $this->selectedItemId = $itemId;  
+    $category = Category::with('Subcategory')->find($this->selectedItemId);
+    
+    // Clear the userAssignments array before populating it again
+    $this->userAssignments = [];
+
+    foreach ($category->Subcategory as $subcategory) {
+        $subcategoryAssignments = SubcategoryToAssign::where('subcategory_id', $subcategory->id)->get();
+        $userIdsSubcategory = $subcategoryAssignments->pluck('user_id_subcategory')->toArray();
+
+        // Obtener usuarios asignados a la subcategoría
+        $usersInSubcategory = User::whereIn('id', $userIdsSubcategory)->get(['id', 'username']); // Selecciona solo los campos necesarios
+        
+        // Guardar información en el array $userAssignments
+        $this->userAssignments[] = [
+            'subcategory_name' => $subcategory->subcategory_name,
+            'users' => $usersInSubcategory,
+            'user_id_assignSubcategory' => $userIdsSubcategory,
+        ];
+    }
+   
+}
+
+
+public function deleteSubcategoryAssignments($subcategoryName, $selectedUserIdDelete)
+{
+    // Find the subcategory by name
+    $subcategory = Subcategory::where('subcategory_name', $subcategoryName)->first();
+
+    // Check if the subcategory is found
+    if ($subcategory) {
+        // Find the user by ID
+        $user = User::find($selectedUserIdDelete);
+
+        if ($selectedUserIdDelete === 'removedAll') {
+            // Eliminar todos los usuarios asignados a la subcategoría
+            SubcategoryToAssign::where('subcategory_id', $subcategory->id)->delete();
+            session()->flash('removedAllSubcategory', "All users have been removed from the Subcategory!");
+        } else {
+            // Eliminar el usuario específico de la subcategoría
+            SubcategoryToAssign::where('subcategory_id', $subcategory->id)
+                ->where('user_id_subcategory', $selectedUserIdDelete)
+                ->delete();
+
+            session()->flash('removedSubcategory', "User $user->username has been removed from the Subcategory!");
+        }
+
+        // Refresh the modal or any other necessary action
+        $this->resfreschModalUserAssignment($subcategory->category_id);
+        $this->emit('sessionRemovedSubcategory');
+    } else {
+        // Handle the case where the subcategory is not found
+        session()->flash('info', 'Subcategory not found.');
+    }
+}
+
+
+
+
+   // END USER ASSIGNMENT TO REGISTER CATEGORY AND SUBCATEGORY ITEM
+
+
+
 
 
 public function OpenModalUserAssignment($itemId)
@@ -393,7 +462,7 @@ public function OpenModalUserAssignment($itemId)
         $userIdsSubcategory = $subcategoryAssignments->pluck('user_id_subcategory')->toArray();
 
         // Obtener usuarios asignados a la subcategoría
-        $usersInSubcategory = User::whereIn('id', $userIdsSubcategory)->get(['id', 'name']); // Selecciona solo los campos necesarios
+      $usersInSubcategory = User::whereIn('id', $userIdsSubcategory)->get(['id', 'username']); // Selecciona solo los campos necesarios
 
         // Guardar información en el array $userAssignments
         $userAssignments[] = [
@@ -410,7 +479,7 @@ public function OpenModalUserAssignment($itemId)
     public function closeModalUserAssignment()
     {
         $this->showModal = false;
-         $this->resetValidation(); 
+        $this->resetInputFields(); 
     }
 
     public function addSubcategory()
