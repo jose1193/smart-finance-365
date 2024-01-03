@@ -478,10 +478,11 @@
 
                                                                         </label>
 
-                                                                        <!-- Segundo select que se actualiza según las selecciones del primer select -->
+
 
                                                                         <div class="flex items-center">
 
+                                                                            <!-- First Select -->
                                                                             <select x-data="{ borderClass: '' }"
                                                                                 x-init="Livewire.on('sessionAssigned', () => {
                                                                                     borderClass = 'border-green-700';
@@ -501,16 +502,17 @@
                                                                                 :class="borderClass"
                                                                                 wire:loading.attr="disabled">
 
-                                                                                <option value="">-- Select a
-                                                                                    User
+                                                                                <option value="">-- Select a User
                                                                                     --</option>
-
 
                                                                                 @php
                                                                                     $sortedUserIds = collect($user_id_assign)->sortDesc();
+                                                                                    $assignedUserIds = collect($assignment['users'])
+                                                                                        ->pluck('id')
+                                                                                        ->toArray();
                                                                                 @endphp
                                                                                 @foreach ($sortedUserIds as $userId)
-                                                                                    @if ($userId !== 'all')
+                                                                                    @if ($userId !== 'all' && !in_array($userId, $assignedUserIds))
                                                                                         @php
                                                                                             $user = $users->firstWhere('id', $userId);
                                                                                         @endphp
@@ -521,7 +523,6 @@
                                                                                     @endif
                                                                                 @endforeach
                                                                             </select>
-
 
 
                                                                             <button

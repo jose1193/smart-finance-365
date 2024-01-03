@@ -478,6 +478,7 @@
 
                                                                         <div class="flex items-center">
 
+                                                                            <!-- First Select -->
                                                                             <select x-data="{ borderClass: '' }"
                                                                                 x-init="Livewire.on('sessionAssigned', () => {
                                                                                     borderClass = 'border-green-700';
@@ -497,16 +498,17 @@
                                                                                 :class="borderClass"
                                                                                 wire:loading.attr="disabled">
 
-                                                                                <option value="">-- Select a
-                                                                                    User
+                                                                                <option value="">-- Select a User
                                                                                     --</option>
-
 
                                                                                 @php
                                                                                     $sortedUserIds = collect($user_id_assign)->sortDesc();
+                                                                                    $assignedUserIds = collect($assignment['users'])
+                                                                                        ->pluck('id')
+                                                                                        ->toArray();
                                                                                 @endphp
                                                                                 @foreach ($sortedUserIds as $userId)
-                                                                                    @if ($userId !== 'all')
+                                                                                    @if ($userId !== 'all' && !in_array($userId, $assignedUserIds))
                                                                                         @php
                                                                                             $user = $users->firstWhere('id', $userId);
                                                                                         @endphp
@@ -517,8 +519,6 @@
                                                                                     @endif
                                                                                 @endforeach
                                                                             </select>
-
-
 
                                                                             <button
                                                                                 class="relative bg-teal-600 duration-500 ease-in-out hover:bg-teal-700 text-white text-sm font-bold py-1 px-2 rounded mr-6"
@@ -555,6 +555,7 @@
                                                                         <div class="flex items-center">
 
                                                                             <!-- Your Blade file with Livewire component -->
+                                                                            <!-- Second Select -->
                                                                             <select x-data="{ borderClassSubcategory: '' }"
                                                                                 x-init="Livewire.on('sessionAssignedSubcategory', () => {
                                                                                     borderClassSubcategory = 'border-green-700';
