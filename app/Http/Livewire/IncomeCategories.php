@@ -31,7 +31,6 @@ class IncomeCategories extends Component
     
     public $selectedUserId;
     public $selectedUserIdDelete;
-   
     
     use WithPagination;
 
@@ -332,13 +331,11 @@ private function updateOrCreateAssignments($storeCategory)
 
 
 
-
 public function AssignToSubCategoryUser($subcategoryName, $selectedUserId)
 {
-   
     // Validate the selectedUserId
     $this->validate([
-        'selectedUserId' => 'required|exists:users,id', // Assuming your users table has an 'id' column
+        'selectedUserId' => 'required', // Add any additional validation rules as needed
     ]);
 
     // Now, you can proceed with finding the subcategory
@@ -354,20 +351,24 @@ public function AssignToSubCategoryUser($subcategoryName, $selectedUserId)
             // User is already assigned to the subcategory
             session()->flash('info', 'User is already assigned to this subcategory.');
         } else {
-             // Find the user by ID
-            $user = User::find($selectedUserId);
-            // User is not assigned, perform the assignment
-            SubcategoryToAssign::updateOrCreate(
-                ['subcategory_id' => $subcategory->id, 'user_id_subcategory' => $selectedUserId],
-                ['user_id_admin' => auth()->user()->id]
-            );
-
             
-          
+            if ($selectedUserId === 'AllUsers') {
+              
+               // Find the category by name
+                $category = Category::where('category_name', $this->categoryNameSelected)->first();
+                if ($category) {
+             // Assign all users to the subcategory
+                 $this->assignAllUsersToSubcategory($subcategory, $selectedUserId, $category->id);
+                }
+              
+                
+            } else {
+                // Assign a single user to the subcategory
+                $this->assignUserToSubcategory($subcategory, $selectedUserId);
+            }
+
             $this->emit('sessionAssignedSubcategory');
-
-            session()->flash('assignedSubcategory',"User $user->username assigned to subcategory successfully" );
-            
+            session()->flash('assignedSubcategory', 'Users assigned to subcategory successfully');
         }
     } else {
         // Subcategory not found
@@ -377,6 +378,50 @@ public function AssignToSubCategoryUser($subcategoryName, $selectedUserId)
     // Refresh the modal or any other necessary action
     $this->resfreschModalUserAssignment($subcategory->category_id);
 }
+
+
+
+private function assignUserToSubcategory($subcategory, $selectedUserId)
+{
+    
+    // Find the user by ID
+    $user = User::find($selectedUserId);
+
+    // Perform the assignment
+    SubcategoryToAssign::updateOrCreate(
+        ['subcategory_id' => $subcategory->id, 'user_id_subcategory' => $selectedUserId],
+        ['user_id_admin' => auth()->user()->id]
+    );
+
+    session()->flash('assignedSubcategory', "User $user->username assigned to subcategory successfully");
+}
+
+
+
+private function assignAllUsersToSubcategory($subcategory, $selectedUserId, $categoryIdSelected)
+{
+    // Find the user IDs assigned to the category
+    $categoryAssignments = CategoriesToAssign::where('category_id', $categoryIdSelected)->get();
+    $userIdsCategory = $categoryAssignments->pluck('user_id_assign')->toArray();
+
+    // Find the user IDs assigned to the subcategory
+    $subcategoryAssignments = SubcategoryToAssign::where('subcategory_id', $subcategory->id)->get();
+    $userIdsSubcategory = $subcategoryAssignments->pluck('user_id_subcategory')->toArray();
+
+    // Find the user IDs that are not assigned to the subcategory but are assigned to the category
+    $missingUserIds = array_diff($userIdsCategory, $userIdsSubcategory);
+   
+    foreach ($missingUserIds as $userId) {
+        // Perform the assignment for missing user IDs
+        SubcategoryToAssign::updateOrCreate(
+            ['subcategory_id' => $subcategory->id, 'user_id_subcategory' => $userId],
+            ['user_id_admin' => auth()->user()->id]
+        );
+    }
+
+    session()->flash('assignedSubcategory', "Users have been assigned to the subcategory successfully");
+}
+
 
 
 

@@ -479,10 +479,8 @@
                                                                         </label>
 
 
-
                                                                         <div class="flex items-center">
 
-                                                                            <!-- First Select -->
                                                                             <select x-data="{ borderClass: '' }"
                                                                                 x-init="Livewire.on('sessionAssigned', () => {
                                                                                     borderClass = 'border-green-700';
@@ -510,7 +508,19 @@
                                                                                     $assignedUserIds = collect($assignment['users'])
                                                                                         ->pluck('id')
                                                                                         ->toArray();
+                                                                                    $availableUsersCount = count(
+                                                                                        $sortedUserIds->reject(function ($userId) use ($assignedUserIds) {
+                                                                                            return $userId === 'all' || in_array($userId, $assignedUserIds);
+                                                                                        }),
+                                                                                    );
                                                                                 @endphp
+
+                                                                                {{-- Show the option "-- Assign All Users --" only if there are available users --}}
+                                                                                @if ($availableUsersCount > 0)
+                                                                                    <option value="AllUsers">-- Assign
+                                                                                        All Users --</option>
+                                                                                @endif
+
                                                                                 @foreach ($sortedUserIds as $userId)
                                                                                     @if ($userId !== 'all' && !in_array($userId, $assignedUserIds))
                                                                                         @php
@@ -523,6 +533,8 @@
                                                                                     @endif
                                                                                 @endforeach
                                                                             </select>
+
+
 
 
                                                                             <button

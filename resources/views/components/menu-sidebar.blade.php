@@ -150,7 +150,7 @@
                              @role('User')
                                  Management
                              @else
-                                 Management All Users
+                                 Management Users
                              @endrole
                          </span>
                      </span>
@@ -447,7 +447,7 @@
                          <span class="ml-4"> @role('User')
                                  Management
                              @else
-                                 Management All Users
+                                 Management Users
                              @endrole
                          </span>
                      </span>
