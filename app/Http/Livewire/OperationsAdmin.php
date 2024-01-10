@@ -50,7 +50,7 @@ public $registeredSubcategoryItem;
 
 public $selectedUser8;
 public $users;
-public $showData = false;
+public $showData = true;
 public $data;
 public $user_selected;
 
@@ -110,7 +110,7 @@ public function refreshBudget()
  
  // CHANGE USER CATEGORY ASSIGNED
 public function updateCategoryUser()
-{
+{ 
     $this->refreshCategories($this->user_selected);
     $this->category_id = null;
    $this->showSubcategories = false; 
@@ -130,7 +130,7 @@ public function refreshCategories()
 {
     $assignedCategories = CategoriesToAssign::where('user_id_assign', $this->user_selected)
         ->pluck('category_id');
-
+$this->updateDataExpense();
     $this->categoriesRender = Category::where('main_category_id', 2)
         ->whereIn('id', $assignedCategories)
         ->orWhere(function ($query) use ($assignedCategories) {
@@ -163,6 +163,7 @@ public function refreshCategories()
     
     { 
         $this->users = User::orderBy('id', 'desc')->get();
+         $this->updateDataExpense();
     }
 
      public function render()
@@ -184,63 +185,72 @@ public function updateDataExpense()
    
 }
 
-
 public function updateDataExpenseOperations() 
-    {
-      
+{
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-    ->join('users', 'operations.user_id', '=', 'users.id')
-    ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
-    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
-    ->leftJoin('budget_expenses', 'budget_expenses.operation_id', '=', 'operations.id')
-    ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
-    ->where('users.id', $this->selectedUser8)
-    ->where('categories.main_category_id', 2)
-    ->where('operations.operation_description', 'like', '%' . $this->search . '%')
-    ->select(
-        'operations.*', 'users.username',
-        'categories.category_name','budgets.budget_currency_total',
-        'statu_options.status_description',
-        DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name'),
-        'budget_expenses.operation_id as budget_expense_operation_id',
-        'budgets.budget_date as date',
-        'budgets.id as budget_id'
-    )
-    ->orderBy('operations.id', 'desc')
-    ->get();
+        ->join('users', 'operations.user_id', '=', 'users.id')
+        ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
+        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
+        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
+        ->leftJoin('budget_expenses', 'budget_expenses.operation_id', '=', 'operations.id')
+        ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
+        ->where('categories.main_category_id', 2)
+        ->where('operations.operation_description', 'like', '%' . $this->search . '%')
+        ->select(
+            'operations.*', 'users.username',
+            'categories.category_name', 'budgets.budget_currency_total',
+            'statu_options.status_description',
+            DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name'),
+            'budget_expenses.operation_id as budget_expense_operation_id',
+            'budgets.budget_date as date',
+            'budgets.id as budget_id'
+        )
+        ->orderBy('operations.id', 'desc');
 
+    // Agregar la condición para el usuario seleccionado solo si está configurado
+    if ($this->selectedUser8) {
+        $query->where('users.id', $this->selectedUser8);
 
-    $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
-    ->pluck('category_id');
+        $assignedCategories = CategoriesToAssign::where('user_id_assign', $this->selectedUser8)
+            ->pluck('category_id');
 
-    $this->categoriesRender = Category::where('main_category_id', 2)
-    ->whereIn('id', $assignedCategories)
-    ->orWhere(function ($query) use ($assignedCategories) {
-        $query->whereNotIn('id', $assignedCategories)
-              ->whereNotExists(function ($subQuery) {
-                  $subQuery->select(DB::raw(2))
-                           ->from('categories_to_assigns')
-                           ->whereColumn('categories_to_assigns.category_id', 'categories.id');
-              })
-              ->where('main_category_id', 2); 
-    })
-    ->orderBy('id', 'asc')
-    ->get();
+        $this->categoriesRender = Category::where('main_category_id', 2)
+            ->whereIn('id', $assignedCategories)
+            ->orWhere(function ($query) use ($assignedCategories) {
+                $query->whereNotIn('id', $assignedCategories)
+                    ->whereNotExists(function ($subQuery) {
+                        $subQuery->select(DB::raw(2))
+                            ->from('categories_to_assigns')
+                            ->whereColumn('categories_to_assigns.category_id', 'categories.id');
+                    })
+                    ->where('main_category_id', 2); 
+            })
+            ->orderBy('id', 'asc')
+            ->get();
 
-    
-    $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
-                                  ->orderBy('id', 'asc')
-                                  ->get();
-       
-    $this->budgets = Budget::where('user_id', $this->selectedUser8)
-        ->orderBy('id', 'desc')
-        ->get();
+        $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
+            ->orderBy('id', 'asc')
+            ->get();
 
-  
-        return $query;
+        $this->budgets = Budget::where('user_id', $this->selectedUser8)
+            ->orderBy('id', 'desc')
+            ->get();
+    } else {
+        // Si no se ha seleccionado un usuario, obtén todos los usuarios
+        $this->categoriesRender = Category::where('main_category_id', 2)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        // No asignar nada a $this->budgets si no hay usuario seleccionado
     }
+
+    return $query->get();
+}
 
 
         public function fetchData()
@@ -370,6 +380,7 @@ public function updatedOperationAmount()
         $this->authorize('manage admin');
         $this->openModal();
         $this->updateDataExpense();
+         $this->user_selected = $this->selectedUser8;
     }
 
     public function openModal()
@@ -405,8 +416,8 @@ public function updatedOperationAmount()
        
     ]);
      $this->showSubcategories = false; 
-         $this->resetValidation(); 
-           $this->updateDataExpense();
+        $this->resetValidation(); 
+        $this->updateDataExpense();
     }
 
        
@@ -449,7 +460,8 @@ public function edit($id)
         $registeredSubcategory = $operation->operationSubcategories->first();
         
          $this->updatedCategoryId($this->category_id, optional($registeredSubcategory)->subcategory_id);
-
+        $this->emit('reinitDataTable');
+        $this->updateDataExpense();
        
      
     }
@@ -574,6 +586,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
 
 public function updatedCategoryId($value,$registeredSubcategoryId = null)
 {
+      $this->updateDataExpense();
     $userId = auth()->user()->id;
 
     // Lógica para obtener las subcategorías asignadas al usuario autenticado en la categoría seleccionada

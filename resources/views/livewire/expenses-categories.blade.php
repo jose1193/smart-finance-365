@@ -49,7 +49,8 @@
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
-                            <table class="w-full whitespace-no-wrap">
+
+                            <table class="w-full whitespace-no-wrap" id="miTabla">
                                 <thead>
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
@@ -129,33 +130,36 @@
                                             </td>
                                             @can('manage admin')
                                                 <td class="px-4 py-3 text-sm">
-                                                    <button wire:click="OpenModalUserAssignment({{ $item->id }})"
-                                                        class="relative bg-emerald-600 duration-500 ease-in-out hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded"
-                                                        x-data="{ showTooltip: false }" x-on:mouseenter="showTooltip = true"
-                                                        x-on:mouseleave="showTooltip = false" x-tooltip="Editar artículo">
-                                                        <i class="fa-solid fa-users-line"></i>
+                                                    @if ($item->category_name !== 'No Category Expense')
+                                                        <button wire:click="OpenModalUserAssignment({{ $item->id }})"
+                                                            class="relative bg-emerald-600 duration-500 ease-in-out hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded"
+                                                            x-data="{ showTooltip: false }" x-on:mouseenter="showTooltip = true"
+                                                            x-on:mouseleave="showTooltip = false"
+                                                            x-tooltip="Editar artículo">
+                                                            <i class="fa-solid fa-users-line"></i>
 
-                                                        <!-- Tooltip -->
-                                                        <div x-show="showTooltip" x-cloak
-                                                            class="absolute left-0 bg-gray-800 text-white px-2 py-1 rounded mt-3 z-10">
-                                                            Category Assignment
-                                                        </div>
-                                                    </button>
-                                                    <button wire:click="edit({{ $item->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="$emit('deleteData',{{ $item->id }})"
-                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-trash"></i></button>
-
-
+                                                            <!-- Tooltip -->
+                                                            <div x-show="showTooltip" x-cloak
+                                                                class="absolute left-0 bg-gray-800 text-white px-2 py-1 rounded mt-3 z-10">
+                                                                Category Assignment
+                                                            </div>
+                                                        </button>
+                                                        <button wire:click="edit({{ $item->id }})"
+                                                            class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
+                                                                class="fa-solid fa-pen-to-square"></i></button>
+                                                        <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                            class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                                class="fa-solid fa-trash"></i></button>
+                                                    @else
+                                                        Default Category
+                                                    @endif
                                                 </td>
                                             @endcan
                                         </tr>
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="7">
+                                            <td colspan="8">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -185,13 +189,14 @@
                                         <div
                                             class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                             <!--Modal title-->
+                                            <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
                                                 Expenses Category
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
-                                                class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                                class="p-0.5 bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white rounded-full box-content  border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                                                 data-te-modal-dismiss aria-label="Close">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -347,7 +352,7 @@
                                                             Category:</label>
 
                                                         <input type="text" autocomplete="off"
-                                                            wire:model="categoryNameSelected"
+                                                            wire:model="categoryNameSelected" readonly
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                         @error('categoryNameSelected')
                                                             <span class="text-red-500">{{ $message }}</span>

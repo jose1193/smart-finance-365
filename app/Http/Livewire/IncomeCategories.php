@@ -7,6 +7,7 @@ use App\Models\SubcategoryToAssign;
 use App\Models\MainCategories;
 use App\Models\User;
 use App\Models\CategoriesToAssign;
+use App\Models\Operation;
 use Livewire\WithPagination;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -39,12 +40,25 @@ class IncomeCategories extends Component
     return true;
 }
 
+public function render()
+{
+    if (auth()->user()->hasRole('Admin')) {
+        $data = $this->getDataForAdmin();
+    } elseif (auth()->user()->hasRole('User')) {
+        $data = $this->getDataForUser();
+    }
 
+    $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
+    $this->users = User::orderBy('id', 'desc')->get();
+    
+    return view('livewire.income-categories', [
+        'data' => $data,
+    ]);
+}
 
-    public function render()
-    {
-         if (auth()->user()->hasRole('Admin')) {
-             
+protected function getDataForAdmin()
+{
+           
  $searchTerm = $this->search;
  //RELATION MODEL
 $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUsersSubcategory'])
@@ -77,14 +91,19 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
     ->paginate(10);
 
 
+ 
+    return $data;
+    
+}
 
-         }
 
-    elseif (auth()->user()->hasRole('User')) {
-     $searchTerm = $this->search;
-    $userId = auth()->id(); 
 
-    $data = Category::with(['assignedUsers', 'Subcategory'])
+protected function getDataForUser()
+{
+    $searchTerm = $this->search;
+    $userId = auth()->id();
+
+   $data = Category::with(['assignedUsers', 'Subcategory'])
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->leftJoin('categories_to_assigns', function ($join) use ($userId) {
             $join->on('categories.id', '=', 'categories_to_assigns.category_id')
@@ -109,19 +128,12 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
         )
         ->groupBy('categories.id', 'categories.category_name', 'main_categories.title', 'subcategories.subcategory_name')
         ->orderBy('categories.id', 'desc')
-        ->paginate(10);
+       ->paginate(10);
+
+    return $data;
 }
 
 
-        $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
-        $this->users = User::orderBy('id', 'desc')->get();
-
-       
-        return view('livewire.income-categories', [
-            'data' => $data]);
-    }
-
-  
 
     public function create()
     {
@@ -134,6 +146,7 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
     {
         
         $this->isOpen = true;
+        
     }
 
     public function closeModal()
@@ -204,6 +217,7 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
    
         $this->closeModal();
         $this->resetInputFields();
+       
     }
 
 
@@ -495,7 +509,7 @@ public function deleteSubcategoryAssignments($subcategoryName, $selectedUserIdDe
 
 public function OpenModalUserAssignment($itemId)
 {
-    
+      
     $this->selectedItemId = $itemId;  
     $category = Category::with('Subcategory')->find($this->selectedItemId);
     $this->categoryNameSelected = $category ? $category->category_name : null;
@@ -549,11 +563,39 @@ public function OpenModalUserAssignment($itemId)
     
 
     
+
 public function delete($id)
-    {
-         $this->authorize('manage admin');
-        Category::find($id)->delete();
-       
+{
+    $this->authorize('manage admin');
+
+    // Obtener la categoría que se va a eliminar
+    $categoryToDelete = Category::find($id);
+
+    // Obtener la categoría especial 'No Category Income'
+    $otrosCategory = Category::firstOrCreate(
+        [
+            'category_name' => 'No Category Income',
+            'main_category_id' => '1',
+        ],
+        [
+            'category_description' => 'No Category Income',
+            'user_id' => auth()->user()->id,
+        ]
+    );
+
+    // Verificar si la categoría a eliminar es diferente de la categoría especial
+    if ($categoryToDelete->id !== $otrosCategory->id) {
+        // Actualizar las operaciones que tienen la categoría a eliminar
+        Operation::where('category_id', $id)->update(['category_id' => $otrosCategory->id]);
+
+        // Eliminar la categoría
+        $categoryToDelete->delete();
+
         session()->flash('message', 'Data Deleted Successfully.');
+    } else {
+        // Si estás intentando eliminar la categoría especial, puedes manejarlo como desees,
+        // por ejemplo, mostrar un mensaje de advertencia o simplemente no hacer nada.
+        session()->flash('info', 'Cannot delete special category.');
     }
+}
 }

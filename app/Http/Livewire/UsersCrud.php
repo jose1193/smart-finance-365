@@ -91,7 +91,7 @@ return view('livewire.users-crud', [
     'username' => ['required', 'unique:users,username,' . $this->data_id, 'regex:/^[^\s]+$/','max:60'],
     'email' => 'required|email|unique:users,email,' . $this->data_id,
     'role' => 'required',
-   'password' => 'required|string|min:8|max:15|regex:/^[^\s]+$/',
+   'password' => 'required|string|min:8|max:115|regex:/^[^\s]+$/',
 ], [
     'name' => [
         'required' => 'El campo nombre es obligatorio',
@@ -126,8 +126,12 @@ if ($user) {
     ];
 
     
-    if ($this->password) {
+    // Verificar si la contraseña enviada es diferente de la actual
+    if ($this->password && $this->password != $user->password) {
         $userData['password'] = bcrypt($this->password);
+    } else {
+        // Si la contraseña es la misma, mantener el password actual
+        $userData['password'] = $user->password;
     }
 
     $user->update($userData);

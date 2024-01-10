@@ -49,7 +49,8 @@
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
-                            <table class="w-full whitespace-no-wrap">
+
+                            <table class="w-full whitespace-no-wrap" id="miTabla">
                                 <thead>
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
@@ -125,25 +126,32 @@
                                             </td>
                                             @can('manage admin')
                                                 <td class="px-4 py-3 text-sm">
-                                                    <button wire:click="OpenModalUserAssignment({{ $item->id }})"
-                                                        class="relative bg-emerald-600 duration-500 ease-in-out hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded"
-                                                        x-data="{ showTooltip: false }" x-on:mouseenter="showTooltip = true"
-                                                        x-on:mouseleave="showTooltip = false" x-tooltip="Editar artículo">
-                                                        <i class="fa-solid fa-users-line"></i>
+                                                    @if ($item->category_name !== 'No Category Income')
+                                                        <button wire:click="OpenModalUserAssignment({{ $item->id }})"
+                                                            class="relative bg-emerald-600 duration-500 ease-in-out hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded"
+                                                            x-data="{ showTooltip: false }" x-on:mouseenter="showTooltip = true"
+                                                            x-on:mouseleave="showTooltip = false"
+                                                            x-tooltip="Editar artículo">
+                                                            <i class="fa-solid fa-users-line"></i>
 
-                                                        <!-- Tooltip -->
-                                                        <div x-show="showTooltip" x-cloak
-                                                            class="absolute left-0 bg-gray-800 text-white px-2 py-1 rounded mt-3 z-10">
-                                                            Category Assignment
-                                                        </div>
-                                                    </button>
+                                                            <!-- Tooltip -->
+                                                            <div x-show="showTooltip" x-cloak
+                                                                class="absolute left-0 bg-gray-800 text-white px-2 py-1 rounded mt-3 z-10">
+                                                                Category Assignment
+                                                            </div>
+                                                        </button>
 
-                                                    <button wire:click="edit({{ $item->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="$emit('deleteData',{{ $item->id }})"
-                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-trash"></i></button>
+                                                        <button wire:click="edit({{ $item->id }})"
+                                                            class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                                            <i class="fa-solid fa-pen-to-square"></i>
+                                                        </button>
+                                                        <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                            class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                                class="fa-solid fa-trash"></i></button>
+                                                    @else
+                                                        Default Category
+                                                    @endif
+
 
                                                 </td>
                                             @endcan
@@ -151,7 +159,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="7">
+                                            <td colspan="8">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -181,13 +189,14 @@
                                         <div
                                             class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                             <!--Modal title-->
+                                            <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
                                                 Income Category
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
-                                                class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                                class="p-0.5 bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white rounded-full box-content  border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                                                 data-te-modal-dismiss aria-label="Close">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -342,7 +351,7 @@
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">
                                                             Category:</label>
 
-                                                        <input type="text" autocomplete="off"
+                                                        <input type="text" autocomplete="off" readonly
                                                             wire:model="categoryNameSelected"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                         @error('categoryNameSelected')
@@ -364,37 +373,36 @@
                                                                     <optgroup label="{{ $nameUser }}">
                                                                         @foreach ($groupedEmails as $email)
                                                                             <option value="{{ $email->id }}">
-                                                                                {{ $email->email }}</option>
+                                                                                {{ $email->username }}</option>
                                                                         @endforeach
                                                                     </optgroup>
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                        <script>
-                                                            document.addEventListener('livewire:load', function() {
-                                                                Livewire.hook('message.sent', () => {
-                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                                    $('#selectUserAssign').select2({
-                                                                        width: 'resolve' // need to override the changed default
-                                                                    });
-                                                                });
-                                                            });
 
+
+
+                                                        <script>
                                                             $(document).ready(function() {
                                                                 // Inicializa Select2
                                                                 $('#selectUserAssign').select2();
+
+                                                                // Llama a la función categoryAssignment al inicializar Select2
+                                                                @this.call('categoryAssignment');
+
+                                                                // Guarda el estado inicial del Select2 al cargar la página
+                                                                var initialSelectedValues = $('#selectUserAssign').val();
 
                                                                 // Escucha el cambio en Select2 y actualiza Livewire
                                                                 $('#selectUserAssign').on('change', function(e) {
                                                                     // Obtiene el valor seleccionado
                                                                     var selectedUserIds = $(this).val();
-                                                                    // Guarda el estado inicial del Select2 al cargar la página
-                                                                    var initialSelectedValues = $('#selectUserAssign').val();
+
                                                                     if (selectedUserIds && selectedUserIds.includes('all')) {
                                                                         // Muestra un mensaje de confirmación con SweetAlert2
                                                                         Swal.fire({
                                                                             title: 'Confirm',
-                                                                            text: 'Are you sure you select all users?',
+                                                                            text: 'Are you sure you want to select all users?',
                                                                             icon: 'warning',
                                                                             showCancelButton: true,
                                                                             confirmButtonText: 'Yes, select all',
@@ -408,7 +416,6 @@
                                                                                 @this.call('categoryAssignment');
                                                                                 // Reinicia el valor del selectUserAssign
                                                                                 $('#selectUserAssign').val(null).trigger('change');
-
                                                                             } else {
                                                                                 // Excluye 'all' del conjunto de valores seleccionados
                                                                                 var filteredValues = initialSelectedValues.filter(val => val !== 'all');
@@ -418,21 +425,58 @@
                                                                             }
                                                                         });
                                                                     } else {
-                                                                        // Actualiza Livewire con los nuevos valores
-                                                                        @this.set('user_id_assign', selectedUserIds);
+                                                                        //ELSE A MODIFICAR
+                                                                        // Verifica que no sea la primera vez que se ejecuta
+                                                                        if (selectedUserIds !== initialSelectedValues) {
+                                                                            // Actualiza Livewire con los nuevos valores
+                                                                            @this.set('user_id_assign', selectedUserIds);
 
-                                                                        // Llama a la función categoryAssignment
-                                                                        @this.call('categoryAssignment');
+                                                                            // Llama a la función categoryAssignment
+                                                                            @this.call('categoryAssignment');
+                                                                        }
                                                                     }
                                                                 });
 
+
                                                                 // Escucha el evento de eliminación en Select2 y actualiza Livewire
                                                                 $('#selectUserAssign').on('select2:unselect', function(e) {
-                                                                    // Llama a la función categoryAssignment
-                                                                    @this.call('categoryAssignment');
+                                                                    // Obtiene el valor que se está eliminando
+                                                                    var unselectedValue = e.params.data.id;
+
+                                                                    // Obtiene el texto (nombre de usuario) del elemento que se está eliminando
+                                                                    var unselectedText = e.params.data.text;
+
+                                                                    // Muestra un mensaje de confirmación con SweetAlert2 antes de eliminar el elemento
+                                                                    Swal.fire({
+                                                                        title: 'Confirm',
+                                                                        text: 'Are you sure you want to unselect this user?',
+                                                                        icon: 'warning',
+                                                                        showCancelButton: true,
+                                                                        confirmButtonText: 'Yes, unselect',
+                                                                        cancelButtonText: 'Cancel',
+                                                                        confirmButtonColor: '#3085d6',
+                                                                        cancelButtonColor: '#d33',
+                                                                    }).then((result) => {
+                                                                        if (result.isConfirmed) {
+                                                                            // Llama a la función categoryAssignment solo si se confirma
+                                                                            @this.call('categoryAssignment');
+                                                                        } else {
+                                                                            // Si se cancela, vuelve a seleccionar el valor que se estaba eliminando
+                                                                            $('#selectUserAssign').append(new Option(unselectedText, unselectedValue,
+                                                                                true, true)).trigger('change');
+                                                                            initialSelectedValues = selectedUserIds;
+                                                                            // No ejecuta la acción de Livewire y no actualiza el valor en el componente de Livewire
+                                                                        }
+                                                                    });
                                                                 });
                                                             });
                                                         </script>
+
+
+
+
+
+
 
 
 
@@ -543,6 +587,7 @@
                                                                                     $selectedUserId[$index]">
                                                                                 <i class="fa-solid fa-arrow-right"></i>
                                                                             </button>
+
 
                                                                             @error("selectedUserId.{$index}")
                                                                                 <span

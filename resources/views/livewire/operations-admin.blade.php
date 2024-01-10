@@ -213,13 +213,14 @@
                                             <div
                                                 class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                                 <!--Modal title-->
+                                                <div class="text-center"></div>
                                                 <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                     id="exampleModalLabel">
                                                     Expense Management
                                                 </h5>
                                                 <!--Close button-->
                                                 <button type="button" wire:click="closeModal()"
-                                                    class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                                    class="p-0.5 bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white rounded-full box-content  border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                                                     data-te-modal-dismiss aria-label="Close">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -283,22 +284,25 @@
                                                                 style="width: 100%" wire:model="budget_id">
                                                                 <option></option>
                                                                 <option value="na">N/A</option>
-                                                                @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
-                                                                    @php
-                                                                        $formattedDate = \Carbon\Carbon::parse($date)
-                                                                            ->locale('es')
-                                                                            ->isoFormat('MMMM [de] YYYY');
+                                                                @if ($this->selectedUser8 && $budgets->count() > 0)
+                                                                    @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
+                                                                        @php
+                                                                            $formattedDate = \Carbon\Carbon::parse($date)
+                                                                                ->locale('es')
+                                                                                ->isoFormat('MMMM [de] YYYY');
+                                                                        @endphp
 
-                                                                    @endphp
-
-                                                                    @foreach ($groupedBudgets as $budget)
-                                                                        <option value="{{ $budget->id }}"
-                                                                            @if ($budget->id == $budget_id) selected @endif>
-                                                                            {{ $formattedDate }} -
-                                                                            {{ $budget->budget_currency_total }} $
-                                                                        </option>
+                                                                        @foreach ($groupedBudgets as $budget)
+                                                                            <option value="{{ $budget->id }}"
+                                                                                @if ($budget->id == $budget_id) selected @endif>
+                                                                                {{ $formattedDate }} -
+                                                                                {{ $budget->budget_currency_total }} $
+                                                                            </option>
+                                                                        @endforeach
                                                                     @endforeach
-                                                                @endforeach
+
+                                                                @endif
+
                                                             </select>
 
 
@@ -703,8 +707,15 @@
         });
     });
 </script>
+
+
+
+
 <script>
     document.addEventListener('livewire:load', function() {
+        $(document).ready(function() {
+            $('#miTabla').DataTable();
+        });
         Livewire.on('reinitDataTable', function() {
             $('#miTabla').DataTable().destroy();
             $('#miTabla').DataTable();

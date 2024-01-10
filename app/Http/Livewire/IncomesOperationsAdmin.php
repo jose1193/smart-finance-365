@@ -46,7 +46,7 @@ public $registeredSubcategoryItem;
 
 public $selectedUser7;
 public $users;
-public $showData = false;
+public $showData = true;
 public $data;
 public $user_selected;
 
@@ -70,6 +70,7 @@ public function userSelected7($userId)
  // CHANGE USER CATEGORY ASSIGNED
 public function updateCategoryUser()
 {
+   
     $this->refreshCategories($this->user_selected);
     $this->category_id = null;
    $this->showSubcategories = false; 
@@ -87,6 +88,8 @@ public function updateSelect($userSelected)
 
 public function refreshCategories()
 {
+    
+    $this->updateData();
     $assignedCategories = CategoriesToAssign::where('user_id_assign', $this->user_selected)
         ->pluck('category_id');
 
@@ -103,7 +106,8 @@ public function refreshCategories()
         })
         ->orderBy('id', 'asc')
         ->get();
-    
+       
+  
 }
  // END FUNCTION CHANGE USER CATEGORY ASSIGNED
 
@@ -111,6 +115,7 @@ public function refreshCategories()
 
     public function updateSubCategoryUser()
     {
+         
         // Asigna el valor de subcategory_id a registeredSubcategoryItem
         $this->registeredSubcategoryItem = $this->subcategory_id;
     }
@@ -122,6 +127,7 @@ public function refreshCategories()
     
     { 
         $this->users = User::orderBy('id', 'desc')->get();
+        $this->updateData();
        
     }
 
@@ -143,56 +149,80 @@ $this->data = $this->updateDataIncomeOperations();
 
 
 }
-
-
 public function updateDataIncomeOperations()
-    {
-      
-  
+{
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-    ->join('users', 'operations.user_id', '=', 'users.id')
-    ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
-    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
-    ->where('users.id', $this->selectedUser7)
-    ->where('categories.main_category_id', 1)
-    ->where('operations.operation_description', 'like', '%' . $this->search . '%')
-    ->select(
-        'operations.*', 'users.username',
-        'categories.category_name',
-        'statu_options.status_description',
-        DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name')
-    )
-    ->orderBy('operations.id', 'desc')
-     ->get();
+        ->join('users', 'operations.user_id', '=', 'users.id')
+        ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
+        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
+        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
+        ->where('categories.main_category_id', 1)
+        ->where('operations.operation_description', 'like', '%' . $this->search . '%')
+        ->select(
+            'operations.*', 'users.username',
+            'categories.category_name',
+            'statu_options.status_description',
+            DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name')
+        )
+        ->orderBy('operations.id', 'desc');
+
+    // Add condition for the selected user only if configured
+    if ($this->selectedUser7) {
+        $this->applyUserConditions($query);
+    } else {
+        // If no user is selected, get all users
+        $this->categoriesRender = $this->getAllCategories();
+        $this->statusOptionsRender = $this->getAllStatusOptions();
+    }
+
+    return $query->get();
+}
+
+private function applyUserConditions($query)
+{
+    $query->where('users.id', $this->selectedUser7);
 
     $assignedCategories = CategoriesToAssign::where('user_id_assign', $this->selectedUser7)
-    ->pluck('category_id');
+        ->pluck('category_id');
 
-    $this->categoriesRender = Category::where('main_category_id', 1)
-    ->whereIn('id', $assignedCategories)
-    ->orWhere(function ($query) use ($assignedCategories) {
-        $query->whereNotIn('id', $assignedCategories)
-              ->whereNotExists(function ($subQuery) {
-                  $subQuery->select(DB::raw(1))
-                           ->from('categories_to_assigns')
-                           ->whereColumn('categories_to_assigns.category_id', 'categories.id');
-              })
-              ->where('main_category_id', 1); 
-    })
-    ->orderBy('id', 'asc')
-   ->get();
+    $this->categoriesRender = $this->getUserCategories($assignedCategories);
+
+    $this->statusOptionsRender = $this->getAllStatusOptions();
+}
+
+private function getAllCategories()
+{
+    return Category::where('main_category_id', 1)
+        ->orderBy('id', 'asc')
+        ->get();
+}
+
+private function getUserCategories($assignedCategories)
+{
+    return Category::where('main_category_id', 1)
+        ->whereIn('id', $assignedCategories)
+        ->orWhere(function ($query) use ($assignedCategories) {
+            $query->whereNotIn('id', $assignedCategories)
+                ->whereNotExists(function ($subQuery) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('categories_to_assigns')
+                        ->whereColumn('categories_to_assigns.category_id', 'categories.id');
+                })
+                ->where('main_category_id', 1);
+        })
+        ->orderBy('id', 'asc')
+        ->get();
+}
+
+private function getAllStatusOptions()
+{
+    return StatuOptions::where('main_category_id', 1)
+        ->orderBy('id', 'asc')
+        ->get();
+}
 
 
-
-    $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
-                                  ->orderBy('id', 'asc')
-                                  ->get();
-    
-        return $query;
-        
-    }
 
 
         public function fetchData()
@@ -322,6 +352,7 @@ public function updatedOperationAmount()
         $this->authorize('manage admin');
         $this->updateData();
         $this->openModal();
+         $this->user_selected = $this->selectedUser7;
     }
 
     public function openModal()
@@ -391,8 +422,9 @@ public function updatedOperationAmount()
 
         $registeredSubcategory = $list->operationSubcategories->first();
         $this->updatedCategoryId($list->category_id, optional($registeredSubcategory)->subcategory_id);
-
         
+        $this->emit('reinitDataTable');
+        $this->updateData();
 
     }
 
@@ -502,6 +534,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
 
 public function updatedCategoryId($value,$registeredSubcategoryId = null)
 {
+     $this->updateData();
     $userId = $this->selectedUser7;
 
     // Lógica para obtener la subcategoría registrada en OperationSubcategories

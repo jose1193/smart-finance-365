@@ -7,6 +7,7 @@ use App\Models\SubcategoryToAssign;
 use App\Models\MainCategories;
 use App\Models\User;
 use App\Models\CategoriesToAssign;
+use App\Models\Operation;
 use Livewire\WithPagination;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class ExpensesCategories extends Component
     public $search = '';
     public $mainCategoriesRender;
     public $isOpen = 0;
-     protected $listeners = ['render','delete','deleteSubcategoryAssignments'];
+    protected $listeners = ['render','delete','deleteSubcategoryAssignments'];
     public $users;
     public $user_id_assign = [];
     public $selectedUsers = [];
@@ -39,10 +40,27 @@ class ExpensesCategories extends Component
     return true;
 }
 
-    public function render()
-    {
-     if (auth()->user()->hasRole('Admin')) {
-             
+public function render()
+{
+    if (auth()->user()->hasRole('Admin')) {
+        $data = $this->getDataForAdmin();
+    } elseif (auth()->user()->hasRole('User')) {
+        $data = $this->getDataForUser();
+    }
+
+     $this->mainCategoriesRender = MainCategories::orderBy('id', 'desc')->get();
+    $this->users = User::orderBy('id', 'desc')->get();
+ 
+    return view('livewire.expenses-categories', [
+        'data' => $data,
+    ]);
+}
+
+
+protected function getDataForAdmin()
+{
+            
+          
  $searchTerm = $this->search;
  //RELATION MODEL
 $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUsersSubcategory'])
@@ -76,13 +94,17 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
 
 
 
-         }
-  
-    elseif (auth()->user()->hasRole('User')) {
-    $searchTerm = $this->search;
-    $userId = auth()->id(); 
+ 
+    return $data;
+}
 
-   
+
+
+protected function getDataForUser()
+{
+    $searchTerm = $this->search;
+    $userId = auth()->id();
+
     $data = Category::with(['assignedUsers', 'Subcategory'])
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->leftJoin('categories_to_assigns', function ($join) use ($userId) {
@@ -109,15 +131,9 @@ $data = Category::with(['assignedUsers', 'Subcategory', 'Subcategory.assignedUse
         ->groupBy('categories.id', 'categories.category_name', 'main_categories.title', 'subcategories.subcategory_name')
         ->orderBy('categories.id', 'desc')
         ->paginate(10);
+
+    return $data;
 }
-
-        $this->mainCategoriesRender = MainCategories::orderBy('id', 'desc')->get();
-        $this->users = User::orderBy('id', 'desc')->get();
-
-       
-        return view('livewire.expenses-categories', [
-            'data' => $data]);
-    }
 
     
     public function create()
@@ -544,9 +560,38 @@ public function OpenModalUserAssignment($itemId)
 
     
 public function delete($id)
-    {
-         $this->authorize('manage admin');
-        Category::find($id)->delete();
+{
+    $this->authorize('manage admin');
+
+    // Obtener la categoría que se va a eliminar
+    $categoryToDelete = Category::find($id);
+
+    // Obtener la categoría especial 'No Category Expense'
+    $otrosCategory = Category::firstOrCreate(
+        [
+            'category_name' => 'No Category Expense',
+            'main_category_id' => '2',
+        ],
+        [
+            'category_description' => 'No Category Expense',
+            'user_id' => auth()->user()->id,
+        ]
+    );
+
+    // Verificar si la categoría a eliminar es diferente de la categoría especial
+    if ($categoryToDelete->id !== $otrosCategory->id) {
+        // Actualizar las operaciones que tienen la categoría a eliminar
+        Operation::where('category_id', $id)->update(['category_id' => $otrosCategory->id]);
+
+        // Eliminar la categoría
+        $categoryToDelete->delete();
+
         session()->flash('message', 'Data Deleted Successfully.');
+    } else {
+        // Si estás intentando eliminar la categoría especial, puedes manejarlo como desees,
+        // por ejemplo, mostrar un mensaje de advertencia o simplemente no hacer nada.
+        session()->flash('info', 'Cannot delete special category.');
     }
+}
+
 }
