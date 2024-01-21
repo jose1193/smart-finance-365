@@ -31,6 +31,9 @@ class ReportGeneralBudgetsExpenseCharts extends Component
     public $budgetData;
     protected $listeners = ['userSelectedChart6','MonthSelectedBudget2','YearSelectedChart5'];
 
+    public $topTenBudgetExpenses;
+    
+     
     public function userSelectedChart6($userId)
     {
         // Aquí puedes ejecutar la lógica que desees con el $userId
@@ -49,7 +52,7 @@ class ReportGeneralBudgetsExpenseCharts extends Component
     public function YearSelectedChart5($selectedYear3Id)
     {
        
-        $this->selectedYear5 = $selectedYear3Id;
+        $this->selectedYear4 = $selectedYear3Id;
         $this->updateBudgetExpenseData();
     }
 
@@ -81,12 +84,12 @@ public function months()
         return view('livewire.report-general-budgets-expense-charts');
     }
 
-    
- // REPORT GENERAL MONTH CHART
+ // REPORT GENERAL BUDGET EXPENSE MONTHLY CHART
 
 public function updateBudgetExpenseData()
 {
     $this->updateBudgetExpenseDataInternal();
+    $this->topTenBudgetExpenses = $this->fetchTopTenBudgetExpenses();
 }
 
 private function updateBudgetExpenseDataInternal()
@@ -95,20 +98,18 @@ private function updateBudgetExpenseDataInternal()
     $this->operationsFetchMonths = $this->fetchMonthData();
     $this->totalMonthAmount = $this->fetchTotalMonthAmount(); 
     $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
-    
     $this->showChart6 = true;
-    
-    
+
     if ($this->selectedMonth2) {
-        $selectedDate = Carbon::create()->month($this->selectedMonth2);
-        $this->selectedMonthName2 = $selectedDate->format('F');
+        $this->selectedMonthName2 = Carbon::create()->month($this->selectedMonth2)->format('F');
     }
-     $this->budget = Budget::where('budget_month', $this->selectedMonth2)
-                      ->where('user_id', $this->selectedUser6)
-                      ->first();
+    
+    $this->budget = Budget::where('budget_month', $this->selectedMonth2)
+                          ->where('user_id', $this->selectedUser6)
+                          ->whereYear('budget_date', $this->selectedYear4)
+                          ->first();
 
-    $this->budgetData = $this->budget ? 'Budget Month ' . $this->budget->budget_currency_total . ' $' : 'Budget Month N/A';
-
+    $this->budgetData = $this->budget ? 'Monthly Budget  ' . $this->budget->budget_currency_total . ' $' : '';
 }
 
 private function fetchTotalMonthAmountCurrency()
@@ -123,48 +124,63 @@ private function fetchTotalMonthAmount()
 
 private function fetchMonthData()
 {
-    $query = Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses']) 
-    ->join('categories', 'operations.category_id', '=', 'categories.id')
-    ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
-    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
-    ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
-    ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
-    ->leftJoin('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id')
-    ->whereHas('category.mainCategories', function ($query) {
-    $query->where('id', 2); // Utiliza la clave foránea correcta
-    })
-        ->when($this->selectedUser6, function ($query, $selectedUser6) {
-            return $query->where('operations.user_id', $selectedUser6);
-        })
-        ->when($this->selectedMonth2, function ($query, $selectedMonth2) {
-            return $query->whereMonth('operations.operation_date', $selectedMonth2);
-        })
-        ->when($this->selectedYear4, function ($query, $selectedYear4) {
-            return $query->whereYear('operations.operation_date', $selectedYear4);
-        })
-        ->select(
-            'operations.operation_amount',
-            'operations.operation_currency',
-            'operations.operation_currency_total',
-            'categories.category_name as category_title',
-            'statu_options.status_description as status_description',
-            'operations.operation_status as operation_status',
-            'operations.operation_description',
-            'operations.operation_date',
-            'operations.operation_currency_type',
-            'main_categories.title as main_category_title',
-            'subcategories.subcategory_name',
-            'budgets.budget_operation as budget_operation',
-            'budget_expenses.budget_id',
-        )
-        ->orderBy('operations.id', 'desc')
-        ->get();
+    $query = $this->buildOperationQuery();
+    return $this->executeOperationQuery($query);
+}
 
-      
+private function fetchTopTenBudgetExpenses()
+{
+    $query = $this->buildOperationQuery();
 
-    return $query;
+    return $query->orderBy('operations.operation_currency_total', 'desc')
+                 ->limit(10)
+                 ->get();
+}
+
+private function buildOperationQuery()
+{
+    return Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses']) 
+                    ->join('categories', 'operations.category_id', '=', 'categories.id')
+                    ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+                    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+                    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
+                    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
+                    ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
+                    ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
+                    ->leftJoin('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id')
+                    ->whereHas('category.mainCategories', function ($query) {
+                        $query->where('id', 2); // Utiliza la clave foránea correcta
+                    })
+                    ->when($this->selectedUser6, function ($query, $selectedUser6) {
+                        return $query->where('operations.user_id', $selectedUser6);
+                    })
+                    ->when($this->selectedMonth2, function ($query, $selectedMonth2) {
+                        return $query->whereMonth('operations.operation_date', $selectedMonth2);
+                    })
+                    ->when($this->selectedYear4, function ($query, $selectedYear4) {
+                        return $query->whereYear('operations.operation_date', $selectedYear4);
+                    })
+                    ->select(
+                        'operations.operation_amount',
+                        'operations.operation_currency',
+                        'operations.operation_currency_total',
+                        'categories.category_name as category_title',
+                        'statu_options.status_description as status_description',
+                        'operations.operation_status as operation_status',
+                        'operations.operation_description',
+                        'operations.operation_date',
+                        'operations.operation_currency_type',
+                        'main_categories.title as main_category_title',
+                        'subcategories.subcategory_name',
+                        'budgets.budget_operation as budget_operation',
+                        'budget_expenses.budget_id',
+                    )
+                    ->orderBy('operations.id', 'desc');
+}
+
+private function executeOperationQuery($query)
+{
+    return $query->get();
 }
 
 
@@ -174,7 +190,7 @@ public function resetFields6()
 {
     $this->selectedUser6 = null;
     $this->selectedMonth2 = null;
-    $this->selectedYear5 = null;
+    $this->selectedYear4 = null;
     $this->showChart6 = false;
 }
 

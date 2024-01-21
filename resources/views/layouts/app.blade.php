@@ -47,7 +47,7 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
     <!--  end Flatpickr DATE -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         main {
             font-family: 'Roboto', sans-serif;
@@ -58,7 +58,12 @@
     <!-- Styles -->
 
     <!--  CHART JS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.esm.min.js">
+    </script>
+
     <!--  END CHART JS -->
 
     <style>
@@ -85,8 +90,6 @@
     <link rel="stylesheet" href="./assets/css/tailwind.output.css" />
 
     <script src="./assets/js/init-alpine.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" defer></script>
 
     <!--  DataTable JS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">

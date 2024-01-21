@@ -39,6 +39,7 @@
 
      </div>
      @if ($showChart5)
+
          <div class="my-10 flex justify-end space-x-2">
              <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
                  wire:click="exportToExcel" wire:loading.attr="disabled">
@@ -97,79 +98,709 @@
              wire:key="chart-{{ $selectedUser5 }}-{{ $selectedYear4 }}-{{ uniqid() }}">
 
              <div class="grid gap-6 mb-8 md:grid-cols-2">
-                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+
+                 <!-- INCOME -->
+                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-5">
                      <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
-                         Bars
+                         {{ $categoryName }}
                      </h4>
 
-                     <canvas id="myChartGeneral5" height="200"></canvas>
+                     <!-- Crea un elemento canvas donde se renderizará el gráfico -->
+                     <div class="w-full flex flex-wrap items-center px-4 py-2  ">
+                         <div class="w-full justify-between flex space-x-7 ">
+                             <div> <canvas id="myChartIncomeGeneraldoughnut" width="250" height="250"></canvas>
+                             </div>
+                             <div
+                                 class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center  capitalize border-b bg-gray-100 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700">
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">General {{ $categoryName }}
+                                 </p>
+                                 <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
+                                     {{ number_format(array_sum($incomeDataCurrency), 0, '.', ',') }} $
+                                 </p>
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName }} Budget
+                                 </p>
+                                 <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
+                                     {{ number_format(array_sum($budgetDataCurrency), 0, '.', ',') }} $
+                                 </p>
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference $</p>
+                                 <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
+                                     {{ number_format(array_sum($incomeDataCurrency) - array_sum($budgetDataCurrency), 0, '.', ',') }}
+                                     $ </p>
+
+
+                                 {{-- Mostrar el total --}}
+
+                             </div>
+
+                         </div>
+
+                     </div>
+                     <script>
+                         var ctx = document.getElementById('myChartIncomeGeneraldoughnut').getContext('2d');
+                         var incomeData = @json($incomeDataCurrency);
+                         var budgetData = @json($budgetDataCurrency);
+                         var totalIncome = incomeData.reduce((a, b) => a + b, 0);
+                         var totalBudget = budgetData.reduce((a, b) => a + b, 0);
+                         var percentageIncome = (totalBudget !== 0) ? ((totalIncome / totalBudget) * 100).toFixed(0) : 0;
+
+                         var myChart = new Chart(ctx, {
+                             type: 'doughnut',
+                             data: {
+                                 labels: [],
+                                 datasets: [{
+                                     label: '# of Income',
+                                     data: [totalIncome, totalBudget],
+                                     backgroundColor: ['#14b8a6', '#f1f5f9'],
+                                     borderColor: ['#14b8a6', '#f1f5f9'],
+                                     borderWidth: 1
+                                 }]
+                             },
+                             options: {
+                                 responsive: true,
+                                 plugins: {
+                                     legend: {
+                                         display: false,
+                                     },
+                                     title: {
+                                         display: false,
+                                         text: 'Income Chart'
+                                     },
+                                 },
+                                 cutoutPercentage: 65,
+                                 animation: {
+                                     duration: 2000,
+                                     onComplete: function(animation) {
+                                         var ctx = this.chart.ctx;
+                                         ctx.textAlign = 'center';
+                                         ctx.textBaseline = 'middle';
+                                         var centerX = this.chart.width / 2;
+                                         var centerY = this.chart.height / 2;
+                                         ctx.fillStyle = '#14b8a6';
+                                         ctx.font = '28px Roboto';
+                                         ctx.fillText(percentageIncome + '%', centerX, centerY);
+
+                                         // Añadir texto adicional "of Income"
+                                         ctx.fillStyle = '#808080'; // Color gris
+                                         ctx.font = '14px Roboto';
+                                         ctx.fillText('of {{ $categoryName }} Budget', centerX, centerY +
+                                             30); // Ajusta la posición vertical según sea necesario
+                                     }
+                                 },
+                                 hover: {
+                                     animationDuration: 0
+                                 },
+                                 tooltips: {
+                                     callbacks: {
+                                         label: function(tooltipItem, data) {
+                                             var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName }}' :
+                                                 'Total Budget';
+                                             var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
+                                             return label + ': ' + value + ' USD';
+                                         }
+                                     }
+                                 }
+
+                             }
+                         });
+                     </script>
+
+
+
+
+
+                     <div
+                         class="border-solid border-2 border-gray-100 rounded mt-10 p-3 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700 ">
+                         <canvas id="myChartIncomeGeneralbar"></canvas>
+                     </div>
+
+                     <script>
+                         var ctx = document.getElementById('myChartIncomeGeneralbar').getContext('2d');
+                         var incomeData = @json($incomeDataCurrency);
+
+                         var totalIncome = incomeData.reduce((a, b) => a + b, 0);
+
+                         var dataBar = {
+                             labels: [
+                                 @for ($i = 1; $i <= 12; $i++)
+                                     "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                                 @endfor
+                             ],
+                             datasets: [{
+                                 label: "{{ $categoryName }}",
+                                 backgroundColor: "#14b8a6",
+                                 borderColor: "#14b8a6",
+                                 data: [totalIncome],
+                             }]
+                         };
+
+                         var options = {
+                             responsive: true,
+                             legend: {
+                                 display: false // Oculta la leyenda
+                             },
+                             scales: {
+                                 xAxes: [{
+                                     display: true,
+                                     gridLines: {
+                                         display: false, // Oculta las líneas de la cuadrícula en el eje x
+                                     },
+                                     title: 'Mes',
+                                     ticks: {
+                                         beginAtZero: true // Comienza desde cero en el eje x
+                                     }
+                                 }],
+                                 yAxes: [{
+                                     display: true,
+                                     gridLines: {
+                                         color: "rgba(0, 0, 0, 0)", // Establece el color de las líneas de la cuadrícula en blanco
+                                     },
+                                     title: 'Valor',
+                                     ticks: {
+                                         beginAtZero: true // Comienza desde cero en el eje y
+                                     }
+                                 }]
+                             },
+
+                             tooltips: {
+                                 enabled: true,
+                                 callbacks: {
+                                     label: function(tooltipItem, data) {
+                                         var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                         var value = tooltipItem.yLabel.toLocaleString('en-US', {
+                                             style: 'currency',
+                                             currency: 'USD',
+                                             minimumFractionDigits: 0,
+                                             maximumFractionDigits: 0
+                                         });
+                                         label += ': ' + value;
+                                         return label;
+                                     }
+                                 }
+                             }
+
+                         };
+
+                         var myChart = new Chart(ctx, {
+                             type: 'bar',
+                             data: dataBar,
+                             options: options
+                         });
+                     </script>
 
 
                  </div>
 
+                 <!-- END INCOME -->
+
+
+                 <!-- EXPENSE -->
+                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-5">
+                     <h4 class="mb-4 font-semibold text-gray-800 capitalize dark:text-gray-300">
+                         {{ $categoryName2 }}
+                     </h4>
+
+                     <!-- Crea un elemento canvas donde se renderizará el gráfico -->
+                     <div class="w-full flex flex-wrap items-center px-4 py-2  ">
+                         <div class="w-full justify-between flex space-x-7 ">
+                             <div> <canvas id="myChartExpenseGeneraldoughnut" width="250" height="250"></canvas>
+                             </div>
+                             <div
+                                 class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center  capitalize border-b bg-gray-100 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700">
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">General {{ $categoryName2 }}
+                                 </p>
+                                 <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
+                                     {{ number_format(array_sum($expenseDataCurrency), 0, '.', ',') }} $
+                                 </p>
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold"> {{ $categoryName2 }} Budget
+                                 </p>
+                                 <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
+                                     {{ number_format(array_sum($budgetDataCurrency), 0, '.', ',') }} $
+                                 </p>
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference $</p>
+                                 <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
+                                     {{ number_format(array_sum($expenseDataCurrency) - array_sum($budgetDataCurrency), 0, '.', ',') }}
+                                     $ </p>
+
+
+                                 {{-- Mostrar el total --}}
+
+                             </div>
+
+                         </div>
+
+                     </div>
+
+
+                     <script>
+                         var ctx = document.getElementById('myChartExpenseGeneraldoughnut').getContext('2d');
+                         var expenseData = @json($expenseDataCurrency);
+                         var budgetData = @json($budgetDataCurrency);
+                         var totalExpense = expenseData.reduce((a, b) => a + b, 0);
+                         var totalBudget = budgetData.reduce((a, b) => a + b, 0);
+                         var percentageExpense = (totalBudget !== 0) ? ((totalExpense / totalBudget) * 100).toFixed(0) : 0;
+
+                         var myChart = new Chart(ctx, {
+                             type: 'doughnut',
+                             data: {
+                                 labels: [],
+                                 datasets: [{
+                                     label: '# of Expense',
+                                     data: [totalExpense, totalBudget],
+                                     backgroundColor: ['#7e3af2', '#f1f5f9'],
+                                     borderColor: ['#7e3af2', '#f1f5f9'],
+                                     borderWidth: 1
+                                 }]
+                             },
+                             options: {
+                                 responsive: true,
+                                 plugins: {
+                                     legend: {
+                                         display: false,
+                                     },
+                                     title: {
+                                         display: false,
+                                         text: 'Expense Chart'
+                                     },
+                                 },
+                                 cutoutPercentage: 65,
+                                 animation: {
+                                     duration: 2000,
+                                     onComplete: function(animation) {
+                                         var ctx = this.chart.ctx;
+                                         ctx.textAlign = 'center';
+                                         ctx.textBaseline = 'middle';
+                                         var centerX = this.chart.width / 2;
+                                         var centerY = this.chart.height / 2;
+                                         ctx.fillStyle = '#7e3af2';
+                                         ctx.font = '28px Roboto';
+                                         ctx.fillText(percentageExpense + '%', centerX, centerY);
+
+                                         // Añadir texto adicional "of Expense"
+                                         ctx.fillStyle = '#808080'; // Color gris
+                                         ctx.font = '14px Roboto';
+                                         ctx.fillText('of {{ $categoryName2 }} Budget', centerX, centerY +
+                                             30); // Ajusta la posición vertical según sea necesario
+                                     }
+                                 },
+                                 hover: {
+                                     animationDuration: 0
+                                 },
+                                 tooltips: {
+                                     callbacks: {
+                                         label: function(tooltipItem, data) {
+                                             var label = (tooltipItem.index === 0) ? ' Total {{ $categoryName2 }}' :
+                                                 'Total Budget';
+                                             var value = data.datasets[0].data[tooltipItem.index];
+                                             return label + ': ' + value + ' USD';
+                                         }
+                                     }
+                                 }
+
+                             }
+                         });
+                     </script>
+
+
+
+
+
+                     <div
+                         class="border-solid border-2 border-gray-100 rounded mt-10 p-3 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700 ">
+                         <canvas id="myChartExpenseGeneralbar"></canvas>
+                     </div>
+
+                     <script>
+                         var ctx = document.getElementById('myChartExpenseGeneralbar').getContext('2d');
+                         var expenseData = @json($expenseDataCurrency);
+
+                         var totalExpense = expenseData.reduce((a, b) => a + b, 0);
+
+                         var dataBar = {
+                             labels: [
+                                 @for ($i = 1; $i <= 12; $i++)
+                                     "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                                 @endfor
+                             ],
+                             datasets: [{
+                                 label: "{{ $categoryName2 }}",
+                                 backgroundColor: "#7e3af2",
+                                 borderColor: "#7e3af2",
+                                 data: [totalExpense],
+                             }]
+                         };
+
+                         var options = {
+                             responsive: true,
+                             legend: {
+                                 display: false // Oculta la leyenda
+                             },
+                             scales: {
+                                 xAxes: [{
+                                     display: true,
+                                     gridLines: {
+                                         display: false, // Oculta las líneas de la cuadrícula en el eje x
+                                     },
+                                     title: 'Mes',
+                                     ticks: {
+                                         beginAtZero: true // Comienza desde cero en el eje x
+                                     }
+                                 }],
+                                 yAxes: [{
+                                     display: true,
+                                     gridLines: {
+                                         color: "rgba(0, 0, 0, 0)", // Establece el color de las líneas de la cuadrícula en blanco
+                                     },
+                                     title: 'Valor',
+                                     ticks: {
+                                         beginAtZero: true // Comienza desde cero en el eje y
+                                     }
+                                 }]
+                             },
+                             tooltips: {
+                                 enabled: true,
+                                 callbacks: {
+                                     label: function(tooltipItem, data) {
+                                         var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                         var value = tooltipItem.yLabel.toLocaleString('en-US', {
+                                             style: 'currency',
+                                             currency: 'USD',
+                                             minimumFractionDigits: 0,
+                                             maximumFractionDigits: 0
+                                         });
+                                         label += ': ' + value;
+                                         return label;
+                                     }
+                                 }
+                             }
+
+                         };
+
+                         var myChart = new Chart(ctx, {
+                             type: 'bar',
+                             data: dataBar,
+                             options: options
+                         });
+                     </script>
+
+
+                 </div>
+
+                 <!-- END EXPENSE -->
+
+                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-5">
+
+
+                     <canvas id="myChartGeneral5" height="200"></canvas>
+
+                     <script>
+                         var ctx = document.getElementById('myChartGeneral5').getContext('2d');
+
+                         var dataBar = {
+                             labels: [
+                                 @for ($i = 1; $i <= 12; $i++)
+                                     "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                                 @endfor
+                             ],
+
+                             datasets: [{
+                                     label: "Budget",
+                                     backgroundColor: "#16a34a",
+                                     borderColor: "#16a34a",
+                                     data: @json($budgetDataCurrency),
+                                 },
+                                 {
+                                     label: "{{ $categoryName }}",
+                                     backgroundColor: "#14b8a6",
+                                     borderColor: "#14b8a6",
+                                     data: @json($incomeDataCurrency),
+                                 },
+                                 {
+                                     label: "{{ $categoryName2 }}",
+                                     backgroundColor: "#7e3af2",
+                                     borderColor: "#7e3af2",
+                                     data: @json($expenseDataCurrency),
+                                 },
+                             ]
+                         };
+
+                         var options = {
+                             title: {
+                                 display: true,
+                                 text: ' ',
+                                 responsive: true,
+                                 legend: {
+                                     display: false,
+                                 },
+                             },
+                             scales: {
+                                 xAxes: [{
+                                     display: true,
+                                     title: 'Mes',
+                                 }],
+                                 yAxes: [{
+                                     display: true,
+                                     title: 'Valor'
+                                 }]
+                             },
+                             tooltips: {
+                                 callbacks: {
+                                     title: function(tooltipItem, data) {
+                                         return data.labels[tooltipItem[0].index];
+                                     },
+                                     label: function(tooltipItem, data) {
+                                         var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
+                                         var value = tooltipItem.value;
+
+                                         // Aplicar formato con toLocaleString
+                                         if (!isNaN(value)) {
+                                             value = Number(value).toLocaleString('en-US') + ' USD ';
+                                         }
+
+                                         return datasetLabel + ': ' + value;
+                                     }
+                                 }
+                             }
+                         };
+
+                         var myChart = new Chart(ctx, {
+                             type: 'bar',
+                             data: dataBar,
+                             options: options
+                         });
+                     </script>
+                 </div>
+
+                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-5">
+
+
+                     <!-- Agrega un elemento canvas para el gráfico -->
+                     <canvas id="myDoughnutChart" class="mt-5"></canvas>
+                     <script>
+                         var ctx = document.getElementById('myDoughnutChart').getContext('2d');
+                         var incomeData = @json($incomeDataCurrency);
+                         var expenseData = @json($expenseDataCurrency);
+                         var totalIncome = incomeData.reduce((a, b) => a + b, 0);
+                         var totalExpenses = expenseData.reduce((a, b) => a + b, 0);
+                         var percentageExpenses = (totalIncome !== 0) ? ((totalExpenses / totalIncome) * 100).toFixed(0) : 0;
+
+                         var textLabel = (totalIncome > totalExpenses) ? ' {{ $categoryName }}' : ' {{ $categoryName2 }}';
+
+                         var myChart = new Chart(ctx, {
+                             type: 'doughnut',
+                             data: {
+                                 labels: [],
+                                 datasets: [{
+                                     label: '# of ',
+                                     data: [totalIncome, totalExpenses],
+                                     backgroundColor: ['#14b8a6', '#7e3af2'],
+                                     borderColor: ['#14b8a6', '#7e3af2'],
+                                     borderWidth: 1
+                                 }]
+                             },
+                             options: {
+                                 responsive: true,
+                                 plugins: {
+                                     legend: {
+                                         display: false,
+                                     },
+                                     title: {
+                                         display: false,
+                                         text: ' Chart'
+                                     },
+                                 },
+                                 cutoutPercentage: 65,
+                                 animation: {
+                                     duration: 2000,
+                                     onComplete: function(animation) {
+                                         var ctx = this.chart.ctx;
+                                         ctx.textAlign = 'center';
+                                         ctx.textBaseline = 'middle';
+                                         var centerX = this.chart.width / 2;
+                                         var centerY = this.chart.height / 2;
+
+                                         ctx.fillStyle = '#eab308';
+                                         ctx.font = '28px Roboto';
+                                         ctx.fillText(percentageExpenses + '%', centerX, centerY);
+
+                                         // Agregar el texto "of Income" o "of Expenses" debajo del porcentaje
+                                         ctx.fillStyle = '#808080'; // Gris
+                                         ctx.font = '16px Roboto';
+                                         ctx.fillText('of ' + textLabel, centerX, centerY +
+                                             30); // Ajustar la posición vertical según sea necesario
+                                     }
+                                 },
+                                 hover: {
+                                     animationDuration: 0
+                                 },
+                                 tooltips: {
+                                     callbacks: {
+                                         label: function(tooltipItem, data) {
+                                             var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName }}' :
+                                                 'Total {{ $categoryName2 }}';
+                                             var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
+                                             return label + ': ' + value + ' USD';
+                                         }
+                                     }
+                                 }
+
+                             }
+                         });
+                     </script>
+
+
+
+
+                 </div>
+
+
+                 <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800">
+                     <h4 class="mb-4 font-semibold text-gray-800 text-center dark:text-gray-300">
+                         Top 10 {{ $categoryName }}
+                     </h4>
+                     <canvas id="horizontalBarChart" width="400" height="200"></canvas>
+
+                     <script>
+                         // Obtener los datos de PHP y convertirlos a un formato que pueda ser utilizado por Chart.js
+                         var incomeData = @json($this->incomeTopTen);
+
+                         // Preparar datos para Chart.js
+                         var labels = incomeData.map(function(income) {
+                             return income.category_name;
+                         });
+
+                         var data = incomeData.map(function(income) {
+                             return income.operation_currency_total;
+                         });
+
+                         // Configurar el gráfico
+                         var ctx = document.getElementById('horizontalBarChart').getContext('2d');
+                         var horizontalBarChart = new Chart(ctx, {
+                             type: 'horizontalBar',
+                             data: {
+                                 labels: labels,
+                                 datasets: [{
+                                     label: 'Top 10  {{ $categoryName }}',
+                                     data: data,
+                                     backgroundColor: '#14b8a6',
+                                     borderColor: '#14b8a6',
+                                     borderWidth: 1
+                                 }]
+                             },
+                             options: {
+                                 legend: {
+                                     display: false // Ocultar la leyenda
+                                 },
+                                 tooltips: {
+                                     callbacks: {
+                                         title: function(tooltipItem, data) {
+                                             // Mostrar la etiqueta del eje x (category_name)
+                                             return data.labels[tooltipItem[0].index];
+                                         },
+                                         label: function(tooltipItem, data) {
+                                             // Mostrar el valor en el tooltip
+                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + Number(tooltipItem
+                                                 .value).toLocaleString('en-US') + ' USD ';
+                                         }
+                                     }
+                                 },
+                                 scales: {
+                                     xAxes: [{
+                                         ticks: {
+                                             beginAtZero: true
+                                         },
+                                         gridLines: {
+                                             display: false // Ocultar las líneas de la cuadrícula
+                                         }
+                                     }],
+                                     yAxes: [{
+                                         gridLines: {
+                                             display: false // Ocultar las líneas de la cuadrícula
+                                         }
+
+                                     }]
+                                 }
+                             }
+                         });
+                     </script>
+
+                 </div>
+
+
+                 <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800">
+                     <h4 class="mb-4 font-semibold text-gray-800 text-center dark:text-gray-300">
+                         Top 10 {{ $categoryName2 }}
+                     </h4>
+                     <canvas id="horizontalBarChart2" width="400" height="200"></canvas>
+
+                     <script>
+                         // Obtener los datos de PHP y convertirlos a un formato que pueda ser utilizado por Chart.js
+                         var expenseData = @json($this->expenseTopTen);
+
+                         // Preparar datos para Chart.js
+                         var labels = expenseData.map(function(expense) {
+                             return expense.category_name;
+                         });
+
+                         var data = expenseData.map(function(expense) {
+                             return expense.operation_currency_total;
+                         });
+
+                         // Configurar el gráfico
+                         var ctx = document.getElementById('horizontalBarChart2').getContext('2d');
+                         var horizontalBarChart = new Chart(ctx, {
+                             type: 'horizontalBar',
+                             data: {
+                                 labels: labels,
+                                 datasets: [{
+                                     label: 'Top 10  {{ $categoryName2 }}',
+                                     data: data,
+                                     backgroundColor: '#7e3af2',
+                                     borderColor: '#7e3af2',
+                                     borderWidth: 1
+                                 }]
+                             },
+                             options: {
+                                 legend: {
+                                     display: false // Ocultar la leyenda
+                                 },
+                                 tooltips: {
+                                     callbacks: {
+                                         title: function(tooltipItem, data) {
+                                             // Mostrar la etiqueta del eje x (category_name)
+                                             return data.labels[tooltipItem[0].index];
+                                         },
+                                         label: function(tooltipItem, data) {
+                                             // Mostrar el valor en el tooltip
+                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + Number(tooltipItem
+                                                 .value).toLocaleString('en-US') + ' USD ';
+
+                                         }
+                                     }
+                                 },
+                                 scales: {
+                                     xAxes: [{
+                                         ticks: {
+                                             beginAtZero: true
+                                         },
+                                         gridLines: {
+                                             display: false // Ocultar las líneas de la cuadrícula
+                                         }
+                                     }],
+                                     yAxes: [{
+                                         gridLines: {
+                                             display: false // Ocultar las líneas de la cuadrícula
+                                         }
+
+                                     }]
+                                 }
+                             }
+                         });
+                     </script>
+
+                 </div>
+
              </div>
-             <script>
-                 var ctx = document.getElementById('myChartGeneral5').getContext('2d');
 
-                 var dataBar = {
-                     labels: [
-                         @for ($i = 1; $i <= 12; $i++)
-                             "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
-                         @endfor
-                     ],
-
-                     datasets: [{
-                             label: "Budget",
-                             backgroundColor: "#16a34a",
-                             borderColor: "#16a34a",
-                             data: @json($budgetDataCurrency),
-                         }, {
-                             label: "{{ $categoryName }}",
-                             backgroundColor: "#0694a2",
-                             borderColor: "#0694a2",
-                             data: @json($incomeDataCurrency),
-
-                         },
-                         {
-                             label: "{{ $categoryName2 }}",
-                             backgroundColor: "#7e3af2",
-                             borderColor: "#7e3af2",
-                             data: @json($expenseDataCurrency),
-                         },
-
-
-                     ]
-                 };
-
-                 var options = {
-                     title: {
-                         display: true,
-                         text: ' ',
-                         responsive: true,
-                         legend: {
-                             display: false,
-                         },
-
-                     },
-                     scales: {
-                         xAxes: [{
-                             display: true,
-                             title: 'Mes',
-
-                         }],
-                         yAxes: [{
-                             display: true,
-                             title: 'Valor'
-                         }]
-                     }
-                 };
-
-                 var myChart = new Chart(ctx, {
-                     type: 'bar',
-                     data: dataBar,
-                     options: options
-                 });
-             </script>
 
          </div>
      @endif

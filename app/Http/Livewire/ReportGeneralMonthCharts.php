@@ -33,6 +33,8 @@ class ReportGeneralMonthCharts extends Component
     public $date_end;
     public $mainCategoriesRender;
 
+    public $topTenOperations;
+
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
     public function userSelected4($userId)
@@ -87,15 +89,12 @@ public function months()
 
 
     
-  // REPORT GENERAL MONTH CHART
-
-public function updateMonthData()
+  public function updateMonthData()
 {
     $this->emit('initializeFlatpickr');
     $this->updateMonthDataInternal();
-    
+    $this->topTenOperations = $this->fetchTopOperations(10);
 }
-
 
 private function updateMonthDataInternal()
 {
@@ -104,14 +103,14 @@ private function updateMonthDataInternal()
     
     $this->totalMonthAmount = $this->fetchTotalMonthAmount(); 
     $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
-    
+
     $this->showChart4 = true;
+
     if ($this->selectedMonth) {
         $selectedDate = Carbon::create()->month($this->selectedMonth);
         $this->selectedMonthName = $selectedDate->format('F');
     }
 }
-
 
 private function fetchTotalMonthAmountCurrency()
 {
@@ -120,36 +119,33 @@ private function fetchTotalMonthAmountCurrency()
 
 private function fetchTotalMonthAmount()
 {
-    return $this->operationsFetchMonths->sum('operation_currency_total');
+    return $this->fetchTotalMonthAmountCurrency();
 }
 
-
-private function fetchMonthData()
+private function buildBaseQuery()
 {
-    // Crear la base de la consulta
-    $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+    return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
+        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
         ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id');
+}
 
-    // Aplicar filtro por usuario si está seleccionado
+private function applyFiltersToQuery($query)
+{
     if ($this->selectedUser4) {
         $query->where('operations.user_id', $this->selectedUser4);
     }
 
-    // Aplicar filtro por mes si está seleccionado
     if ($this->selectedMonth) {
         $query->whereMonth('operations.operation_date', $this->selectedMonth);
     }
 
-    // Aplicar filtro por año si está seleccionado
     if ($this->selectedYear3) {
         $query->whereYear('operations.operation_date', $this->selectedYear3);
     }
 
-    // Aplicar filtro por fechas
-     if ($this->date_start && $this->date_end) {
+    if ($this->date_start && $this->date_end) {
         $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
     } elseif ($this->date_start) {
         $query->whereDate('operations.operation_date', '>=', $this->date_start);
@@ -158,19 +154,36 @@ private function fetchMonthData()
     }
 
     if ($this->main_category_id !== null && $this->main_category_id !== '') {
-    $query->where('main_categories.id', $this->main_category_id);
+        $query->where('main_categories.id', $this->main_category_id);
     }
 
-    $this->budget = Budget::where('budget_month', $this->selectedMonth)
-                      ->where('user_id', $this->selectedUser4)
-                      ->first();
+    return $query;
+}
 
-    $this->budgetData = $this->budget ? 'Budget Month ' . $this->budget->budget_currency_total . ' $' : 'Budget Month N/A';
+private function fetchBudgetData()
+{
+    return Budget::where('budget_month', $this->selectedMonth)
+                 ->where('user_id', $this->selectedUser4)
+                 ->where('budget_year', $this->selectedYear3)
+                 ->first();
+}
 
- 
-    // Ejecutar la consulta y seleccionar columnas calculadas
-   return $query->select(
-            'operations.operation_amount',
+private function fetchBudgetDataString()
+{
+    $budget = $this->fetchBudgetData();
+    return $budget ?  $budget->budget_currency_total  : 'Budget N/A';
+}
+
+private function fetchMonthData()
+{
+    $query = $this->buildBaseQuery();
+    $query = $this->applyFiltersToQuery($query);
+
+    $this->budget = $this->fetchBudgetData();
+    $this->budgetData = $this->fetchBudgetDataString();
+
+    return $query->select(
+         'operations.operation_amount',
             'operations.operation_currency',
             'operations.operation_currency_total',
             'categories.category_name as category_title',
@@ -180,10 +193,38 @@ private function fetchMonthData()
             'operations.operation_date',
             'operations.operation_currency_type',
             'main_categories.title as main_category_title',
-            'subcategories.subcategory_name' 
-        )
-        ->orderBy('operations.id', 'desc')
-        ->get();
+            'subcategories.subcategory_name',
+             'categories.main_category_id as main_category_id', 
+    )
+    ->orderBy('operations.id', 'desc')
+    ->get();
+}
+
+private function fetchTopOperations($limit)
+{
+    $query = $this->buildBaseQuery();
+    $query = $this->applyFiltersToQuery($query);
+
+    $this->budget = $this->fetchBudgetData();
+    $this->budgetData = $this->fetchBudgetDataString();
+    
+    return $query->select(
+         'operations.operation_amount',
+            'operations.operation_currency',
+            'operations.operation_currency_total',
+            'categories.category_name as category_title',
+            'statu_options.status_description as status_description',
+            'operations.operation_status as operation_status',
+            'operations.operation_description',
+            'operations.operation_date',
+            'operations.operation_currency_type',
+            'main_categories.title as main_category_title',
+            'subcategories.subcategory_name',
+             'categories.main_category_id as main_category_id', 
+    )
+    ->orderBy('operations.operation_currency_total', 'desc')
+    ->limit($limit)
+    ->get();
 }
 
 
@@ -192,6 +233,9 @@ public function resetFields4()
     $this->selectedUser4 = null;
     $this->selectedMonth = null;
     $this->selectedYear3 = null;
+    $this->main_category_id = null;
+    $this->date_start = null;
+    $this->date_end = null;
     $this->showChart4 = false;
 }
 

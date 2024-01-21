@@ -77,7 +77,11 @@
                  <div class="grid gap-6 mb-8 md:grid-cols-2">
                      <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
                          <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
-                             Bars
+                             @if ($userNameSelected2)
+                                 {{ $userNameSelected2->name }}
+                             @else
+                                 User Not Selected
+                             @endif
                          </h4>
 
                          <canvas id="myChartGeneral2" height="200"></canvas>
@@ -86,8 +90,8 @@
 
                  </div>
                  <script>
-                     @if ($userNameSelected2)
-                         var userName = "{{ $userNameSelected2->name }}";
+                     @if ($categoryNameSelected)
+                         var userName = "{{ $categoryNameSelected->category_name }}";
                      @else
                          var userName = "";
                      @endif
@@ -101,18 +105,15 @@
                          ],
 
                          datasets: [{
-                                 label: userName,
-                                 backgroundColor: "#0694a2",
-                                 borderColor: "#0694a2",
-                                 data: [
-                                     @foreach ($ArrayCategories as $data)
-                                         {{ $data['total'] }},
-                                     @endforeach
-                                 ],
-
-                             },
-
-                         ]
+                             label: userName,
+                             backgroundColor: "#0694a2",
+                             borderColor: "#0694a2",
+                             data: [
+                                 @foreach ($ArrayCategories as $data)
+                                     {{ $data['total'] }},
+                                 @endforeach
+                             ],
+                         }]
                      };
 
                      var options = {
@@ -123,18 +124,34 @@
                              legend: {
                                  display: false,
                              },
-
                          },
                          scales: {
                              xAxes: [{
                                  display: true,
                                  title: 'Mes',
-
                              }],
                              yAxes: [{
                                  display: true,
                                  title: 'Valor'
                              }]
+                         },
+                         tooltips: {
+                             callbacks: {
+                                 title: function(tooltipItem, data) {
+                                     return data.labels[tooltipItem[0].index];
+                                 },
+                                 label: function(tooltipItem, data) {
+                                     var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
+                                     var value = tooltipItem.value;
+
+                                     // Aplicar formato con toLocaleString
+                                     if (!isNaN(value)) {
+                                         value = Number(value).toLocaleString('en-US') + ' USD ';
+                                     }
+
+                                     return datasetLabel + ': ' + value;
+                                 }
+                             }
                          }
                      };
 
@@ -144,6 +161,7 @@
                          options: options
                      });
                  </script>
+
 
              </div>
          @endif

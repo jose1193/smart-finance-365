@@ -113,75 +113,523 @@
              wire:key="chart-{{ $selectedUser4 }}-{{ $selectedMonth }}-{{ $selectedYear3 }}-{{ uniqid() }}">
 
 
-             <div class="grid gap-6 mb-8 md:grid-cols-2">
-                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-                     <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
-                         Bars
-                     </h4>
+             <div class="grid gap-6 mb-8 md:grid-cols-2 ">
+                 <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 my-5">
+
 
                      <canvas id="myChartGeneral4" height="200"></canvas>
+                     <script>
+                         var ctx = document.getElementById('myChartGeneral4').getContext('2d');
+
+                         var dataBar = {
+                             labels: [
+
+                                 @foreach ($operationsFetchMonths as $item)
+                                     "{{ Str::words($item->operation_description, 2, '...') }}",
+                                 @endforeach
+                             ],
+
+                             datasets: [{
+                                     label: "",
+                                     backgroundColor: [
+                                         @foreach ($operationsFetchMonths as $item)
+                                             @if ($item->main_category_id == 1)
+                                                 "#14B8A6",
+                                             @elseif ($item->main_category_id == 2)
+                                                 "#7e3af2",
+                                             @else
+                                                 "#000000", // Color por defecto para otros casos
+                                             @endif
+                                         @endforeach
+                                     ],
+                                     borderColor: [
+                                         @foreach ($operationsFetchMonths as $item)
+                                             @if ($item->main_category_id == 1)
+                                                 "#14B8A6",
+                                             @elseif ($item->main_category_id == 2)
+                                                 "#7e3af2",
+                                             @else
+                                                 "#000000", // Color por defecto para otros casos
+                                             @endif
+                                         @endforeach
+                                     ],
+                                     data: [
+                                         @foreach ($operationsFetchMonths as $item)
+                                             {{ $item->operation_currency_total }},
+                                         @endforeach
+                                     ],
+
+                                 },
+
+                             ]
+                         };
+
+                         var options = {
+                             title: {
+                                 display: true,
+                                 text: ' ',
+                                 responsive: true,
+                             },
+                             legend: { // Añadido para ocultar la leyenda
+                                 display: false,
+                             },
+
+                             scales: {
+                                 xAxes: [{
+                                     display: true,
+                                     title: 'Mes',
+                                 }],
+                                 yAxes: [{
+                                     display: true,
+                                     title: 'Valor'
+                                 }]
+                             },
+                             tooltips: {
+                                 callbacks: {
+                                     title: function(tooltipItem, data) {
+                                         return data.labels[tooltipItem[0].index];
+                                     },
+                                     label: function(tooltipItem, data) {
+                                         var value = tooltipItem.value;
+
+                                         // Aplicar formato con toLocaleString
+                                         if (!isNaN(value)) {
+                                             value = Number(value).toLocaleString('en-US') + ' USD ';
+                                         }
+
+                                         return value;
+                                     }
+                                 }
+                             }
+                         };
+
+
+                         var myChart = new Chart(ctx, {
+                             type: 'bar',
+                             data: dataBar,
+                             options: options
+                         });
+                     </script>
+
+                     <div class="text-center justify-center mt-10 my-3 flex">
+                         @php
+                             $selectedCategoryId = $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
+                             $totalCategories = [];
+
+                             foreach ($mainCategoriesRender as $item) {
+                                 $totalCategory = 0;
+                                 foreach ($operationsFetchMonths as $operationItem) {
+                                     if ($operationItem->main_category_id == $item->id) {
+                                         $totalCategory += $operationItem->operation_currency_total;
+                                     }
+                                 }
+                                 $totalCategories[$item->id] = $totalCategory;
+                             }
+                         @endphp
+
+                         @if (!empty($totalCategories))
+                             @foreach ($mainCategoriesRender as $item)
+                                 @if ($totalCategories[$item->id] > 0)
+                                     <div style="display: flex; align-items: center; margin-right: 15px;">
+                                         <div
+                                             style="background-color: {{ $item->id == 1 ? '#14B8A6' : '#7e3af2' }}; height: 13px; width: 40px; margin-bottom: 5px;">
+                                         </div>
+                                         <span
+                                             class="-mt-1 ml-2 text-xs font-bold text-center text-gray-800 capitalize dark:text-gray-300">
+                                             <span class="text-gray-500 capitalize dark:text-gray-400">
+                                                 {{ $item->title }}</span>
+
+                                         </span>
+                                     </div>
+                                 @endif
+                             @endforeach
+
+                         @endif
+
+
+                     </div>
+
+
+                     <div class="mt-5">
+                         <p class="text-xs font-bold text-center text-gray-600 capitalize   dark:text-gray-400 ">
+                             @if ($userNameSelected4)
+                                 {{ $userNameSelected4->name }}
+                             @endif
+                             @if ($selectedMonthName)
+                                 - {{ $selectedMonthName }}
+                             @endif
+                             @if ($selectedYear3)
+                                 - {{ $selectedYear3 }}
+                             @endif
+                         </p>
+                     </div>
 
                  </div>
 
 
+                 <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800 my-5">
+
+                     <!-- Agrega un elemento canvas para el gráfico -->
+                     <canvas id="myDoughnutChart"></canvas>
+                     <script>
+                         // Inicializar totales de cada categoría
+                         var totalCategory1 = 0;
+                         var totalCategory2 = 0;
+
+                         @foreach ($operationsFetchMonths as $item)
+                             // Sumar al total correspondiente según la categoría principal
+                             @if ($item->main_category_id == 1)
+                                 totalCategory1 += {{ $item->operation_currency_total }};
+                             @elseif ($item->main_category_id == 2)
+                                 totalCategory2 += {{ $item->operation_currency_total }};
+                             @endif
+                         @endforeach
+
+                         // Obtener los nombres de categoría
+                         var categoryName = '';
+                         var categoryName2 = '';
+
+                         @foreach ($mainCategoriesRender as $category)
+                             @if ($category->id == 1)
+                                 categoryName = "{{ $category->title }}";
+                             @elseif ($category->id == 2)
+                                 categoryName2 = "{{ $category->title }}";
+                             @endif
+                         @endforeach
+
+                         // Verificar si solo hay una categoría presente
+                         var isSingleCategory = (totalCategory1 === 0 || totalCategory2 === 0);
+
+                         // Configuración del gráfico de dona
+                         var ctx = document.getElementById('myDoughnutChart').getContext('2d');
+                         var labels = [];
+
+                         // Verificar si solo hay una categoría presente
+                         if (totalCategory1 > 0 && totalCategory2 > 0) {
+                             // Ambas categorías están presentes
+                             labels = [categoryName + ' ' + totalCategory1.toLocaleString('en-US') + ' $', categoryName2 + ' ' +
+                                 totalCategory2.toLocaleString('en-US') + ' $'
+                             ];
+                         } else if (totalCategory1 > 0) {
+                             // Solo la primera categoría está presente
+                             labels = [categoryName + ' ' + totalCategory1.toLocaleString('en-US') + ' $'];
+                         } else if (totalCategory2 > 0) {
+                             // Solo la segunda categoría está presente
+                             labels = [categoryName2 + ' ' + totalCategory2.toLocaleString('en-US') + ' $'];
+                         }
+
+                         var myChart = new Chart(ctx, {
+                             type: 'doughnut',
+                             data: {
+                                 labels: "",
+                                 datasets: [{
+                                     label: '# of ',
+                                     data: [totalCategory1, totalCategory2],
+                                     backgroundColor: ['#14b8a6', '#7e3af2'],
+                                     borderColor: ['#14b8a6', '#7e3af2'],
+                                     borderWidth: 1
+                                 }]
+                             },
+                             options: {
+                                 responsive: true,
+                                 plugins: {
+                                     legend: {
+                                         display: false,
+
+                                     },
+                                     title: {
+                                         display: false,
+                                         text: ' Chart'
+                                     },
+                                 },
+                                 cutoutPercentage: 65,
+                                 animation: {
+                                     duration: 2000,
+                                     onComplete: function(animation) {
+                                         var ctx = this.chart.ctx;
+                                         ctx.textAlign = 'center';
+                                         ctx.textBaseline = 'middle';
+                                         var centerX = this.chart.width / 2;
+                                         var centerY = this.chart.height / 2;
+
+                                         if (isSingleCategory) {
+                                             // Mostrar solo el total si hay una sola categoría
+                                             var totalText = (totalCategory1 !== 0 ? totalCategory1.toLocaleString('en-US') +
+                                                 ' $' : totalCategory2.toLocaleString('en-US') + ' $');
+                                             ctx.fillStyle = '#eab308';
+                                             ctx.font = '17px Roboto';
+                                             ctx.fillText(totalText, centerX, centerY);
+
+                                             // Agregar el texto "of Income" o "of Expenses" debajo del porcentaje
+                                             ctx.fillStyle = '#808080'; // Gris
+                                             ctx.font = '16px Roboto';
+                                             ctx.fillText((totalCategory1 > totalCategory2) ? 'of ' + categoryName : 'of ' +
+                                                 categoryName2,
+                                                 centerX, centerY + 30);
+
+                                         } else {
+                                             // Mostrar el porcentaje si hay dos categorías
+                                             var totalPercentage = ((totalCategory2 / totalCategory1) * 100).toFixed(0);
+                                             ctx.fillStyle = '#eab308';
+                                             ctx.font = '28px Roboto';
+                                             ctx.fillText(totalPercentage + '%', centerX, centerY);
+
+                                             // Agregar el texto "of Income" o "of Expenses" debajo del porcentaje
+                                             ctx.fillStyle = '#808080'; // Gris
+                                             ctx.font = '16px Roboto';
+                                             ctx.fillText((totalCategory1 > totalCategory2) ? 'of ' + categoryName : 'of ' +
+                                                 categoryName2,
+                                                 centerX, centerY + 30);
+                                         }
+                                     }
+                                 },
+                                 hover: {
+                                     animationDuration: 0 // Evitar que la animación del porcentaje se reinicie al hacer hover
+                                 },
+                                 tooltips: {
+                                     callbacks: {
+                                         label: function(tooltipItem, data) {
+                                             var label = (tooltipItem.index === 0) ? 'Total ' + categoryName :
+                                                 'Total ' + categoryName2;
+                                             var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
+                                             return label + ': ' + value + ' USD';
+                                         }
+                                     }
+                                 }
+                             }
+                         });
+                     </script>
+
+
+
+                     <div class="text-center justify-center mt-10 my-3 flex">
+                         @php
+                             $selectedCategoryId = $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
+                             $totalCategories = [];
+
+                             foreach ($mainCategoriesRender as $item) {
+                                 $totalCategory = 0;
+                                 foreach ($operationsFetchMonths as $operationItem) {
+                                     if ($operationItem->main_category_id == $item->id) {
+                                         $totalCategory += $operationItem->operation_currency_total;
+                                     }
+                                 }
+                                 $totalCategories[$item->id] = $totalCategory;
+                             }
+                         @endphp
+
+                         @if (!empty($totalCategories))
+                             @foreach ($mainCategoriesRender as $item)
+                                 @if ($totalCategories[$item->id] > 0)
+                                     <div style="display: flex; align-items: center; margin-right: 15px;">
+                                         <div
+                                             style="background-color: {{ $item->id == 1 ? '#14B8A6' : '#7e3af2' }}; height: 13px; width: 40px; margin-bottom: 5px;">
+                                         </div>
+                                         <span
+                                             class="-mt-1 ml-2 text-xs font-bold text-center text-gray-800 capitalize dark:text-gray-300">
+                                             <span class="text-gray-500 capitalize dark:text-gray-400">
+                                                 {{ $item->title }}</span>
+                                             {{ number_format($totalCategories[$item->id], 0) }} $
+                                         </span>
+                                     </div>
+                                 @endif
+                             @endforeach
+
+                         @endif
+
+                         @if ($budget)
+                             <div style="display: flex; align-items: center; margin-right: 15px;">
+                                 <div style="background-color: #22c55e; height: 13px; width: 40px; margin-bottom: 5px;">
+                                 </div>
+                                 <span
+                                     class="-mt-1 ml-2 text-xs font-bold text-center text-gray-800 capitalize dark:text-gray-300">
+                                     <span class="text-gray-500 capitalize dark:text-gray-400">
+                                         Budget</span>
+                                     @if (is_numeric($budgetData))
+                                         {{ number_format($budgetData, 0, '.', ',') }} $
+                                     @else
+                                         {{ $budgetData }}
+                                     @endif
+                                 </span>
+
+                             </div>
+                         @endif
+                     </div>
+
+                     <div class="mt-5">
+                         <p class="text-xs font-bold text-center text-gray-600 capitalize   dark:text-gray-400 ">
+                             @if ($userNameSelected4)
+                                 {{ $userNameSelected4->name }}
+                             @endif
+                             @if ($selectedMonthName)
+                                 - {{ $selectedMonthName }}
+                             @endif
+                             @if ($selectedYear3)
+                                 - {{ $selectedYear3 }}
+                             @endif
+                         </p>
+                     </div>
+
+                 </div>
+
+                 <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800 my-5">
+
+                     <canvas id="topTenChart" class="my-10"></canvas>
+
+
+                     <script>
+                         // Función para limitar la longitud de las palabras
+                         function limitWords(str, numWords) {
+                             var words = str.split(' ');
+                             var truncated = words.slice(0, numWords).join(' ');
+                             if (words.length > numWords) {
+                                 truncated += '...';
+                             }
+                             return truncated;
+                         }
+
+                         // Tomando como ejemplo que $topTenOperations contiene los datos obtenidos
+                         var topTenOperations = @json($this->topTenOperations);
+
+                         // Limita la longitud de las descripciones a 2 palabras
+                         var labels = topTenOperations.map(item => limitWords(item.operation_description, 2));
+
+                         var data = topTenOperations.map(item => item.operation_currency_total);
+
+                         var ctx = document.getElementById('topTenChart').getContext('2d');
+                         var myChart = new Chart(ctx, {
+                             type: 'horizontalBar',
+                             data: {
+                                 labels: labels,
+                                 datasets: [{
+                                     label: 'Top 10 Operations',
+                                     data: data,
+                                     backgroundColor: [
+                                         @foreach ($topTenOperations as $item)
+                                             @if ($item->main_category_id == 1)
+                                                 "#14B8A6",
+                                             @elseif ($item->main_category_id == 2)
+                                                 "#7e3af2",
+                                             @else
+                                                 "#000000", // Color por defecto para otros casos
+                                             @endif
+                                         @endforeach
+                                     ],
+                                     borderColor: [
+                                         @foreach ($topTenOperations as $item)
+                                             @if ($item->main_category_id == 1)
+                                                 "#14B8A6",
+                                             @elseif ($item->main_category_id == 2)
+                                                 "#7e3af2",
+                                             @else
+                                                 "#000000", // Color por defecto para otros casos
+                                             @endif
+                                         @endforeach
+                                     ],
+                                     borderWidth: 1
+                                 }]
+                             },
+                             options: {
+                                 legend: {
+                                     display: true,
+                                     position: 'top',
+                                     align: 'center',
+                                     labels: {
+                                         boxWidth: 0, // Sin caja alrededor del texto
+                                         usePointStyle: false,
+                                         fontColor: 'black',
+                                         fontSize: 14,
+                                     },
+                                     onClick: function() {
+                                         // Evita que se oculte la leyenda al hacer clic en ella
+                                     }
+                                 },
+                                 scales: {
+                                     xAxes: [{
+                                         ticks: {
+                                             beginAtZero: true
+                                         }
+                                     }]
+                                 },
+                                 tooltips: {
+                                     callbacks: {
+                                         title: function(tooltipItem, data) {
+                                             // Mostrar la etiqueta del eje x (category_name)
+                                             return data.labels[tooltipItem[0].index];
+                                         },
+                                         label: function(tooltipItem, data) {
+                                             // Mostrar el valor en el tooltip
+                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + Number(tooltipItem
+                                                 .value).toLocaleString('en-US') + ' USD ';
+
+                                         }
+                                     }
+                                 },
+                             }
+                         });
+                     </script>
+
+                     <div class="text-center justify-center mt-10 my-3 flex">
+                         @php
+                             $selectedCategoryId = $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
+                             $totalCategories = [];
+
+                             foreach ($mainCategoriesRender as $item) {
+                                 $totalCategory = 0;
+                                 foreach ($operationsFetchMonths as $operationItem) {
+                                     if ($operationItem->main_category_id == $item->id) {
+                                         $totalCategory += $operationItem->operation_currency_total;
+                                     }
+                                 }
+                                 $totalCategories[$item->id] = $totalCategory;
+                             }
+                         @endphp
+
+                         @if (!empty($totalCategories))
+                             @foreach ($mainCategoriesRender as $item)
+                                 @if ($totalCategories[$item->id] > 0)
+                                     <div style="display: flex; align-items: center; margin-right: 15px;">
+                                         <div
+                                             style="background-color: {{ $item->id == 1 ? '#14B8A6' : '#7e3af2' }}; height: 13px; width: 40px; margin-bottom: 5px;">
+                                         </div>
+                                         <span
+                                             class="-mt-1 ml-2 text-xs font-bold text-center text-gray-800 capitalize dark:text-gray-300">
+                                             <span class="text-gray-500 capitalize dark:text-gray-400">
+                                                 {{ $item->title }}</span>
+
+                                         </span>
+                                     </div>
+                                 @endif
+                             @endforeach
+
+                         @endif
+
+
+
+
+
+                     </div>
+
+
+
+                     <div class="mt-5">
+                         <p class="text-xs font-bold text-center text-gray-600 capitalize   dark:text-gray-400 ">
+                             @if ($userNameSelected4)
+                                 {{ $userNameSelected4->name }}
+                             @endif
+                             @if ($selectedMonthName)
+                                 - {{ $selectedMonthName }}
+                             @endif
+                             @if ($selectedYear3)
+                                 - {{ $selectedYear3 }}
+                             @endif
+                         </p>
+                     </div>
+                 </div>
 
              </div>
 
-             <script>
-                 var ctx = document.getElementById('myChartGeneral4').getContext('2d');
 
-                 var dataBar = {
-                     labels: [
-
-                         @foreach ($operationsFetchMonths as $item)
-                             "{{ Str::words($item->category_title, 2, '...') }}",
-                         @endforeach
-                     ],
-
-                     datasets: [{
-                             label: "",
-                             backgroundColor: "#7C3AED",
-                             borderColor: "#7C3AED",
-                             data: [
-                                 @foreach ($operationsFetchMonths as $item)
-                                     {{ $item->operation_currency_total }},
-                                 @endforeach
-                             ],
-
-                         },
-
-                     ]
-                 };
-
-                 var options = {
-                     title: {
-                         display: true,
-                         text: ' ',
-                         responsive: true,
-                         legend: {
-                             display: false,
-                         },
-
-                     },
-                     scales: {
-                         xAxes: [{
-                             display: true,
-                             title: 'Mes',
-
-                         }],
-                         yAxes: [{
-                             display: true,
-                             title: 'Valor'
-                         }]
-                     }
-                 };
-
-                 var myChart = new Chart(ctx, {
-                     type: 'bar',
-                     data: dataBar,
-                     options: options
-                 });
-             </script>
 
          </div>
      @endif
