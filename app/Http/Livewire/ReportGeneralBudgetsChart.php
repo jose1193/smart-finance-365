@@ -181,7 +181,8 @@ private function fetchTopTenExpenses()
 {
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->where('main_categories.id', 2); // Assuming 2 is the ID for the expense main category
+        ->where('main_categories.id', 2) // Assuming 2 is the ID for the expense main category
+        ->groupBy('categories.id', 'categories.category_name'); // Agrupar por categoría
 
     if ($this->selectedUser5) {
         $query->where('operations.user_id', $this->selectedUser5);
@@ -200,20 +201,23 @@ private function fetchTopTenExpenses()
     }
 
     $topTenExpenses = $query
-        ->orderByDesc('operations.operation_currency_total')
+        ->selectRaw('categories.category_name, SUM(operations.operation_currency_total) as total_expenses')
+        ->orderByDesc('total_expenses')
         ->limit(10)
-        ->get(['categories.category_name', 'operations.operation_currency_total'])
+        ->get()
         ->toArray();
 
     return $topTenExpenses;
 }
 
 
+
 private function fetchTopTenIncome()
 {
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->where('main_categories.id', 1); 
+        ->where('main_categories.id', 1)
+        ->groupBy('categories.id', 'categories.category_name'); // Agrupa por categoría
 
     if ($this->selectedUser5) {
         $query->where('operations.user_id', $this->selectedUser5);
@@ -231,13 +235,14 @@ private function fetchTopTenIncome()
         $query->whereDate('operations.operation_date', '<=', $this->date_end);
     }
 
-    $topTenIncome = $query
-        ->orderByDesc('operations.operation_currency_total')
+    $incomeTopTen = $query
+        ->selectRaw('categories.category_name, SUM(operations.operation_currency_total) as total_income')
+        ->orderByDesc('total_income')
         ->limit(10)
-        ->get(['categories.category_name', 'operations.operation_currency_total'])
+        ->get()
         ->toArray();
 
-    return $topTenIncome;
+    return $incomeTopTen;
 }
 
 

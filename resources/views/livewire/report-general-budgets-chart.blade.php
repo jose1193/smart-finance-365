@@ -660,26 +660,23 @@
                      <canvas id="horizontalBarChart" width="400" height="200"></canvas>
 
                      <script>
-                         // Obtener los datos de PHP y convertirlos a un formato que pueda ser utilizado por Chart.js
-                         var incomeData = @json($this->incomeTopTen);
+                         var incomeData = @json($incomeTopTen);
 
-                         // Preparar datos para Chart.js
-                         var labels = incomeData.map(function(income) {
-                             return income.category_name;
+                         var labels = incomeData.map(function(entry) {
+                             return entry.category_name;
                          });
 
-                         var data = incomeData.map(function(income) {
-                             return income.operation_currency_total;
+                         var data = incomeData.map(function(entry) {
+                             return entry.total_income;
                          });
 
-                         // Configurar el gráfico
                          var ctx = document.getElementById('horizontalBarChart').getContext('2d');
                          var horizontalBarChart = new Chart(ctx, {
                              type: 'horizontalBar',
                              data: {
                                  labels: labels,
                                  datasets: [{
-                                     label: 'Top 10  {{ $categoryName }}',
+                                     label: 'Total Income',
                                      data: data,
                                      backgroundColor: '#14b8a6',
                                      borderColor: '#14b8a6',
@@ -688,18 +685,16 @@
                              },
                              options: {
                                  legend: {
-                                     display: false // Ocultar la leyenda
+                                     display: false
                                  },
                                  tooltips: {
                                      callbacks: {
                                          title: function(tooltipItem, data) {
-                                             // Mostrar la etiqueta del eje x (category_name)
                                              return data.labels[tooltipItem[0].index];
                                          },
                                          label: function(tooltipItem, data) {
-                                             // Mostrar el valor en el tooltip
-                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + Number(tooltipItem
-                                                 .value).toLocaleString('en-US') + ' USD ';
+                                             return 'Total Income: ' + Number(tooltipItem.value).toLocaleString('en-US') +
+                                                 ' USD';
                                          }
                                      }
                                  },
@@ -709,19 +704,20 @@
                                              beginAtZero: true
                                          },
                                          gridLines: {
-                                             display: false // Ocultar las líneas de la cuadrícula
+                                             display: false
                                          }
                                      }],
                                      yAxes: [{
                                          gridLines: {
-                                             display: false // Ocultar las líneas de la cuadrícula
+                                             display: false
                                          }
-
                                      }]
                                  }
                              }
                          });
                      </script>
+
+
 
                  </div>
 
@@ -730,30 +726,27 @@
                      <h4 class="mb-4 font-semibold text-gray-800 text-center dark:text-gray-300">
                          Top 10 {{ $categoryName2 }}
                      </h4>
-                     <canvas id="horizontalBarChart2" width="400" height="200"></canvas>
+                     <canvas id="horizontalBarChartExpenses" width="400" height="200"></canvas>
 
                      <script>
-                         // Obtener los datos de PHP y convertirlos a un formato que pueda ser utilizado por Chart.js
-                         var expenseData = @json($this->expenseTopTen);
+                         var expensesData = @json($expenseTopTen);
 
-                         // Preparar datos para Chart.js
-                         var labels = expenseData.map(function(expense) {
-                             return expense.category_name;
+                         var labelsExpenses = expensesData.map(function(entry) {
+                             return entry.category_name;
                          });
 
-                         var data = expenseData.map(function(expense) {
-                             return expense.operation_currency_total;
+                         var dataExpenses = expensesData.map(function(entry) {
+                             return entry.total_expenses;
                          });
 
-                         // Configurar el gráfico
-                         var ctx = document.getElementById('horizontalBarChart2').getContext('2d');
-                         var horizontalBarChart = new Chart(ctx, {
+                         var ctxExpenses = document.getElementById('horizontalBarChartExpenses').getContext('2d');
+                         var horizontalBarChartExpenses = new Chart(ctxExpenses, {
                              type: 'horizontalBar',
                              data: {
-                                 labels: labels,
+                                 labels: labelsExpenses,
                                  datasets: [{
-                                     label: 'Top 10  {{ $categoryName2 }}',
-                                     data: data,
+                                     label: 'Total Expenses',
+                                     data: dataExpenses,
                                      backgroundColor: '#7e3af2',
                                      borderColor: '#7e3af2',
                                      borderWidth: 1
@@ -761,19 +754,16 @@
                              },
                              options: {
                                  legend: {
-                                     display: false // Ocultar la leyenda
+                                     display: false
                                  },
                                  tooltips: {
                                      callbacks: {
                                          title: function(tooltipItem, data) {
-                                             // Mostrar la etiqueta del eje x (category_name)
                                              return data.labels[tooltipItem[0].index];
                                          },
                                          label: function(tooltipItem, data) {
-                                             // Mostrar el valor en el tooltip
-                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + Number(tooltipItem
-                                                 .value).toLocaleString('en-US') + ' USD ';
-
+                                             return 'Total Expenses: ' + Number(tooltipItem.value).toLocaleString('en-US') +
+                                                 ' USD';
                                          }
                                      }
                                  },
@@ -783,19 +773,19 @@
                                              beginAtZero: true
                                          },
                                          gridLines: {
-                                             display: false // Ocultar las líneas de la cuadrícula
+                                             display: false
                                          }
                                      }],
                                      yAxes: [{
                                          gridLines: {
-                                             display: false // Ocultar las líneas de la cuadrícula
+                                             display: false
                                          }
-
                                      }]
                                  }
                              }
                          });
                      </script>
+
 
                  </div>
 

@@ -115,6 +115,20 @@
                                                         class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                             class="fa-solid fa-trash"></i></button>
 
+                                                    <button wire:click="$emit('deleteUserOperations',{{ $item->id }})"
+                                                        class="relative bg-orange-600 duration-500 ease-in-out hover:bg-orange-700 text-white font-bold py-2 px-4 rounded"
+                                                        x-data="{ showTooltip: false }" x-on:mouseenter="showTooltip = true"
+                                                        x-on:mouseleave="showTooltip = false" x-tooltip="Delete Operations">
+                                                        <i class="fa-solid fa-eraser"></i>
+
+                                                        <!-- Tooltip -->
+                                                        <div x-show="showTooltip" x-cloak
+                                                            class="absolute left-1/3 -ml-5 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded mt-3 z-10">
+                                                            Delete User Operations
+                                                        </div>
+                                                    </button>
+
+
                                                 </td>
                                             @endcan
                                         </tr>
@@ -167,6 +181,8 @@
                                                         d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>
+
+
                                         </div>
                                         <form autocomplete="off">
                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -331,7 +347,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id) {
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
+                title: 'Are you sure you want to delete all of this user records?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
@@ -341,6 +357,33 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('users-crud', 'delete',
+                        id); // Envía el Id al método delete
+                    Swal.fire(
+                        'Deleted!',
+                        'Your Data has been deleted.',
+                        'success'
+                    );
+                }
+            });
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Livewire.on('deleteUserOperations', function(id) {
+            Swal.fire({
+                title: 'Are you sure you want to delete this item?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('users-crud', 'deleteOperations',
                         id); // Envía el Id al método delete
                     Swal.fire(
                         'Deleted!',

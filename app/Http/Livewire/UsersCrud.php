@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 use App\Models\User;
+use App\Models\Operation;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Livewire\WithPagination;
@@ -16,7 +17,7 @@ class UsersCrud extends Component
  public $search = '';
  public $rolesRender;
  public $isOpen = 0;
- protected $listeners = ['render','delete']; 
+ protected $listeners = ['render','delete','deleteOperations']; 
 
 
  public function authorize()
@@ -201,5 +202,16 @@ public function delete($id)
         User::find($id)->delete();
         session()->flash('message', 'Data Deleted Successfully.');
     }
+
+    
+ public function deleteOperations($user_id)
+{
+    $this->authorize('manage admin');
+    
+    // Elimina todas las operaciones asociadas al usuario con el ID proporcionado
+    Operation::where('user_id', $user_id)->delete();
+
+    session()->flash('message', 'All Operations for the User Deleted Successfully.');
+}
 
 }
