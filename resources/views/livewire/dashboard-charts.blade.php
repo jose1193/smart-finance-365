@@ -16,15 +16,15 @@
                     class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center  capitalize border-b bg-gray-100 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700">
                     <p class="text-gray-500 dark:text-gray-400 font-semibold">Actual {{ $categoryName }}</p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                        {{ number_format($totalIncome, 0, '.', ',') }} $
+                        {{ number_format($totalIncome, 0, '.', ',') }} USD
                     </p>
                     <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName }} Budget</p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                        {{ number_format($totalBudget, 0, '.', ',') }} $
+                        {{ number_format($totalBudget, 0, '.', ',') }} USD
                     </p>
-                    <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference $</p>
+                    <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference </p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
-                        {{ number_format($totalIncome - $totalBudget, 0, '.', ',') }} $ </p>
+                        {{ number_format($totalIncome - $totalBudget, 0, '.', ',') }} USD </p>
 
 
                     {{-- Mostrar el total --}}
@@ -184,7 +184,7 @@
                                 class="text-xs font-bold tracking-wide text-center text-gray-600 capitaliza border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-700">
 
                                 <th class="px-4 py-3 " colspan="5">
-                                    {{ $categoryName }}
+                                    {{ $categoryName }} (USD) - {{ now()->format('F Y') }}
                                 </th>
                             </tr>
                             <tr
@@ -194,7 +194,7 @@
                                 <th class="px-4 py-3">Actual</th>
 
                                 <th class="px-4 py-3">Budget</th>
-                                <th class="px-4 py-3">Dif ($)</th>
+                                <th class="px-4 py-3">Dif (USD)</th>
                                 <th class="px-4 py-3">% Budget</th>
 
 
@@ -228,7 +228,7 @@
                                     </td>
                                     <td
                                         class="px-4 py-3 text-xs text-center flex items-center justify-between  space-x-2 ">
-                                        <div class="relative w-20 h-4 bg-gray-300 rounded-full overflow-hidden">
+                                        <div class="relative w-16 h-4 bg-gray-300 rounded-full overflow-hidden">
                                             <div class="absolute top-0 left-0 h-full {{ $result['percentageMonthlyIncome'] < 100 ? 'bg-teal-500' : 'bg-teal-500' }}"
                                                 style="width: {{ $result['percentageMonthlyIncome'] }}%;"></div>
                                         </div>
@@ -249,7 +249,7 @@
                             @endforeach
                             <tr
                                 class=" border-t-3  border-teal-500 text-xs font-bold tracking-wide text-center text-gray-600 capitalize  dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-700">
-                                <th class="px-4 py-3 text-xs font-bold text-gray-800 dark:text-gray-400">Total</th>
+                                <th class="px-4 py-3 text-xs font-bold text-gray-800 dark:text-gray-400">Total USD</th>
 
                                 <th class="px-4 py-3">{{ number_format($totalIncome, 0, '.', ',') }} $</th>
 
@@ -286,15 +286,15 @@
                     class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center  capitalize border-b bg-gray-100 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700">
                     <p class="text-gray-500 dark:text-gray-400 font-semibold">Actual {{ $categoryName2 }}</p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                        {{ number_format($totalExpenses, 0, '.', ',') }} $
+                        {{ number_format($totalExpenses, 0, '.', ',') }} USD
                     </p>
                     <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName2 }} Budget</p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                        {{ number_format($totalBudget, 0, '.', ',') }} $
+                        {{ number_format($totalBudget, 0, '.', ',') }} USD
                     </p>
-                    <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference $</p>
+                    <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference </p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
-                        {{ number_format($totalExpenses - $totalBudget, 0, '.', ',') }} $ </p>
+                        {{ number_format($totalExpenses - $totalBudget, 0, '.', ',') }} USD </p>
 
                 </div>
 
@@ -453,7 +453,7 @@
                                 class="text-xs font-bold tracking-wide text-center text-gray-600 capitaliza border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-700">
 
                                 <th class="px-4 py-3 " colspan="5">
-                                    {{ $categoryName2 }}
+                                    {{ $categoryName2 }} (USD) - {{ now()->format('F Y') }}
                                 </th>
                             </tr>
                             <tr
@@ -463,7 +463,7 @@
                                 <th class="px-4 py-3">Actual</th>
 
                                 <th class="px-4 py-3">Budget</th>
-                                <th class="px-4 py-3">Dif ($)</th>
+                                <th class="px-4 py-3">Dif (USD)</th>
                                 <th class="px-4 py-3">% Budget</th>
 
 
@@ -497,7 +497,7 @@
                                     </td>
                                     <td
                                         class="px-4 py-3 text-xs text-center flex items-center justify-between  space-x-2 ">
-                                        <div class="relative w-20 h-4 bg-gray-300 rounded-full overflow-hidden">
+                                        <div class="relative w-16 h-4 bg-gray-300 rounded-full overflow-hidden">
                                             <div class="absolute top-0 left-0 h-full {{ $result['percentageMonthlyExpense'] < 100 ? 'bg-purple-600' : 'bg-purple-600' }}"
                                                 style="width: {{ $result['percentageMonthlyExpense'] }}%;"></div>
                                         </div>
@@ -518,7 +518,7 @@
                             @endforeach
                             <tr
                                 class=" border-t-3  border-[#7e3af2] text-xs font-bold tracking-wide text-center text-gray-600 capitalize  dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-700">
-                                <th class="px-4 py-3 text-xs font-bold text-gray-800 dark:text-gray-400">Total</th>
+                                <th class="px-4 py-3 text-xs font-bold text-gray-800 dark:text-gray-400">Total USD</th>
 
                                 <th class="px-4 py-3">{{ number_format($totalExpenses, 0, '.', ',') }} $</th>
 

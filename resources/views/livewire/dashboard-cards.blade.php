@@ -15,7 +15,7 @@
                  {{ $this->labelBudget }}
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 {{ number_format($account_balance, 0, '.', ',') }} $
+                 {{ number_format($account_balance, 0, '.', ',') }} USD
              </p>
          </div>
      </div>
@@ -54,7 +54,7 @@
                  {{ $this->labelIncome }}
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 {{ number_format($income, 0, '.', ',') }} $
+                 {{ number_format($income, 0, '.', ',') }} USD
              </p>
          </div>
      </div>
@@ -72,7 +72,7 @@
                  {{ $this->labelExpense }}
              </p>
              <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                 {{ number_format($expense, 0, '.', ',') }} $
+                 {{ number_format($expense, 0, '.', ',') }} USD
              </p>
          </div>
      </div>
