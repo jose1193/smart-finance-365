@@ -35,12 +35,19 @@ class ReportGeneralMonthCharts extends Component
 
     public $topTenOperations;
 
+    public $SelectMainCurrencyTypeRender = 'USD';
+
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
     public function userSelected4($userId)
     {
         // Aquí puedes ejecutar la lógica que desees con el $userId
         $this->selectedUser4 = $userId;
+         $this->mainCurrencyTypeRender = Operation::where('user_id', $userId)
+    ->where('operation_currency_type', '!=', 'USD')
+    ->distinct()
+    ->pluck('operation_currency_type');
+
         $this->updateMonthData();
     }
 
@@ -112,6 +119,8 @@ private function updateMonthDataInternal()
     }
 }
 
+
+
 private function fetchTotalMonthAmountCurrency()
 {
     return $this->operationsFetchMonths->sum('operation_currency_total');
@@ -157,22 +166,39 @@ private function applyFiltersToQuery($query)
         $query->where('main_categories.id', $this->main_category_id);
     }
 
+     // Apply currency type filter if SelectMainCurrencyTypeRender is set and not 'USD'
+    if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+        $query->where('operations.operation_currency_type', $this->SelectMainCurrencyTypeRender);
+    }
     return $query;
 }
 
 private function fetchBudgetData()
 {
-    return Budget::where('budget_month', $this->selectedMonth)
+    $query = Budget::where('budget_month', $this->selectedMonth)
                  ->where('user_id', $this->selectedUser4)
-                 ->where('budget_year', $this->selectedYear3)
-                 ->first();
+                 ->where('budget_year', $this->selectedYear3);
+
+    // Aplicar el filtro del tipo de moneda si SelectMainCurrencyTypeRender está establecido y no es 'USD'
+    if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+        $query->where('budget_currency_type', $this->SelectMainCurrencyTypeRender);
+    }
+
+    return $query->first();
 }
 
 private function fetchBudgetDataString()
 {
     $budget = $this->fetchBudgetData();
-    return $budget ?  $budget->budget_currency_total  : 'Budget N/A';
+    
+    if ($budget) {
+        $budgetAmount = $budget->budget_operation ?? $budget->budget_currency_total;
+        return $budgetAmount;
+    }
+
+    return 'Budget N/A';
 }
+
 
 private function fetchMonthData()
 {

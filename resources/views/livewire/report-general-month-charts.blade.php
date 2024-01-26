@@ -93,6 +93,24 @@
                      @endforeach
                  </select>
              </div>
+
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                 <select wire:model="SelectMainCurrencyTypeRender" wire:change="updateMonthData"
+                     class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                     <option value="USD">USD</option>
+                     @foreach ($mainCurrencyTypeRender as $currencyType)
+                         @php
+                             // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                             $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                         @endphp
+                         <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                     @endforeach
+
+                 </select>
+
+             </div>
+
          </div>
          @if ($date_start)
              <p>Date Start:
@@ -115,7 +133,9 @@
 
              <div class="grid gap-6 mb-8 md:grid-cols-2 ">
                  <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 my-5">
-
+                     @php
+                         $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                     @endphp
 
                      <canvas id="myChartGeneral4" height="200"></canvas>
                      <script>
@@ -123,46 +143,40 @@
 
                          var dataBar = {
                              labels: [
-
                                  @foreach ($operationsFetchMonths as $item)
                                      "{{ Str::words($item->operation_description, 2, '...') }}",
                                  @endforeach
                              ],
 
                              datasets: [{
-                                     label: "",
-                                     backgroundColor: [
-                                         @foreach ($operationsFetchMonths as $item)
-                                             @if ($item->main_category_id == 1)
-                                                 "#14B8A6",
-                                             @elseif ($item->main_category_id == 2)
-                                                 "#7e3af2",
-                                             @else
-                                                 "#000000", // Color por defecto para otros casos
-                                             @endif
-                                         @endforeach
-                                     ],
-                                     borderColor: [
-                                         @foreach ($operationsFetchMonths as $item)
-                                             @if ($item->main_category_id == 1)
-                                                 "#14B8A6",
-                                             @elseif ($item->main_category_id == 2)
-                                                 "#7e3af2",
-                                             @else
-                                                 "#000000", // Color por defecto para otros casos
-                                             @endif
-                                         @endforeach
-                                     ],
-                                     data: [
-                                         @foreach ($operationsFetchMonths as $item)
-                                             {{ $item->operation_currency_total }},
-                                         @endforeach
-                                     ],
-
-                                 },
-
-                             ]
+                                 label: "",
+                                 backgroundColor: [],
+                                 borderColor: [],
+                                 data: [],
+                             }]
                          };
+
+                         @foreach ($operationsFetchMonths as $item)
+                             // Determine the amount based on the condition
+                             var amount =
+                                 {{ $SelectMainCurrencyTypeRender === 'USD' ? $item->operation_currency_total : $item->operation_amount }};
+
+                             // Add the amount to the data array
+                             dataBar.datasets[0].data.push(amount);
+
+                             // Set background color based on main_category_id
+                             if ({{ $item->main_category_id }} === 1) {
+                                 dataBar.datasets[0].backgroundColor.push("#14B8A6");
+                             } else if ({{ $item->main_category_id }} === 2) {
+                                 dataBar.datasets[0].backgroundColor.push("#7e3af2");
+                             } else {
+                                 dataBar.datasets[0].backgroundColor.push("#000000"); // Default color for other cases
+                             }
+
+                             // Set border color based on main_category_id (same logic as background color)
+                             dataBar.datasets[0].borderColor.push(dataBar.datasets[0].backgroundColor[dataBar.datasets[0].backgroundColor
+                                 .length - 1]);
+                         @endforeach
 
                          var options = {
                              title: {
@@ -170,10 +184,9 @@
                                  text: ' ',
                                  responsive: true,
                              },
-                             legend: { // Añadido para ocultar la leyenda
+                             legend: {
                                  display: false,
                              },
-
                              scales: {
                                  xAxes: [{
                                      display: true,
@@ -191,18 +204,22 @@
                                      },
                                      label: function(tooltipItem, data) {
                                          var value = tooltipItem.value;
+                                         var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
 
-                                         // Aplicar formato con toLocaleString
+                                         // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                         currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                         // Format with toLocaleString and append the currencyType
                                          if (!isNaN(value)) {
-                                             value = Number(value).toLocaleString('en-US') + ' USD ';
+                                             value = Number(value).toLocaleString('en-US') + ' ' + currencyType;
                                          }
 
                                          return value;
                                      }
                                  }
                              }
-                         };
 
+                         };
 
                          var myChart = new Chart(ctx, {
                              type: 'bar',
@@ -210,6 +227,7 @@
                              options: options
                          });
                      </script>
+
 
                      <div class="text-center justify-center mt-10 my-3 flex">
                          @php
@@ -275,16 +293,23 @@
                          // Inicializar totales de cada categoría
                          var totalCategory1 = 0;
                          var totalCategory2 = 0;
+                         var amount = 0;
+
 
                          @foreach ($operationsFetchMonths as $item)
-                             // Sumar al total correspondiente según la categoría principal
+
+                             @if ($SelectMainCurrencyTypeRender && $SelectMainCurrencyTypeRender === 'USD')
+                                 amount = {{ $item->operation_currency_total }};
+                             @else
+                                 amount = {{ $item->operation_amount }};
+                             @endif
+
                              @if ($item->main_category_id == 1)
-                                 totalCategory1 += {{ $item->operation_currency_total }};
+                                 totalCategory1 += amount;
                              @elseif ($item->main_category_id == 2)
-                                 totalCategory2 += {{ $item->operation_currency_total }};
+                                 totalCategory2 += amount;
                              @endif
                          @endforeach
-
                          // Obtener los nombres de categoría
                          var categoryName = '';
                          var categoryName2 = '';
@@ -392,10 +417,16 @@
                                              var label = (tooltipItem.index === 0) ? 'Total ' + categoryName :
                                                  'Total ' + categoryName2;
                                              var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
-                                             return label + ': ' + value + ' USD';
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             return label + ': ' + value + ' ' + currencyType;
+
                                          }
                                      }
                                  }
+
                              }
                          });
                      </script>
@@ -410,13 +441,17 @@
                              foreach ($mainCategoriesRender as $item) {
                                  $totalCategory = 0;
                                  foreach ($operationsFetchMonths as $operationItem) {
+                                     // Determine the amount based on the condition
+                                     $amount = $SelectMainCurrencyTypeRender === 'USD' ? $operationItem->operation_currency_total : $operationItem->operation_amount;
+
                                      if ($operationItem->main_category_id == $item->id) {
-                                         $totalCategory += $operationItem->operation_currency_total;
+                                         $totalCategory += $amount;
                                      }
                                  }
                                  $totalCategories[$item->id] = $totalCategory;
                              }
                          @endphp
+
 
                          @if (!empty($totalCategories))
                              @foreach ($mainCategoriesRender as $item)
@@ -429,7 +464,7 @@
                                              class="-mt-1 ml-2 text-xs font-bold text-center text-gray-800 capitalize dark:text-gray-300">
                                              <span class="text-gray-500 capitalize dark:text-gray-400">
                                                  {{ $item->title }}</span>
-                                             {{ number_format($totalCategories[$item->id], 0) }} $
+                                             {{ number_format($totalCategories[$item->id], 0) }} {{ $currencyType }}
                                          </span>
                                      </div>
                                  @endif
@@ -446,7 +481,7 @@
                                      <span class="text-gray-500 capitalize dark:text-gray-400">
                                          Budget</span>
                                      @if (is_numeric($budgetData))
-                                         {{ number_format($budgetData, 0, '.', ',') }} $
+                                         {{ number_format($budgetData, 0, '.', ',') }} {{ $currencyType }}
                                      @else
                                          {{ $budgetData }}
                                      @endif
@@ -494,7 +529,13 @@
                          // Limita la longitud de las descripciones a 2 palabras
                          var labels = topTenOperations.map(item => limitWords(item.operation_description, 2));
 
-                         var data = topTenOperations.map(item => item.operation_currency_total);
+                         var data = topTenOperations.map(function(item) {
+                             // Determinar la cantidad según la condición
+                             var amount =
+                                 {{ $SelectMainCurrencyTypeRender === 'USD' ? 'item.operation_currency_total' : 'item.operation_amount' }};
+                             return amount;
+                         });
+
 
                          var ctx = document.getElementById('topTenChart').getContext('2d');
                          var myChart = new Chart(ctx, {
@@ -502,7 +543,7 @@
                              data: {
                                  labels: labels,
                                  datasets: [{
-                                     label: 'Top 10 Operations',
+                                     label: 'Top 10 Operations  {{ $currencyType }}',
                                      data: data,
                                      backgroundColor: [
                                          @foreach ($topTenOperations as $item)
@@ -558,10 +599,19 @@
                                              return data.labels[tooltipItem[0].index];
                                          },
                                          label: function(tooltipItem, data) {
-                                             // Mostrar el valor en el tooltip
-                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + Number(tooltipItem
-                                                 .value).toLocaleString('en-US') + ' USD ';
+                                             var value = tooltipItem.value;
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
 
+                                             // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             // Format with toLocaleString and append the currencyType
+                                             if (!isNaN(value)) {
+                                                 value = Number(value).toLocaleString('en-US') + ' ' + currencyType;
+                                             }
+
+                                             // Mostrar el valor en el tooltip
+                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + value;
                                          }
                                      }
                                  },
@@ -577,8 +627,11 @@
                              foreach ($mainCategoriesRender as $item) {
                                  $totalCategory = 0;
                                  foreach ($operationsFetchMonths as $operationItem) {
+                                     // Determine the amount based on the condition
+                                     $amount = $SelectMainCurrencyTypeRender === 'USD' ? $operationItem->operation_currency_total : $operationItem->operation_amount;
+
                                      if ($operationItem->main_category_id == $item->id) {
-                                         $totalCategory += $operationItem->operation_currency_total;
+                                         $totalCategory += $amount;
                                      }
                                  }
                                  $totalCategories[$item->id] = $totalCategory;

@@ -71,6 +71,26 @@
                      Reset Fields
                  </x-button>
              </div>
+             <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
+
+
+                 <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                     <select wire:model="SelectMainCurrencyTypeRender" wire:change="updateCategoriesData"
+                         class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                         <option value="USD">USD</option>
+                         @foreach ($mainCurrencyTypeRender as $currencyType)
+                             @php
+                                 // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                                 $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                             @endphp
+                             <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                         @endforeach
+
+                     </select>
+
+                 </div>
+             </div>
              <div id="chart-container2" class="my-5"
                  wire:key="chart-{{ $selectedUser2 }}-{{ $selectedCategoryId }}-{{ $selectedYear2 }}-{{ uniqid() }}">
 
@@ -143,16 +163,21 @@
                                  label: function(tooltipItem, data) {
                                      var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
                                      var value = tooltipItem.value;
+                                     var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                     // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                     currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
 
                                      // Aplicar formato con toLocaleString
                                      if (!isNaN(value)) {
-                                         value = Number(value).toLocaleString('en-US') + ' USD ';
+                                         value = Number(value).toLocaleString('en-US') + ' ' + currencyType;
                                      }
 
                                      return datasetLabel + ': ' + value;
                                  }
                              }
                          }
+
                      };
 
                      var myChart = new Chart(ctx, {

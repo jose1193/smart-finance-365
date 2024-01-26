@@ -77,7 +77,22 @@
                  </div>
              </div>
 
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                 <select wire:model="SelectMainCurrencyTypeRender" wire:change="updateChartBudgetData"
+                     class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
 
+                     <option value="USD">USD</option>
+                     @foreach ($mainCurrencyTypeRender as $currencyType)
+                         @php
+                             // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                             $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                         @endphp
+                         <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                     @endforeach
+
+                 </select>
+
+             </div>
          </div>
          @if ($date_start)
              <p>Date Start:
@@ -111,26 +126,32 @@
                              <div> <canvas id="myChartIncomeGeneraldoughnut" width="250" height="250"></canvas>
                              </div>
                              <div
-                                 class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center  capitalize border-b bg-gray-100 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700">
+                                 class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center capitalize border-b bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-700">
+                                 @php
+                                     $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                 @endphp
+
                                  <p class="text-gray-500 dark:text-gray-400 font-semibold">General {{ $categoryName }}
                                  </p>
                                  <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                                     {{ number_format(array_sum($incomeDataCurrency), 0, '.', ',') }} $
+                                     {{ number_format(array_sum($incomeDataCurrency), 0, '.', ',') }}
+                                     {{ $currencyType }}
                                  </p>
                                  <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName }} Budget
                                  </p>
                                  <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                                     {{ number_format(array_sum($budgetDataCurrency), 0, '.', ',') }} $
+                                     {{ number_format(array_sum($budgetDataCurrency), 0, '.', ',') }}
+                                     {{ $currencyType }}
                                  </p>
-                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference $</p>
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference</p>
                                  <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
                                      {{ number_format(array_sum($incomeDataCurrency) - array_sum($budgetDataCurrency), 0, '.', ',') }}
-                                     $ </p>
-
+                                     {{ $currencyType }}
+                                 </p>
 
                                  {{-- Mostrar el total --}}
-
                              </div>
+
 
                          </div>
 
@@ -195,7 +216,12 @@
                                              var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName }}' :
                                                  'Total Budget';
                                              var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
-                                             return label + ': ' + value + ' USD';
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                             // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             return label + ': ' + value + currencyType;
                                          }
                                      }
                                  }
@@ -203,9 +229,6 @@
                              }
                          });
                      </script>
-
-
-
 
 
                      <div
@@ -262,21 +285,21 @@
                              },
 
                              tooltips: {
-                                 enabled: true,
                                  callbacks: {
                                      label: function(tooltipItem, data) {
-                                         var label = data.datasets[tooltipItem.datasetIndex].label || '';
-                                         var value = tooltipItem.yLabel.toLocaleString('en-US', {
-                                             style: 'currency',
-                                             currency: 'USD',
-                                             minimumFractionDigits: 0,
-                                             maximumFractionDigits: 0
-                                         });
-                                         label += ': ' + value;
-                                         return label;
+                                         var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName }}' :
+                                             'Total Budget';
+                                         var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
+                                         var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                         // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                         currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                         return label + ': ' + value + ' ' + currencyType;
                                      }
                                  }
                              }
+
 
                          };
 
@@ -305,31 +328,36 @@
                              <div> <canvas id="myChartExpenseGeneraldoughnut" width="250" height="250"></canvas>
                              </div>
                              <div
-                                 class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center  capitalize border-b bg-gray-100 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700">
+                                 class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center capitalize border-b bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-700">
+                                 @php
+                                     $currencyType2 = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                 @endphp
+
                                  <p class="text-gray-500 dark:text-gray-400 font-semibold">General {{ $categoryName2 }}
                                  </p>
                                  <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                                     {{ number_format(array_sum($expenseDataCurrency), 0, '.', ',') }} $
+                                     {{ number_format(array_sum($expenseDataCurrency), 0, '.', ',') }}
+                                     {{ $currencyType2 }}
                                  </p>
-                                 <p class="text-gray-500 dark:text-gray-400 font-semibold"> {{ $categoryName2 }} Budget
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName2 }} Budget
                                  </p>
                                  <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
-                                     {{ number_format(array_sum($budgetDataCurrency), 0, '.', ',') }} $
+                                     {{ number_format(array_sum($budgetDataCurrency), 0, '.', ',') }}
+                                     {{ $currencyType2 }}
                                  </p>
-                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference $</p>
+                                 <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference</p>
                                  <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
                                      {{ number_format(array_sum($expenseDataCurrency) - array_sum($budgetDataCurrency), 0, '.', ',') }}
-                                     $ </p>
-
+                                     {{ $currencyType2 }}
+                                 </p>
 
                                  {{-- Mostrar el total --}}
-
                              </div>
+
 
                          </div>
 
                      </div>
-
 
                      <script>
                          var ctx = document.getElementById('myChartExpenseGeneraldoughnut').getContext('2d');
@@ -388,10 +416,15 @@
                                  tooltips: {
                                      callbacks: {
                                          label: function(tooltipItem, data) {
-                                             var label = (tooltipItem.index === 0) ? ' Total {{ $categoryName2 }}' :
+                                             var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName2 }}' :
                                                  'Total Budget';
-                                             var value = data.datasets[0].data[tooltipItem.index];
-                                             return label + ': ' + value + ' USD';
+                                             var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             return label + ': ' + value + currencyType;
                                          }
                                      }
                                  }
@@ -399,10 +432,6 @@
                              }
                          });
                      </script>
-
-
-
-
 
                      <div
                          class="border-solid border-2 border-gray-100 rounded mt-10 p-3 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700 ">
@@ -457,18 +486,17 @@
                                  }]
                              },
                              tooltips: {
-                                 enabled: true,
                                  callbacks: {
                                      label: function(tooltipItem, data) {
-                                         var label = data.datasets[tooltipItem.datasetIndex].label || '';
-                                         var value = tooltipItem.yLabel.toLocaleString('en-US', {
-                                             style: 'currency',
-                                             currency: 'USD',
-                                             minimumFractionDigits: 0,
-                                             maximumFractionDigits: 0
-                                         });
-                                         label += ': ' + value;
-                                         return label;
+                                         var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName }}' :
+                                             'Total Budget';
+                                         var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
+                                         var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                         // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                         currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                         return label + ': ' + value + ' ' + currencyType;
                                      }
                                  }
                              }
@@ -553,13 +581,20 @@
 
                                          // Aplicar formato con toLocaleString
                                          if (!isNaN(value)) {
-                                             value = Number(value).toLocaleString('en-US') + ' USD ';
+                                             value = Number(value).toLocaleString('en-US');
                                          }
 
-                                         return datasetLabel + ': ' + value;
+                                         // Aplicar la condición para cambiar 'Blue-ARS' a 'ARS'
+                                         var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+                                         currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                         // Agregar colon, espacio y el tipo de moneda
+                                         return datasetLabel + ': ' + value + ' ' + currencyType;
                                      }
                                  }
                              }
+
+
                          };
 
                          var myChart = new Chart(ctx, {
@@ -571,7 +606,6 @@
                  </div>
 
                  <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-5">
-
 
                      <!-- Agrega un elemento canvas para el gráfico -->
                      <canvas id="myDoughnutChart" class="mt-5"></canvas>
@@ -638,24 +672,29 @@
                                              var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName }}' :
                                                  'Total {{ $categoryName2 }}';
                                              var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
-                                             return label + ': ' + value + ' USD';
+
+                                             // Aplicar la condición para cambiar 'Blue-ARS' a 'ARS'
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             return label + ': ' + value + ' ' + currencyType;
                                          }
                                      }
                                  }
 
+
                              }
                          });
                      </script>
-
-
-
 
                  </div>
 
 
                  <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800">
                      <h4 class="mb-4 font-semibold text-gray-800 text-center dark:text-gray-300">
-                         Top 10 {{ $categoryName }}
+                         Top 10 {{ $categoryName }} @php
+                             $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                         @endphp {{ $currencyType }}
                      </h4>
                      <canvas id="horizontalBarChart" width="400" height="200"></canvas>
 
@@ -693,11 +732,17 @@
                                              return data.labels[tooltipItem[0].index];
                                          },
                                          label: function(tooltipItem, data) {
-                                             return 'Total Income: ' + Number(tooltipItem.value).toLocaleString('en-US') +
-                                                 ' USD';
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                             // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             return 'Total Income: ' + Number(tooltipItem.value).toLocaleString('en-US') + ' ' +
+                                                 currencyType;
                                          }
                                      }
                                  },
+
                                  scales: {
                                      xAxes: [{
                                          ticks: {
@@ -724,7 +769,9 @@
 
                  <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800">
                      <h4 class="mb-4 font-semibold text-gray-800 text-center dark:text-gray-300">
-                         Top 10 {{ $categoryName2 }}
+                         Top 10 {{ $categoryName2 }} @php
+                             $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                         @endphp {{ $currencyType }}
                      </h4>
                      <canvas id="horizontalBarChartExpenses" width="400" height="200"></canvas>
 
@@ -762,11 +809,17 @@
                                              return data.labels[tooltipItem[0].index];
                                          },
                                          label: function(tooltipItem, data) {
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                             // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
                                              return 'Total Expenses: ' + Number(tooltipItem.value).toLocaleString('en-US') +
-                                                 ' USD';
+                                                 ' ' + currencyType;
                                          }
                                      }
                                  },
+
                                  scales: {
                                      xAxes: [{
                                          ticks: {

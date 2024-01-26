@@ -31,20 +31,23 @@ class ReportGeneralCategoriesCharts extends Component
     public $users;
     public $categoriesRender;
     
-    
-   
-  
     public $totalGeneral = 0;
     public $categoryNameSelected;
     
     public $userNameSelected2;
    
+    public $SelectMainCurrencyTypeRender = 'USD';
+
     protected $listeners = ['userSelectedChart2','YearSelectedChart2','categorySelected2'];
 
     public function userSelectedChart2($userId)
     {
         
-        
+    $this->mainCurrencyTypeRender = Operation::where('user_id', $userId)
+    ->where('operation_currency_type', '!=', 'USD')
+    ->distinct()
+    ->pluck('operation_currency_type');
+
         $this->selectedUser2 = $userId;
         $this->updateCategoriesData();
     }
@@ -168,6 +171,13 @@ private function fetchCategoriesData($mainCategoryId, $month)
 
      $this->categoryNameSelected = Category::find($this->selectedCategoryId);
      
+    // Aplica el filtro 'SelectMainCurrencyTypeRender' si es diferente de 'USD'
+    if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+        return $query
+        ->whereMonth('operations.operation_date', $month)
+        ->sum('operations.operation_amount');
+
+    }
 
     return $query
         ->whereMonth('operations.operation_date', $month)

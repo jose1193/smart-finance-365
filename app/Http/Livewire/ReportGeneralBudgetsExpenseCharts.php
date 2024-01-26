@@ -33,10 +33,16 @@ class ReportGeneralBudgetsExpenseCharts extends Component
 
     public $topTenBudgetExpenses;
     
+    public $SelectMainCurrencyTypeRender = 'USD';
      
     public function userSelectedChart6($userId)
     {
-        // Aquí puedes ejecutar la lógica que desees con el $userId
+       
+         $this->mainCurrencyTypeRender = Operation::where('user_id', $userId)
+    ->where('operation_currency_type', '!=', 'USD')
+    ->distinct()
+    ->pluck('operation_currency_type');
+
         $this->selectedUser6 = $userId;
         $this->updateBudgetExpenseData();
     }
@@ -104,12 +110,24 @@ private function updateBudgetExpenseDataInternal()
         $this->selectedMonthName2 = Carbon::create()->month($this->selectedMonth2)->format('F');
     }
     
-    $this->budget = Budget::where('budget_month', $this->selectedMonth2)
-                          ->where('user_id', $this->selectedUser6)
-                          ->whereYear('budget_date', $this->selectedYear4)
-                          ->first();
+ $this->budget = Budget::where('budget_month', $this->selectedMonth2)
+                      ->where('user_id', $this->selectedUser6)
+                      ->whereYear('budget_date', $this->selectedYear4)
+                      ->first();
 
-    $this->budgetData = $this->budget ? 'Monthly Budget  ' . $this->budget->budget_currency_total . ' $' : '';
+                      // Verificar si $this->budget no es nulo
+if ($this->budget) {
+    // Aplicar el filtro del tipo de moneda si SelectMainCurrencyTypeRender está establecido y no es 'USD'
+    if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+        $this->budget = $this->budget->budget_currency_type === $this->SelectMainCurrencyTypeRender
+            ? number_format($this->budget->budget_operation, 0) . ' '. $this->SelectMainCurrencyTypeRender
+            : null; // o algún otro valor que indique que no debe mostrarse
+    } else {
+       $this->budget = number_format($this->budget->budget_currency_total, 0) . ' '. $this->SelectMainCurrencyTypeRender;
+    }
+} 
+
+
 }
 
 private function fetchTotalMonthAmountCurrency()
@@ -128,14 +146,6 @@ private function fetchMonthData()
     return $this->executeOperationQuery($query);
 }
 
-private function fetchTopTenBudgetExpenses()
-{
-    $query = $this->buildOperationQuery();
-
-    return $query->orderBy('operations.operation_currency_total', 'desc')
-                 ->limit(10)
-                 ->get();
-}
 
 private function buildOperationQuery()
 {
@@ -160,6 +170,9 @@ private function buildOperationQuery()
                     ->when($this->selectedYear4, function ($query, $selectedYear4) {
                         return $query->whereYear('operations.operation_date', $selectedYear4);
                     })
+                    ->when($this->SelectMainCurrencyTypeRender, function ($query, $SelectMainCurrencyTypeRender) {
+                        return $query->where('operations.operation_currency_type', $SelectMainCurrencyTypeRender);
+                    })
                     ->select(
                         'operations.operation_amount',
                         'operations.operation_currency',
@@ -173,10 +186,12 @@ private function buildOperationQuery()
                         'main_categories.title as main_category_title',
                         'subcategories.subcategory_name',
                         'budgets.budget_operation as budget_operation',
-                        'budget_expenses.budget_id',
+                        'budget_expenses.budget_id'
                     )
                     ->orderBy('operations.id', 'desc');
-}
+            }
+
+
 
 private function executeOperationQuery($query)
 {
@@ -184,6 +199,14 @@ private function executeOperationQuery($query)
 }
 
 
+private function fetchTopTenBudgetExpenses()
+{
+    $query = $this->buildOperationQuery();
+
+    return $query->orderBy('operations.operation_currency_total', 'desc')
+                 ->limit(10)
+                 ->get();
+}
 
 
 public function resetFields6()

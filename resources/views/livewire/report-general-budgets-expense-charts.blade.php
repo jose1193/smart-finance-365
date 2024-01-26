@@ -65,15 +65,47 @@
                  Reset Fields
              </x-button>
          </div>
+         <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
+
+
+             <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
+                 <select wire:model="SelectMainCurrencyTypeRender" wire:change="updateBudgetExpenseData"
+                     class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                     <option value="USD">USD</option>
+                     @foreach ($mainCurrencyTypeRender as $currencyType)
+                         @php
+                             // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                             $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                         @endphp
+                         <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                     @endforeach
+
+                 </select>
+
+             </div>
+         </div>
          <div id="chart-container6" class="my-5"
              wire:key="chart-{{ $selectedUser6 }}-{{ $selectedMonth2 }}-{{ $selectedYear4 }}-{{ uniqid() }}">
 
+             @php
+                 $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+             @endphp
 
              <div class="grid gap-6 mb-8 md:grid-cols-2">
                  <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
 
 
                      <canvas id="myChartGeneral6" height="200"></canvas>
+                     @php
+                         $data = [];
+
+                         foreach ($operationsFetchMonths as $item) {
+                             $amount = $SelectMainCurrencyTypeRender === 'USD' ? $item->operation_currency_total : $item->operation_amount;
+
+                             $data[] = $amount;
+                         }
+                     @endphp
                      <script>
                          var ctx = document.getElementById('myChartGeneral6').getContext('2d');
 
@@ -84,15 +116,11 @@
                                  @endforeach
                              ],
                              datasets: [{
-                                 label: "@if ($budgetData){{ $budgetData }} - @endif Expenses ",
+                                 label: "@if ($budget) Monthly Budget {{ $budget }} - @endif Expenses {{ $currencyType }} ",
                                  backgroundColor: '#7e3af280',
                                  borderColor: 'rgba(124, 58, 237, 1)',
                                  borderWidth: 1, // Establecer el ancho de borde para todas las barras
-                                 data: [
-                                     @foreach ($operationsFetchMonths as $item)
-                                         {{ $item->operation_currency_total }},
-                                     @endforeach
-                                 ],
+                                 data: @json($data),
                              }]
                          };
 
@@ -122,16 +150,21 @@
                                      },
                                      label: function(tooltipItem, data) {
                                          var value = tooltipItem.value;
+                                         var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
 
-                                         // Aplicar formato con toLocaleString
+                                         // Aplicar un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                         currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                         // Aplicar formato con toLocaleString y agregar el tipo de moneda si la condición es verdadera
                                          if (!isNaN(value)) {
-                                             value = Number(value).toLocaleString('en-US') + ' USD ';
+                                             value = Number(value).toLocaleString('en-US') + ' ' + currencyType;
                                          }
 
                                          return value;
                                      }
                                  }
                              }
+
                          };
 
                          var myChart = new Chart(ctx, {
@@ -177,15 +210,20 @@
 
                          // Limita la longitud de las descripciones a 2 palabras
                          var labels = topTenBudgetExpenses.map(item => limitWords(item.operation_description, 2));
-                         var data = topTenBudgetExpenses.map(item => item.operation_currency_total);
 
+                         var data = topTenBudgetExpenses.map(function(item) {
+                             // Determinar la cantidad según la condición
+                             var amount =
+                                 {{ $SelectMainCurrencyTypeRender === 'USD' ? 'item.operation_currency_total' : 'item.operation_amount' }};
+                             return amount;
+                         });
                          var ctx = document.getElementById('topTenChartBudgetExpenses').getContext('2d');
                          var myChart = new Chart(ctx, {
                              type: 'horizontalBar',
                              data: {
                                  labels: labels,
                                  datasets: [{
-                                     label: 'Top 10 Budget Expenses ',
+                                     label: 'Top 10 Budget Expenses {{ $currencyType }} ',
                                      data: data,
                                      backgroundColor: 'rgba(20, 184, 166, 0.2)',
                                      borderColor: 'rgba(20, 184, 166, 1)',
@@ -203,11 +241,23 @@
                                  tooltips: {
                                      callbacks: {
                                          title: function(tooltipItem, data) {
+                                             // Mostrar la etiqueta del eje x (category_name)
                                              return data.labels[tooltipItem[0].index];
                                          },
                                          label: function(tooltipItem, data) {
-                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + Number(tooltipItem
-                                                 .value).toLocaleString('en-US') + ' USD ';
+                                             var value = tooltipItem.value;
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                             // Utiliza un ternario para cambiar 'Blue-ARS' a 'ARS'
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             // Format with toLocaleString and append the currencyType
+                                             if (!isNaN(value)) {
+                                                 value = Number(value).toLocaleString('en-US') + ' ' + currencyType;
+                                             }
+
+                                             // Mostrar el valor en el tooltip
+                                             return data.datasets[tooltipItem.datasetIndex].label + ': ' + value;
                                          }
                                      }
                                  },
@@ -237,14 +287,24 @@
 
                      <script>
                          var ctx = document.getElementById('myChartBudgetMonthlyExpenses').getContext('2d');
-                         var totalMonthlyExpenses = 0; // Variable para almacenar la suma de los valores
+                         var totalMonthlyExpenses = 0;
 
                          @foreach ($operationsFetchMonths as $item)
-                             totalMonthlyExpenses += {{ $item->operation_currency_total }};
+
+
+                             @if ($SelectMainCurrencyTypeRender && $SelectMainCurrencyTypeRender === 'USD')
+                                 totalMonthlyExpenses += {{ $item->operation_currency_total }};
+                             @else
+                                 totalMonthlyExpenses += {{ $item->operation_amount }};
+                             @endif
                          @endforeach
 
-                         // Verificar si $budget es nulo
-                         var budgetValue = {!! json_encode($budget ? $budget->budget_currency_total : 0) !!};
+
+                         var budgetValue = {!! $budget ? json_encode(str_replace(',', '', $budget)) : '0' !!};
+                         budgetValue = parseFloat(budgetValue);
+                         var percentageExpense = budgetValue !== null && budgetValue !== 0 ?
+                             (totalMonthlyExpenses / budgetValue * 100).toFixed(0) :
+                             null;
 
                          var percentageExpense = budgetValue !== 0 ? (totalMonthlyExpenses / budgetValue * 100).toFixed(0) : null;
 
@@ -303,10 +363,17 @@
                                          label: function(tooltipItem, data) {
                                              var label = (tooltipItem.index === 0) ? 'Total Monthly Expenses' : 'Total Budget';
                                              var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
-                                             return label + ': ' + value + ' USD';
+
+                                             var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
+
+                                             currencyType = (currencyType === 'Blue-ARS') ? ' ARS' : currencyType;
+
+                                             return label + ': ' + value + ' ' + currencyType;
                                          }
                                      }
                                  }
+
+
                              }
                          });
                      </script>
