@@ -33,12 +33,18 @@ class ReportGeneralBudgetsMonthTable extends Component
     public $selectedMonthName;
     public $totalMonthAmountCurrency;
 
-    
+    public $SelectMainCurrencyTypeRender = 'USD';
+
     protected $listeners = ['userSelected6','MonthSelectedBudget','YearSelected5'];
 
     public function userSelected6($userId)
     {
         // Aquí puedes ejecutar la lógica que desees con el $userId
+    $this->mainCurrencyTypeRender = Operation::where('user_id', $userId)
+    ->where('operation_currency_type', '!=', 'USD')
+    ->distinct()
+    ->pluck('operation_currency_type');
+
         $this->selectedUser6 = $userId;
         $this->updateBudgetMonthData();
     }
@@ -152,6 +158,10 @@ private function fetchMonthData()
     ->when($this->selectedYear5, function ($query, $selectedYear5) {
         return $query->whereYear('operations.operation_date', $selectedYear5);
     })
+    ->when($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD', function ($query) {
+            // Apply currency type filter if SelectMainCurrencyTypeRender is set and not 'USD'
+            return $query->where('operations.operation_currency_type', $this->SelectMainCurrencyTypeRender);
+        })
     ->select(
         'operations.operation_amount',
         'operations.operation_currency',

@@ -37,11 +37,17 @@ class ReportGeneralCategoriesTable extends Component
     public $totalCategoriesRender;
     public $totalCategoriesRenderCurrency;
    
+    public $SelectMainCurrencyTypeRender = 'USD';
+
     protected $listeners = ['userSelected2','categorySelected','YearSelected2'];
 
     public function userSelected2($userId)
     {
-        // Aquí puedes ejecutar la lógica que desees con el $userId
+        
+    $this->mainCurrencyTypeRender = Operation::where('user_id', $userId)
+    ->where('operation_currency_type', '!=', 'USD')
+    ->distinct()
+    ->pluck('operation_currency_type');
         $this->selectedUser2 = $userId;
         $this->updateCategoriesData();
     }
@@ -157,13 +163,14 @@ private function updateCategoriesDataInternal()
     $this->showData2 = true;
 }
 
-
 private function fetchCategoriesData($mainCategoryId, $month)
 {
+    // Build the initial query with joins and main category condition
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
         ->where('main_categories.id', $mainCategoryId);
 
+    // Apply additional conditions based on optional parameters
     if ($this->selectedUser2) {
         $query->where('operations.user_id', $this->selectedUser2);
     }
@@ -176,13 +183,15 @@ private function fetchCategoriesData($mainCategoryId, $month)
         $query->whereYear('operations.operation_date', $this->selectedYear2);
     }
 
+    // Fetch the category name based on the selected category ID
     $this->categoryNameSelected = Category::find($this->selectedCategoryId);
 
+    // Execute the query and get the results
     $operations = $query
         ->whereMonth('operations.operation_date', $month)
         ->get();
 
-    // Agrupar los resultados por categoría
+    // Group the results by category and calculate totals
     $categoryTotal = $operations->groupBy('category_id')
         ->map(function ($group) {
             return [
@@ -191,8 +200,31 @@ private function fetchCategoriesData($mainCategoryId, $month)
             ];
         });
 
-    return $categoryTotal;
+    // Apply an additional filter 'SelectMainCurrencyTypeRender' if it's not 'USD'
+if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+    // Note: It seems there's an issue here, 'operations.operation_date' is not directly accessible
+    // You may need to adjust this part based on your data structure
+    // Group the results by category and calculate totals
+    $categoryTotal = $operations->groupBy('category_id')
+        ->map(function ($group) {
+            return [
+                'operation_currency_type' => $this->SelectMainCurrencyTypeRender,
+                'operation_amount' => $group->sum('operation_amount'),
+                'operation_currency_total' => $group->sum(function ($item) {
+                    // Consider only the items with the selected currency type
+                    return $item->operation_currency_type === $this->SelectMainCurrencyTypeRender
+                        ? $item->operation_amount
+                        : 0;
+                })
+            ];
+        });
+    }
+
+
+    // Return the category totals
+    return $categoryTotal; 
 }
+
 
 
 

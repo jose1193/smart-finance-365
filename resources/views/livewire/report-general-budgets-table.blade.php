@@ -165,7 +165,7 @@
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
 
                                  <th class="px-4 py-3 " colspan="3">
-                                     <div class="  w-2/3 space-x-3">
+                                     <div class="  w-2/5 space-x-3">
 
                                          <input wire:ignore type="text" id="myDatePicker5"
                                              wire:model.lazy="date_start" wire:change="updateDataBudget"
@@ -177,6 +177,24 @@
                                              wire:change="updateDataBudget" placeholder="dd/mm/yyyy" autocomplete="off"
                                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
 
+                                         <select wire:model="SelectMainCurrencyTypeRender"
+                                             wire:change="updateDataBudget"
+                                             class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                                             <option value="USD">USD</option>
+                                             @foreach ($mainCurrencyTypeRender as $currencyType)
+                                                 @php
+                                                     // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                                                     $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                                                 @endphp
+                                                 <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                                             @endforeach
+
+                                         </select>
+
+                                         @php
+                                             $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                         @endphp
                                      </div>
 
                                  </th>
@@ -205,7 +223,10 @@
                                          Year Not Selected
                                      @endif
                                  </th>
-                                 <th class="px-4 py-3" colspan="6">
+                                 <th class="px-4 py-3">
+                                     {{ $currencyType }}
+                                 </th>
+                                 <th class="px-4 py-3" colspan="5">
                                      @if ($date_start)
                                          <p>Date Start:
                                              <span class="text-green-700 ml-2">
@@ -248,15 +269,18 @@
                                          {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
 
                                      <td class="px-4 py-3 text-center">
-                                         {{ number_format($budgetDataCurrency[$i - 1], 0, '.', ',') }} $</td>
+                                         {{ number_format($budgetDataCurrency[$i - 1], 0, '.', ',') }}
+                                     </td>
 
                                      <td class="px-4 py-3 text-center">
-                                         {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }} $</td>
+                                         {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }}
+                                     </td>
 
                                      <!-- Inside the loop, in the table body -->
                                      <td class="px-4 py-3 text-center"
                                          style="{{ $expenseDataCurrency[$i - 1] > $budgetDataCurrency[$i - 1] ? 'color: red;' : '' }}">
-                                         {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }} $
+                                         {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }}
+
                                      </td>
 
                                      <td class="px-4 py-3 text-center"
@@ -271,7 +295,7 @@
                                      <td class="px-4 py-3 text-center"
                                          style="{{ $incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1] < 0 ? 'color: red;' : '' }}">
                                          {{ number_format($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1], 0) }}
-                                         $
+
                                      </td>
 
 
@@ -295,18 +319,18 @@
 
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     Total
+                                     Total {{ $currencyType }}
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ number_format($totalBudgetCurrency, 0, '.', ',') }} $
+                                     {{ number_format($totalBudgetCurrency, 0, '.', ',') }} {{ $currencyType }}
 
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ number_format($totalIncomeCurrency, 0, '.', ',') }} $
+                                     {{ number_format($totalIncomeCurrency, 0, '.', ',') }} {{ $currencyType }}
                                  </td>
 
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ number_format($totalExpenseCurrency, 0, '.', ',') }} $
+                                     {{ number_format($totalExpenseCurrency, 0, '.', ',') }} {{ $currencyType }}
 
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
@@ -315,7 +339,7 @@
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold"
                                      style="{{ $totalSavings < 0 ? 'color: red;' : '' }}">
-                                     {{ number_format($totalSavings, 0, '.', ',') }} $
+                                     {{ number_format($totalSavings, 0, '.', ',') }} {{ $currencyType }}
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
 

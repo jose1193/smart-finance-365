@@ -206,7 +206,24 @@
                                                   </option>
                                               @endforeach
                                           </select>
+                                          <select wire:model="SelectMainCurrencyTypeRender"
+                                              wire:change="updateMonthData"
+                                              class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
 
+                                              <option value="USD">USD</option>
+                                              @foreach ($mainCurrencyTypeRender as $currencyType)
+                                                  @php
+                                                      // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                                                      $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                                                  @endphp
+                                                  <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                                              @endforeach
+
+                                          </select>
+
+                                          @php
+                                              $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                          @endphp
                                       </div>
 
                                   </th>
@@ -314,7 +331,7 @@
                                       </td>
 
                                       <td class="px-4 py-3 text-center">
-                                          {{ $item->operation_currency_type }}
+                                          {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
 
@@ -358,13 +375,22 @@
 
                               <!-- Fila adicional para mostrar el nombre del usuario -->
                               <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
-                                  <td class="px-4 py-3 text-center font-semibold" colspan="10">
+                                  <td class="px-4 py-3 text-center font-semibold" colspan="8">
 
                                   </td>
+                                  <td class="px-4 py-3 text-center font-semibold">
+                                      @if ($currencyType !== 'USD')
+                                          {{ number_format($totalMonthAmount, 0, '.', ',') }}
+                                          {{ $currencyType }}
+                                      @endif
 
+                                  </td>
+                                  <td class="px-4 py-3 text-center font-semibold">
+
+                                  </td>
                                   <td class="px-4 py-3 text-center font-semibold">
                                       {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
-                                      $
+                                      USD
                                   </td>
                                   <td class="px-4 py-3 text-center">
                                   </td>

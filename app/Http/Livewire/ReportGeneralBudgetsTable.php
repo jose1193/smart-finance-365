@@ -50,6 +50,8 @@ class ReportGeneralBudgetsTable extends Component
 
     protected $listeners = ['userSelected5','YearSelected4'];
 
+    public $SelectMainCurrencyTypeRender = 'USD';
+
     public function mount() {
         $this->dataSelectBudget();
     }
@@ -62,7 +64,11 @@ class ReportGeneralBudgetsTable extends Component
     public function userSelected5($userId)
     {
         
-        
+         $this->mainCurrencyTypeRender = Operation::where('user_id', $userId)
+    ->where('operation_currency_type', '!=', 'USD')
+    ->distinct()
+    ->pluck('operation_currency_type');
+
         $this->selectedUser5 = $userId;
         $this->updateDataBudget();
     }
@@ -108,13 +114,13 @@ private function updateDataBudgetInternal()
     for ($i = 1; $i <= 12; $i++) {
         $data = $this->fetchData(1, $i);
 
-        $this->incomeData[] = $data['operation_amount'];
-        $this->incomeDataCurrency[] = $data['operation_currency_total'];
+        $this->incomeData[] = $data['operation_total'];
+        $this->incomeDataCurrency[] = $data['operation_total'];
 
         $data = $this->fetchData(2, $i);
 
-        $this->expenseData[] = $data['operation_amount'];
-        $this->expenseDataCurrency[] = $data['operation_currency_total'];
+        $this->expenseData[] = $data['operation_total'];
+        $this->expenseDataCurrency[] = $data['operation_total'];
 
         $data = $this->fetchBudgetData($i);
 
@@ -158,21 +164,25 @@ private function fetchData($mainCategoryId, $month)
         $query->whereDate('operations.operation_date', '<=', $this->date_end);
     }
 
-   $data = [
-        'operation_amount' => $query
+   // Calcula la suma de 'operation_currency_total' sin aplicar el filtro
+    $data['operation_total'] = $query
+        ->whereMonth('operations.operation_date', $month)
+        ->sum('operations.operation_currency_total');
+
+    // Aplica el filtro 'SelectMainCurrencyTypeRender' si es diferente de 'USD'
+    if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+        $data['operation_total'] = $query
             ->whereMonth('operations.operation_date', $month)
-            ->sum('operations.operation_amount'),
-        'operation_currency_total' => $query
-            ->whereMonth('operations.operation_date', $month)
-            ->sum('operations.operation_currency_total')
-    ];
+            ->where('operations.operation_currency_type', $this->SelectMainCurrencyTypeRender)
+            ->sum('operations.operation_amount');
+    }
 
     return $data;
 }
 
 private function fetchBudgetData($month)
 {
-    $query = Budget::where('user_id', $this->selectedUser5);
+  $query = Budget::where('user_id', $this->selectedUser5);
 
     if ($this->selectedYear4) {
         $query->whereYear('budget_date', $this->selectedYear4);
@@ -184,6 +194,17 @@ private function fetchBudgetData($month)
             ->sum('budget_currency_total')
     ];
 
+    // Aplica el filtro 'SelectMainCurrencyTypeRender' si es diferente de 'USD'
+    if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+        $data = [
+        'budget_currency_total' => $query
+            ->whereMonth('budget_date', $month)
+              ->where('budget_currency_type', $this->SelectMainCurrencyTypeRender)
+            ->sum('budget_operation')
+    ];
+
+    }
+    
     return $data;
 }
 

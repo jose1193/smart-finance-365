@@ -203,6 +203,24 @@
                                        @endif
                                    </th>
                                    <th class="px-4 py-3">
+                                       <select wire:model="SelectMainCurrencyTypeRender"
+                                           wire:change="updateCategoriesData"
+                                           class="w-2/4 text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                                           <option value="USD">USD</option>
+                                           @foreach ($mainCurrencyTypeRender as $currencyType)
+                                               @php
+                                                   // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                                                   $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                                               @endphp
+                                               <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                                           @endforeach
+
+                                       </select>
+
+                                       @php
+                                           $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                       @endphp
                                    </th>
 
                                </tr>
@@ -216,6 +234,7 @@
                                        @else
                                            Category Not Selected
                                        @endif
+
                                    </th>
 
                                </tr>
@@ -231,7 +250,8 @@
                                        </td>
 
                                        <td class="px-4 py-3 text-center">
-                                           {{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }} $
+                                           {{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }}
+                                           {{ $currencyType }}
                                        </td>
                                    </tr>
                                @endfor
@@ -245,7 +265,8 @@
 
 
                                    <td class="px-4 py-3 text-center font-semibold">
-                                       {{ number_format($totalCategoriesRenderCurrency, 0, '.', ',') }} $
+                                       {{ number_format($totalCategoriesRenderCurrency, 0, '.', ',') }}
+                                       {{ $currencyType }}
 
                                    </td>
 
