@@ -111,7 +111,7 @@
                             {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
                         </td>
                         <td>
-                            {{ $item->operation_currency_type }}
+                            {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
                         </td>
                         <td>
 
@@ -123,7 +123,7 @@
                         </td>
                         <td>
                             {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
-                            $
+
                         </td>
                         <td>
                             @if ($item->operation_status == '1')
@@ -163,7 +163,8 @@
                             Year Not Selected
                         @endif
                     </td>
-                    <td>
+
+                    <td colspan="6">
                         @if ($date_start)
                             <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_start }} </p>
                         @endif
@@ -173,12 +174,21 @@
                             <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_end }}</p>
                         @endif
                     </td>
-                    <td colspan="6">
-                    </td>
 
                     <td>
+                        @if ($currencyType !== 'USD')
+                            {{ number_format($totalMonthAmount, 0, '.', ',') }}
+                            {{ $currencyType === 'Blue-ARS' ? 'ARS' : $currencyType }}
+                        @endif
+
+                    </td>
+                    <td>
+
+
+                    </td>
+                    <td>
                         {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
-                        $
+                        USD
                     </td>
 
                 </tr>

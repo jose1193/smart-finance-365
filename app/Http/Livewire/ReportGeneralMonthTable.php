@@ -38,6 +38,7 @@ class ReportGeneralMonthTable extends Component
     public $date_end;
     
     public $SelectMainCurrencyTypeRender = 'USD';
+    public $currencyType;
 
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
@@ -296,10 +297,11 @@ public function emailStore4()
             'selectedYear3' => $this->selectedYear3,
             'user' => $userName,
             'email' => $email,
-            'title' => "Report General Month",
-            'date' => $datenow,
+            'title' => "General Report Month",
             'date' => $datenow,
             'date_start' => $dateStartFormatted,
+            'date_end' => $dateEndFormatted,
+             'currencyType' => $this->SelectMainCurrencyTypeRender,
         ];
 
         $pdf = PDF::loadView('emails.pdf-generalmonthreport', $data);

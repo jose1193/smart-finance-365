@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Genearte PDF</title>
+    <title>Generate PDF</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -68,6 +68,15 @@
                 {{ $date }}
             </span></h6>
         <br>
+        @if ($date_start)
+            <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_start }} </p>
+        @endif
+
+        @if ($date_end)
+            -
+            <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_end }}</p>
+        @endif
+        <br>
         <table class="customTable">
             <thead>
                 <tr>
@@ -91,18 +100,18 @@
                         <td>
                             {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
                         <td>
-                            {{ number_format($budgetDataCurrency[$i - 1], 0, '.', ',') }} $</td>
+                            {{ number_format($budgetDataCurrency[$i - 1], 0, '.', ',') }} </td>
                         <td>
-                            {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }} $</td>
+                            {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }} </td>
                         <td
                             style="{{ $expenseDataCurrency[$i - 1] > $budgetDataCurrency[$i - 1] ? 'color: red;' : '' }}">
-                            {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }} $
+                            {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }}
                         </td>
 
                         <td
                             style="{{ $budgetDataCurrency[$i - 1] > 0 && $expenseDataCurrency[$i - 1] / $budgetDataCurrency[$i - 1] > 100 ? 'color: red;' : '' }}">
                             @if ($budgetDataCurrency[$i - 1] > 0)
-                                {{ number_format(($expenseDataCurrency[$i - 1] / $budgetDataCurrency[$i - 1]) * 100, 2) }}%
+                                {{ number_format(($expenseDataCurrency[$i - 1] / $budgetDataCurrency[$i - 1]) * 100, 0) }}%
                             @else
                                 N/A
                             @endif
@@ -110,7 +119,7 @@
                         <td
                             style="{{ $incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1] < 0 ? 'color: red;' : '' }}">
                             {{ number_format($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1], 0) }}
-                            $
+
                         </td>
                         <td class="px-4 py-3 text-center"
                             style="{{ $incomeDataCurrency[$i - 1] > 0 && ($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1]) / $incomeDataCurrency[$i - 1] < 0 ? 'color: red;' : '' }}">
@@ -138,34 +147,32 @@
                         @endif
                     </td>
                     <td>
-                        @if ($date_start)
-                            <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_start }} </p>
-                        @endif
 
-                        @if ($date_end)
-                            -
-                            <p style="text-transform: capitalize; color:#1d4ed8"> {{ $date_end }}</p>
-                        @endif
+                        {{ number_format($totalBudgetCurrency, 0, '.', ',') }}
+                        {{ $currencyType === 'Blue-ARS' ? 'ARS' : $currencyType }}
+                    </td>
+                    <td>
+                        {{ number_format($totalIncomeCurrency, 0, '.', ',') }}
+                        {{ $currencyType === 'Blue-ARS' ? 'ARS' : $currencyType }}
 
                     </td>
                     <td>
-                        {{ number_format($totalBudgetCurrency, 0, '.', ',') }} $
-
-                    </td>
-                    <td>
-                        {{ number_format($totalIncomeCurrency, 0, '.', ',') }} $
+                        {{ number_format($totalExpenseCurrency, 0, '.', ',') }}
+                        {{ $currencyType === 'Blue-ARS' ? 'ARS' : $currencyType }}
                     </td>
 
                     <td>
-                        {{ number_format($totalExpenseCurrency, 0, '.', ',') }} $
-                    </td>
-                    <td>
-
 
                     </td>
                     <td style="{{ $totalSavings < 0 ? 'color: red;' : '' }}">
-                        {{ number_format($totalSavings, 0, '.', ',') }} $
+                        {{ number_format($totalSavings, 0, '.', ',') }}
+                        {{ $currencyType === 'Blue-ARS' ? 'ARS' : $currencyType }}
                     </td>
+                    <td>
+
+
+                    </td>
+
 
 
                 </tr>

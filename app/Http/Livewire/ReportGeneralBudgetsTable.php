@@ -291,10 +291,11 @@ public function emailStore5()
         'categoryName' => $this->categoryName,
         'categoryName2' => $this->categoryName2,
         'user' => $userName,
-        'title' => "Report General Budget",
+        'title' => "General Report",
         'date' => $datenow,
         'date_start' => $dateStartFormatted,
         'date_end' => $dateEndFormatted,
+         'currencyType' => $this->SelectMainCurrencyTypeRender,
     ];
 
     foreach ($this->emails_user5 as $email) {

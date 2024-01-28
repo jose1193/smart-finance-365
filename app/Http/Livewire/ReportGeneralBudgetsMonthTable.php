@@ -175,6 +175,7 @@ private function fetchMonthData()
         'main_categories.title as main_category_title',
         'subcategories.subcategory_name',
         'budgets.budget_currency_total as budget_operation',
+         'budgets.budget_currency_type as budget_currency_type',
         'budgets.budget_date as date',
         'budget_expenses.budget_id',
         
@@ -273,8 +274,9 @@ public function emailStore6()
             'selectedMonthName' => $this->selectedMonthName,
             'user' => $userName,
             'email' => $email,
-            'title' => "Report General Month Budget",
+            'title' => "General Monthly Budget Report",
             'date' => $datenow,
+             'currencyType' => $this->SelectMainCurrencyTypeRender,
         ];
 
         $pdf = PDF::loadView('emails.pdf-generalbudgetmonthreport', $data);

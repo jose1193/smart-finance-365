@@ -301,6 +301,7 @@ public function resetFields2()
         'user' => $userName,
         'title' => "Report Categories",
         'date' => $datenow,
+        'currencyType' => $this->SelectMainCurrencyTypeRender,
     ];
 
     foreach ($this->emails_user2 as $email) {
