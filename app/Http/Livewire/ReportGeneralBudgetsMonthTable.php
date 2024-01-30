@@ -67,14 +67,19 @@ class ReportGeneralBudgetsMonthTable extends Component
 
    public function months()
 {
+    $currentYear = Carbon::now()->year;
     $months = [];
+
     for ($i = 1; $i <= 12; $i++) {
-        $monthName = Carbon::now()->month($i)->format('F');
+        $dateInMonth = Carbon::create($currentYear, $i, 1);
+        $monthName = $dateInMonth->format('F');
+
         $months[] = [
             'number' => $i,
             'name' => $monthName,
         ];
     }
+
     return $months;
 }
 
