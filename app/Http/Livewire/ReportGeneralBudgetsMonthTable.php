@@ -34,7 +34,8 @@ class ReportGeneralBudgetsMonthTable extends Component
     public $totalMonthAmountCurrency;
 
     public $SelectMainCurrencyTypeRender = 'USD';
-
+    public $mainCurrencyTypeRender;
+    
     protected $listeners = ['userSelected6','MonthSelectedBudget','YearSelected5'];
 
     public function userSelected6($userId)
@@ -262,7 +263,7 @@ public function emailStore6()
     $datenow = $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY, H:mm:ss');
 
     $data['user'] = $userName;
-    $fileName = 'General-Month-PDF-Report' . '-' . $userName . '-' . $datenow . '.pdf';
+    $fileName = 'Budget-Expense-Monthly-Report' . '-' . $userName . '-' . $datenow . '.pdf';
 
     foreach ($this->emails_user6 as $email) {
         $data = [
@@ -274,7 +275,7 @@ public function emailStore6()
             'selectedMonthName' => $this->selectedMonthName,
             'user' => $userName,
             'email' => $email,
-            'title' => "General Monthly Budget Report",
+            'title' => "Budget Expense Monthly Report",
             'date' => $datenow,
              'currencyType' => $this->SelectMainCurrencyTypeRender,
         ];

@@ -42,6 +42,8 @@ class ReportGeneralBudgetsChart extends Component
     public $mainCurrencyTypeRender;
     public $SelectMainCurrencyTypeRender = 'USD';
 
+    public $report_date;
+
     public function userSelectedChart5($userId)
     {
         
@@ -128,6 +130,9 @@ private function updateChartBudgetDataInternal()
     
     $this->expenseTopTen = $this->fetchTopTenExpenses();
     $this->incomeTopTen = $this->fetchTopTenIncome();
+
+    $now = Carbon::now('America/Argentina/Buenos_Aires');
+    $this->report_date =  $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
 }
 
 

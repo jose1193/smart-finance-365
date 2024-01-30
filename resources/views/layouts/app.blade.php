@@ -96,6 +96,11 @@
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <!--  END DataTable JS -->
 
+    <!--  JSPDF HTML2CANVAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- END JSPDF HTML2CANVAS -->
+
     @livewireStyles
 </head>
 

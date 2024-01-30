@@ -54,16 +54,28 @@
                      </select>
                  </div>
              </div>
+             <!-- VARIABLES for JSPDF -->
+             <span id="userInfo2" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
+                 data-username="{{ $userNameSelected2 ? $userNameSelected2->name : '' }}"
+                 data-year="{{ $selectedYear2 ? $selectedYear2 : '' }}" data-report="{{ $report_date }}"
+                 data-category-name="{{ isset($categoryNameSelected->category_name) ? $categoryNameSelected->category_name : '' }}">
 
+             </span>
+             <!-- END VARIABLES for JSPDF -->
          </div>
 
          @if ($showChart2)
              <div class="my-10 flex justify-end space-x-2">
 
                  <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
-                     wire:click="exportToExcel" wire:loading.attr="disabled">
+                     onclick="downloadImage2()">
                      <span class="font-semibold"><i class="fa-regular fa-image px-1"></i></span>
                      Download
+                 </x-button>
+                 <x-button class="bg-purple-600 hover:bg-purple-700 shadow-lg hover:shadow-purple-500/50"
+                     onclick="generatePDF2()">
+                     <span class="font-semibold"><i class="fa-regular fa-file-pdf px-1"></i></span>
+                     Convert To PDF
                  </x-button>
                  <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50"
                      wire:click="resetFields2" wire:loading.attr="disabled">
@@ -91,24 +103,53 @@
 
                  </div>
              </div>
+
              <div id="chart-container2" class="my-5"
                  wire:key="chart-{{ $selectedUser2 }}-{{ $selectedCategoryId }}-{{ $selectedYear2 }}-{{ uniqid() }}">
+                 <div id="content2">
+                     <div class="grid gap-6 mb-8 md:grid-cols-1">
+                         <div
+                             class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 flex flex-col md:flex-row items-center">
+                             <!-- Contenedor del canvas, ajustado para ser responsive y con margen -->
+                             <div class="p-3 md:w-2/5 lg:w-4/6 xl:w-4/6 -mt-4 mr-4">
+                                 <!-- Agregado "mr-4" para añadir margen a la derecha -->
+                                 <canvas id="myChartGeneral2" height="200"></canvas>
+                             </div>
 
-                 <div class="grid gap-6 mb-8 md:grid-cols-2">
-                     <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-                         <h4 class="mb-4 font-semibold text-gray-800 dark:text-gray-300">
-                             @if ($userNameSelected2)
-                                 {{ $userNameSelected2->name }}
-                             @else
-                                 User Not Selected
-                             @endif
-                         </h4>
-
-                         <canvas id="myChartGeneral2" height="200"></canvas>
-
+                             <!-- Contenedor de la información, ajustado para ser responsive -->
+                             <div
+                                 class="rounded-lg w-full md:w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center capitalize border-b bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-700">
+                                 @php
+                                     $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                 @endphp
+                                 <h4 class="text-base mb-4 font-semibold text-gray-600 dark:text-gray-300">
+                                     @if ($userNameSelected2)
+                                         {{ $userNameSelected2->name }}
+                                     @else
+                                         User Not Selected
+                                     @endif
+                                     @if ($selectedYear2)
+                                         - {{ $selectedYear2 }}
+                                     @endif
+                                 </h4>
+                                 <p class="text-lg text-[#0694a2] dark:text-gray-400 font-semibold">
+                                     @if (isset($categoryNameSelected->category_name))
+                                         {{ $categoryNameSelected->category_name }}
+                                     @endif
+                                 </p>
+                                 <p class="text-gray-800 dark:text-gray-300 text-lg font-bold mb-7 my-3">
+                                     @if (isset($categoryNameSelected))
+                                         {{ number_format($totalGeneral, 0, '.', ',') }}
+                                         {{ $currencyType }}
+                                     @endif
+                                 </p>
+                             </div>
+                         </div>
                      </div>
 
                  </div>
+
+
                  <script>
                      @if ($categoryNameSelected)
                          var userName = "{{ $categoryNameSelected->category_name }}";
@@ -188,8 +229,152 @@
                  </script>
 
 
+
              </div>
          @endif
      </div>
      <!-- END REPORT GENERAL CATEGORIES TABLE  -->
  </div>
+
+ <!--  JSPDF HTML2CANVAS -->
+
+ <script type="text/javascript">
+     function generatePDF2() {
+         // Obtén el valor del atributo de datos para la categoría seleccionada
+         const userInfoElement = document.getElementById('userInfo2');
+         const categoryNameSelected = userInfoElement.getAttribute('data-category-name');
+         const selectedYear2 = userInfoElement.getAttribute('data-year');
+         const reportDate = userInfoElement.getAttribute('data-report');
+         const userNameSelected = userInfoElement.getAttribute('data-username');
+
+         // Verifica si la categoría está seleccionada
+         if (categoryNameSelected) {
+             const {
+                 jsPDF
+             } = window.jspdf;
+             const doc = new jsPDF();
+
+             // Usa html2canvas para convertir el contenido del div en una imagen
+             html2canvas(document.getElementById('content2')).then((canvas) => {
+                 const imgData = canvas.toDataURL('image/png');
+
+                 // Calcula las coordenadas para centrar el logo en el PDF
+                 const pdfWidth = doc.internal.pageSize.width;
+                 const logoWidth = 31;
+                 const logoHeight = 22;
+                 const logoX = (pdfWidth - logoWidth) / 2;
+                 const logoY = 10;
+                 doc.addImage('{{ asset('img/logo.png') }}', 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+                 // Calcula las coordenadas para centrar la imagen en el PDF
+                 const imgWidth = 190;
+                 const imgHeight = 75;
+                 const x = (pdfWidth - imgWidth) / 2;
+                 const y = 60;
+
+                 // Agrega la imagen al PDF
+                 doc.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+
+                 // Ajusta el tamaño y color del texto
+                 const fontSize = 12;
+                 const generalReportColor = '#000000'; // Negro
+                 const textColor = '#0000FF'; // Azul
+
+                 // Agrega texto alineado a la izquierda debajo del logo
+                 const textBelowLogoY = logoY + logoHeight + 10;
+                 const textLeftMargin = 20;
+
+                 // Convierte la cadena 'reportDate' a formato capitalize
+                 function capitalize(str) {
+                     return str.replace(/\b\w/g, function(char) {
+                         return char.toUpperCase();
+                     });
+                 }
+
+                 const capitalizedReportDate = capitalize(reportDate);
+
+
+                 // Agrega el texto al PDF con colores diferentes
+                 doc.setFontSize(fontSize);
+                 doc.setTextColor(generalReportColor);
+                 doc.text('Report Category ', textLeftMargin, textBelowLogoY);
+
+                 doc.setTextColor(textColor);
+                 doc.text(' ' + userNameSelected + ' ' + selectedYear2, textLeftMargin + doc.getTextWidth(
+                     'Report Category '), textBelowLogoY);
+
+
+                 // Agrega otro texto debajo del primer texto
+                 const reportDateTextY = textBelowLogoY + 10;
+                 // Cambia el color del texto para 'Report Date'
+                 doc.setTextColor(generalReportColor);
+                 doc.text('Report Date: ', textLeftMargin, reportDateTextY);
+                 // Cambia el color del texto para el valor de 'capitalizedReportDate'
+                 doc.setTextColor(textColor);
+                 doc.text(capitalizedReportDate, textLeftMargin + doc.getTextWidth('Report Date: '),
+                     reportDateTextY);
+
+
+                 // Formatea la fecha como DD-MM-YYYY
+                 const formattedDate = new Date().toLocaleDateString('es-ES', {
+                     day: '2-digit',
+                     month: '2-digit',
+                     year: 'numeric'
+                 });
+
+
+                 // Genera el nombre del archivo con el nombre de usuario y la fecha
+                 const fileName =
+                     `Report-Categories-Chart-${userNameSelected}-${categoryNameSelected}-${formattedDate}.pdf`;
+
+                 // Guarda el PDF con el nombre generado
+                 doc.save(fileName);
+
+             });
+         } else {
+             // Si la categoría no está seleccionada, muestra un mensaje o realiza alguna otra acción
+             alert("Por favor, selecciona una categoría antes de generar el PDF.");
+         }
+     }
+ </script>
+
+ <script type="text/javascript">
+     function downloadImage2() {
+         // Obtén el valor del atributo de datos para la categoría seleccionada
+         const userInfoElement = document.getElementById('userInfo2');
+         const categoryNameSelected = userInfoElement.getAttribute('data-category-name');
+         const userNameSelected = userInfoElement.getAttribute('data-username');
+
+         // Verifica si la categoría está seleccionada
+         if (categoryNameSelected) {
+             // Usa html2canvas para convertir el contenido del div en una imagen
+             html2canvas(document.getElementById('content2')).then((canvas) => {
+
+                 // Formatea la fecha como DD-MM-YYYY
+                 const formattedDate = new Date().toLocaleDateString('es-ES', {
+                     day: '2-digit',
+                     month: '2-digit',
+                     year: 'numeric'
+                 });
+
+                 const imgData = canvas.toDataURL('image/jpeg'); // Puedes cambiar a 'image/png' si prefieres PNG
+
+                 // Crea un enlace temporal y simula un clic para descargar la imagen
+                 const link = document.createElement('a');
+                 const fileName =
+                     `Report-Categories-Image-${userNameSelected}-${categoryNameSelected}-${formattedDate}.jpg`; // Cambia a '.png' si prefieres PNG
+                 link.href = imgData;
+                 link.download = fileName;
+                 document.body.appendChild(link);
+                 link.click();
+                 document.body.removeChild(link);
+             });
+         } else {
+             // Si la categoría no está seleccionada, muestra un mensaje o realiza alguna otra acción
+             alert("Por favor, selecciona una categoría antes de descargar la imagen.");
+         }
+     }
+ </script>
+
+
+ <!-- END JSPDF HTML2CANVAS -->

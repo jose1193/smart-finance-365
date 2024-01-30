@@ -37,6 +37,10 @@ class ReportGeneralMonthCharts extends Component
 
     public $SelectMainCurrencyTypeRender = 'USD';
 
+    public $report_date;
+    public $selectedMonthNameEs;
+    public $mainCurrencyTypeRender;
+
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
     public function userSelected4($userId)
@@ -113,10 +117,17 @@ private function updateMonthDataInternal()
 
     $this->showChart4 = true;
 
+    
     if ($this->selectedMonth) {
-        $selectedDate = Carbon::create()->month($this->selectedMonth);
-        $this->selectedMonthName = $selectedDate->format('F');
-    }
+    $selectedDate = Carbon::create()->month($this->selectedMonth);
+    $this->selectedMonthName = $selectedDate->format('F');
+
+    $this->selectedMonthNameEs = Carbon::create()->month($this->selectedMonth)->locale('es')->isoFormat('MMMM');
+
+}
+
+$now = Carbon::now('America/Argentina/Buenos_Aires');
+$this->report_date =  $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
 }
 
 

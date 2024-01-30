@@ -35,6 +35,10 @@ class ReportGeneralBudgetsExpenseCharts extends Component
     
     public $SelectMainCurrencyTypeRender = 'USD';
      
+    public $report_date;
+    public $selectedMonthNameEs;
+    public $mainCurrencyTypeRender;
+
     public function userSelectedChart6($userId)
     {
        
@@ -108,8 +112,14 @@ private function updateBudgetExpenseDataInternal()
 
     if ($this->selectedMonth2) {
         $this->selectedMonthName2 = Carbon::create()->month($this->selectedMonth2)->format('F');
+
+       $this->selectedMonthNameEs = Carbon::create()->month($this->selectedMonth2)->locale('es')->isoFormat('MMMM');
+
     }
     
+    $now = Carbon::now('America/Argentina/Buenos_Aires');
+    $this->report_date =  $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
+
  $this->budget = Budget::where('budget_month', $this->selectedMonth2)
                       ->where('user_id', $this->selectedUser6)
                       ->whereYear('budget_date', $this->selectedYear4)

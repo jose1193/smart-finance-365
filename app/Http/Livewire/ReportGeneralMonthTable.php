@@ -39,7 +39,8 @@ class ReportGeneralMonthTable extends Component
     
     public $SelectMainCurrencyTypeRender = 'USD';
     public $currencyType;
-
+    public $mainCurrencyTypeRender;
+    
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
     public function userSelected4($userId)

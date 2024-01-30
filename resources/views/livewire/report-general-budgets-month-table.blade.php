@@ -196,7 +196,7 @@
                                          class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
 
                                          <option value="USD">USD</option>
-                                         @foreach ($mainCurrencyTypeRender as $currencyType)
+                                         @foreach ($mainCurrencyTypeRender ?? [] as $currencyType)
                                              @php
                                                  // Si es 'Blue-ARS', cambiarlo a 'ARS'
                                                  $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;

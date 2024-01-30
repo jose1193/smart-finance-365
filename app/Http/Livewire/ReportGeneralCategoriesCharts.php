@@ -38,6 +38,8 @@ class ReportGeneralCategoriesCharts extends Component
    
     public $SelectMainCurrencyTypeRender = 'USD';
 
+    public $report_date;
+
     protected $listeners = ['userSelectedChart2','YearSelectedChart2','categorySelected2'];
 
     public function userSelectedChart2($userId)
@@ -147,6 +149,9 @@ private function updateCategoriesDataInternal()
     $this->categoryName = MainCategories::where('id', 1)->value('title');
     $this->categoryName2 = MainCategories::where('id', 2)->value('title');
     $this->showChart2 = true;
+
+    $now = Carbon::now('America/Argentina/Buenos_Aires');
+    $this->report_date =  $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
 }
 
 
