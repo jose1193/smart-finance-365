@@ -85,22 +85,20 @@
                                                 {{ Str::words($item->operation_description, 2, '...') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->operation_currency_type }}
+                                                {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
-
-                                                {{ number_format($item->operation_amount, 0, '.', ',') }}
+                                                {{ number_format($item->operation_amount, 2, '.', ',') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ is_numeric($item->operation_currency) ? number_format($item->operation_currency, 2, '.', ',') : $item->operation_currency }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
+                                                {{ number_format($item->operation_currency_total, 2, '.', ',') }}
 
-                                                {{ $item->operation_currency }}
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-
-                                                {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
                                                 $
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -222,7 +220,7 @@
                                                                 wire:change="showSelectedCurrency"
                                                                 id="selectedCurrencyFrom" style="width: 100%;">
                                                                 <option value="">Select Option</option>
-                                                                <option value="Blue-ARS">Argentine Peso (Blue-ARS)
+                                                                <option value="Blue-ARS">Argentine Peso (ARS)
                                                                 </option>
                                                                 @if ($listCurrencies)
                                                                     @foreach ($listCurrencies['currencies'] as $codigo => $nombre)
@@ -243,7 +241,7 @@
                                                         <label for="operation_amount"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
                                                             Operation With <span
-                                                                class="text-blue-700">{{ $this->selectedCurrencyFrom }}</label>
+                                                                class="text-blue-700">{{ $this->selectedCurrencyFromARS }}</label>
 
 
                                                         <div class="flex items-center relative">
@@ -254,7 +252,7 @@
                                                                 placeholder="Enter Income Transaction Amount">
 
                                                             <span
-                                                                class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFrom }}</span>
+                                                                class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFromARS }}</span>
                                                         </div>
 
                                                         @error('operation_amount')
@@ -564,6 +562,16 @@
                 }
             });
 
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        Livewire.on('modalOpenedAutonumeric4', function() {
+            $('#operation_amount').mask('#.##0,00', {
+                reverse: true
+            });
         });
     });
 </script>

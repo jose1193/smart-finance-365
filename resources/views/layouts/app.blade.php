@@ -35,7 +35,7 @@
             document.head.appendChild(script);
         });
     </script>
-    <script src="./assets/js/operation-amount-input.js"></script>
+    <!--<script src="./assets/js/operation-amount-input.js"></script>-->
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,6 +100,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- END JSPDF HTML2CANVAS -->
+
+    <!-- Incluye jQuery Mask -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <!-- End jQuery Mask -->
 
     @livewireStyles
 </head>

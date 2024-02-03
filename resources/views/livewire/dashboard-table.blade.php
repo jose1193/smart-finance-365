@@ -89,20 +89,20 @@
                                         </td>
 
                                         <td class="px-4 py-3 text-xs text-center">
-                                            {{ Str::words($item->operation_description, 2, '...') }}
+                                            {{ Str::words($item->operation_description, 3, '...') }}
                                         </td>
 
                                         <td class="px-4 py-3 text-xs text-center">
 
-                                            {{ number_format($item->operation_amount, 0, '.', ',') }}
+                                            {{ number_format($item->operation_amount, 2, '.', ',') }}
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
 
 
-                                            {{ $item->operation_currency }}
+                                            {{ is_numeric($item->operation_currency) ? number_format($item->operation_currency, 2, '.', ',') : $item->operation_currency }}
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
-                                            {{ $item->operation_currency_total }} $
+                                            {{ number_format($item->operation_currency_total, 2, '.', ',') }} $
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
 
@@ -128,9 +128,6 @@
                                                     {{ $item->status_description }}
                                                 </span>
                                             @endif
-
-
-
 
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
@@ -224,7 +221,7 @@
                                                             wire:change="showSelectedCurrency"
                                                             id="selectedCurrencyFrom" style="width: 100%;">
                                                             <option value="">Select Option</option>
-                                                            <option value="Blue-ARS">Argentine Peso (Blue-ARS)
+                                                            <option value="Blue-ARS">Argentine Peso (ARS)
                                                             </option>
                                                             @if ($listCurrencies)
                                                                 @foreach ($listCurrencies['currencies'] as $codigo => $nombre)
@@ -245,7 +242,7 @@
                                                     <label for="operation_amount"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
                                                         Operation With <span
-                                                            class="text-blue-700">{{ $this->selectedCurrencyFrom }}</label>
+                                                            class="text-blue-700">{{ $this->selectedCurrencyFromARS }}</label>
 
 
                                                     <div class="flex items-center relative">
@@ -255,7 +252,7 @@
                                                             placeholder="Enter Income Transaction Amount">
 
                                                         <span
-                                                            class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFrom }}</span>
+                                                            class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFromARS }}</span>
                                                     </div>
 
                                                     @error('operation_amount')
@@ -314,11 +311,12 @@
                                                         class="block text-gray-700 text-sm font-bold mb-2">
                                                         Date</label>
 
-                                                    <input type="text" readonly id="myDatePicker"
-                                                        autocomplete="off" wire:model="operation_date"
-                                                        placeholder="dd/mm/yyyy"
-                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
+                                                    <div wire:ignore>
+                                                        <input type="text" readonly id="myDatePicker"
+                                                            autocomplete="off" wire:model="operation_date"
+                                                            placeholder="dd/mm/yyyy"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                    </div>
                                                     @error('operation_date')
                                                         <span class="text-red-500">{{ $message }}</span>
                                                     @enderror
@@ -540,14 +538,28 @@
         Livewire.on('modalOpened', function() {
             flatpickr("#myDatePicker", {
                 locale: "es",
-                dateFormat: "d/m/Y", // Configura el formato de fecha deseado
+
                 allowInput: true,
+                altInput: true,
+                altFormat: "l, F j, Y",
+                dateFormat: "d/m/Y",
                 onClose: function(selectedDates, dateStr, instance) {
                     // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
                     @this.set('operation_date', dateStr);
+                    console.log(dateStr);
                 }
             });
 
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        Livewire.on('modalOpenedAutonumericDashboard', function() {
+            $('#operation_amount').mask('#.##0,00', {
+                reverse: true
+            });
         });
     });
 </script>

@@ -167,7 +167,13 @@
                       </div>
                   </div>
               @endif
+              <!-- VARIABLES for EXPORT EXCEL -->
+              <span id="userInfo3" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
+                  data-username="{{ $userNameSelected4 ? $userNameSelected4->name : '' }}"
+                  data-year="{{ $selectedYear3 ? $selectedYear3 : '' }}" data-month="{{ $selectedMonthName }}">
 
+              </span>
+              <!-- END VARIABLES for EXPORT EXCEL -->
               <!-- Tables -->
               @if ($date_start && $date_end && $date_start > $date_end)
                   <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
@@ -176,65 +182,63 @@
               @endif
               <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                   <div class="w-full overflow-x-auto">
+                      <div class="flex items-center  w-full space-x-3 mt-5">
+                          <div wire:ignore>
+                              <input type="text" id="myDatePicker3" wire:model.lazy="date_start" readonly
+                                  wire:change="updateMonthData" placeholder="dd/mm/yyyy" autocomplete="off"
+                                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                          </div>
+                          <div wire:ignore>
+                              <input wire:ignore type="text" id="myDatePicker4" readonly wire:model.lazy="date_end"
+                                  wire:change="updateMonthData" placeholder="dd/mm/yyyy" autocomplete="off"
+                                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                          </div>
+                          <div>
+                              <select wire:model="main_category_id" wire:change="updateMonthData"
+                                  class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+                                  <option value="">All Categories
+                                  </option>
+                                  @foreach ($mainCategoriesRender as $item)
+                                      <option value="{{ $item->id }}">
+                                          {{ $item->title }}
+                                      </option>
+                                  @endforeach
+                              </select>
+                          </div>
+                          <div>
+                              <select wire:model="SelectMainCurrencyTypeRender" wire:change="updateMonthData"
+                                  class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                                  <option value="USD">USD</option>
+                                  @foreach ($mainCurrencyTypeRender ?? [] as $currencyType)
+                                      @php
+                                          // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                                          $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                                      @endphp
+                                      <option value="{{ $currencyType }}">{{ $displayCurrency }}
+                                      </option>
+                                  @endforeach
+
+
+                              </select>
+                          </div>
+
+
+                          @php
+                              $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                          @endphp
+                      </div>
+
                       <table class="w-full whitespace-no-wrap " id="tableId4">
                           <thead>
                               <tr
                                   class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
 
-                                  <th class="px-4 py-3 " colspan="3">
-                                      <div class="  w-2/3 space-x-3">
+                                  <th class="px-4 py-3 " colspan="12">
 
-                                          <input wire:ignore type="text" id="myDatePicker3"
-                                              wire:model.lazy="date_start" wire:change="updateMonthData"
-                                              placeholder="dd/mm/yyyy" autocomplete="off"
-                                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
-
-                                          <input wire:ignore type="text" id="myDatePicker4"
-                                              wire:model.lazy="date_end" wire:change="updateMonthData"
-                                              placeholder="dd/mm/yyyy" autocomplete="off"
-                                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
-
-                                          <select wire:model="main_category_id" wire:change="updateMonthData"
-                                              class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                                              <option value="">All Categories
-                                              </option>
-                                              @foreach ($mainCategoriesRender as $item)
-                                                  <option value="{{ $item->id }}">
-                                                      {{ $item->title }}
-                                                  </option>
-                                              @endforeach
-                                          </select>
-                                          <select wire:model="SelectMainCurrencyTypeRender"
-                                              wire:change="updateMonthData"
-                                              class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-
-                                              <option value="USD">USD</option>
-                                              @foreach ($mainCurrencyTypeRender ?? [] as $currencyType)
-                                                  @php
-                                                      // Si es 'Blue-ARS', cambiarlo a 'ARS'
-                                                      $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
-                                                  @endphp
-                                                  <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
-                                              @endforeach
-
-
-                                          </select>
-
-                                          @php
-                                              $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
-                                          @endphp
-                                      </div>
 
                                   </th>
-
-
-
-                                  <th class="px-4 py-3" colspan="9">
-
-                                  </th>
-
 
                               </tr>
                               <tr
@@ -273,7 +277,8 @@
 
                                       @if ($date_end)
                                           <p>Date End:
-                                              <span class="text-green-700 ml-2">
+                                              <span
+                                                  class="{{ $date_start && $date_end && $date_start > $date_end ? 'text-red-700' : 'text-green-700' }} ml-2">
                                                   {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
                                               </span>
                                           </p>
@@ -321,7 +326,7 @@
                                           {{ Str::words($item->subcategory_name, 2) ?: 'N/A' }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->operation_description, 1, '...') }}
+                                          {{ Str::words($item->operation_description, 3, '...') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ $selectedMonthName }}
@@ -336,15 +341,16 @@
                                       </td>
                                       <td class="px-4 py-3 text-center">
 
-                                          {{ number_format($item->operation_amount, 0, '.', ',') }}
+                                          {{ number_format($item->operation_amount, 2, '.', ',') }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
 
-                                          {{ $item->operation_currency }}
+                                          {{ is_numeric($item->operation_currency) ? number_format($item->operation_currency, 2, '.', ',') : $item->operation_currency }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
-                                          $</td>
+                                          {{ number_format($item->operation_currency_total, 2, '.', ',') }}
+
+                                          $ </td>
                                       <td class="px-4 py-3 text-center">
                                           @if ($item->operation_status == '1')
                                               <span
@@ -381,7 +387,7 @@
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
                                       @if ($currencyType !== 'USD')
-                                          {{ number_format($totalMonthAmount, 0, '.', ',') }}
+                                          {{ number_format($totalMonthAmount, 2, '.', ',') }}
                                           {{ $currencyType }}
                                       @endif
 
@@ -390,7 +396,7 @@
 
                                   </td>
                                   <td class="px-4 py-3 text-center font-semibold">
-                                      {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
+                                      {{ number_format($totalMonthAmountCurrency, 2, '.', ',') }}
                                       USD
                                   </td>
                                   <td class="px-4 py-3 text-center">
@@ -404,20 +410,50 @@
               </div>
           @endif
       </div>
+
       <script>
           document.addEventListener('livewire:load', function() {
 
               Livewire.on('exportTableToExcel4', function() {
                   // Lógica para exportar la tabla a Excel (usando table2excel o la biblioteca de tu elección)
 
-                  // Por ejemplo:
-                  $("#tableId4").table2excel({
-                      exclude: ".no-export",
-                      name: "Worksheet Name",
-                      filename: "month-report"
+                  // Quitar el símbolo "$" antes de exportar
+                  $('#tableId4 td').each(function() {
+                      var cellText = $(this).text();
+                      if (cellText.includes('$')) {
+                          // Remover el símbolo "$"
+                          $(this).text(cellText.replace('$', ''));
+                      }
+                  });
+
+                  // Formatea la fecha como DD-MM-YYYY
+                  const formattedDate = new Date().toLocaleDateString('es-ES', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
                   });
 
 
+                  // Obtener el nombre de usuario de los datos de la tabla
+                  const username = $('#userInfo3').data('username');
+                  const selectedYear3 = $('#userInfo3').data('year');
+                  const selectedMonthName = $('#userInfo3').data('month') ?? '';
+
+                  // Convertir el nombre de usuario a mayúsculas
+                  const capitalizedUsername = username.toUpperCase();
+
+                  // Concatenar el nombre del usuario y la fecha al nombre del archivo
+                  var filename = "month-report-" + capitalizedUsername + "-" + selectedMonthName + "-" +
+                      selectedYear3 + "-" +
+                      formattedDate;
+
+
+                  // Exportar la tabla a Excel
+                  $("#tableId4").table2excel({
+                      exclude: ".no-export",
+                      name: "Worksheet Name",
+                      filename: filename
+                  });
               });
 
               Livewire.on('emailSent4', function() {
@@ -426,6 +462,7 @@
               });
           });
       </script>
+
 
       <script>
           document.addEventListener('livewire:load', function() {

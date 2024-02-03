@@ -150,7 +150,13 @@
                      </div>
                  </div>
              @endif
+             <!-- VARIABLES for EXCEL -->
+             <span id="userInfo" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
+                 data-username="{{ $userNameSelected ? $userNameSelected->name : '' }}"
+                 data-year="{{ $selectedYear4 ? $selectedYear4 : '' }}">
 
+             </span>
+             <!-- END VARIABLES for EXCEL -->
              <!-- Tables -->
              @if ($date_start && $date_end && $date_start > $date_end)
                  <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
@@ -159,51 +165,51 @@
              @endif
              <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                  <div class="w-full overflow-x-auto">
+                     <div class="flex items-center  w-full space-x-3 mt-5">
+                         <div wire:ignore>
+                             <input wire:ignore type="text" id="myDatePicker5" wire:model.lazy="date_start"
+                                 wire:change="updateDataBudget" placeholder="dd/mm/yyyy" autocomplete="off"
+                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                         </div>
+                         <div wire:ignore>
+                             <input wire:ignore type="text" id="myDatePicker6" wire:model.lazy="date_end"
+                                 wire:change="updateDataBudget" placeholder="dd/mm/yyyy" autocomplete="off"
+                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                         </div>
+                         <div>
+                             <select wire:model="SelectMainCurrencyTypeRender" wire:change="updateDataBudget"
+                                 class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
+
+                                 <option value="USD">USD</option>
+                                 @foreach ($mainCurrencyTypeRender as $currencyType)
+                                     @php
+                                         // Si es 'Blue-ARS', cambiarlo a 'ARS'
+                                         $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
+                                     @endphp
+                                     <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
+                                 @endforeach
+
+                             </select>
+                         </div>
+
+
+
+                         @php
+                             $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                         @endphp
+                     </div>
                      <table class="w-full whitespace-no-wrap" id="tableId">
                          <thead>
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
 
-                                 <th class="px-4 py-3 " colspan="3">
-                                     <div class="  w-2/5 space-x-3">
+                                 <th class="px-4 py-3 " colspan="12">
 
-                                         <input wire:ignore type="text" id="myDatePicker5"
-                                             wire:model.lazy="date_start" wire:change="updateDataBudget"
-                                             placeholder="dd/mm/yyyy" autocomplete="off"
-                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
-
-                                         <input wire:ignore type="text" id="myDatePicker6" wire:model.lazy="date_end"
-                                             wire:change="updateDataBudget" placeholder="dd/mm/yyyy" autocomplete="off"
-                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
-                                         <select wire:model="SelectMainCurrencyTypeRender"
-                                             wire:change="updateDataBudget"
-                                             class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-
-                                             <option value="USD">USD</option>
-                                             @foreach ($mainCurrencyTypeRender as $currencyType)
-                                                 @php
-                                                     // Si es 'Blue-ARS', cambiarlo a 'ARS'
-                                                     $displayCurrency = $currencyType == 'Blue-ARS' ? 'ARS' : $currencyType;
-                                                 @endphp
-                                                 <option value="{{ $currencyType }}">{{ $displayCurrency }}</option>
-                                             @endforeach
-
-                                         </select>
-
-                                         @php
-                                             $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
-                                         @endphp
-                                     </div>
 
                                  </th>
 
-
-
-                                 <th class="px-4 py-3" colspan="9">
-
-                                 </th>
 
 
                              </tr>
@@ -237,7 +243,8 @@
 
                                      @if ($date_end)
                                          <p>Date End:
-                                             <span class="text-green-700 ml-2">
+                                             <span
+                                                 class="{{ $date_start && $date_end && $date_start > $date_end ? 'text-red-700' : 'text-green-700' }} ml-2">
                                                  {{ \Carbon\Carbon::parse($date_end)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
                                              </span>
                                          </p>
@@ -269,17 +276,17 @@
                                          {{ \Carbon\Carbon::create()->month($i)->format('F') }}</td>
 
                                      <td class="px-4 py-3 text-center">
-                                         {{ number_format($budgetDataCurrency[$i - 1], 0, '.', ',') }}
+                                         {{ number_format($budgetDataCurrency[$i - 1], 2, '.', ',') }}
                                      </td>
 
                                      <td class="px-4 py-3 text-center">
-                                         {{ number_format($incomeDataCurrency[$i - 1], 0, '.', ',') }}
+                                         {{ number_format($incomeDataCurrency[$i - 1], 2, '.', ',') }}
                                      </td>
 
                                      <!-- Inside the loop, in the table body -->
                                      <td class="px-4 py-3 text-center"
                                          style="{{ $expenseDataCurrency[$i - 1] > $budgetDataCurrency[$i - 1] ? 'color: red;' : '' }}">
-                                         {{ number_format($expenseDataCurrency[$i - 1], 0, '.', ',') }}
+                                         {{ number_format($expenseDataCurrency[$i - 1], 2, '.', ',') }}
 
                                      </td>
 
@@ -294,7 +301,7 @@
 
                                      <td class="px-4 py-3 text-center"
                                          style="{{ $incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1] < 0 ? 'color: red;' : '' }}">
-                                         {{ number_format($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1], 0) }}
+                                         {{ number_format($incomeDataCurrency[$i - 1] - $expenseDataCurrency[$i - 1], 2) }}
 
                                      </td>
 
@@ -322,15 +329,15 @@
                                      Total {{ $currencyType }}
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ number_format($totalBudgetCurrency, 0, '.', ',') }} {{ $currencyType }}
+                                     {{ number_format($totalBudgetCurrency, 2, '.', ',') }} {{ $currencyType }}
 
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ number_format($totalIncomeCurrency, 0, '.', ',') }} {{ $currencyType }}
+                                     {{ number_format($totalIncomeCurrency, 2, '.', ',') }} {{ $currencyType }}
                                  </td>
 
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ number_format($totalExpenseCurrency, 0, '.', ',') }} {{ $currencyType }}
+                                     {{ number_format($totalExpenseCurrency, 2, '.', ',') }} {{ $currencyType }}
 
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
@@ -339,7 +346,7 @@
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold"
                                      style="{{ $totalSavings < 0 ? 'color: red;' : '' }}">
-                                     {{ number_format($totalSavings, 0, '.', ',') }} {{ $currencyType }}
+                                     {{ number_format($totalSavings, 2, '.', ',') }} {{ $currencyType }}
                                  </td>
                                  <td class="px-4 py-3 text-center font-semibold">
 
@@ -361,17 +368,44 @@
          Livewire.on('exportTableToExcel5', function() {
              // Lógica para exportar la tabla a Excel (usando table2excel o la biblioteca de tu elección)
 
-             // Por ejemplo:
+             // Quitar el símbolo "$" antes de exportar
+             $('#tableId td').each(function() {
+                 var cellText = $(this).text();
+                 if (cellText.includes('$')) {
+                     // Remover el símbolo "$"
+                     $(this).text(cellText.replace('$', ''));
+                 }
+             });
+
+             // Formatea la fecha como DD-MM-YYYY
+             const formattedDate = new Date().toLocaleDateString('es-ES', {
+                 day: '2-digit',
+                 month: '2-digit',
+                 year: 'numeric'
+             });
+
+             // Obtener el nombre de usuario de los datos de la tabla
+
+             const username = $('#userInfo').data('username');
+             const selectedYear4 = $('#userInfo').data('year');
+
+             // Convertir el nombre de usuario a mayúsculas
+             const capitalizedUsername = username.toUpperCase();
+
+             // Concatenar el nombre del usuario y la fecha al nombre del archivo
+             var filename = "general-report-budget-" + capitalizedUsername + "-" + selectedYear4 + "-" +
+                 formattedDate;
+
+             // Exportar la tabla a Excel
              $("#tableId").table2excel({
                  exclude: ".no-export",
                  name: "Worksheet Name",
-                 filename: "general-report-budget"
+                 filename: filename
              });
 
              // Después de exportar a Excel, dispara el evento para enviar por correo
              Livewire.emit('sendEmailWithExcel');
          });
-
 
          Livewire.on('emailSent', function() {
              // Lógica para manejar el evento de correo enviado
@@ -379,6 +413,10 @@
          });
      });
  </script>
+
+
+
+
  <script>
      document.addEventListener('livewire:load', function() {
          Livewire.on('initializeFlatpickr2', function() {

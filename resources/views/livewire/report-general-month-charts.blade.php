@@ -158,7 +158,7 @@
                              var dataBar = {
                                  labels: [
                                      @foreach ($operationsFetchMonths as $item)
-                                         "{{ Str::words($item->operation_description, 2, '...') }}",
+                                         "{{ Str::words($item->category_title, 2, '...') }}",
                                      @endforeach
                                  ],
 
@@ -173,7 +173,7 @@
                              @foreach ($operationsFetchMonths as $item)
                                  // Determine the amount based on the condition
                                  var amount =
-                                     {{ $SelectMainCurrencyTypeRender === 'USD' ? $item->operation_currency_total : $item->operation_amount }};
+                                     {{ $SelectMainCurrencyTypeRender === 'USD' ? $item->total_currency : $item->total_amount }};
 
                                  // Add the amount to the data array
                                  dataBar.datasets[0].data.push(amount);
@@ -252,7 +252,9 @@
                                      $totalCategory = 0;
                                      foreach ($operationsFetchMonths as $operationItem) {
                                          if ($operationItem->main_category_id == $item->id) {
-                                             $totalCategory += $operationItem->operation_currency_total;
+                                             $totalCategory += $operationItem->total_currency;
+                                         } else {
+                                             $totalCategory += $operationItem->total_amount;
                                          }
                                      }
                                      $totalCategories[$item->id] = $totalCategory;
@@ -313,9 +315,9 @@
                              @foreach ($operationsFetchMonths as $item)
 
                                  @if ($SelectMainCurrencyTypeRender && $SelectMainCurrencyTypeRender === 'USD')
-                                     amount = {{ $item->operation_currency_total }};
+                                     amount = {{ $item->total_currency }};
                                  @else
-                                     amount = {{ $item->operation_amount }};
+                                     amount = {{ $item->total_amount }};
                                  @endif
 
                                  @if ($item->main_category_id == 1)
@@ -456,7 +458,7 @@
                                      $totalCategory = 0;
                                      foreach ($operationsFetchMonths as $operationItem) {
                                          // Determine the amount based on the condition
-                                         $amount = $SelectMainCurrencyTypeRender === 'USD' ? $operationItem->operation_currency_total : $operationItem->operation_amount;
+                                         $amount = $SelectMainCurrencyTypeRender === 'USD' ? $operationItem->total_currency : $operationItem->total_amount;
 
                                          if ($operationItem->main_category_id == $item->id) {
                                              $totalCategory += $amount;
@@ -543,12 +545,12 @@
                              var topTenOperations = @json($this->topTenOperations);
 
                              // Limita la longitud de las descripciones a 2 palabras
-                             var labels = topTenOperations.map(item => limitWords(item.operation_description, 2));
+                             var labels = topTenOperations.map(item => limitWords(item.category_title, 2));
 
                              var data = topTenOperations.map(function(item) {
                                  // Determinar la cantidad según la condición
                                  var amount =
-                                     {{ $SelectMainCurrencyTypeRender === 'USD' ? 'item.operation_currency_total' : 'item.operation_amount' }};
+                                     {{ $SelectMainCurrencyTypeRender === 'USD' ? 'item.total_currency' : 'item.total_amount' }};
                                  return amount;
                              });
 

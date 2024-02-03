@@ -116,9 +116,6 @@ private function updateMonthDataInternal()
 {
     $this->userNameSelected4 = User::find($this->selectedUser4);
     $this->operationsFetchMonths = $this->fetchMonthData();
-    
-    $this->totalMonthAmount = $this->fetchTotalMonthAmount(); 
-    $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
 
     $this->showChart4 = true;
 
@@ -137,23 +134,10 @@ $this->report_date =  $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY
 
 
 
-private function fetchTotalMonthAmountCurrency()
-{
-    return $this->operationsFetchMonths->sum('operation_currency_total');
-}
-
-private function fetchTotalMonthAmount()
-{
-    return $this->fetchTotalMonthAmountCurrency();
-}
-
 private function buildBaseQuery()
 {
     return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
-        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id');
+        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id');
 }
 
 private function applyFiltersToQuery($query)
@@ -182,12 +166,60 @@ private function applyFiltersToQuery($query)
         $query->where('main_categories.id', $this->main_category_id);
     }
 
-     // Apply currency type filter if SelectMainCurrencyTypeRender is set and not 'USD'
+    // Apply currency type filter if SelectMainCurrencyTypeRender is set and not 'USD'
     if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
         $query->where('operations.operation_currency_type', $this->SelectMainCurrencyTypeRender);
     }
+
     return $query;
 }
+
+private function fetchData($limit = null)
+{
+    $query = $this->buildBaseQuery();
+    $query = $this->applyFiltersToQuery($query);
+
+    $this->budget = $this->fetchBudgetData();
+    $this->budgetData = $this->fetchBudgetDataString();
+
+    $query->select(
+        'categories.category_name as category_title',
+        'main_categories.title as main_category_title',
+        'categories.main_category_id as main_category_id'
+    );
+
+    if ($this->SelectMainCurrencyTypeRender === 'USD') {
+        $query->selectRaw('SUM(operations.operation_currency_total) as total_currency');
+    } else {
+        $query->selectRaw('SUM(operations.operation_amount) as total_amount');
+    }
+
+    $query->groupBy('categories.category_name', 'main_categories.title', 'categories.main_category_id');
+
+    if ($limit !== null) {
+        if ($this->SelectMainCurrencyTypeRender === 'USD') {
+            $query->orderBy('total_currency', 'desc')->limit($limit);
+        } else {
+            $query->orderBy('total_amount', 'desc')->limit($limit);
+        }
+    }
+
+    return $query->get();
+}
+
+
+
+private function fetchMonthData()
+{
+    return $this->fetchData();
+}
+
+private function fetchTopOperations($limit)
+{
+    return $this->fetchData($limit);
+}
+
+
 
 private function fetchBudgetData()
 {
@@ -213,60 +245,6 @@ private function fetchBudgetDataString()
     }
 
     return 'Budget N/A';
-}
-
-
-private function fetchMonthData()
-{
-    $query = $this->buildBaseQuery();
-    $query = $this->applyFiltersToQuery($query);
-
-    $this->budget = $this->fetchBudgetData();
-    $this->budgetData = $this->fetchBudgetDataString();
-
-    return $query->select(
-         'operations.operation_amount',
-            'operations.operation_currency',
-            'operations.operation_currency_total',
-            'categories.category_name as category_title',
-            'statu_options.status_description as status_description',
-            'operations.operation_status as operation_status',
-            'operations.operation_description',
-            'operations.operation_date',
-            'operations.operation_currency_type',
-            'main_categories.title as main_category_title',
-            'subcategories.subcategory_name',
-             'categories.main_category_id as main_category_id', 
-    )
-    ->orderBy('operations.id', 'desc')
-    ->get();
-}
-
-private function fetchTopOperations($limit)
-{
-    $query = $this->buildBaseQuery();
-    $query = $this->applyFiltersToQuery($query);
-
-    $this->budget = $this->fetchBudgetData();
-    $this->budgetData = $this->fetchBudgetDataString();
-    
-    return $query->select(
-         'operations.operation_amount',
-            'operations.operation_currency',
-            'operations.operation_currency_total',
-            'categories.category_name as category_title',
-            'statu_options.status_description as status_description',
-            'operations.operation_status as operation_status',
-            'operations.operation_description',
-            'operations.operation_date',
-            'operations.operation_currency_type',
-            'main_categories.title as main_category_title',
-            'subcategories.subcategory_name',
-             'categories.main_category_id as main_category_id', 
-    )
-    ->orderBy('operations.operation_currency_total', 'desc')
-    ->limit($limit)
-    ->get();
 }
 
 

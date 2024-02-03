@@ -54,6 +54,8 @@ public $showData = true;
 public $data;
 public $user_selected;
 
+public $selectedCurrencyFromARS;
+
  protected $rules = [
         'user_selected' => 'required', 
     ];
@@ -296,7 +298,9 @@ public function updateDataExpenseOperations()
         $this->fetchData();
 
         if ($this->selectedCurrencyFrom === 'Blue-ARS' && isset($this->data2['blue']['value_sell'])) {
-        $this->operation_currency = $this->data2['blue']['value_sell'];
+        $formattedCurrency = number_format($this->data2['blue']['value_sell'], 2, ',', '.');
+        $this->operation_currency = $formattedCurrency;
+
         $this->operation_currency_type = $this->selectedCurrencyFrom;
     } else {
         // Realiza la solicitud HTTP para obtener la tasa de cambio de USD a la moneda seleccionada
@@ -333,7 +337,8 @@ public function updateDataExpenseOperations()
     }
       // Emitir evento para reiniciar los valores
     $this->emit('currencyChanged');
-    
+    $this->emit('modalOpenedAutonumeric3'); 
+    $this->selectedCurrencyFromARS = $this->selectedCurrencyFrom === 'Blue-ARS' ? 'ARS' : $this->selectedCurrencyFrom; 
 }
 
 
@@ -341,11 +346,10 @@ public function updateDataExpenseOperations()
 // CALCULATE CURRENCY
 public function updatedOperationAmount()
 {
-    // Reemplaza comas por nada para manejar el formato con comas
-    $cleanedValue = str_replace(',', '', $this->operation_amount);
-
+     // Reemplaza comas por nada para manejar el formato con comas
+  $cleanedValue = str_replace([',', '.'], '', $this->operation_amount);
     // Reemplaza el espacio por nada para manejar el formato con espacios
-    $cleanedCurrency = str_replace(' ', '', $this->operation_currency);
+  $cleanedCurrency = preg_replace('/[\s,\.]/', '', $this->operation_currency);
 
     // Verifica si el valor es un número
     if (is_numeric($cleanedValue) && is_numeric($cleanedCurrency) && $cleanedCurrency != 0) {
@@ -356,11 +360,11 @@ public function updatedOperationAmount()
         if ($result < 1) {
             $this->operation_currency_total = number_format($result, 2, '.', '');
         } else {
-            $this->operation_currency_total = number_format($result);
+            $this->operation_currency_total = number_format($result, 2, ',', '.');
         }
     } else {
       
-        $this->operation_currency_total = $cleanedValue; // O cualquier otro valor predeterminado
+        $this->operation_currency_total = number_format(floatval($cleanedValue) / 100, 2, ',', '.');// O cualquier otro valor predeterminado
     }
 }
 
@@ -387,6 +391,7 @@ public function updatedOperationAmount()
     {
         $this->isOpen = true;
         $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
+        $this->emit('modalOpenedAutonumeric3'); 
         $this->fetchDataCurrencies();
         
     }
@@ -429,7 +434,7 @@ public function edit($id)
         ->findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
-        $this->operation_amount = number_format($list->operation_amount, 0, '.', ',');
+       $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
         $this->operation_currency = $list->operation_currency;
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
         $this->operation_status = $list->operation_status;
@@ -515,13 +520,25 @@ if (empty($this->operation_date)) {
     $validatedData['operation_year'] = $operationDate->format('Y');
 
     // Elimina cualquier carácter no numérico, como comas y puntos
-    $numericValue = str_replace(['.', ','], '', $validatedData['operation_amount']);
-    $numericValue2 = str_replace(['.', ','], '', $validatedData['operation_currency_total']);
+    $numericValue = str_replace([',', '.'], '', $validatedData['operation_amount']);
+    $numericValue2 = str_replace([',', '.'], '', $validatedData['operation_currency_total']);
+    $numericValue3 = preg_replace('/[\s,\.]/', '', $validatedData['operation_currency']);
+
+    // Divide los valores por 100 y formatea con dos decimales
+    $formattedValue = number_format($numericValue / 100, 2, '.', '');
+    $formattedValue2 = number_format($numericValue2 / 100, 2, '.', '');
     
+    if (is_numeric($numericValue3)) {
+    $formattedValue3 = number_format(floatval($numericValue3) / 100, 2, ',', '.');
+    } else {
+    $formattedValue3 = $validatedData['operation_currency'];
+    }
 
     // Asigna la cadena, sin convertirla a un entero
-    $validatedData['operation_amount'] = $numericValue;
-    $validatedData['operation_currency_total'] = $numericValue2;  
+    $validatedData['operation_amount'] = $formattedValue;
+    $validatedData['operation_currency_total'] = $formattedValue2;
+    $validatedData['operation_currency'] = $formattedValue3;
+   
 
     // SEND UPDATE USER  RENDER
     $this->selectedUser8 = $validatedData['user_id']; 

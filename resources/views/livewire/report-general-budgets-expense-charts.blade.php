@@ -114,7 +114,7 @@
                              $data = [];
 
                              foreach ($operationsFetchMonths as $item) {
-                                 $amount = $SelectMainCurrencyTypeRender === 'USD' ? $item->operation_currency_total : $item->operation_amount;
+                                 $amount = $SelectMainCurrencyTypeRender === 'USD' ? $item->total_currency : $item->total_amount;
 
                                  $data[] = $amount;
                              }
@@ -125,7 +125,7 @@
                              var dataBar = {
                                  labels: [
                                      @foreach ($operationsFetchMonths as $item)
-                                         "{{ Str::words($item->operation_description, 2, '...') }}",
+                                         "{{ Str::words($item->category_title, 2, '...') }}",
                                      @endforeach
                                  ],
                                  datasets: [{
@@ -222,12 +222,12 @@
                              var topTenBudgetExpenses = @json($this->topTenBudgetExpenses);
 
                              // Limita la longitud de las descripciones a 2 palabras
-                             var labels = topTenBudgetExpenses.map(item => limitWords(item.operation_description, 2));
+                             var labels = topTenBudgetExpenses.map(item => limitWords(item.category_title, 2));
 
                              var data = topTenBudgetExpenses.map(function(item) {
                                  // Determinar la cantidad según la condición
                                  var amount =
-                                     {{ $SelectMainCurrencyTypeRender === 'USD' ? 'item.operation_currency_total' : 'item.operation_amount' }};
+                                     {{ $SelectMainCurrencyTypeRender === 'USD' ? 'item.total_currency' : 'item.total_amount' }};
                                  return amount;
                              });
                              var ctx = document.getElementById('topTenChartBudgetExpenses').getContext('2d');
@@ -306,9 +306,9 @@
 
 
                                  @if ($SelectMainCurrencyTypeRender && $SelectMainCurrencyTypeRender === 'USD')
-                                     totalMonthlyExpenses += {{ $item->operation_currency_total }};
+                                     totalMonthlyExpenses += {{ $item->total_currency }};
                                  @else
-                                     totalMonthlyExpenses += {{ $item->operation_amount }};
+                                     totalMonthlyExpenses += {{ $item->total_amount }};
                                  @endif
                              @endforeach
 
@@ -391,7 +391,25 @@
                              });
                          </script>
 
+                         <div class="mt-10">
+                             <p class="text-xs font-bold text-center text-blue-500 capitalize   dark:text-gray-400 ">
+                                 @if ($userNameSelected5)
+                                 @else
+                                     Please select a user -
+                                 @endif
 
+                                 @if ($selectedMonthName2)
+                                 @else
+                                     Please select a month
+                                 @endif
+
+                                 @if ($selectedYear4)
+                                 @else
+                                     - Please select a year
+                                 @endif
+
+                             </p>
+                         </div>
                      </div>
                  </div>
 

@@ -45,6 +45,8 @@
                         <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
                             autocomplete="off" />
                     </div>
+                    <!-- resources/views/tu-vista.blade.php -->
+
 
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
@@ -80,17 +82,21 @@
                                                 </td>
                                             @endif
                                             <td class="px-4 py-3 text-xs">
-                                                {{ number_format($item->budget_operation, 0, '.', ',') }}
+                                                {{ number_format($item->budget_operation, 2, '.', ',') }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->budget_currency_type }}
+                                                {{ $item->budget_currency_type === 'Blue-ARS' ? 'ARS' : $item->budget_currency_type }}
+
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->budget_currency }}
+
+                                                {{ is_numeric($item->budget_currency) ? number_format($item->budget_currency, 2, '.', ',') : $item->budget_currency }}
+
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->budget_currency_total < 1 ? $item->budget_currency_total : number_format($item->budget_currency_total) }}
+                                                {{ number_format($item->budget_currency_total, 2, '.', ',') }}
+
                                                 $
 
                                             </td>
@@ -228,7 +234,7 @@
                                                                 wire:change="showSelectedCurrency"
                                                                 id="selectedCurrencyFrom" style="width: 100%;">
                                                                 <option value="">Select Option</option>
-                                                                <option value="Blue-ARS">Argentine Peso (Blue-ARS)
+                                                                <option value="Blue-ARS">Argentine Peso (ARS)
                                                                 </option>
                                                                 @if ($listCurrencies)
                                                                     @foreach ($listCurrencies['currencies'] as $codigo => $nombre)
@@ -253,8 +259,8 @@
 
 
                                                         <div class="flex items-center relative">
-                                                            <input type="text" autocomplete="off"
-                                                                id="operation_amount" wire:model="budget_operation"
+                                                            <input type="text" autocomplete="off" id="montoInput"
+                                                                wire:model="budget_operation"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8"
                                                                 placeholder="Enter Budget Operation">
 
@@ -441,6 +447,16 @@
                 }
             });
 
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        Livewire.on('modalOpenedAutonumeric', function() {
+            $('#montoInput').mask('#.##0,00', {
+                reverse: true
+            });
         });
     });
 </script>

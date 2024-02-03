@@ -161,7 +161,13 @@
                      </div>
                  </div>
              @endif
+             <!-- VARIABLES for EXPORT EXCEL -->
+             <span id="userInfo4" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
+                 data-username="{{ $userNameSelected4 ? $userNameSelected4->name : '' }}"
+                 data-year="{{ $selectedYear5 ? $selectedYear5 : '' }}" data-month="{{ $selectedMonthName }}">
 
+             </span>
+             <!-- END VARIABLES for EXPORT EXCEL -->
              <!-- Tables -->
              <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                  <div class="w-full overflow-x-auto">
@@ -291,7 +297,7 @@
                                          {{ Str::words($item->subcategory_name, 2) ?: 'N/A' }}
                                      </td>
                                      <td class="px-4 py-3 text-center">
-                                         {{ Str::words($item->operation_description, 1, '...') }}
+                                         {{ Str::words($item->operation_description, 3, '...') }}
                                      </td>
                                      <td class="px-4 py-3 text-center">
                                          {{ $selectedMonthName }}
@@ -306,14 +312,15 @@
                                      </td>
                                      <td class="px-4 py-3 text-center">
 
-                                         {{ number_format($item->operation_amount, 0, '.', ',') }}
+                                         {{ number_format($item->operation_amount, 2, '.', ',') }}
                                      </td>
                                      <td class="px-4 py-3 text-center">
 
-                                         {{ $item->operation_currency }}
+                                         {{ is_numeric($item->operation_currency) ? number_format($item->operation_currency, 2, '.', ',') : $item->operation_currency }}
                                      </td>
                                      <td class="px-4 py-3 text-center">
-                                         {{ $item->operation_currency_total < 1 ? $item->operation_currency_total : number_format($item->operation_currency_total) }}
+                                         {{ number_format($item->operation_currency_total, 2, '.', ',') }}
+
                                          $</td>
                                      <td class="px-4 py-3 text-center">
                                          @if ($item->operation_status == '1')
@@ -352,7 +359,7 @@
 
                                  <td class="px-4 py-3 text-center font-semibold">
                                      @if ($currencyType !== 'USD')
-                                         {{ number_format($totalMonthAmount, 0, '.', ',') }}
+                                         {{ number_format($totalMonthAmount, 2, '.', ',') }}
                                          {{ $currencyType }}
                                      @endif
                                  </td>
@@ -361,7 +368,7 @@
                                  </td>
 
                                  <td class="px-4 py-3 text-center font-semibold">
-                                     {{ number_format($totalMonthAmountCurrency, 0, '.', ',') }}
+                                     {{ number_format($totalMonthAmountCurrency, 2, '.', ',') }}
                                      $
                                  </td>
                                  <td class="px-4 py-3 text-center">
@@ -374,20 +381,49 @@
              </div>
          @endif
      </div>
+
      <script>
          document.addEventListener('livewire:load', function() {
 
              Livewire.on('exportTableToExcel6', function() {
                  // Lógica para exportar la tabla a Excel (usando table2excel o la biblioteca de tu elección)
 
-                 // Por ejemplo:
+                 // Quitar el símbolo "$" antes de exportar
+                 $('#tableId6 td').each(function() {
+                     var cellText = $(this).text();
+                     if (cellText.includes('$')) {
+                         // Remover el símbolo "$"
+                         $(this).text(cellText.replace('$', ''));
+                     }
+                 });
+
+                 // Formatea la fecha como DD-MM-YYYY
+                 const formattedDate = new Date().toLocaleDateString('es-ES', {
+                     day: '2-digit',
+                     month: '2-digit',
+                     year: 'numeric'
+                 });
+
+                 // Obtener el nombre de usuario de los datos de la tabla
+                 const username = $('#userInfo4').data('username');
+                 const selectedYear5 = $('#userInfo4').data('year');
+                 const selectedMonthName = $('#userInfo4').data('month') ?? '';
+
+                 // Convertir el nombre de usuario a mayúsculas
+                 const capitalizedUsername = username.toUpperCase();
+
+                 // Concatenar el nombre del usuario y la fecha al nombre del archivo
+                 var filename = "monthly-expense-report-" + capitalizedUsername + "-" + selectedMonthName +
+                     "-" +
+                     selectedYear5 + "-" +
+                     formattedDate;
+
+                 // Exportar la tabla a Excel
                  $("#tableId6").table2excel({
                      exclude: ".no-export",
                      name: "Worksheet Name",
-                     filename: "budget-month-report"
+                     filename: filename
                  });
-
-
              });
 
              Livewire.on('emailSent4', function() {
@@ -396,6 +432,7 @@
              });
          });
      </script>
+
 
 
 

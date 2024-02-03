@@ -9,9 +9,6 @@
            <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
                <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
 
-
-
-
                    <div wire:ignore>
                        <select id="selectUser2" style="width: 100%" wire:model="selectedUser2"
                            wire:change="updateCategoriesData" wire:ignore>
@@ -180,7 +177,14 @@
                        </div>
                    </div>
                @endif
+               <!-- VARIABLES for EXPORT EXCEL -->
+               <span id="userInfo2" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
+                   data-username="{{ $userNameSelected2 ? $userNameSelected2->name : '' }}"
+                   data-year="{{ $selectedYear2 ? $selectedYear2 : '' }}"
+                   data-category-name="{{ isset($categoryNameSelected->category_name) ? $categoryNameSelected->category_name : '' }}">
 
+               </span>
+               <!-- END VARIABLES for EXPORT EXCEL -->
                <!-- Tables -->
                <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                    <div class="w-full overflow-x-auto">
@@ -250,7 +254,7 @@
                                        </td>
 
                                        <td class="px-4 py-3 text-center">
-                                           {{ number_format($ArrayCategories[$i]['totalCurrency'], 0, '.', ',') }}
+                                           {{ number_format($ArrayCategories[$i]['totalCurrency'], 2, '.', ',') }}
                                            {{ $currencyType }}
                                        </td>
                                    </tr>
@@ -265,7 +269,7 @@
 
 
                                    <td class="px-4 py-3 text-center font-semibold">
-                                       {{ number_format($totalCategoriesRenderCurrency, 0, '.', ',') }}
+                                       {{ number_format($totalCategoriesRenderCurrency, 2, '.', ',') }}
                                        {{ $currencyType }}
 
                                    </td>
@@ -279,25 +283,48 @@
            @endif
        </div>
    </div>
-
    <script>
        document.addEventListener('livewire:load', function() {
-
-
            Livewire.on('exportTableToExcel2', function() {
                // Lógica para exportar la tabla a Excel (usando table2excel o la biblioteca de tu elección)
 
-               // Por ejemplo:
+               // Quitar el símbolo "$" antes de exportar
+               $('#tableId2 td').each(function() {
+                   var cellText = $(this).text();
+                   if (cellText.includes('$')) {
+                       // Remover el símbolo "$"
+                       $(this).text(cellText.replace('$', ''));
+                   }
+               });
+
+               // Obtener el nombre de usuario de los datos de la tabla
+               const username = $('#userInfo2').data('username');
+               const selectedYear2 = $('#userInfo2').data('year');
+               const categoryNameSelected = $('#userInfo2').data('category-name') ?? '';
+
+
+               // Formatear la fecha como DD-MM-YYYY
+               const formattedDate = new Date().toLocaleDateString('es-ES', {
+                   day: '2-digit',
+                   month: '2-digit',
+                   year: 'numeric'
+               });
+
+               // Concatenar el nombre del usuario y la fecha al nombre del archivo
+               var filename = "categories-report-" + username.toUpperCase() + "-" + categoryNameSelected +
+                   "-" + selectedYear2 +
+                   "-" + formattedDate;
+
+               // Exportar la tabla a Excel
                $("#tableId2").table2excel({
                    exclude: ".no-export",
                    name: "Worksheet Name",
-                   filename: "categories-report"
+                   filename: filename
                });
 
                // Después de exportar a Excel, dispara el evento para enviar por correo
                Livewire.emit('sendEmailWithExcel2');
            });
-
 
            Livewire.on('emailSent2', function() {
                // Lógica para manejar el evento de correo enviado

@@ -25,6 +25,8 @@ public $selectedCurrencyFrom;
 public $listCurrencies;
 public $quotes;
 
+public $selectedCurrencyFromARS;
+
 use WithPagination;
 
 public function authorize()
@@ -109,8 +111,12 @@ public function fetchDataCurrencies()
         $this->fetchData();
 
         if ($this->selectedCurrencyFrom === 'Blue-ARS' && isset($this->data2['blue']['value_sell'])) {
-        $this->budget_currency = $this->data2['blue']['value_sell'];
+             // Obtén el valor de $this->data2['blue']['value_sell'] y formatea como cadena con coma y punto
+        $formattedCurrency = number_format($this->data2['blue']['value_sell'], 2, ',', '.');
+        $this->budget_currency = $formattedCurrency;
+      
         $this->budget_currency_type = $this->selectedCurrencyFrom;
+       
     } else {
         // Realiza la solicitud HTTP para obtener la tasa de cambio de USD a la moneda seleccionada
         $response = Http::get('http://api.currencylayer.com/live', [
@@ -147,34 +153,35 @@ public function fetchDataCurrencies()
     }
       // Emitir evento para reiniciar los valores
     $this->emit('currencyChanged');
-    
+            $this->selectedCurrencyFromARS = $this->selectedCurrencyFrom === 'Blue-ARS' ? 'ARS' : $this->selectedCurrencyFrom; 
 }
 
 
 // CALCULATE CURRENCY
 public function updatedBudgetOperation()
 {
-    // Reemplaza comas por nada para manejar el formato con comas
-    $cleanedValue = str_replace(',', '', $this->budget_operation);
-
-    // Reemplaza el espacio por nada para manejar el formato con espacios
-    $cleanedCurrency = str_replace(' ', '', $this->budget_currency);
+    // Reemplaza comas por nada y puntos por nada para manejar el formato con comas y puntos
+    $cleanedValue = str_replace([',', '.'], '', $this->budget_operation);
+   $cleanedCurrency = preg_replace('/[\s,\.]/', '', $this->budget_currency);
 
     // Verifica si el valor es un número
     if (is_numeric($cleanedValue) && is_numeric($cleanedCurrency) && $cleanedCurrency != 0) {
-        // Realiza la operación de división y redondeo después de la división
+        // Realiza la operación de multiplicación y redondeo después de la multiplicación
         $result = $cleanedValue / $cleanedCurrency;
 
-        // Aplica la condición: si el resultado es menor a 1, lo deja así, de lo contrario, lo redondea
+       // Aplica la condición: si el resultado es menor a 1, lo deja así, de lo contrario, lo redondea
         if ($result < 1) {
             $this->budget_currency_total = number_format($result, 2, '.', '');
+            
         } else {
-            $this->budget_currency_total = number_format($result);
+           $this->budget_currency_total = number_format($result, 2, ',', '.');
+          
         }
     } else {
-        $this->budget_currency_total = $cleanedValue; // O cualquier otro valor predeterminado
+        $this->budget_currency_total = number_format(floatval($cleanedValue) / 100, 2, ',', '.');// O cualquier otro valor predeterminado
     }
 }
+
 
 
 
@@ -200,6 +207,7 @@ public function updatedBudgetOperation()
     {
         $this->isOpen = true;
         $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
+         $this->emit('modalOpenedAutonumeric'); 
         $this->fetchDataCurrencies();
          $this->updatedBudgetOperation();
     }
@@ -228,7 +236,7 @@ public function updatedBudgetOperation()
 
     $this->data_id = $id;
     $this->budget_currency_type = $list->budget_currency_type;
-    $this->budget_operation = number_format($list->budget_operation, 0, '.', ',');
+    $this->budget_operation = number_format($list->budget_operation, 2, '.', ',');
     $this->budget_currency = $list->budget_currency;
     $this->budget_currency_total = number_format($list->budget_currency_total, 2, '.', ',');
     $this->selectedCurrencyFrom = $list->budget_currency_type;
@@ -299,15 +307,26 @@ if (empty($fechaRecibida)) {
     $validatedData['budget_month'] = $operationDate->format('m');
     $validatedData['budget_year'] = $operationDate->format('Y');
 
-    // Elimina cualquier carácter no numérico, como comas y puntos
-    $numericValue = str_replace(['.', ','], '', $validatedData['budget_operation']);
-    $numericValue2 = str_replace(['.', ','], '', $validatedData['budget_currency_total']);
+   // Elimina cualquier carácter no numérico, como comas y puntos
+    $numericValue = str_replace([',', '.'], '', $validatedData['budget_operation']);
+    $numericValue2 = str_replace([',', '.'], '', $validatedData['budget_currency_total']);
+    $numericValue3 = preg_replace('/[\s,\.]/', '', $validatedData['budget_currency']);
+
+    // Divide los valores por 100 y formatea con dos decimales
+    $formattedValue = number_format($numericValue / 100, 2, '.', '');
+    $formattedValue2 = number_format($numericValue2 / 100, 2, '.', '');
+     if (is_numeric($numericValue3)) {
+    $formattedValue3 = number_format(floatval($numericValue3) / 100, 2, ',', '.');
+    } else {
+    $formattedValue3 = $validatedData['budget_currency'];
+    }
+
+
+    // Asigna las cadenas formateadas
+    $validatedData['budget_operation'] = $formattedValue;
+    $validatedData['budget_currency_total'] = $formattedValue2;
+    $validatedData['budget_currency'] = $formattedValue3;
     
-
-    // Asigna la cadena, sin convertirla a un entero
-    $validatedData['budget_operation'] = $numericValue;
-    $validatedData['budget_currency_total'] = $numericValue2;
-
     $model = Budget::updateOrCreate(['id' => $this->data_id], $validatedData);
 
     session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');

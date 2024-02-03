@@ -42,10 +42,7 @@ class ReportGeneralBudgetsExpenseCharts extends Component
     public function userSelectedChart6($userId)
     {
        
-         $this->mainCurrencyTypeRender = Operation::where('user_id', $userId)
-    ->where('operation_currency_type', '!=', 'USD')
-    ->distinct()
-    ->pluck('operation_currency_type');
+        
 
         $this->selectedUser6 = $userId;
         $this->updateBudgetExpenseData();
@@ -105,15 +102,14 @@ public function months()
 public function updateBudgetExpenseData()
 {
     $this->updateBudgetExpenseDataInternal();
-    $this->topTenBudgetExpenses = $this->fetchTopTenBudgetExpenses();
+    $this->topTenBudgetExpenses = $this->fetchTopTenBudgetExpenses(10);
 }
 
 private function updateBudgetExpenseDataInternal()
 {
     $this->userNameSelected5 = User::find($this->selectedUser6);
     $this->operationsFetchMonths = $this->fetchMonthData();
-    $this->totalMonthAmount = $this->fetchTotalMonthAmount(); 
-    $this->totalMonthAmountCurrency = $this->fetchTotalMonthAmountCurrency(); 
+   
     $this->showChart6 = true;
 
     if ($this->selectedMonth2) {
@@ -146,83 +142,94 @@ if ($this->budget) {
 
 }
 
-private function fetchTotalMonthAmountCurrency()
+
+private function buildBaseQuery()
 {
-    return $this->operationsFetchMonths->sum('operation_currency_total');
+    return Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses']) 
+        ->join('categories', 'operations.category_id', '=', 'categories.id')
+        ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
+        ->where('main_categories.id', 2)
+        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
+        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
+        ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
+        ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
+        ->leftJoin('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id');
 }
 
-private function fetchTotalMonthAmount()
+private function applyFiltersToQuery($query)
 {
-    return $this->operationsFetchMonths->sum('operation_amount');
+    if ($this->selectedUser6) {
+        $query->where('operations.user_id', $this->selectedUser6);
+    }
+
+    if ($this->selectedMonth2) {
+        $query->whereMonth('operations.operation_date', $this->selectedMonth2);
+    }
+
+    if ($this->selectedYear4) {
+        $query->whereYear('operations.operation_date', $this->selectedYear4);
+    }
+
+    
+    // Apply currency type filter if SelectMainCurrencyTypeRender is set and not 'USD'
+    if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !== 'USD') {
+        $query->where('operations.operation_currency_type', $this->SelectMainCurrencyTypeRender);
+    }
+
+    return $query;
+}
+
+private function fetchData($limit = null)
+{
+    $query = $this->buildBaseQuery();
+    $query = $this->applyFiltersToQuery($query);
+
+    $this->mainCurrencyTypeRender = $this->buildBaseQuery()
+        ->where('operations.user_id', $this->selectedUser6)
+        ->where('operations.operation_currency_type', '!=', 'USD')
+        ->distinct()
+        ->pluck('operations.operation_currency_type');
+
+
+    $query->select(
+        'categories.category_name as category_title',
+        'main_categories.title as main_category_title',
+        'categories.main_category_id as main_category_id'
+    );
+
+    if ($this->SelectMainCurrencyTypeRender === 'USD') {
+        $query->selectRaw('SUM(operations.operation_currency_total) as total_currency');
+    } else {
+        $query->selectRaw('SUM(operations.operation_amount) as total_amount');
+    }
+
+    $query->groupBy('categories.category_name', 'main_categories.title', 'categories.main_category_id');
+
+    if ($limit !== null) {
+        if ($this->SelectMainCurrencyTypeRender === 'USD') {
+            $query->orderBy('total_currency', 'desc')->limit($limit);
+        } else {
+            $query->orderBy('total_amount', 'desc')->limit($limit);
+        }
+    }
+
+    return $query->get();
 }
 
 private function fetchMonthData()
 {
-    $query = $this->buildOperationQuery();
-    return $this->executeOperationQuery($query);
+    return $this->fetchData();
+}
+
+private function fetchTopTenBudgetExpenses($limit)
+{
+    return $this->fetchData($limit);
 }
 
 
-private function buildOperationQuery()
-{
-    return Operation::with(['category.mainCategories', 'status', 'operationSubcategories', 'budgetExpenses']) 
-                    ->join('categories', 'operations.category_id', '=', 'categories.id')
-                    ->join('main_categories', 'categories.main_category_id', '=', 'main_categories.id')
-                    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-                    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
-                    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
-                    ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
-                    ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
-                    ->leftJoin('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id')
-                    ->whereHas('category.mainCategories', function ($query) {
-                        $query->where('id', 2); // Utiliza la clave foránea correcta
-                    })
-                    ->when($this->selectedUser6, function ($query, $selectedUser6) {
-                        return $query->where('operations.user_id', $selectedUser6);
-                    })
-                    ->when($this->selectedMonth2, function ($query, $selectedMonth2) {
-                        return $query->whereMonth('operations.operation_date', $selectedMonth2);
-                    })
-                    ->when($this->selectedYear4, function ($query, $selectedYear4) {
-                        return $query->whereYear('operations.operation_date', $selectedYear4);
-                    })
-                    ->when($this->SelectMainCurrencyTypeRender, function ($query, $SelectMainCurrencyTypeRender) {
-                        return $query->where('operations.operation_currency_type', $SelectMainCurrencyTypeRender);
-                    })
-                    ->select(
-                        'operations.operation_amount',
-                        'operations.operation_currency',
-                        'operations.operation_currency_total',
-                        'categories.category_name as category_title',
-                        'statu_options.status_description as status_description',
-                        'operations.operation_status as operation_status',
-                        'operations.operation_description',
-                        'operations.operation_date',
-                        'operations.operation_currency_type',
-                        'main_categories.title as main_category_title',
-                        'subcategories.subcategory_name',
-                        'budgets.budget_operation as budget_operation',
-                        'budget_expenses.budget_id'
-                    )
-                    ->orderBy('operations.id', 'desc');
-            }
 
 
-
-private function executeOperationQuery($query)
-{
-    return $query->get();
-}
-
-
-private function fetchTopTenBudgetExpenses()
-{
-    $query = $this->buildOperationQuery();
-
-    return $query->orderBy('operations.operation_currency_total', 'desc')
-                 ->limit(10)
-                 ->get();
-}
 
 
 public function resetFields6()
