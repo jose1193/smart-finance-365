@@ -150,13 +150,7 @@
                      </div>
                  </div>
              @endif
-             <!-- VARIABLES for EXCEL -->
-             <span id="userInfo" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
-                 data-username="{{ $userNameSelected ? $userNameSelected->name : '' }}"
-                 data-year="{{ $selectedYear4 ? $selectedYear4 : '' }}">
 
-             </span>
-             <!-- END VARIABLES for EXCEL -->
              <!-- Tables -->
              @if ($date_start && $date_end && $date_start > $date_end)
                  <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
@@ -365,16 +359,15 @@
 
  <script>
      document.addEventListener('livewire:load', function() {
-         Livewire.on('exportTableToExcel5', function() {
+         Livewire.on('exportTableToExcel5', function(params) {
              // Lógica para exportar la tabla a Excel (usando table2excel o la biblioteca de tu elección)
 
-             // Quitar el símbolo "$" antes de exportar
+             // Quitar el símbolo "$" y la coma "," antes de exportar
              $('#tableId td').each(function() {
                  var cellText = $(this).text();
-                 if (cellText.includes('$')) {
-                     // Remover el símbolo "$"
-                     $(this).text(cellText.replace('$', ''));
-                 }
+                 // Utilizar una expresión regular para quitar todas las ocurrencias de "$" y ","
+                 var cleanedText = cellText.replace(/[$,]/g, '');
+                 $(this).text(cleanedText);
              });
 
              // Formatea la fecha como DD-MM-YYYY
@@ -385,9 +378,8 @@
              });
 
              // Obtener el nombre de usuario de los datos de la tabla
-
-             const username = $('#userInfo').data('username');
-             const selectedYear4 = $('#userInfo').data('year');
+             const username = params.userName;
+             const selectedYear4 = params.selectedYear4;
 
              // Convertir el nombre de usuario a mayúsculas
              const capitalizedUsername = username.toUpperCase();
@@ -413,8 +405,6 @@
          });
      });
  </script>
-
-
 
 
  <script>

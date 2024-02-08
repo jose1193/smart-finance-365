@@ -218,9 +218,18 @@ private function fetchMonthData()
 {
     // Lógica para exportar la tabla a Excel
 $this->updateMonthData();
-$this->emit('exportTableToExcel4');
+
+    $userName = $this->userNameSelected4->name ?? ''; 
+    $yearSelected = $this->selectedYear3 ?? ''; 
+     $selectedMonthName = $this->selectedMonthName ?? ''; 
 
 
+    // Emitir el evento y pasar las variables como parámetros
+    $this->emit('exportTableToExcel4', [
+        'userName' => $userName,
+        'selectedYear3' => $yearSelected,
+         'selectedMonthName' => $selectedMonthName,
+    ]);
 
 }
 

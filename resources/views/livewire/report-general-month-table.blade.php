@@ -167,13 +167,7 @@
                       </div>
                   </div>
               @endif
-              <!-- VARIABLES for EXPORT EXCEL -->
-              <span id="userInfo3" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
-                  data-username="{{ $userNameSelected4 ? $userNameSelected4->name : '' }}"
-                  data-year="{{ $selectedYear3 ? $selectedYear3 : '' }}" data-month="{{ $selectedMonthName }}">
 
-              </span>
-              <!-- END VARIABLES for EXPORT EXCEL -->
               <!-- Tables -->
               @if ($date_start && $date_end && $date_start > $date_end)
                   <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
@@ -349,8 +343,8 @@
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ number_format($item->operation_currency_total, 2, '.', ',') }}
-
-                                          $ </td>
+                                          $
+                                      </td>
                                       <td class="px-4 py-3 text-center">
                                           @if ($item->operation_status == '1')
                                               <span
@@ -413,18 +407,19 @@
 
       <script>
           document.addEventListener('livewire:load', function() {
-
-              Livewire.on('exportTableToExcel4', function() {
-                  // Lógica para exportar la tabla a Excel (usando table2excel o la biblioteca de tu elección)
-
-                  // Quitar el símbolo "$" antes de exportar
+              Livewire.on('exportTableToExcel4', function(params) {
+                  // Quitar el símbolo "$" y la coma "," antes de exportar
                   $('#tableId4 td').each(function() {
                       var cellText = $(this).text();
-                      if (cellText.includes('$')) {
-                          // Remover el símbolo "$"
-                          $(this).text(cellText.replace('$', ''));
-                      }
+                      // Utilizar una expresión regular para quitar todas las ocurrencias de "$" y ","
+                      var cleanedText = cellText.replace(/[$,]/g, '');
+                      $(this).text(cleanedText);
                   });
+
+                  // Obtener el nombre de usuario de los datos de la tabla
+                  const username = params.userName;
+                  const selectedYear3 = params.selectedYear3;
+                  const selectedMonthName = params.selectedMonthName;
 
                   // Formatea la fecha como DD-MM-YYYY
                   const formattedDate = new Date().toLocaleDateString('es-ES', {
@@ -433,12 +428,6 @@
                       year: 'numeric'
                   });
 
-
-                  // Obtener el nombre de usuario de los datos de la tabla
-                  const username = $('#userInfo3').data('username');
-                  const selectedYear3 = $('#userInfo3').data('year');
-                  const selectedMonthName = $('#userInfo3').data('month') ?? '';
-
                   // Convertir el nombre de usuario a mayúsculas
                   const capitalizedUsername = username.toUpperCase();
 
@@ -446,7 +435,6 @@
                   var filename = "month-report-" + capitalizedUsername + "-" + selectedMonthName + "-" +
                       selectedYear3 + "-" +
                       formattedDate;
-
 
                   // Exportar la tabla a Excel
                   $("#tableId4").table2excel({
@@ -462,6 +450,8 @@
               });
           });
       </script>
+
+
 
 
       <script>

@@ -51,7 +51,7 @@ class ReportGeneralBudgetsTable extends Component
     protected $listeners = ['userSelected5','YearSelected4'];
 
     public $SelectMainCurrencyTypeRender = 'USD';
-
+       
     public function mount() {
         $this->dataSelectBudget();
     }
@@ -210,13 +210,19 @@ private function fetchBudgetData($month)
 
 
 // FUNCIONT TO EXPORT EXCEL
- public function exportToExcel5()
+public function exportToExcel5()
 {
-    // Lógica para exportar la tabla a Excel
+    // Obtener los valores de $userNameSelected->name y $selectedYear4
+    $userName = $this->userNameSelected->name ?? ''; // Asigna '' si $userNameSelected o su propiedad name están vacíos
+    $yearSelected = $this->selectedYear4 ?? ''; // Asigna '' si $selectedYear4 está vacío
 
-    $this->emit('exportTableToExcel5');
+
+    // Emitir el evento y pasar las variables como parámetros
+    $this->emit('exportTableToExcel5', [
+        'userName' => $userName,
+        'selectedYear4' => $yearSelected,
+    ]);
 }
-
 
 
 

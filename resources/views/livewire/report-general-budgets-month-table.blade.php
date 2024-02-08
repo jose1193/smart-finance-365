@@ -161,13 +161,7 @@
                      </div>
                  </div>
              @endif
-             <!-- VARIABLES for EXPORT EXCEL -->
-             <span id="userInfo4" class="text-xs font-bold text-center text-blue-500 capitalize dark:text-gray-400"
-                 data-username="{{ $userNameSelected4 ? $userNameSelected4->name : '' }}"
-                 data-year="{{ $selectedYear5 ? $selectedYear5 : '' }}" data-month="{{ $selectedMonthName }}">
 
-             </span>
-             <!-- END VARIABLES for EXPORT EXCEL -->
              <!-- Tables -->
              <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                  <div class="w-full overflow-x-auto">
@@ -369,7 +363,7 @@
 
                                  <td class="px-4 py-3 text-center font-semibold">
                                      {{ number_format($totalMonthAmountCurrency, 2, '.', ',') }}
-                                     $
+                                     USD
                                  </td>
                                  <td class="px-4 py-3 text-center">
                                  </td>
@@ -385,16 +379,14 @@
      <script>
          document.addEventListener('livewire:load', function() {
 
-             Livewire.on('exportTableToExcel6', function() {
-                 // Lógica para exportar la tabla a Excel (usando table2excel o la biblioteca de tu elección)
+             Livewire.on('exportTableToExcel6', function(params) {
 
-                 // Quitar el símbolo "$" antes de exportar
+                 // Quitar el símbolo "$" y la coma "," antes de exportar
                  $('#tableId6 td').each(function() {
                      var cellText = $(this).text();
-                     if (cellText.includes('$')) {
-                         // Remover el símbolo "$"
-                         $(this).text(cellText.replace('$', ''));
-                     }
+                     // Utilizar una expresión regular para quitar todas las ocurrencias de "$" y ","
+                     var cleanedText = cellText.replace(/[$,]/g, '');
+                     $(this).text(cleanedText);
                  });
 
                  // Formatea la fecha como DD-MM-YYYY
@@ -405,9 +397,9 @@
                  });
 
                  // Obtener el nombre de usuario de los datos de la tabla
-                 const username = $('#userInfo4').data('username');
-                 const selectedYear5 = $('#userInfo4').data('year');
-                 const selectedMonthName = $('#userInfo4').data('month') ?? '';
+                 const username = params.userName;
+                 const selectedYear5 = params.selectedYear5;
+                 const selectedMonthName = params.selectedMonthName;
 
                  // Convertir el nombre de usuario a mayúsculas
                  const capitalizedUsername = username.toUpperCase();

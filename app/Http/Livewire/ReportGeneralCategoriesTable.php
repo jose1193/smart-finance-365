@@ -229,11 +229,20 @@ if ($this->SelectMainCurrencyTypeRender && $this->SelectMainCurrencyTypeRender !
 
 
 // FUNCIONT TO EXPORT EXCEL 2
- public function exportToExcel2()
+
+public function exportToExcel2()
 {
     // Lógica para exportar la tabla a Excel
+    $userName = $this->userNameSelected2->name ?? '';
+    $yearSelected = $this->selectedYear2 ?? '';
+    $categoryNameSelected = $this->categoryNameSelected->category_name ?? '';
 
-    $this->emit('exportTableToExcel2');
+    // Emitir el evento y pasar las variables como parámetros
+    $this->emit('exportTableToExcel2', [
+        'userName' => $userName,
+        'selectedYear2' => $yearSelected,
+        'categoryNameSelected' => $categoryNameSelected,
+    ]);
 }
 
 

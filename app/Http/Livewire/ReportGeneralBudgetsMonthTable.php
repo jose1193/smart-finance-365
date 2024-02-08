@@ -201,7 +201,17 @@ private function fetchMonthData()
 {
     // Lógica para exportar la tabla a Excel
  $this->updateBudgetMonthData();
-    $this->emit('exportTableToExcel6');
+    $userName = $this->userNameSelected4->name ?? ''; 
+    $yearSelected = $this->selectedYear5 ?? ''; 
+     $selectedMonthName = $this->selectedMonthName ?? ''; 
+
+
+    // Emitir el evento y pasar las variables como parámetros
+    $this->emit('exportTableToExcel6', [
+        'userName' => $userName,
+        'selectedYear5' => $yearSelected,
+         'selectedMonthName' => $selectedMonthName,
+    ]);
 }
 
 //FUNCTION RESET FIELDS REPORT GENERAL
