@@ -43,6 +43,8 @@ class ReportGeneralMonthCharts extends Component
 
     protected $listeners = ['userSelected4','MonthSelected','YearSelected3'];
 
+    public $MonthlyChart1,$MonthlyChart2,$MonthlyChart3;
+
     public function userSelected4($userId)
     {
         // Aquí puedes ejecutar la lógica que desees con el $userId
@@ -110,6 +112,9 @@ public function months()
     $this->emit('initializeFlatpickr');
     $this->updateMonthDataInternal();
     $this->topTenOperations = $this->fetchTopOperations(10);
+    $this->MonthlyChart1 = 'MonthChart1-' . uniqid();
+    $this->MonthlyChart2 = 'MonthChart2-' . uniqid();
+    $this->MonthlyChart3 = 'MonthChart3-' . uniqid();
 }
 
 private function updateMonthDataInternal()

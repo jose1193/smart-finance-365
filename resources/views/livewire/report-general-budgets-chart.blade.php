@@ -124,7 +124,7 @@
          @endif
          <div id="content" class="p-2">
              <div id="chart-container5" class="my-5"
-                 wire:key="chart-{{ $selectedUser5 }}-{{ $selectedYear4 }}-{{ uniqid() }}">
+                 wire:key="{{ $GeneralChart1 }},{{ $GeneralChart2 }},{{ $GeneralChart3 }},{{ $GeneralChart4 }},{{ $GeneralChart5 }},{{ $GeneralChart6 }},{{ $GeneralChart7 }},{{ $GeneralChart8 }}">
 
                  <div class="grid gap-6 mb-8 md:grid-cols-2">
 
@@ -137,7 +137,7 @@
                          <!-- Crea un elemento canvas donde se renderizará el gráfico -->
                          <div class="w-full flex flex-wrap items-center px-4 py-2  ">
                              <div class="w-full justify-between flex space-x-7 ">
-                                 <div> <canvas id="myChartIncomeGeneraldoughnut" width="250" height="250"></canvas>
+                                 <div> <canvas id="{{ $GeneralChart1 }}" width="250" height="250"></canvas>
                                  </div>
                                  <div
                                      class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center capitalize border-b bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-700">
@@ -173,7 +173,7 @@
 
                          </div>
                          <script>
-                             var ctx = document.getElementById('myChartIncomeGeneraldoughnut').getContext('2d');
+                             var ctx = document.getElementById('{{ $GeneralChart1 }}').getContext('2d');
                              var incomeData = @json($incomeDataCurrency);
                              var budgetData = @json($budgetDataCurrency);
                              var totalIncome = incomeData.reduce((a, b) => a + b, 0);
@@ -249,11 +249,11 @@
 
                          <div
                              class="border-solid border-2 border-gray-100 rounded mt-10 p-3 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700 ">
-                             <canvas id="myChartIncomeGeneralbar"></canvas>
+                             <canvas id="{{ $GeneralChart2 }}"></canvas>
                          </div>
 
                          <script>
-                             var ctx = document.getElementById('myChartIncomeGeneralbar').getContext('2d');
+                             var ctx = document.getElementById('{{ $GeneralChart2 }}').getContext('2d');
                              var incomeData = @json($incomeDataCurrency);
 
                              var totalIncome = incomeData.reduce((a, b) => a + b, 0);
@@ -341,8 +341,7 @@
                          <!-- Crea un elemento canvas donde se renderizará el gráfico -->
                          <div class="w-full flex flex-wrap items-center px-4 py-2  ">
                              <div class="w-full justify-between flex space-x-7 ">
-                                 <div> <canvas id="myChartExpenseGeneraldoughnut" width="250"
-                                         height="250"></canvas>
+                                 <div> <canvas id="{{ $GeneralChart3 }}" width="250" height="250"></canvas>
                                  </div>
                                  <div
                                      class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center capitalize border-b bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-700">
@@ -379,7 +378,7 @@
                          </div>
 
                          <script>
-                             var ctx = document.getElementById('myChartExpenseGeneraldoughnut').getContext('2d');
+                             var ctx = document.getElementById('{{ $GeneralChart3 }}').getContext('2d');
                              var expenseData = @json($expenseDataCurrency);
                              var budgetData = @json($budgetDataCurrency);
                              var totalExpense = expenseData.reduce((a, b) => a + b, 0);
@@ -454,11 +453,11 @@
 
                          <div
                              class="border-solid border-2 border-gray-100 rounded mt-10 p-3 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700 ">
-                             <canvas id="myChartExpenseGeneralbar"></canvas>
+                             <canvas id="{{ $GeneralChart4 }}"></canvas>
                          </div>
 
                          <script>
-                             var ctx = document.getElementById('myChartExpenseGeneralbar').getContext('2d');
+                             var ctx = document.getElementById('{{ $GeneralChart4 }}').getContext('2d');
                              var expenseData = @json($expenseDataCurrency);
 
                              var totalExpense = expenseData.reduce((a, b) => a + b, 0);
@@ -507,7 +506,7 @@
                                  tooltips: {
                                      callbacks: {
                                          label: function(tooltipItem, data) {
-                                             var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName }}' :
+                                             var label = (tooltipItem.index === 0) ? 'Total {{ $categoryName2 }}' :
                                                  'Total Budget';
                                              var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
                                              var currencyType = '{{ $SelectMainCurrencyTypeRender }}';
@@ -537,10 +536,10 @@
                      <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-5">
 
 
-                         <canvas id="myChartGeneral5" height="200"></canvas>
+                         <canvas id="{{ $GeneralChart5 }}" height="200"></canvas>
 
                          <script>
-                             var ctx = document.getElementById('myChartGeneral5').getContext('2d');
+                             var ctx = document.getElementById('{{ $GeneralChart5 }}').getContext('2d');
 
                              var dataBar = {
                                  labels: [
@@ -627,9 +626,9 @@
                      <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 mb-5">
 
                          <!-- Agrega un elemento canvas para el gráfico -->
-                         <canvas id="myDoughnutChart" class="mt-5"></canvas>
+                         <canvas id="{{ $GeneralChart6 }}" class="mt-5"></canvas>
                          <script>
-                             var ctx = document.getElementById('myDoughnutChart').getContext('2d');
+                             var ctx = document.getElementById('{{ $GeneralChart6 }}').getContext('2d');
                              var incomeData = @json($incomeDataCurrency);
                              var expenseData = @json($expenseDataCurrency);
                              var totalIncome = incomeData.reduce((a, b) => a + b, 0);
@@ -715,7 +714,7 @@
                                  $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
                              @endphp {{ $currencyType }}
                          </h4>
-                         <canvas id="horizontalBarChart" width="400" height="200"></canvas>
+                         <canvas id="{{ $GeneralChart7 }}" width="400" height="200"></canvas>
 
                          <script>
                              var incomeData = @json($incomeTopTen);
@@ -728,7 +727,7 @@
                                  return entry.total_income;
                              });
 
-                             var ctx = document.getElementById('horizontalBarChart').getContext('2d');
+                             var ctx = document.getElementById('{{ $GeneralChart7 }}').getContext('2d');
                              var horizontalBarChart = new Chart(ctx, {
                                  type: 'horizontalBar',
                                  data: {
@@ -792,7 +791,7 @@
                                  $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
                              @endphp {{ $currencyType }}
                          </h4>
-                         <canvas id="horizontalBarChartExpenses" width="400" height="200"></canvas>
+                         <canvas id="{{ $GeneralChart8 }}" width="400" height="200"></canvas>
 
                          <script>
                              var expensesData = @json($expenseTopTen);
@@ -805,7 +804,7 @@
                                  return entry.total_expenses;
                              });
 
-                             var ctxExpenses = document.getElementById('horizontalBarChartExpenses').getContext('2d');
+                             var ctxExpenses = document.getElementById('{{ $GeneralChart8 }}').getContext('2d');
                              var horizontalBarChartExpenses = new Chart(ctxExpenses, {
                                  type: 'horizontalBar',
                                  data: {

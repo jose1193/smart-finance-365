@@ -60,9 +60,6 @@
     <!--  CHART JS -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.esm.min.js">
-    </script>
 
     <!--  END CHART JS -->
 

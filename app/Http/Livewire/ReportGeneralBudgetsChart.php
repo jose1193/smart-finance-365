@@ -44,6 +44,9 @@ class ReportGeneralBudgetsChart extends Component
 
     public $report_date;
 
+    public $GeneralChart1,$GeneralChart2,$GeneralChart3,$GeneralChart4;
+    public $GeneralChart5,$GeneralChart6,$GeneralChart7,$GeneralChart8;
+
     public function userSelectedChart5($userId)
     {
         
@@ -84,6 +87,14 @@ public function updateChartBudgetData()
     $this->emit('initializeFlatpickr2');
     $this->updateChartBudgetDataInternal();
 
+    $this->GeneralChart1 = 'GeneralChart1-' . uniqid();
+    $this->GeneralChart2 = 'GeneralChart2-' . uniqid();
+    $this->GeneralChart3 = 'GeneralChart3-' . uniqid();
+    $this->GeneralChart4 = 'GeneralChart4-' . uniqid();
+    $this->GeneralChart5 = 'GeneralChart5-' . uniqid();
+    $this->GeneralChart6 = 'GeneralChart6-' . uniqid();
+    $this->GeneralChart7 = 'GeneralChart7-' . uniqid();
+    $this->GeneralChart8 = 'GeneralChart8-' . uniqid();
 }
 
 

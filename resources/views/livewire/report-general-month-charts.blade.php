@@ -140,20 +140,20 @@
                  </span>
              </p>
          @endif
-         <div id="content3" class="p-2">
+         <div class="p-2">
              <div id="chart-container3" class="my-5"
-                 wire:key="chart-{{ $selectedUser4 }}-{{ $selectedMonth }}-{{ $selectedYear3 }}-{{ uniqid() }}">
+                 wire:key="{{ $MonthlyChart1 }},{{ $MonthlyChart2 }},{{ $MonthlyChart3 }}">
 
 
-                 <div class="grid gap-6 mb-8 md:grid-cols-2 ">
+                 <div class="grid gap-6 mb-8 md:grid-cols-2 " id="content3">
                      <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 my-5">
                          @php
                              $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
                          @endphp
 
-                         <canvas id="myChartGeneral4" height="200"></canvas>
+                         <canvas id="{{ $MonthlyChart1 }}" height="200"></canvas>
                          <script>
-                             var ctx = document.getElementById('myChartGeneral4').getContext('2d');
+                             var ctx = document.getElementById('{{ $MonthlyChart1 }}').getContext('2d');
 
                              var dataBar = {
                                  labels: [
@@ -304,7 +304,7 @@
                      <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800 my-5">
 
                          <!-- Agrega un elemento canvas para el gráfico -->
-                         <canvas id="myDoughnutChart"></canvas>
+                         <canvas id="{{ $MonthlyChart2 }}"></canvas>
                          <script>
                              // Inicializar totales de cada categoría
                              var totalCategory1 = 0;
@@ -342,7 +342,7 @@
                              var isSingleCategory = (totalCategory1 === 0 || totalCategory2 === 0);
 
                              // Configuración del gráfico de dona
-                             var ctx = document.getElementById('myDoughnutChart').getContext('2d');
+                             var ctx = document.getElementById('{{ $MonthlyChart2 }}').getContext('2d');
                              var labels = [];
 
                              // Verificar si solo hay una categoría presente
@@ -527,7 +527,7 @@
 
                      <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800 my-5">
 
-                         <canvas id="topTenChart" class="my-10"></canvas>
+                         <canvas id="{{ $MonthlyChart3 }}" class="my-10"></canvas>
 
 
                          <script>
@@ -555,7 +555,7 @@
                              });
 
 
-                             var ctx = document.getElementById('topTenChart').getContext('2d');
+                             var ctx = document.getElementById('{{ $MonthlyChart3 }}').getContext('2d');
                              var myChart = new Chart(ctx, {
                                  type: 'horizontalBar',
                                  data: {

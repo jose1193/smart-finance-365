@@ -99,7 +99,7 @@
          </div>
          <div id="content4" class="p-2">
              <div id="chart-container6" class="my-5"
-                 wire:key="chart-{{ $selectedUser6 }}-{{ $selectedMonth2 }}-{{ $selectedYear4 }}-{{ uniqid() }}">
+                 wire:key="{{ $BudgetExpenseChart1 }},{{ $BudgetExpenseChart2 }},{{ $BudgetExpenseChart3 }}">
 
                  @php
                      $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
@@ -109,7 +109,7 @@
                      <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
 
 
-                         <canvas id="myChartGeneral6" height="200"></canvas>
+                         <canvas id="{{ $BudgetExpenseChart1 }}" height="200"></canvas>
                          @php
                              $data = [];
 
@@ -120,7 +120,7 @@
                              }
                          @endphp
                          <script>
-                             var ctx = document.getElementById('myChartGeneral6').getContext('2d');
+                             var ctx = document.getElementById('{{ $BudgetExpenseChart1 }}').getContext('2d');
 
                              var dataBar = {
                                  labels: [
@@ -204,7 +204,7 @@
 
                      <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800">
 
-                         <canvas id="topTenChartBudgetExpenses" class="my-10"></canvas>
+                         <canvas id="{{ $BudgetExpenseChart2 }}" class="my-10"></canvas>
 
 
                          <script>
@@ -230,7 +230,7 @@
                                      {{ $SelectMainCurrencyTypeRender === 'USD' ? 'item.total_currency' : 'item.total_amount' }};
                                  return amount;
                              });
-                             var ctx = document.getElementById('topTenChartBudgetExpenses').getContext('2d');
+                             var ctx = document.getElementById('{{ $BudgetExpenseChart2 }}').getContext('2d');
                              var myChart = new Chart(ctx, {
                                  type: 'horizontalBar',
                                  data: {
@@ -295,11 +295,11 @@
 
                      <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800 mt-5">
 
-                         <canvas id="myChartBudgetMonthlyExpenses"></canvas>
+                         <canvas id="{{ $BudgetExpenseChart3 }}"></canvas>
 
 
                          <script>
-                             var ctx = document.getElementById('myChartBudgetMonthlyExpenses').getContext('2d');
+                             var ctx = document.getElementById('{{ $BudgetExpenseChart3 }}').getContext('2d');
                              var totalMonthlyExpenses = 0;
 
                              @foreach ($operationsFetchMonths as $item)

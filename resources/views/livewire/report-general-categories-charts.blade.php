@@ -1,5 +1,5 @@
  <div x-show="activeTab === '2'">
-     <!-- REPORT GENERAL CATEGORIES TABLE  -->
+     <!-- REPORT GENERAL CATEGORIES CHART  -->
      <div id="between-dates-chart-table">
          <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -104,16 +104,15 @@
                  </div>
              </div>
 
-             <div id="chart-container2" class="my-5"
-                 wire:key="chart-{{ $selectedUser2 }}-{{ $selectedCategoryId }}-{{ $selectedYear2 }}-{{ uniqid() }}">
-                 <div id="content2">
-                     <div class="grid gap-6 mb-8 md:grid-cols-1">
+             <div id="chart-container2" class="my-5" wire:key="{{ $chartId }}">
+                 <div>
+                     <div class="grid gap-6 mb-8 md:grid-cols-1" id="content2">
                          <div
                              class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 flex flex-col md:flex-row items-center">
                              <!-- Contenedor del canvas, ajustado para ser responsive y con margen -->
                              <div class="p-3 md:w-2/5 lg:w-4/6 xl:w-4/6 -mt-4 mr-4">
                                  <!-- Agregado "mr-4" para añadir margen a la derecha -->
-                                 <canvas id="myChartGeneral2" height="200"></canvas>
+                                 <canvas id="{{ $chartId }}" height="200"></canvas>
                              </div>
 
                              <!-- Contenedor de la información, ajustado para ser responsive -->
@@ -149,14 +148,9 @@
 
                  </div>
 
-
                  <script>
-                     @if ($categoryNameSelected)
-                         var userName = "{{ $categoryNameSelected->category_name }}";
-                     @else
-                         var userName = "";
-                     @endif
-                     var ctx = document.getElementById('myChartGeneral2').getContext('2d');
+                     var userName = "{{ $categoryNameSelected ? $categoryNameSelected->category_name : '' }}";
+                     var ctx = document.getElementById('{{ $chartId }}').getContext('2d');
 
                      var dataBar = {
                          labels: [
@@ -227,8 +221,6 @@
                          options: options
                      });
                  </script>
-
-
 
              </div>
          @endif

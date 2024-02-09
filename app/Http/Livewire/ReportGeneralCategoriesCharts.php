@@ -41,6 +41,8 @@ class ReportGeneralCategoriesCharts extends Component
     public $report_date;
 
     protected $listeners = ['userSelectedChart2','YearSelectedChart2','categorySelected2'];
+    
+    public $chartId;
 
     public function userSelectedChart2($userId)
     {
@@ -74,6 +76,7 @@ class ReportGeneralCategoriesCharts extends Component
         $this->years = Operation::distinct()->pluck('operation_year');
          $this->users = User::orderBy('id', 'desc')->get();
            $this->categoriesRender = $this->getCategoryOptions();
+       
     }
 
     public function render()
@@ -119,8 +122,8 @@ public function updateCategoriesData()
 {
     $this->updateCategoriesDataInternal();
    
+    $this->chartId = 'barChart-' . uniqid();
 }
-
 
 private function updateCategoriesDataInternal()
 {
@@ -153,7 +156,6 @@ private function updateCategoriesDataInternal()
     $now = Carbon::now('America/Argentina/Buenos_Aires');
     $this->report_date =  $now->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
 }
-
 
 
 private function fetchCategoriesData($mainCategoryId, $month)
@@ -198,5 +200,6 @@ public function resetFields2()
     $this->selectedCategoryId = null;
     $this->showChart2 = false;
 }
+
 
 }

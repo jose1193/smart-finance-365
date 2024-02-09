@@ -39,6 +39,8 @@ class ReportGeneralBudgetsExpenseCharts extends Component
     public $selectedMonthNameEs;
     public $mainCurrencyTypeRender;
 
+    public $BudgetExpenseChart1,$BudgetExpenseChart2,$BudgetExpenseChart3;
+
     public function userSelectedChart6($userId)
     {
        
@@ -103,6 +105,10 @@ public function updateBudgetExpenseData()
 {
     $this->updateBudgetExpenseDataInternal();
     $this->topTenBudgetExpenses = $this->fetchTopTenBudgetExpenses(10);
+    
+    $this->BudgetExpenseChart1 = 'BudgetExpenseChart1-' . uniqid();
+    $this->BudgetExpenseChart2 = 'BudgetExpenseChart2-' . uniqid();
+    $this->BudgetExpenseChart3 = 'BudgetExpenseChart3-' . uniqid();
 }
 
 private function updateBudgetExpenseDataInternal()
