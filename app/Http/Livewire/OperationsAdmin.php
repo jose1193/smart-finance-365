@@ -338,6 +338,7 @@ public function updateDataExpenseOperations()
       // Emitir evento para reiniciar los valores
     $this->emit('currencyChanged');
     $this->emit('modalOpenedAutonumeric3'); 
+     $this->emit('modalOpenedAutonumeric4'); 
     $this->selectedCurrencyFromARS = $this->selectedCurrencyFrom === 'Blue-ARS' ? 'ARS' : $this->selectedCurrencyFrom; 
 }
 
@@ -392,6 +393,7 @@ public function updatedOperationAmount()
         $this->isOpen = true;
         $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
         $this->emit('modalOpenedAutonumeric3'); 
+         $this->emit('modalOpenedAutonumeric4'); 
         $this->fetchDataCurrencies();
         
     }

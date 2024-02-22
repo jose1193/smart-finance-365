@@ -345,7 +345,7 @@
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
                                                                 Rate CONV/USD </label>
 
-                                                            <input type="text" autocomplete="off" readonly
+                                                            <input type="text" autocomplete="off"
                                                                 id="operation_currency"
                                                                 wire:model="operation_currency"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -666,6 +666,16 @@
     $(document).ready(function() {
         Livewire.on('modalOpenedAutonumeric2', function() {
             $('#operation_amount').mask('#.##0,00', {
+                reverse: true
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        Livewire.on('modalOpenedAutonumeric3', function() {
+            $('#operation_currency').mask('#.##0,00', {
                 reverse: true
             });
         });

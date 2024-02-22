@@ -287,9 +287,7 @@
                                                                 @if ($this->selectedUser8 && $budgets->count() > 0)
                                                                     @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
                                                                         @php
-                                                                            $formattedDate = \Carbon\Carbon::parse($date)
-                                                                                ->locale('es')
-                                                                                ->isoFormat('MMMM [de] YYYY');
+                                                                            $formattedDate = \Carbon\Carbon::parse($date)->locale('es')->isoFormat('MMMM [de] YYYY');
                                                                         @endphp
 
                                                                         @foreach ($groupedBudgets as $budget)
@@ -404,7 +402,7 @@
 
                                                             <input type="text" autocomplete="off"
                                                                 id="operation_currency"
-                                                                wire:model="operation_currency" readonly
+                                                                wire:model="operation_currency"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                                 placeholder="">
 
@@ -727,6 +725,16 @@
     $(document).ready(function() {
         Livewire.on('modalOpenedAutonumeric3', function() {
             $('#operation_amount').mask('#.##0,00', {
+                reverse: true
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        Livewire.on('modalOpenedAutonumeric4', function() {
+            $('#operation_currency').mask('#.##0,00', {
                 reverse: true
             });
         });
