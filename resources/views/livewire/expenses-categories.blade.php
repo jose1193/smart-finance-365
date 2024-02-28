@@ -78,7 +78,7 @@
                                                 {{ $item->main_category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->category_name, 2, '...') }}
+                                                {{ $item->category_name }}
                                             </td>
 
                                             <td class="px-4 py-3 text-xs">
@@ -94,7 +94,7 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 @if (!empty($item->subcategory_name))
-                                                    {{ Str::words($item->subcategory_name, 2, '...') }}
+                                                    {{ $item->subcategory_name }}
                                                 @else
                                                     unavailable
                                                 @endif
@@ -108,11 +108,7 @@
                                                         $assignedUsers = $subcategory->assignedUsersSubcategory;
 
                                                         if (!$assignedUsers->isEmpty()) {
-                                                            if (
-                                                                auth()
-                                                                    ->user()
-                                                                    ->hasRole('Admin')
-                                                            ) {
+                                                            if (auth()->user()->hasRole('Admin')) {
                                                                 // Include all assigned usernames for Admin
                                                                 $assignedUsernames = array_merge($assignedUsernames, $assignedUsers->pluck('username')->toArray());
                                                             } elseif ($assignedUsers->pluck('id')->contains(auth()->user()->id)) {

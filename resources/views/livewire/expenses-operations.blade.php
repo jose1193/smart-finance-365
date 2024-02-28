@@ -81,14 +81,14 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->category_name, 1, '...') }}
+                                                {{ $item->category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->display_name }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->operation_description, 2, '...') }}
+                                                {{ $item->operation_description }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
@@ -215,9 +215,7 @@
                                                                 <option value="na">N/A</option>
                                                                 @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
                                                                     @php
-                                                                        $formattedDate = \Carbon\Carbon::parse($date)
-                                                                            ->locale('es')
-                                                                            ->isoFormat('MMMM [de] YYYY');
+                                                                        $formattedDate = \Carbon\Carbon::parse($date)->locale('es')->isoFormat('MMMM [de] YYYY');
 
                                                                     @endphp
 

@@ -313,14 +313,14 @@
                                       <td class="px-4 py-3 text-center">
                                           {{ $item->main_category_title }}</td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->category_title, 2, '...') }}
+                                          {{ $item->category_title }}
 
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->subcategory_name, 2) ?: 'N/A' }}
+                                          {{ $item->subcategory_name ?: 'N/A' }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
-                                          {{ Str::words($item->operation_description, 3, '...') }}
+                                          {{ $item->operation_description }}
                                       </td>
                                       <td class="px-4 py-3 text-center">
                                           {{ $selectedMonthName }}

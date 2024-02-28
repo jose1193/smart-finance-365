@@ -75,14 +75,14 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->category_name, 1, '...') }}
+                                                {{ $item->category_name }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->display_name }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ Str::words($item->operation_description, 2, '...') }}
+                                                {{ $item->operation_description }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
