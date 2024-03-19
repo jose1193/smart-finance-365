@@ -638,11 +638,11 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
      
      
     if ($value) {
-          $this->emit('reinitDataTable');
+         
         $this->checkedSelected = $this->getItemsIds();
 
     } else {
-        $this->emit('reinitDataTable');
+       
         $this->checkedSelected = [];
 
     }
@@ -652,7 +652,7 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
 
 public function getItemsIds()
 {
-     $this->emit('reinitDataTable');
+    
     // Retorna un array con los IDs de los elementos disponibles
     return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
@@ -667,7 +667,7 @@ public function confirmDelete()
 {
     $this->emit('showConfirmation'); // Emite un evento para mostrar la confirmación
      $this->updateData();
-     $this->emit('reinitDataTable');
+    
 }
 
 public function deleteMultiple()
