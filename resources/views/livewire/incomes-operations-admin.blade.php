@@ -266,8 +266,6 @@
                                         </div>
                                     </div>
 
-
-
                                     <script>
                                         $(document).ready(function() {
                                             var rowsPerPage = 10; // Número de filas por página
@@ -280,24 +278,19 @@
                                                 });
 
                                                 var totalFilteredEntries = filteredRows.length;
+                                                var totalPages = Math.ceil(totalFilteredEntries / rowsPerPage);
+
                                                 var startEntry = page * rowsPerPage + 1;
                                                 var endEntry = Math.min((page + 1) * rowsPerPage, totalFilteredEntries);
-
-                                                // Ocultar el paginador si no hay resultados después de filtrar
-                                                if (totalFilteredEntries === 0) {
-                                                    $('#pagination-controls').hide();
-                                                } else {
-                                                    $('#pagination-controls').show();
-                                                }
 
                                                 $('tbody tr').hide();
                                                 filteredRows.slice(page * rowsPerPage, (page + 1) * rowsPerPage).show();
                                                 updateEntriesInfo(startEntry, endEntry, totalFilteredEntries);
+                                                renderPageNumbers(totalPages);
+                                                updatePaginationButtons(page, totalPages);
                                             }
 
-
-                                            function renderPageNumbers() {
-                                                var totalPages = Math.ceil($('tbody tr').length / rowsPerPage);
+                                            function renderPageNumbers(totalPages) {
                                                 var pageNumbersContainer = $('#page-numbers');
                                                 pageNumbersContainer.empty();
 
@@ -310,7 +303,6 @@
                                                     pageNumberButton.on('click', function() {
                                                         currentPage = parseInt($(this).text()) - 1;
                                                         showPage(currentPage);
-                                                        renderPageNumbers();
                                                     });
 
                                                     pageNumbersContainer.append(pageNumberButton);
@@ -318,26 +310,28 @@
                                             }
 
                                             function updateEntriesInfo(startEntry, endEntry, totalFilteredEntries) {
-                                                var totalEntries = $('tbody tr').length;
                                                 var entriesInfo = '';
-
                                                 if (totalFilteredEntries > 0) {
                                                     entriesInfo = 'Showing ' + startEntry + ' to ' + endEntry + ' of ' +
-                                                        totalFilteredEntries +
-                                                        ' entries (filtered from ' + totalEntries + ' total entries)';
+                                                        totalFilteredEntries + ' entries';
+                                                } else {
+                                                    entriesInfo = 'No entries found';
                                                 }
-
                                                 $('#entries-info').text(entriesInfo);
                                             }
 
+                                            function updatePaginationButtons(page, totalPages) {
+                                                $('#prev-page').prop('disabled', page === 0); // Deshabilitar "Previous" en la primera página
+                                                $('#next-page').prop('disabled', page === totalPages -
+                                                    1); // Deshabilitar "Next" en la última página
+                                            }
+
                                             showPage(currentPage);
-                                            renderPageNumbers();
 
                                             $('#prev-page').on('click', function() {
                                                 if (currentPage > 0) {
                                                     currentPage--;
                                                     showPage(currentPage);
-                                                    renderPageNumbers();
                                                 }
                                             });
 
@@ -346,24 +340,22 @@
                                                 if (currentPage < maxPage) {
                                                     currentPage++;
                                                     showPage(currentPage);
-                                                    renderPageNumbers();
                                                 }
                                             });
 
                                             $('#search-input').on('input', function() {
                                                 currentPage = 0; // Resetear a la primera página al realizar una nueva búsqueda
                                                 showPage(currentPage);
-                                                renderPageNumbers();
                                             });
 
                                             $('#per-page').on('change', function() {
                                                 rowsPerPage = parseInt($(this).val());
                                                 currentPage = 0; // Resetear a la primera página
                                                 showPage(currentPage);
-                                                renderPageNumbers();
                                             });
                                         });
                                     </script>
+
 
                                 </div>
 
