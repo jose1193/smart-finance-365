@@ -104,7 +104,7 @@
                                     class="fa-solid fa-envelope-open-text"></i></span>
                         </x-button>
                         <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" />
+                            autocomplete="off" class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
                     </div>
 
                     <div class="flex justify-end mb-5">

@@ -39,7 +39,7 @@
                                     class="fa-solid fa-envelope-open-text"></i></span>
                         </x-button>
                         <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" />
+                            autocomplete="off" class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
                     </div>
 
                     <!-- Tables -->
@@ -48,7 +48,7 @@
                             <table class="w-full whitespace-no-wrap">
                                 <thead>
                                     <tr
-                                        class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
+                                        class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Name</th>
                                         <th class="px-4 py-3">Email</th>
@@ -58,7 +58,7 @@
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-xs  uppercase dark:text-gray-400">
+                                        <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}

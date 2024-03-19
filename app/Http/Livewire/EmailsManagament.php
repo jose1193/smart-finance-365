@@ -18,10 +18,7 @@ public $search = '';
    
     public function render()
     {
-         $user = auth()->user();
-        if (!$user || !$user->hasRole('Admin')) {
-            abort(403, 'This action is Forbidden.');
-        }
+        
 
     $data = EmailManagement::where('user_id', auth()->user()->id)
         ->where(function ($query) {

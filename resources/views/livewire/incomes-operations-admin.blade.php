@@ -216,6 +216,7 @@
 
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
+
                                                     {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
                                                 </td>
                                                 <td class="px-4 py-3 text-sm">
@@ -277,14 +278,23 @@
                                                 var filteredRows = $('tbody tr').filter(function() {
                                                     return $(this).text().toLowerCase().indexOf(searchTerm) > -1;
                                                 });
+
                                                 var totalFilteredEntries = filteredRows.length;
                                                 var startEntry = page * rowsPerPage + 1;
                                                 var endEntry = Math.min((page + 1) * rowsPerPage, totalFilteredEntries);
+
+                                                // Ocultar el paginador si no hay resultados después de filtrar
+                                                if (totalFilteredEntries === 0) {
+                                                    $('#pagination-controls').hide();
+                                                } else {
+                                                    $('#pagination-controls').show();
+                                                }
 
                                                 $('tbody tr').hide();
                                                 filteredRows.slice(page * rowsPerPage, (page + 1) * rowsPerPage).show();
                                                 updateEntriesInfo(startEntry, endEntry, totalFilteredEntries);
                                             }
+
 
                                             function renderPageNumbers() {
                                                 var totalPages = Math.ceil($('tbody tr').length / rowsPerPage);

@@ -43,7 +43,7 @@
                                     class="fa-solid fa-money-bill-wave"></i></span>
                         </x-button>
                         <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" />
+                            autocomplete="off" class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
                     </div>
                     <!-- resources/views/tu-vista.blade.php -->
 
