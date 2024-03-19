@@ -59,6 +59,10 @@ public $selectedCurrencyFromARS;
 public $selectAll = false;
 public $checkedSelected = [];
 
+public $sortBy = 'operations.id'; // Columna predeterminada para ordenar
+ public $sortDirection = 'desc'; // Dirección predeterminada para ordenar   
+
+
  protected $rules = [
         'user_selected' => 'required', 
     ];
@@ -187,7 +191,7 @@ public function updateDataExpense()
  $this->showData= true;
  $this->emit('reinitDataTable');
   $this->data = $this->updateDataExpenseOperations();
-   
+   $this->updateKey = now()->timestamp;
 }
 
 public function updateDataExpenseOperations() 
@@ -211,7 +215,7 @@ public function updateDataExpenseOperations()
             'budgets.budget_date as date',
             'budgets.id as budget_id'
         )
-        ->orderBy('operations.id', 'desc');
+         ->orderBy($this->sortBy, $this->sortDirection);
 
     // Agregar la condición para el usuario seleccionado solo si está configurado
     if ($this->selectedUser8) {
@@ -256,6 +260,30 @@ public function updateDataExpenseOperations()
 
     return $query->get();
 }
+
+
+// Método para cambiar la cantidad de elementos por página
+    public function updatedPerPage()
+    {
+        $this->resetPage(); // Resetear la página al cambiar la cantidad de elementos por página
+          $this->updateData();
+    }
+
+    
+    //----------- ordering columns start --------------//
+public function sortBy($column)
+    {
+        if ($this->sortBy === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+
+        $this->sortBy = $column;
+          $this->updateDataExpense();
+    }
+    
+     //----------- end ordering columns --------------//
 
 
         public function fetchData()
@@ -677,11 +705,11 @@ public function delete($id)
      
      
     if ($value) {
-          $this->emit('reinitDataTable');
+         
         $this->checkedSelected = $this->getItemsIds();
 
     } else {
-        $this->emit('reinitDataTable');
+       
         $this->checkedSelected = [];
 
     }
@@ -691,7 +719,7 @@ public function delete($id)
 
 public function getItemsIds()
 {
-     $this->emit('reinitDataTable');
+    
     // Retorna un array con los IDs de los elementos disponibles
     return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
@@ -706,7 +734,7 @@ public function confirmDelete()
 {
     $this->emit('showConfirmation'); // Emite un evento para mostrar la confirmación
      $this->updateDataExpense();
-     $this->emit('reinitDataTable');
+    
 }
 
 public function deleteMultiple()

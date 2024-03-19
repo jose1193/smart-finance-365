@@ -80,6 +80,27 @@
                                 </button>
                             @endif
                         </div>
+                        <!-- PAGINATOR JQUERY START -->
+                        <div class="flex items-center justify-between -mt-5">
+                            <div class="my-5 ">
+                                <label for="perPage" class="text-gray-800 dark:text-gray-300 mr-1 ">Show</label>
+                                <select id="per-page"
+                                    class="bg-white p-2 dark:border-gray-700  dark:text-gray-300 dark:bg-gray-800">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                </select>
+                                <label for="perPage" class="text-gray-800 dark:text-gray-300 ml-1 ">entries</label>
+                            </div>
+                            <div class="mt-4">
+
+                                <input type="text" id="search-input" placeholder="Search..."
+                                    class="block w-full  text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input">
+                            </div>
+                        </div>
+                        <!-- PAGINATOR JQUERY END -->
                         <!-- Tables -->
                         <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                             <div class="w-full overflow-x-auto">
@@ -91,7 +112,15 @@
 
                                         <tr
                                             class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                            <th class="px-4 py-3">Nro</th>
+                                            <th class="px-4 py-3" wire:click="sortBy('operations.id')">Nro
+                                                @if ($sortBy === 'operations.id')
+                                                    @if ($sortDirection === 'asc')
+                                                        <i class="fa-solid fa-arrow-up"></i>
+                                                    @else
+                                                        <i class="fa-solid fa-arrow-down"></i>
+                                                    @endif
+                                                @endif
+                                            </th>
                                             <th class="px-4 py-3">Username</th>
                                             <th class="px-4 py-3">Category</th>
                                             <th class="px-4 py-3">Subcategory</th>
@@ -101,7 +130,15 @@
                                             <th class="px-4 py-3">Rate CONV/USD</th>
                                             <th class="px-4 py-3">Total In USD</th>
                                             <th class="px-4 py-3">Status</th>
-                                            <th class="px-4 py-3">Date</th>
+                                            <th class="px-4 py-3" wire:click="sortBy('operations.id')">Date
+                                                @if ($sortBy === 'operations.id')
+                                                    @if ($sortDirection === 'asc')
+                                                        <i class="fa-solid fa-arrow-up"></i>
+                                                    @else
+                                                        <i class="fa-solid fa-arrow-down"></i>
+                                                    @endif
+                                                @endif
+                                            </th>
                                             <th class="px-4 py-3">Action</th>
                                             <th class="px-4 py-3">
                                                 @if (!$data->isEmpty())
@@ -194,7 +231,8 @@
                                                 </td>
                                                 <td class="px-4 py-3 text-sm">
                                                     <input type="checkbox" wire:model="checkedSelected"
-                                                        value="{{ $item->id }}" id="checkbox-{{ $item->id }}">
+                                                        value="{{ $item->id }}"
+                                                        id="checkbox-{{ $item->id }}">
 
                                                 </td>
                                             </tr>
@@ -213,7 +251,113 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+                                <!-- PAGINATOR JQUERY START -->
+                                <div wire:key="updateMonthData-{{ $updateKey }}">
+                                    <div id="pagination-controls" class="flex items-center justify-between mt-4 my-3">
+                                        <div id="entries-info"
+                                            class="entries-info mr-2 text-gray-700 dark:text-gray-400"></div>
+                                        <div class="flex items-center">
+                                            <button id="prev-page"
+                                                class="mr-2 px-3 py-1 rounded text-gray-700 dark:text-gray-400">Previous</button>
+                                            <div id="page-numbers" class="flex items-center"></div>
+                                            <button id="next-page"
+                                                class="ml-2 px-3 py-1 rounded text-gray-700 dark:text-gray-400">Next</button>
+                                        </div>
+                                    </div>
 
+
+
+                                    <script>
+                                        $(document).ready(function() {
+                                            var rowsPerPage = 10; // Número de filas por página
+                                            var currentPage = 0;
+
+                                            function showPage(page) {
+                                                var searchTerm = $('#search-input').val().toLowerCase(); // Obtener el término de búsqueda
+                                                var filteredRows = $('tbody tr').filter(function() {
+                                                    return $(this).text().toLowerCase().indexOf(searchTerm) > -1;
+                                                });
+                                                var totalFilteredEntries = filteredRows.length;
+                                                var startEntry = page * rowsPerPage + 1;
+                                                var endEntry = Math.min((page + 1) * rowsPerPage, totalFilteredEntries);
+
+                                                $('tbody tr').hide();
+                                                filteredRows.slice(page * rowsPerPage, (page + 1) * rowsPerPage).show();
+                                                updateEntriesInfo(startEntry, endEntry, totalFilteredEntries);
+                                            }
+
+                                            function renderPageNumbers() {
+                                                var totalPages = Math.ceil($('tbody tr').length / rowsPerPage);
+                                                var pageNumbersContainer = $('#page-numbers');
+                                                pageNumbersContainer.empty();
+
+                                                for (var i = 0; i < totalPages; i++) {
+                                                    var pageNumber = i + 1;
+                                                    var buttonClass = (i === currentPage) ? 'bg-blue-600 text-white' : 'text-gray-700';
+                                                    var pageNumberButton = $('<button class="mx-1 px-3 py-1 rounded page-number-button ' +
+                                                        buttonClass + '">' + pageNumber + '</button>');
+
+                                                    pageNumberButton.on('click', function() {
+                                                        currentPage = parseInt($(this).text()) - 1;
+                                                        showPage(currentPage);
+                                                        renderPageNumbers();
+                                                    });
+
+                                                    pageNumbersContainer.append(pageNumberButton);
+                                                }
+                                            }
+
+                                            function updateEntriesInfo(startEntry, endEntry, totalFilteredEntries) {
+                                                var totalEntries = $('tbody tr').length;
+                                                var entriesInfo = '';
+
+                                                if (totalFilteredEntries > 0) {
+                                                    entriesInfo = 'Showing ' + startEntry + ' to ' + endEntry + ' of ' +
+                                                        totalFilteredEntries +
+                                                        ' entries (filtered from ' + totalEntries + ' total entries)';
+                                                }
+
+                                                $('#entries-info').text(entriesInfo);
+                                            }
+
+                                            showPage(currentPage);
+                                            renderPageNumbers();
+
+                                            $('#prev-page').on('click', function() {
+                                                if (currentPage > 0) {
+                                                    currentPage--;
+                                                    showPage(currentPage);
+                                                    renderPageNumbers();
+                                                }
+                                            });
+
+                                            $('#next-page').on('click', function() {
+                                                var maxPage = Math.floor($('tbody tr').length / rowsPerPage);
+                                                if (currentPage < maxPage) {
+                                                    currentPage++;
+                                                    showPage(currentPage);
+                                                    renderPageNumbers();
+                                                }
+                                            });
+
+                                            $('#search-input').on('input', function() {
+                                                currentPage = 0; // Resetear a la primera página al realizar una nueva búsqueda
+                                                showPage(currentPage);
+                                                renderPageNumbers();
+                                            });
+
+                                            $('#per-page').on('change', function() {
+                                                rowsPerPage = parseInt($(this).val());
+                                                currentPage = 0; // Resetear a la primera página
+                                                showPage(currentPage);
+                                                renderPageNumbers();
+                                            });
+                                        });
+                                    </script>
+
+                                </div>
+
+                                <!-- PAGINATOR JQUERY END -->
                             </div>
 
 
@@ -677,17 +821,7 @@
     });
 </script>
 
-<script>
-    document.addEventListener('livewire:load', function() {
-        $(document).ready(function() {
-            $('#miTabla').DataTable();
-        });
-        Livewire.on('reinitDataTable', function() {
-            $('#miTabla').DataTable().destroy();
-            $('#miTabla').DataTable();
-        });
-    });
-</script>
+
 
 <script>
     $(document).ready(function() {

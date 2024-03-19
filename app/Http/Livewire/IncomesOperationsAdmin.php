@@ -55,7 +55,8 @@ public $selectedCurrencyFromARS;
  public $selectAll = false;
 public $checkedSelected = [];
 
-    
+ public $sortBy = 'operations.id'; // Columna predeterminada para ordenar
+ public $sortDirection = 'desc'; // Dirección predeterminada para ordenar   
 
  protected $rules = [
         'user_selected' => 'required', // Agrega las reglas de validación que necesites
@@ -153,7 +154,7 @@ public function updateData()
 $this->emit('reinitDataTable');
 $this->showData= true;
 $this->data = $this->updateDataIncomeOperations();
-
+ $this->updateKey = now()->timestamp;
 
 }
 public function updateDataIncomeOperations()
@@ -172,7 +173,7 @@ public function updateDataIncomeOperations()
             'statu_options.status_description',
             DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name')
         )
-        ->orderBy('operations.id', 'desc');
+        ->orderBy($this->sortBy, $this->sortDirection);
 
     // Add condition for the selected user only if configured
     if ($this->selectedUser7) {
@@ -185,6 +186,30 @@ public function updateDataIncomeOperations()
 
     return $query->get();
 }
+
+// Método para cambiar la cantidad de elementos por página
+    public function updatedPerPage()
+    {
+        $this->resetPage(); // Resetear la página al cambiar la cantidad de elementos por página
+          $this->updateData();
+    }
+
+    
+    //----------- ordering columns start --------------//
+public function sortBy($column)
+    {
+        if ($this->sortBy === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+
+        $this->sortBy = $column;
+          $this->updateData();
+    }
+    
+     //----------- end ordering columns --------------//
+
 
 private function applyUserConditions($query)
 {
@@ -621,7 +646,7 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
         $this->checkedSelected = [];
 
     }
-   
+   $this->updateKey = now()->timestamp;
    
 }
 

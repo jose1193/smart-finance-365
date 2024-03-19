@@ -88,10 +88,6 @@
 
     <script src="./assets/js/init-alpine.js"></script>
 
-    <!--  DataTable JS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <!--  END DataTable JS -->
 
     <!--  JSPDF HTML2CANVAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
