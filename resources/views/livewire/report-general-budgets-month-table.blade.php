@@ -413,12 +413,21 @@
                                  var currentPage = 0;
 
                                  function showPage(page) {
-                                     $('tbody tr').hide().slice(page * rowsPerPage, (page + 1) * rowsPerPage).show();
-                                     updateEntriesInfo(page);
+                                     var totalEntries = $('tbody tr:not(:last)')
+                                         .length; // Excluir el último tr de los totales o sumarios
+                                     var totalPages = Math.ceil(totalEntries / rowsPerPage);
+
+                                     var startEntry = page * rowsPerPage + 1;
+                                     var endEntry = Math.min((page + 1) * rowsPerPage, totalEntries);
+
+                                     $('tbody tr:not(:last)').hide().slice(page * rowsPerPage, (page + 1) * rowsPerPage).show();
+                                     updateEntriesInfo(startEntry, endEntry, totalEntries);
+                                     renderPageNumbers(totalPages);
+                                     updatePaginationButtons(page, totalPages);
                                  }
 
-                                 function renderPageNumbers() {
-                                     var totalPages = Math.ceil($('tbody tr').length / rowsPerPage);
+
+                                 function renderPageNumbers(totalPages) {
                                      var pageNumbersContainer = $('#page-numbers');
                                      pageNumbersContainer.empty();
 
@@ -431,29 +440,29 @@
                                          pageNumberButton.on('click', function() {
                                              currentPage = parseInt($(this).text()) - 1;
                                              showPage(currentPage);
-                                             renderPageNumbers();
                                          });
 
                                          pageNumbersContainer.append(pageNumberButton);
                                      }
                                  }
 
-                                 function updateEntriesInfo(page) {
-                                     var totalEntries = $('tbody tr').length;
-                                     var startEntry = page * rowsPerPage + 1;
-                                     var endEntry = Math.min((page + 1) * rowsPerPage, totalEntries);
-                                     $('#entries-info').text('Showing ' + startEntry + ' to ' + endEntry + ' of ' + totalEntries +
-                                         ' entries');
+                                 function updateEntriesInfo(startEntry, endEntry, totalEntries) {
+                                     var entriesInfo = 'Showing ' + startEntry + ' to ' + endEntry + ' of ' + totalEntries + ' entries';
+                                     $('#entries-info').text(entriesInfo);
+                                 }
+
+                                 function updatePaginationButtons(page, totalPages) {
+                                     $('#prev-page').prop('disabled', page === 0); // Deshabilitar "Previous" en la primera página
+                                     $('#next-page').prop('disabled', page === totalPages -
+                                         1); // Deshabilitar "Next" en la última página
                                  }
 
                                  showPage(currentPage);
-                                 renderPageNumbers();
 
                                  $('#prev-page').on('click', function() {
                                      if (currentPage > 0) {
                                          currentPage--;
                                          showPage(currentPage);
-                                         renderPageNumbers();
                                      }
                                  });
 
@@ -462,7 +471,6 @@
                                      if (currentPage < maxPage) {
                                          currentPage++;
                                          showPage(currentPage);
-                                         renderPageNumbers();
                                      }
                                  });
 
@@ -470,7 +478,6 @@
                                      rowsPerPage = parseInt($(this).val());
                                      currentPage = 0; // Resetear a la primera página
                                      showPage(currentPage);
-                                     renderPageNumbers();
                                  });
                              });
                          </script>

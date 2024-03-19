@@ -635,8 +635,7 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     //---- FUNCTION DELETE MULTIPLE ----//
  public function updatedSelectAll($value)
 {
-     
-     
+    
     if ($value) {
          
         $this->checkedSelected = $this->getItemsIds();

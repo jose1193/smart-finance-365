@@ -172,8 +172,16 @@ private function fetchMonthData()
             return $query->whereYear('operations.operation_date', $selectedYear3);
         })
         ->when($this->main_category_id !== null && $this->main_category_id !== '', function ($query) {
-            // Filtrar por main_category_id si está presente y no es una cadena vacía
-            return $query->where('main_categories.id', $this->main_category_id);
+         if ($this->main_category_id === 'No Category Income') {
+        // Filtrar por nombre de la categoría si la categoría seleccionada es "No Category Income"
+        return $query->where('categories.category_name', 'No Category Income');
+         } elseif ($this->main_category_id === 'No Category Expense') {
+        // Filtrar por nombre de la categoría si la categoría seleccionada es "No Category Expense"
+        return $query->where('categories.category_name', 'No Category Expense');
+         } else {
+        // Filtrar por main_category_id si está presente y no es una cadena vacía
+        return $query->where('main_categories.id', $this->main_category_id);
+          }
         })->when($this->date_start && $this->date_end, function ($query) {
             // Filtrar por rango de fechas si se proporcionan ambas fechas
             return $query->whereBetween('operations.operation_date', [$this->date_start, $this->date_end]);
