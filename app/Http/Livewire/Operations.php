@@ -16,6 +16,8 @@ use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- guzzle query api
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 
 class Operations extends Component
 {
@@ -30,7 +32,7 @@ public $data2;
 public $operation_currency; 
 public $operation_currency_total; 
 public $isOpen = 0;
-protected $listeners = ['render','delete','currencyChanged']; 
+protected $listeners = ['render','delete','currencyChanged','deleteMultiple']; 
 
 public $subcategory_id = [];
 public $showSubcategories = false;
@@ -49,6 +51,13 @@ public $registeredSubcategoryItem;
 
 public $selectedCurrencyFromARS;
 
+public $selectAll = false;
+public $checkedSelected = [];
+
+public $sortBy = 'operations.id'; // Columna predeterminada para ordenar
+public $sortDirection = 'desc'; // Dirección predeterminada para ordenar
+ public $perPage = 10; // Cantidad predeterminada de elementos por página
+ 
     public function authorize()
 {
     return true;
@@ -80,8 +89,8 @@ public $selectedCurrencyFromARS;
         'budgets.budget_date as date',
         'budgets.id as budget_id'
     )
-    ->orderBy('operations.id', 'desc')
-    ->paginate(10);
+    ->orderBy($this->sortBy, $this->sortDirection)
+     ->paginate($this->perPage);
 
 
     $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
@@ -116,6 +125,29 @@ public $selectedCurrencyFromARS;
             'data' => $data]);
     }
 
+
+
+    //----------- ordering columns start --------------//
+public function sortBy($column)
+    {
+        if ($this->sortBy === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+
+        $this->sortBy = $column;
+    }
+    
+     //----------- end ordering columns --------------//
+
+// Método para cambiar la cantidad de elementos por página
+    public function updatedPerPage()
+    {
+        $this->resetPage(); // Resetear la página al cambiar la cantidad de elementos por página
+    }
+
+     
  // SELECT SUBCATEGORY_ID TO REGISTERSUBCATEGORYITEM
 
     public function updateSubCategoryUser()
@@ -255,7 +287,7 @@ public function updatedOperationAmount()
     public function create()
     {
          
-        $this->authorize('manage admin');
+       
         $this->resetInputFields();
         $this->openModal();
     }
@@ -283,7 +315,7 @@ public function updatedOperationAmount()
        
 public function edit($id)
     {
-        $this->authorize('manage admin');
+        
         $list = Operation::leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
         ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
         ->findOrFail($id);
@@ -488,12 +520,68 @@ public function BudgetExpense($budgetId, Operation $operation)
 
 
 
-    public function delete($id)
-    {
-         $this->authorize('manage admin');
-        Operation::find($id)->delete();
-        session()->flash('message', 'Data Deleted Successfully.');
+     public function delete($id)
+{
+    $operation = Operation::find($id);
+    $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
+    $operation->delete();
+    session()->flash('message', $description. ' Deleted Successfully' );
+}
+
+
+
+//---- FUNCTION DELETE MULTIPLE ----//
+ public function updatedSelectAll($value)
+{
+     
+     
+    if ($value) {
+         
+        $this->checkedSelected = $this->getItemsIds();
+
+    } else {
+       
+        $this->checkedSelected = [];
+
     }
+   
+   
+}
 
+public function getItemsIds()
+{
+    
+    
+    // Retorna un array con los IDs de los elementos disponibles
+    return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+        ->join('users', 'operations.user_id', '=', 'users.id')
+        ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
+        ->where('users.id', Auth::id()) // Filtra por el ID del usuario autenticado
+        ->where('main_categories.id', 2) // Filtra por la categoría principal con ID 2
+        ->pluck('operations.id')
+        ->toArray();
+  
+   
+}
 
+public function confirmDelete()
+{
+    $this->emit('showConfirmation'); // Emite un evento para mostrar la confirmación
+    
+}
+
+public function deleteMultiple()
+{
+    if (count($this->checkedSelected) > 0) {
+        Operation::whereIn('id', $this->checkedSelected)->delete();
+        $this->checkedSelected = [];
+        session()->flash('message', 'Data Deleted Successfully');
+        $this->selectAll = false;
+        
+    }
+   
+    
+}
+
+ //---- END FUNCTION DELETE MULTIPLE ----//
 }

@@ -13,12 +13,7 @@
             <!-- END HEADER -->
 
             <!-- PANEL MAIN CATEGORIES -->
-            <!--INCLUDE ALERTS MESSAGES-->
 
-            <x-message-success />
-
-
-            <!-- END INCLUDE ALERTS MESSAGES-->
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
@@ -64,7 +59,12 @@
 
 
                     </div>
+                    <!--INCLUDE ALERTS MESSAGES-->
 
+                    <x-message-success />
+
+
+                    <!-- END INCLUDE ALERTS MESSAGES-->
                     @if ($showData)
                         <div class=" my-7 flex justify-between space-x-2">
                             <x-button wire:click="create()"><span class="font-semibold"> Create New <i
@@ -72,7 +72,14 @@
                             </x-button>
 
                         </div>
-
+                        <div class="flex justify-end mb-5">
+                            @if (count($checkedSelected) >= 1)
+                                <button wire:click="confirmDelete"
+                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Delete Multiple ({{ count($checkedSelected) }})
+                                </button>
+                            @endif
+                        </div>
                         <!-- Tables -->
                         <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                             <div class="w-full overflow-x-auto">
@@ -96,6 +103,11 @@
                                             <th class="px-4 py-3">Status</th>
                                             <th class="px-4 py-3">Date</th>
                                             <th class="px-4 py-3">Action</th>
+                                            <th class="px-4 py-3">
+                                                @if (!$data->isEmpty())
+                                                    <input type="checkbox" wire:model="selectAll" id="select-all">
+                                                @endif
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -174,16 +186,22 @@
                                                     <button wire:click="edit({{ $item->id }})"
                                                         class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                             class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                    <button
+                                                        wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
                                                         class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                             class="fa-solid fa-trash"></i></button>
+
+                                                </td>
+                                                <td class="px-4 py-3 text-sm">
+                                                    <input type="checkbox" wire:model="checkedSelected"
+                                                        value="{{ $item->id }}" id="checkbox-{{ $item->id }}">
 
                                                 </td>
                                             </tr>
 
                                         @empty
                                             <tr class="text-center">
-                                                <td colspan="12">
+                                                <td colspan="13">
                                                     <div class="grid justify-items-center w-full mt-5">
                                                         <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                             role="alert">
@@ -444,12 +462,20 @@
                                                                             {{-- Display Assigned Subcategories --}}
                                                                             @if (is_array($subcategory_id) && count($subcategory_id) > 0)
                                                                                 @php
-                                                                                    $subcategories = \App\Models\Subcategory::whereIn('id', $subcategory_id)->get();
+                                                                                    $subcategories = \App\Models\Subcategory::whereIn(
+                                                                                        'id',
+                                                                                        $subcategory_id,
+                                                                                    )->get();
                                                                                 @endphp
 
                                                                                 {{-- Find the selected subcategory --}}
                                                                                 @php
-                                                                                    $selectedSubcategory = $subcategories->where('id', $registeredSubcategoryItem)->first();
+                                                                                    $selectedSubcategory = $subcategories
+                                                                                        ->where(
+                                                                                            'id',
+                                                                                            $registeredSubcategoryItem,
+                                                                                        )
+                                                                                        ->first();
                                                                                 @endphp
 
                                                                                 {{-- Display the selected subcategory first --}}
@@ -605,9 +631,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        Livewire.on('deleteData', function(id) {
+        Livewire.on('deleteData', function(id, description) {
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
+                title: 'Are you sure you want to delete ' +
+                    '<span style="color:#9333ea">' + description + '</span>' + '?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
@@ -620,7 +647,7 @@
                         id); // Envía el Id al método delete
                     Swal.fire(
                         'Deleted!',
-                        'Your Data has been deleted.',
+                        'Your Data ' + description + ' has been deleted.',
                         'success'
                     );
                 }
@@ -677,6 +704,34 @@
         Livewire.on('modalOpenedAutonumeric3', function() {
             $('#operation_currency').mask('#.##0,00', {
                 reverse: true
+            });
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('showConfirmation', () => {
+            Swal.fire({
+                title: 'Are you sure you want to delete these items?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('incomes-operations-admin',
+                        'deleteMultiple'); // Envía el Id al método delete
+                    Swal.fire(
+                        'Deleted!',
+                        'Your Data has been deleted.',
+                        'success'
+                    );
+
+                }
             });
         });
     });

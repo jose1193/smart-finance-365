@@ -17,8 +17,10 @@ class UsersCrud extends Component
  public $search = '';
  public $rolesRender;
  public $isOpen = 0;
- protected $listeners = ['render','delete','deleteOperations']; 
+ protected $listeners = ['render','delete','deleteOperations','deleteMultiple']; 
 
+ public $selectAll = false;
+public $checkedSelected = [];
 
  public function authorize()
 {
@@ -197,11 +199,27 @@ session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Dat
 }
 
 public function delete($id)
-    {
-         $this->authorize('manage admin');
-        User::find($id)->delete();
-        session()->flash('message', 'Data Deleted Successfully.');
+{
+    $this->authorize('manage admin');
+
+    // Encuentra al usuario que se va a eliminar
+    $user = User::find($id);
+
+    if ($user) {
+        // Obtén el correo electrónico del usuario antes de eliminarlo
+        $email = $user->email;
+
+        // Elimina al usuario
+        $user->delete();
+
+        // Define el mensaje de sesión con el correo electrónico del usuario eliminado
+        session()->flash('message', "$email - Data Deleted Successfully.");
+    } else {
+        // Si el usuario no se encuentra, muestra un mensaje de error
+        session()->flash('message', 'Usuario no encontrado.');
     }
+}
+
 
     
  public function deleteOperations($user_id)
@@ -213,5 +231,58 @@ public function delete($id)
 
     session()->flash('message', 'All Operations for the User Deleted Successfully.');
 }
+
+
+
+
+ //---- FUNCTION DELETE MULTIPLE ----//
+ public function updatedSelectAll($value)
+{
+     
+     
+    if ($value) {
+         
+        $this->checkedSelected = $this->getItemsIds();
+
+    } else {
+       
+        $this->checkedSelected = [];
+
+    }
+   
+   
+}
+
+public function getItemsIds()
+{
+    // Retorna un array con los IDs de los elementos disponibles
+    return  User::whereIn('id', $this->checkedSelected)
+        ->with('operations')
+        ->pluck('operations.id')
+        ->flatten()
+        ->toArray();
+}
+
+
+public function confirmDelete()
+{
+    $this->emit('showConfirmation'); // Emite un evento para mostrar la confirmación
+    
+}
+
+public function deleteMultiple()
+{
+    if (count($this->checkedSelected) > 0) {
+        User::whereIn('id', $this->checkedSelected)->delete();
+        $this->checkedSelected = [];
+        session()->flash('message', 'Data Deleted Successfully');
+        $this->selectAll = false;
+        
+    }
+   
+    
+}
+
+ //---- END FUNCTION DELETE MULTIPLE ----//
 
 }

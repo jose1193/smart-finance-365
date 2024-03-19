@@ -139,7 +139,8 @@
                                             <button wire:click="edit({{ $item->id }})"
                                                 class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                     class="fa-solid fa-pen-to-square"></i></button>
-                                            <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                            <button
+                                                wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
                                                 class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                     class="fa-solid fa-trash"></i></button>
 
@@ -333,7 +334,9 @@
                                                             style="width: 100%;">
                                                             <option value=""></option>
                                                             @php
-                                                                $groupedCategories = $categoriesRender->groupBy('main_category_title');
+                                                                $groupedCategories = $categoriesRender->groupBy(
+                                                                    'main_category_title',
+                                                                );
                                                             @endphp
                                                             @foreach ($groupedCategories as $mainCategoryTitle => $categoryGroup)
                                                                 <optgroup label="{{ $mainCategoryTitle }}">
@@ -367,12 +370,17 @@
                                                                 {{-- Display Assigned Subcategories --}}
                                                                 @if (is_array($subcategory_id) && count($subcategory_id) > 0)
                                                                     @php
-                                                                        $subcategories = \App\Models\Subcategory::whereIn('id', $subcategory_id)->get();
+                                                                        $subcategories = \App\Models\Subcategory::whereIn(
+                                                                            'id',
+                                                                            $subcategory_id,
+                                                                        )->get();
                                                                     @endphp
 
                                                                     {{-- Find the selected subcategory --}}
                                                                     @php
-                                                                        $selectedSubcategory = $subcategories->where('id', $registeredSubcategoryItem)->first();
+                                                                        $selectedSubcategory = $subcategories
+                                                                            ->where('id', $registeredSubcategoryItem)
+                                                                            ->first();
                                                                     @endphp
 
                                                                     {{-- Display the selected subcategory first --}}
@@ -509,10 +517,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        Livewire.on('deleteData', function(id) {
-            console.log('Evento "deleteData" emitido con ID: ' + id);
+        Livewire.on('deleteData', function(id, description) {
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
+                title: 'Are you sure you want to delete ' +
+                    '<span style="color:#9333ea">' + description + '</span>' + '?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,

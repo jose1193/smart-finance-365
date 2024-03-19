@@ -46,6 +46,14 @@
                                 autocomplete="off" />
                         </div>
                     @endcan
+                    <div class="flex justify-end mb-5">
+                        @if (count($checkedSelected) >= 1)
+                            <button wire:click="confirmDelete"
+                                class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Delete Multiple ({{ count($checkedSelected) }})
+                            </button>
+                        @endif
+                    </div>
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
@@ -62,6 +70,11 @@
                                         @can('manage admin')
                                             <th class="px-4 py-3">Action</th>
                                         @endcan
+                                        <th class="px-4 py-3">
+                                            @if (!$data->isEmpty())
+                                                <input type="checkbox" wire:model="selectAll" id="select-all">
+                                            @endif
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -111,7 +124,8 @@
                                                     <button wire:click="edit({{ $item->id }})"
                                                         class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                             class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                    <button
+                                                        wire:click="$emit('deleteData',{{ $item->id }}, '{{ $item->email }}')"
                                                         class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                             class="fa-solid fa-trash"></i></button>
 
@@ -128,6 +142,11 @@
                                                         </div>
                                                     </button>
 
+
+                                                </td>
+                                                <td class="px-4 py-3 text-sm">
+                                                    <input type="checkbox" wire:model="checkedSelected"
+                                                        value="{{ $item->id }}" id="checkbox-{{ $item->id }}">
 
                                                 </td>
                                             @endcan
@@ -345,9 +364,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        Livewire.on('deleteData', function(id) {
+        Livewire.on('deleteData', function(id, email) {
             Swal.fire({
-                title: 'Are you sure you want to delete all of this user records?',
+                title: 'Are you sure you want to delete ' +
+                    '<span style="color:#9333ea">' + email + '</span>' + '?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
@@ -360,7 +380,7 @@
                         id); // Envía el Id al método delete
                     Swal.fire(
                         'Deleted!',
-                        'Your Data has been deleted.',
+                        'Your Data ' + email + ' has been deleted.',
                         'success'
                     );
                 }
@@ -423,4 +443,32 @@
             toggleButton.innerHTML = '<i class="fa-regular fa-eye"></i>'; // Cambia el icono a ojo
         }
     }
+</script>
+
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('showConfirmation', () => {
+            Swal.fire({
+                title: 'Are you sure you want to delete these items?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('users-crud',
+                        'deleteMultiple'); // Envía el Id al método delete
+                    Swal.fire(
+                        'Deleted!',
+                        'Your Data has been deleted.',
+                        'success'
+                    );
+
+                }
+            });
+        });
+    });
 </script>

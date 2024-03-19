@@ -30,7 +30,7 @@ public $data2;
 public $operation_currency; 
 public $operation_currency_total; 
 public $isOpen = 0;
-protected $listeners = ['render','delete','currencyChanged','userSelected7','userSelectedUpdated' => 'updateSelect','updateDataIncomeOperations' => 'updateData']; 
+protected $listeners = ['render','delete','currencyChanged','userSelected7','userSelectedUpdated' => 'updateSelect','updateDataIncomeOperations' => 'updateData','deleteMultiple']; 
 
 public $subcategory_id = [];
 public $showSubcategories = false;
@@ -51,6 +51,11 @@ public $data;
 public $user_selected;
 
 public $selectedCurrencyFromARS;
+
+ public $selectAll = false;
+public $checkedSelected = [];
+
+    
 
  protected $rules = [
         'user_selected' => 'required', // Agrega las reglas de validación que necesites
@@ -591,14 +596,67 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
 }
 
 
+ public function delete($id)
+{
+     $this->authorize('manage admin');
+    $operation = Operation::find($id);
+    $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
+    $operation->delete();
+     $this->updateData();
+    session()->flash('message', $description. ' Deleted Successfully' );
+}
+    
 
-    public function delete($id)
-    {
-         $this->authorize('manage admin');
-        Operation::find($id)->delete();
-        session()->flash('message', 'Data Deleted Successfully.');
-         $this->updateData();
+    //---- FUNCTION DELETE MULTIPLE ----//
+ public function updatedSelectAll($value)
+{
+     
+     
+    if ($value) {
+          $this->emit('reinitDataTable');
+        $this->checkedSelected = $this->getItemsIds();
+
+    } else {
+        $this->emit('reinitDataTable');
+        $this->checkedSelected = [];
+
     }
+   
+   
+}
 
+public function getItemsIds()
+{
+     $this->emit('reinitDataTable');
+    // Retorna un array con los IDs de los elementos disponibles
+    return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+        ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
+        ->where('main_categories.id', 1) // Filtra por la categoría principal con ID 1
+        ->pluck('operations.id')
+        ->toArray();
+  
+   
+}
 
+public function confirmDelete()
+{
+    $this->emit('showConfirmation'); // Emite un evento para mostrar la confirmación
+     $this->updateData();
+     $this->emit('reinitDataTable');
+}
+
+public function deleteMultiple()
+{
+    if (count($this->checkedSelected) > 0) {
+        Operation::whereIn('id', $this->checkedSelected)->delete();
+        $this->checkedSelected = [];
+        session()->flash('message', 'Data Deleted Successfully');
+        $this->selectAll = false;
+        
+    }
+    $this->updateData();
+    
+}
+
+ //---- END FUNCTION DELETE MULTIPLE ----//
 }

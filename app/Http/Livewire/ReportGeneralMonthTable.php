@@ -115,7 +115,7 @@ public function updateMonthData()
 {  $this->emit('initializeFlatpickr');
      $this->mainCategoriesRender = MainCategories::orderBy('id', 'asc')->get();
     $this->updateMonthDataInternal();
-     
+      $this->updateKey = now()->timestamp;
 }
 
 private function updateMonthDataInternal()

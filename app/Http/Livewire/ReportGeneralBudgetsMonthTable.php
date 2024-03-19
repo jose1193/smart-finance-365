@@ -108,6 +108,7 @@ class ReportGeneralBudgetsMonthTable extends Component
 public function updateBudgetMonthData()
 {
     $this->updateBudgetMonthDataInternal();
+      $this->updateKey = now()->timestamp;
 }
 
 private function updateBudgetMonthDataInternal()

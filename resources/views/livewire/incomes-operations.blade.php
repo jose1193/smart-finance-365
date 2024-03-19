@@ -13,12 +13,7 @@
             <!-- END HEADER -->
 
             <!-- PANEL MAIN CATEGORIES -->
-            <!--INCLUDE ALERTS MESSAGES-->
 
-            <x-message-success />
-
-
-            <!-- END INCLUDE ALERTS MESSAGES-->
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
@@ -38,12 +33,39 @@
 
                     </div>
 
+
+                    <!--INCLUDE ALERTS MESSAGES-->
+
+                    <x-message-success />
+
+
+                    <!-- END INCLUDE ALERTS MESSAGES-->
+
                     <div class=" my-7 flex justify-between space-x-2">
                         <x-button wire:click="create()"><span class="font-semibold"> Create New <i
                                     class="fa-solid fa-money-bill-wave"></i></span>
                         </x-button>
                         <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
                             autocomplete="off" />
+                    </div>
+
+                    <div class="flex justify-end mb-5">
+                        @if (count($checkedSelected) >= 1)
+                            <button wire:click="confirmDelete"
+                                class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Delete Multiple ({{ count($checkedSelected) }})
+                            </button>
+                        @endif
+                    </div>
+                    <div class="mb-3">
+                        <label for="perPage" class="text-gray-800 dark:text-gray-300">Mostrar por página:</label>
+                        <select wire:model="perPage" id="perPage"
+                            class="bg-white p-2 dark:border-gray-700  dark:text-gray-300 dark:bg-gray-800">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
                     </div>
 
                     <!-- Tables -->
@@ -53,8 +75,24 @@
                                 <thead>
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3">Nro</th>
-                                        <th class="px-4 py-3">Category</th>
+                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Nro
+                                            @if ($sortBy === 'operations.id')
+                                                @if ($sortDirection === 'asc')
+                                                    <i class="fa-solid fa-arrow-up"></i>
+                                                @else
+                                                    <i class="fa-solid fa-arrow-down"></i>
+                                                @endif
+                                            @endif
+                                        </th>
+                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Category
+                                            @if ($sortBy === 'operations.id')
+                                                @if ($sortDirection === 'asc')
+                                                    <i class="fa-solid fa-arrow-up"></i>
+                                                @else
+                                                    <i class="fa-solid fa-arrow-down"></i>
+                                                @endif
+                                            @endif
+                                        </th>
                                         <th class="px-4 py-3">Subcategory</th>
                                         <th class="px-4 py-3">Description</th>
                                         <th class="px-4 py-3">Currency</th>
@@ -62,8 +100,21 @@
                                         <th class="px-4 py-3">Rate CONV/USD</th>
                                         <th class="px-4 py-3">Total In USD</th>
                                         <th class="px-4 py-3">Status</th>
-                                        <th class="px-4 py-3">Date</th>
+                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Date
+                                            @if ($sortBy === 'operations.id')
+                                                @if ($sortDirection === 'asc')
+                                                    <i class="fa-solid fa-arrow-up"></i>
+                                                @else
+                                                    <i class="fa-solid fa-arrow-down"></i>
+                                                @endif
+                                            @endif
+                                        </th>
                                         <th class="px-4 py-3">Action</th>
+                                        <th class="px-4 py-3">
+                                            @if (!$data->isEmpty())
+                                                <input type="checkbox" wire:model="selectAll" id="select-all">
+                                            @endif
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -136,16 +187,22 @@
                                                 <button wire:click="edit({{ $item->id }})"
                                                     class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-pen-to-square"></i></button>
-                                                <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                <button
+                                                    wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
                                                     class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-trash"></i></button>
+
+                                            </td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <input type="checkbox" wire:model="checkedSelected"
+                                                    value="{{ $item->id }}" id="checkbox-{{ $item->id }}">
 
                                             </td>
                                         </tr>
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="11">
+                                            <td colspan="12">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -363,12 +420,20 @@
                                                                         {{-- Display Assigned Subcategories --}}
                                                                         @if (is_array($subcategory_id) && count($subcategory_id) > 0)
                                                                             @php
-                                                                                $subcategories = \App\Models\Subcategory::whereIn('id', $subcategory_id)->get();
+                                                                                $subcategories = \App\Models\Subcategory::whereIn(
+                                                                                    'id',
+                                                                                    $subcategory_id,
+                                                                                )->get();
                                                                             @endphp
 
                                                                             {{-- Find the selected subcategory --}}
                                                                             @php
-                                                                                $selectedSubcategory = $subcategories->where('id', $registeredSubcategoryItem)->first();
+                                                                                $selectedSubcategory = $subcategories
+                                                                                    ->where(
+                                                                                        'id',
+                                                                                        $registeredSubcategoryItem,
+                                                                                    )
+                                                                                    ->first();
                                                                             @endphp
 
                                                                             {{-- Display the selected subcategory first --}}
@@ -521,9 +586,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        Livewire.on('deleteData', function(id) {
+        Livewire.on('deleteData', function(id, description) {
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
+                title: 'Are you sure you want to delete ' +
+                    '<span style="color:#9333ea">' + description + '</span>' + '?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
@@ -532,11 +598,10 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.emitTo('incomes-operations', 'delete',
-                        id); // Envía el Id al método delete
+                    Livewire.emitTo('incomes-operations', 'delete', id);
                     Swal.fire(
                         'Deleted!',
-                        'Your Data has been deleted.',
+                        'Your Data ' + description + ' has been deleted.',
                         'success'
                     );
                 }
@@ -544,6 +609,7 @@
         });
     });
 </script>
+
 
 <script>
     document.addEventListener('livewire:load', function() {
@@ -571,6 +637,34 @@
         Livewire.on('modalOpenedAutonumeric4', function() {
             $('#operation_amount').mask('#.##0,00', {
                 reverse: true
+            });
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('showConfirmation', () => {
+            Swal.fire({
+                title: 'Are you sure you want to delete these items?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.emitTo('incomes-operations',
+                        'deleteMultiple'); // Envía el Id al método delete
+                    Swal.fire(
+                        'Deleted!',
+                        'Your Data has been deleted.',
+                        'success'
+                    );
+
+                }
             });
         });
     });

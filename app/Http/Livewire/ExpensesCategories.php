@@ -565,7 +565,7 @@ public function delete($id)
 
     // Obtener la categoría que se va a eliminar
     $categoryToDelete = Category::find($id);
-
+    $category_name = $categoryToDelete->category_name;
     // Obtener la categoría especial 'No Category Expense'
     $otrosCategory = Category::firstOrCreate(
         [
@@ -586,7 +586,7 @@ public function delete($id)
         // Eliminar la categoría
         $categoryToDelete->delete();
 
-        session()->flash('message', 'Data Deleted Successfully.');
+         session()->flash('message', $category_name. ' Deleted Successfully' );
     } else {
         // Si estás intentando eliminar la categoría especial, puedes manejarlo como desees,
         // por ejemplo, mostrar un mensaje de advertencia o simplemente no hacer nada.

@@ -437,11 +437,12 @@ public function updatedCategoryId($value)
 
 }
 
-public function delete($id)
-    {
-         $this->authorize('manage admin');
-        Operation::find($id)->delete();
-        session()->flash('message', 'Data Deleted Successfully.');
-    }
+ public function delete($id)
+{
+    $operation = Operation::find($id);
+    $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
+    $operation->delete();
+    session()->flash('message', $description. ' Deleted Successfully' );
+}
 
 }

@@ -13,12 +13,7 @@
             <!-- END HEADER -->
 
             <!-- PANEL MAIN CATEGORIES -->
-            <!--INCLUDE ALERTS MESSAGES-->
 
-            <x-message-success />
-
-
-            <!-- END INCLUDE ALERTS MESSAGES-->
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
@@ -37,6 +32,12 @@
                         </div>
 
                     </div>
+                    <!--INCLUDE ALERTS MESSAGES-->
+
+                    <x-message-success />
+
+
+                    <!-- END INCLUDE ALERTS MESSAGES-->
                     @can('manage admin')
                         <div class=" my-7 flex justify-between space-x-2">
                             <x-button wire:click="create()"><span class="font-semibold"> Create New <i
@@ -105,8 +106,15 @@
                                                         if (!$assignedUsers->isEmpty()) {
                                                             if (auth()->user()->hasRole('Admin')) {
                                                                 // Include all assigned usernames for Admin
-                                                                $assignedUsernames = array_merge($assignedUsernames, $assignedUsers->pluck('username')->toArray());
-                                                            } elseif ($assignedUsers->pluck('id')->contains(auth()->user()->id)) {
+                                                                $assignedUsernames = array_merge(
+                                                                    $assignedUsernames,
+                                                                    $assignedUsers->pluck('username')->toArray(),
+                                                                );
+                                                            } elseif (
+                                                                $assignedUsers
+                                                                    ->pluck('id')
+                                                                    ->contains(auth()->user()->id)
+                                                            ) {
                                                                 // Include the user's own username for non-Admin users
                                                                 $assignedUsernames[] = auth()->user()->username;
                                                             }
@@ -141,7 +149,8 @@
                                                             class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                                             <i class="fa-solid fa-pen-to-square"></i>
                                                         </button>
-                                                        <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                        <button
+                                                            wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->category_name }}')"
                                                             class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                                 class="fa-solid fa-trash"></i></button>
                                                     @else
@@ -542,14 +551,27 @@
                                                                                     --</option>
 
                                                                                 @php
-                                                                                    $sortedUserIds = collect($user_id_assign)->sortDesc();
-                                                                                    $assignedUserIds = collect($assignment['users'])
+                                                                                    $sortedUserIds = collect(
+                                                                                        $user_id_assign,
+                                                                                    )->sortDesc();
+                                                                                    $assignedUserIds = collect(
+                                                                                        $assignment['users'],
+                                                                                    )
                                                                                         ->pluck('id')
                                                                                         ->toArray();
                                                                                     $availableUsersCount = count(
-                                                                                        $sortedUserIds->reject(function ($userId) use ($assignedUserIds) {
-                                                                                            return $userId === 'all' || in_array($userId, $assignedUserIds);
-                                                                                        }),
+                                                                                        $sortedUserIds->reject(
+                                                                                            function ($userId) use (
+                                                                                                $assignedUserIds,
+                                                                                            ) {
+                                                                                                return $userId ===
+                                                                                                    'all' ||
+                                                                                                    in_array(
+                                                                                                        $userId,
+                                                                                                        $assignedUserIds,
+                                                                                                    );
+                                                                                            },
+                                                                                        ),
                                                                                     );
                                                                                 @endphp
 
@@ -562,7 +584,10 @@
                                                                                 @foreach ($sortedUserIds as $userId)
                                                                                     @if ($userId !== 'all' && !in_array($userId, $assignedUserIds))
                                                                                         @php
-                                                                                            $user = $users->firstWhere('id', $userId);
+                                                                                            $user = $users->firstWhere(
+                                                                                                'id',
+                                                                                                $userId,
+                                                                                            );
                                                                                         @endphp
                                                                                         <option
                                                                                             value="{{ $userId }}">
@@ -722,9 +747,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        Livewire.on('deleteData', function(id) {
+        Livewire.on('deleteData', function(id, category_name) {
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
+                title: 'Are you sure you want to delete ' +
+                    '<span style="color:#9333ea">' + category_name + '</span>' + '?',
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
@@ -737,7 +763,7 @@
                         id); // Envía el Id al método delete
                     Swal.fire(
                         'Deleted!',
-                        'Your Data has been deleted.',
+                        'Your Data ' + category_name + ' has been deleted.',
                         'success'
                     );
                 }

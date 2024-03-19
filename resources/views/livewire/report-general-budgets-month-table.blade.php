@@ -162,6 +162,19 @@
                  </div>
              @endif
 
+             <!-- PAGINATOR JQUERY START -->
+             <div class="my-5 ">
+                 <label for="perPage" class="text-gray-800 dark:text-gray-300 mr-1 ">Show</label>
+                 <select id="per-page" class="bg-white p-2 dark:border-gray-700  dark:text-gray-300 dark:bg-gray-800">
+                     <option value="10">10</option>
+                     <option value="25">25</option>
+                     <option value="50">50</option>
+                     <option value="100">100</option>
+                     <option value="200">200</option>
+                 </select>
+                 <label for="perPage" class="text-gray-800 dark:text-gray-300 ml-1 ">entries</label>
+             </div>
+             <!-- PAGINATOR JQUERY END -->
              <!-- Tables -->
              <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                  <div class="w-full overflow-x-auto">
@@ -207,7 +220,10 @@
                                      </select>
 
                                      @php
-                                         $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                         $currencyType =
+                                             $SelectMainCurrencyTypeRender === 'Blue-ARS'
+                                                 ? 'ARS'
+                                                 : $SelectMainCurrencyTypeRender;
                                      @endphp
                                  </th>
                                  @if ($selectedMonthName)
@@ -236,7 +252,12 @@
 
                                              $formattedRemainingBudget = number_format($remainingBudget, 0, '.', ',');
 
-                                             $colorClass = $remainingBudget < 0 ? 'text-red-500' : ($remainingBudget === 0 ? 'text-blue-500' : 'text-emerald-600');
+                                             $colorClass =
+                                                 $remainingBudget < 0
+                                                     ? 'text-red-500'
+                                                     : ($remainingBudget === 0
+                                                         ? 'text-blue-500'
+                                                         : 'text-emerald-600');
                                          @endphp
 
 
@@ -370,6 +391,93 @@
                              </tr>
                          </tbody>
                      </table>
+
+                     <!-- PAGINATOR JQUERY START -->
+                     <div wire:key="updateMonthData-{{ $updateKey }}">
+                         <div id="pagination-controls" class="flex items-center justify-between mt-4 my-3">
+                             <div id="entries-info" class="entries-info mr-2 text-gray-700 dark:text-gray-400"></div>
+                             <div class="flex items-center">
+                                 <button id="prev-page"
+                                     class="mr-2 px-3 py-1 rounded text-gray-700 dark:text-gray-400">Previous</button>
+                                 <div id="page-numbers" class="flex items-center"></div>
+                                 <button id="next-page"
+                                     class="ml-2 px-3 py-1 rounded text-gray-700 dark:text-gray-400">Next</button>
+                             </div>
+                         </div>
+
+
+
+                         <script>
+                             $(document).ready(function() {
+                                 var rowsPerPage = 10; // Número de filas por página
+                                 var currentPage = 0;
+
+                                 function showPage(page) {
+                                     $('tbody tr').hide().slice(page * rowsPerPage, (page + 1) * rowsPerPage).show();
+                                     updateEntriesInfo(page);
+                                 }
+
+                                 function renderPageNumbers() {
+                                     var totalPages = Math.ceil($('tbody tr').length / rowsPerPage);
+                                     var pageNumbersContainer = $('#page-numbers');
+                                     pageNumbersContainer.empty();
+
+                                     for (var i = 0; i < totalPages; i++) {
+                                         var pageNumber = i + 1;
+                                         var buttonClass = (i === currentPage) ? 'bg-blue-600 text-white' : 'text-gray-700';
+                                         var pageNumberButton = $('<button class="mx-1 px-3 py-1 rounded page-number-button ' +
+                                             buttonClass + '">' + pageNumber + '</button>');
+
+                                         pageNumberButton.on('click', function() {
+                                             currentPage = parseInt($(this).text()) - 1;
+                                             showPage(currentPage);
+                                             renderPageNumbers();
+                                         });
+
+                                         pageNumbersContainer.append(pageNumberButton);
+                                     }
+                                 }
+
+                                 function updateEntriesInfo(page) {
+                                     var totalEntries = $('tbody tr').length;
+                                     var startEntry = page * rowsPerPage + 1;
+                                     var endEntry = Math.min((page + 1) * rowsPerPage, totalEntries);
+                                     $('#entries-info').text('Showing ' + startEntry + ' to ' + endEntry + ' of ' + totalEntries +
+                                         ' entries');
+                                 }
+
+                                 showPage(currentPage);
+                                 renderPageNumbers();
+
+                                 $('#prev-page').on('click', function() {
+                                     if (currentPage > 0) {
+                                         currentPage--;
+                                         showPage(currentPage);
+                                         renderPageNumbers();
+                                     }
+                                 });
+
+                                 $('#next-page').on('click', function() {
+                                     var maxPage = Math.floor($('tbody tr').length / rowsPerPage);
+                                     if (currentPage < maxPage) {
+                                         currentPage++;
+                                         showPage(currentPage);
+                                         renderPageNumbers();
+                                     }
+                                 });
+
+                                 $('#per-page').on('change', function() {
+                                     rowsPerPage = parseInt($(this).val());
+                                     currentPage = 0; // Resetear a la primera página
+                                     showPage(currentPage);
+                                     renderPageNumbers();
+                                 });
+                             });
+                         </script>
+
+                     </div>
+
+                     <!-- PAGINATOR JQUERY END -->
                  </div>
 
              </div>
