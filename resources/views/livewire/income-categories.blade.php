@@ -44,7 +44,8 @@
                                         class="fa-regular fa-folder-open"></i></span>
                             </x-button>
                             <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                                autocomplete="off" />
+                                autocomplete="off"
+                                class="dark:border-gray-600 dark:bg-gray-700 focus:border-blue-400 focus:outline-none focus:shadow-outline-blue dark:text-gray-300 dark:focus:shadow-outline-blue " />
                         </div>
                     @endcan
                     <!-- Tables -->
