@@ -426,7 +426,6 @@
                                      updatePaginationButtons(page, totalPages);
                                  }
 
-
                                  function renderPageNumbers(totalPages) {
                                      var pageNumbersContainer = $('#page-numbers');
                                      pageNumbersContainer.empty();
@@ -446,15 +445,27 @@
                                      }
                                  }
 
-                                 function updateEntriesInfo(startEntry, endEntry, totalEntries) {
-                                     var entriesInfo = 'Showing ' + startEntry + ' to ' + endEntry + ' of ' + totalEntries + ' entries';
+                                 function updateEntriesInfo(startEntry, endEntry, totalFilteredEntries) {
+                                     var entriesInfo = '';
+                                     if (totalFilteredEntries > 0) {
+                                         entriesInfo = 'Showing ' + startEntry + ' to ' + endEntry + ' of ' +
+                                             totalFilteredEntries + ' entries';
+                                     } else {
+                                         entriesInfo = 'No matching records found';
+                                     }
                                      $('#entries-info').text(entriesInfo);
                                  }
 
                                  function updatePaginationButtons(page, totalPages) {
-                                     $('#prev-page').prop('disabled', page === 0); // Deshabilitar "Previous" en la primera página
-                                     $('#next-page').prop('disabled', page === totalPages -
-                                         1); // Deshabilitar "Next" en la última página
+                                     if ($('#entries-info').text() === 'No matching records found') {
+                                         $('#prev-page').hide();
+                                         $('#next-page').hide();
+                                     } else {
+                                         $('#prev-page').show().prop('disabled', page ===
+                                             0); // Deshabilitar "Previous" en la primera página
+                                         $('#next-page').show().prop('disabled', page === totalPages -
+                                             1); // Deshabilitar "Next" en la última página
+                                     }
                                  }
 
                                  showPage(currentPage);
@@ -481,6 +492,7 @@
                                  });
                              });
                          </script>
+
 
                      </div>
 

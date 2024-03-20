@@ -238,16 +238,6 @@
                                             </tr>
 
                                         @empty
-                                            <tr class="text-center">
-                                                <td colspan="13">
-                                                    <div class="grid justify-items-center w-full mt-5">
-                                                        <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
-                                                            role="alert">
-                                                            No Data Records
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
@@ -312,9 +302,13 @@
                                                 var entriesInfo = '';
                                                 if (totalFilteredEntries > 0) {
                                                     entriesInfo = 'Showing ' + startEntry + ' to ' + endEntry + ' of ' +
-                                                        totalFilteredEntries + ' entries';
+                                                        totalFilteredEntries + ' entries (filtered from ' + $('tbody tr').length +
+                                                        ' total entries)';
+                                                    $('#prev-page, #next-page').show(); // Mostrar botones de paginación
                                                 } else {
-                                                    entriesInfo = 'No entries found';
+                                                    entriesInfo = 'Showing 0 to 0 of 0 entries (filtered from ' + $('tbody tr').length +
+                                                        ' total entries)';
+                                                    $('#prev-page, #next-page').hide(); // Ocultar botones de paginación
                                                 }
                                                 $('#entries-info').text(entriesInfo);
                                             }
@@ -354,6 +348,7 @@
                                             });
                                         });
                                     </script>
+
 
 
                                 </div>
