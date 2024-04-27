@@ -63,6 +63,10 @@ function data() {
         togglePagesMenu5() {
             this.isPagesMenuOpen5 = !this.isPagesMenuOpen5;
         },
+        isPagesMenuOpen6: false,
+        togglePagesMenu6() {
+            this.isPagesMenuOpen6 = !this.isPagesMenuOpen6;
+        },
         // Modal
         isModalOpen: false,
         trapCleanup: null,

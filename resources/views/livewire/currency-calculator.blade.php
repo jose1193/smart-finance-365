@@ -30,10 +30,10 @@
                             <i class="fa-solid fa-circle-dollar-to-slot mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Currency Exchange Rates') }}
+                                {{ __('messages.currency_exchange_rates') }}
                             </x-slot>
                             <a href="{{ route('currency') }}">
-                                <span>Currency Exchange Rates</span></a>
+                                <span>{{ __('messages.currency_exchange_rates') }}</span></a>
                         </div>
 
                     </div>
@@ -132,7 +132,7 @@
                                                         <img src="https://creazilla-store.fra1.digitaloceanspaces.com/emojis/62260/argentina-flag-emoji-clipart-md.png"
                                                             class="w-8 rounded-lg" alt="Avatar" />
                                                         <span class="ml-2">
-                                                            {{ \Carbon\Carbon::parse($data['last_update'])->format('l j \d\e F, H:i:s') }}</span>
+                                                            {{ ucfirst(\Carbon\Carbon::parse($data['last_update'])->translatedFormat('l j \d\e F, H:i:s')) }}</span>
                                                     </div>
 
                                                 </div>

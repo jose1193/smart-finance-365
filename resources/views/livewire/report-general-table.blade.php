@@ -25,10 +25,12 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('General Report Table') }}
+                                {{ __('messages.general_report_table') }}
+
                             </x-slot>
                             <a href="{{ route('general-report') }}">
-                                <span>General Report Table</span></a>
+                                <span>{{ __('messages.general_report_table') }}
+                                </span></a>
                         </div>
 
                     </div>
@@ -47,7 +49,7 @@
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '2'" :class="{ 'bg-blue-700': activeTab === '2' }">
-                                    Categories
+                                    {{ __('messages.categories_chart') }}
                                 </button>
                             </li>
 
@@ -55,7 +57,7 @@
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '3'" :class="{ 'bg-blue-700': activeTab === '3' }">
-                                    Months
+                                    {{ __('messages.months') }}
                                 </button>
                             </li>
 
@@ -64,7 +66,7 @@
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
-                                    Budget Expense
+                                    {{ __('messages.budget_expense') }}
                                 </button>
                             </li>
                         </ul>

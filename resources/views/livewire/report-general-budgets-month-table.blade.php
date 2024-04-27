@@ -12,7 +12,7 @@
                  <div wire:ignore>
                      <select id="selectUser6" style="width: 100%" wire:model="selectedUser6"
                          wire:change="updateBudgetMonthData">
-                         <option value="">Select User</option>
+                         <option value="">{{ __('messages.table_columns_categories.select_a_user') }}</option>
 
                          @if (auth()->user()->hasRole('Admin'))
                              @foreach ($users as $user)
@@ -31,10 +31,10 @@
                  <div wire:ignore>
                      <select id="selectBudgetMonth" wire:model="selectedMonthBudget" wire:change="updateBudgetMonthData"
                          style="width: 100%">
-                         <option value="">Select Month</option>
+                         <option value="">{{ __('messages.select_a_month') }}</option>
                          @foreach ($this->months() as $month)
                              <option value="{{ $month['number'] }}">{{ $month['number'] }} -
-                                 {{ $month['name'] }}</option>
+                                 {{ trans('messages.month_names.' . $month['name']) }}</option>
                          @endforeach
                      </select>
                  </div>
@@ -44,7 +44,7 @@
                  <div wire:ignore>
                      <select wire:model="selectedYear5" style="width:100%" id="selectYear5"
                          wire:change="updateBudgetMonthData">
-                         <option value="">Select Year</option>
+                         <option value="">{{ __('messages.select_a_year') }}</option>
 
                          @foreach ($years as $year)
                              <option value="{{ $year }}">{{ $year }}</option>
@@ -59,17 +59,17 @@
              <div class="my-10 flex justify-end space-x-2">
                  <x-button wire:click="openModal6">
                      <span class="font-semibold"><i class="fa-solid fa-user-group px-1"></i></i></span>
-                     Send Report
+                     {{ __('messages.send_report') }}
                  </x-button>
                  <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
                      wire:click="exportToExcel6" wire:loading.attr="disabled">
                      <span class="font-semibold"><i class="fa-solid fa-file-excel px-1"></i></span>
-                     Download
+                     {{ __('messages.download') }}
                  </x-button>
                  <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50"
                      wire:click="resetFields6" wire:loading.attr="disabled">
                      <span class="font-semibold"><i class="fa-solid fa-power-off px-1"></i></span>
-                     Reset Fields
+                     {{ __('messages.reset_fields') }}
                  </x-button>
              </div>
 
@@ -90,7 +90,7 @@
                                          <div class="mb-4">
                                              <label for="exampleFormControlInput1"
                                                  class="block text-gray-700 text-sm font-bold mb-2">
-                                                 User Email:</label>
+                                                 {{ __('messages.user_email') }}:</label>
                                              <div wire:ignore>
                                                  @if (count($emails) > 0)
                                                      <select multiple id="select5EmailsUser" style="width: 100%"
@@ -111,7 +111,7 @@
                                                      <a href="{{ route('emails') }}" target="_blank"
                                                          class="text-blue-600 hover:text-blue-700 font-semibold"
                                                          wire:click="closeModal4()">
-                                                         Click here to register your email and submit reports
+                                                         {{ __('messages.register_and_submit_reports') }}
                                                      </a>
 
                                                  @endif
@@ -146,13 +146,13 @@
                                          <button wire:click.prevent="emailStore6()" wire:loading.attr="disabled"
                                              wire:target="emailStore6" type="button"
                                              class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                             Send
+                                             {{ __('messages.send') }}
                                          </button>
                                      </span>
                                      <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                          <button wire:click="closeModal4()" type="button"
                                              class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                             Cancel
+                                             {{ __('messages.button_cancel') }}
                                          </button>
                                      </span>
                                  </div>
@@ -164,7 +164,7 @@
 
              <!-- PAGINATOR JQUERY START -->
              <div class="my-5 ">
-                 <label for="perPage" class="text-gray-800 dark:text-gray-300 mr-1 ">Show</label>
+                 <label for="perPage" class="text-gray-800 dark:text-gray-300 mr-1 ">{{ __('messages.show') }}</label>
                  <select id="per-page" class="bg-white p-2 dark:border-gray-700  dark:text-gray-300 dark:bg-gray-800">
                      <option value="10">10</option>
                      <option value="25">25</option>
@@ -172,7 +172,8 @@
                      <option value="100">100</option>
                      <option value="200">200</option>
                  </select>
-                 <label for="perPage" class="text-gray-800 dark:text-gray-300 ml-1 ">entries</label>
+                 <label for="perPage"
+                     class="text-gray-800 dark:text-gray-300 ml-1 ">{{ __('messages.entries') }}</label>
              </div>
              <!-- PAGINATOR JQUERY END -->
              <!-- Tables -->
@@ -186,21 +187,21 @@
                                      @if ($userNameSelected4)
                                          {{ $userNameSelected4->name }}
                                      @else
-                                         User Not Selected
+                                         {{ __('messages.user_not_selected') }}
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">
                                      @if ($selectedMonthName)
                                          {{ $selectedMonthName }}
                                      @else
-                                         Month Not Selected
+                                         {{ __('messages.month_not_selected') }}
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">
                                      @if ($selectedYear5)
                                          {{ $selectedYear5 }}
                                      @else
-                                         Year Not Selected
+                                         {{ __('messages.year_not_selected') }}
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">
@@ -274,25 +275,26 @@
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                  <th class="px-4 py-3">Nro</th>
-                                 <th class="px-4 py-3">Budget</th>
-                                 <th class="px-4 py-3">Main Category</th>
-                                 <th class="px-4 py-3">Category</th>
-                                 <th class="px-4 py-3">Subcategory</th>
-                                 <th class="px-4 py-3">Description</th>
-                                 <th class="px-4 py-3">Month</th>
-                                 <th class="px-4 py-3">Date</th>
-                                 <th class="px-4 py-3">Currency</th>
-                                 <th class="px-4 py-3">Operation</th>
-                                 <th class="px-4 py-3">Rate CONV/USD</th>
-                                 <th class="px-4 py-3">Total In USD</th>
-                                 <th class="px-4 py-3">State</th>
+                                 <th class="px-4 py-3">{{ __('messages.budget') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_main_category') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_category') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_subcategory') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_description') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_month') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_date') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_currency') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_operation') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_rate_conv_usd') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_total_in_usd') }}</th>
+                                 <th class="px-4 py-3">{{ __('messages.report_month_state') }}</th>
                              </tr>
                          </thead>
                          <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
 
 
                              @foreach ($operationsFetchMonths as $item)
-                                 <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
+                                 <tr translate="no"
+                                     class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                      <td class="px-4 py-3 text-center">
                                          {{ $loop->iteration }}
                                      </td>
@@ -318,7 +320,13 @@
                                          {{ $selectedMonthName }}
                                      </td>
                                      <td class="px-4 py-3 text-center">
-                                         {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
+                                         @if (app()->getLocale() === 'en')
+                                             <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('m/d/Y') }}</span>
+                                         @elseif(app()->getLocale() === 'pt')
+                                             <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('d/m/Y') }}</span>
+                                         @else
+                                             <span>{{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}</span>
+                                         @endif
 
                                      </td>
 

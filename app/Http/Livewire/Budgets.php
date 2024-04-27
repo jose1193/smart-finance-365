@@ -329,7 +329,8 @@ if (empty($fechaRecibida)) {
     
     $model = Budget::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-    session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+    session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
 
 
     $this->closeModal();
@@ -340,9 +341,10 @@ if (empty($fechaRecibida)) {
 
     public function delete($id)
     {
-         $this->authorize('manage admin');
+        $budgetToDelete = Budget::find($id);
+        $budget_currency_total = $budgetToDelete->budget_currency_total;    
         Budget::find($id)->delete();
-        session()->flash('message', 'Data Deleted Successfully.');
+        session()->flash('message', $budget_currency_total .  __('messages.category_deleted_successfully'));
     }
 
 

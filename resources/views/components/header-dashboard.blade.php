@@ -36,7 +36,9 @@
                      </template>
                  </button>
              </li>
-
+             <!-- LENGUAGE BUTTON -->
+             @livewire('language-selector')
+             <!-- LENGUAGE BUTTON END -->
              <!-- Profile menu -->
              <x-dropdown align="right" width="48">
                  <x-slot name="trigger">
@@ -69,7 +71,7 @@
                      </div>
 
                      <x-dropdown-link href="{{ route('profile.show') }}">
-                         {{ __('Profile') }}
+                         {{ __('messages.profile') }}
                      </x-dropdown-link>
 
                      @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
@@ -85,7 +87,7 @@
                          @csrf
 
                          <x-dropdown-link href="{{ route('logout') }}" @click.prevent="$root.submit();">
-                             {{ __('Log Out') }}
+                             {{ __('messages.log_out') }}
                          </x-dropdown-link>
                      </form>
                  </x-slot>

@@ -22,10 +22,10 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Budget Expense Management') }}
+                                {{ __('messages.budget_expense_management') }}
                             </x-slot>
                             <a href="">
-                                <span>Budget Expense Management</span></a>
+                                <span> {{ __('messages.budget_expense_management') }}</span></a>
                         </div>
 
                     </div>
@@ -36,22 +36,24 @@
 
                     <!-- END INCLUDE ALERTS MESSAGES-->
                     <div class=" my-7 flex justify-between space-x-2">
-                        <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                        <x-button wire:click="create()"><span class="font-semibold">{{ __('messages.create_new') }} <i
                                     class="fa-solid fa-money-bill-wave"></i></span>
                         </x-button>
-                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
+                        <x-input id="name" type="text" wire:model="search"
+                            placeholder="{{ __('messages.inpur_search') }}" autofocus autocomplete="off"
+                            class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
                     </div>
                     <div class="flex justify-end mb-5">
                         @if (count($checkedSelected) >= 1)
                             <button wire:click="confirmDelete"
                                 class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                Delete Multiple ({{ count($checkedSelected) }})
+                                {{ __('messages.delete_multiple') }} ({{ count($checkedSelected) }})
                             </button>
                         @endif
                     </div>
                     <div class="mb-3">
-                        <label for="perPage" class="text-gray-800 dark:text-gray-300">Mostrar por página:</label>
+                        <label for="perPage" class="text-gray-800 dark:text-gray-300 mr-1 "> {{ __('messages.show') }}
+                        </label>
                         <select wire:model="perPage" id="perPage"
                             class="bg-white p-2 dark:border-gray-700  dark:text-gray-300 dark:bg-gray-800">
                             <option value="10">10</option>
@@ -59,6 +61,8 @@
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
+                        <label for="perPage" class="text-gray-800 dark:text-gray-300 ml-1 ">
+                            {{ __('messages.entries') }} </label>
                     </div>
                     <!-- Tables -->
                     <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
@@ -67,7 +71,7 @@
                                 <thead>
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Nro
+                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Id
                                             @if ($sortBy === 'operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>
@@ -76,8 +80,18 @@
                                                 @endif
                                             @endif
                                         </th>
-                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Budget
-                                            @if ($sortBy === 'operations.id')
+                                        <th class="px-4 py-3">{{ __('messages.budget') }}</th>
+
+                                        <th class="px-4 py-3">{{ __('messages.operations_category') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_subcategory') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_description') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_currency') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_operation') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_rate_conv_usd') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_total_in_usd') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_status') }}</th>
+                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">
+                                            {{ __('messages.operations_date') }} @if ($sortBy === 'operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>
                                                 @else
@@ -85,31 +99,7 @@
                                                 @endif
                                             @endif
                                         </th>
-                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Category
-                                            @if ($sortBy === 'operations.id')
-                                                @if ($sortDirection === 'asc')
-                                                    <i class="fa-solid fa-arrow-up"></i>
-                                                @else
-                                                    <i class="fa-solid fa-arrow-down"></i>
-                                                @endif
-                                            @endif
-                                        </th>
-                                        <th class="px-4 py-3">Subcategory</th>
-                                        <th class="px-4 py-3">Description</th>
-                                        <th class="px-4 py-3">Currency</th>
-                                        <th class="px-4 py-3">Operation</th>
-                                        <th class="px-4 py-3">Rate CONV/USD</th>
-                                        <th class="px-4 py-3">Total In USD</th>
-                                        <th class="px-4 py-3">State</th>
-                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Date @if ($sortBy === 'operations.id')
-                                                @if ($sortDirection === 'asc')
-                                                    <i class="fa-solid fa-arrow-up"></i>
-                                                @else
-                                                    <i class="fa-solid fa-arrow-down"></i>
-                                                @endif
-                                            @endif
-                                        </th>
-                                        <th class="px-4 py-3">Action</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_action') }}</th>
                                         <th class="px-4 py-3">
                                             @if (!$data->isEmpty())
                                                 <input type="checkbox" wire:model="selectAll" id="select-all">
@@ -119,10 +109,11 @@
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
+                                        <tr translate="no"
+                                            class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                             <td class="px-4 py-3 text-center">
 
-                                                {{ $loop->iteration }}
+                                                {{ $item->id }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -187,7 +178,13 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
+                                                @if (app()->getLocale() === 'en')
+                                                    <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('m/d/Y') }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('d/m/Y') }}</span>
+                                                @else
+                                                    <span>{{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}</span>
+                                                @endif
                                             </td>
                                             <td class="px-4 py-3 text-sm">
 
@@ -214,7 +211,7 @@
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
-                                                        No Data Records
+                                                        {{ __('messages.no_data_records') }}
                                                     </div>
                                                 </div>
                                             </td>
@@ -243,7 +240,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Expense Management
+                                                {{ __('messages.budget_expense_management') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -264,7 +261,7 @@
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput1"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Select a Budget:</label>
+                                                            {{ __('messages.select_a_budget') }}:</label>
                                                         <div wire:ignore>
                                                             <select id="budget_id_select" style="width: 100%"
                                                                 wire:model="budget_id">
@@ -319,11 +316,12 @@
                                                     <div class="mb-4">
                                                         <label for="operation_description"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Description</label>
+                                                            {{ __('messages.modal_operations_description') }}</label>
                                                         <input type="text" autocomplete="off"
                                                             id="operation_description"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            maxlength="50" placeholder="Enter Expense Description"
+                                                            maxlength="50"
+                                                            placeholder="{{ __('messages.enter_expense_description') }}"
                                                             wire:model="operation_description">
                                                         @error('operation_description')
                                                             <span class="text-red-500">{{ $message }}</span>
@@ -332,13 +330,16 @@
                                                     <div class="mb-4">
                                                         <label for="operation_amount"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Select Conversion From</label>
+                                                            {{ __('messages.modal_operations_conversion_from') }}</label>
                                                         <div wire:ignore>
                                                             <select wire:model="selectedCurrencyFrom"
                                                                 wire:change="showSelectedCurrency"
                                                                 id="selectedCurrencyFrom" style="width: 100%;">
-                                                                <option value="">Select Option</option>
-                                                                <option value="Blue-ARS">Argentine Peso (ARS)
+                                                                <option value="">
+                                                                    {{ __('messages.modal_operations_select_a_option') }}
+                                                                </option>
+                                                                <option value="Blue-ARS">
+                                                                    {{ __('messages.modal_operations_argentine_peso') }}
                                                                 </option>
                                                                 @if ($listCurrencies)
                                                                     @foreach ($listCurrencies['currencies'] as $codigo => $nombre)
@@ -358,7 +359,7 @@
                                                     <div class="mb-4">
                                                         <label for="operation_amount"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Operation With <span
+                                                            {{ __('messages.modal_operations_operation_with') }} <span
                                                                 class="text-blue-700">{{ $this->selectedCurrencyFromARS }}</label>
 
 
@@ -367,7 +368,7 @@
                                                                 autocomplete="off" id="operation_amount"
                                                                 wire:model="operation_amount"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8"
-                                                                placeholder="Enter Income Transaction Amount">
+                                                                placeholder="{{ __('messages.enter_expense_transaction_amount') }}">
 
                                                             <span
                                                                 class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFromARS }}</span>
@@ -382,7 +383,8 @@
                                                     <div class="mb-4">
                                                         <label for="operation_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Rate CONV/USD </label>
+                                                            {{ __('messages.modal_operations_rate_conv_usd') }}
+                                                        </label>
 
                                                         <input type="text" autocomplete="off"
                                                             id="operation_currency" wire:model="operation_currency"
@@ -403,7 +405,7 @@
                                                     <div class="mb-4 relative">
                                                         <label for="operation_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Total in USD
+                                                            {{ __('messages.modal_operations_total_in_usd') }}
                                                         </label>
 
                                                         <div class="flex items-center relative">
@@ -428,7 +430,7 @@
                                                     <div class="mb-4">
                                                         <label for="operation_date"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Date</label>
+                                                            {{ __('messages.modal_operations_date') }}</label>
                                                         <div wire:ignore>
                                                             <input type="text" id="myDatePicker" readonly
                                                                 wire:model="operation_date" placeholder="dd/mm/yyyy"
@@ -442,9 +444,8 @@
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2"> Expense
-                                                            Category
-
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            {{ __('messages.modal_operations_expense_category') }}
                                                         </label>
 
                                                         <div wire:ignore>
@@ -472,7 +473,8 @@
                                                         @if ($showSubcategories)
                                                             <div class="mb-4">
                                                                 <label for="exampleFormControlInput2"
-                                                                    class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
+                                                                    class="block text-gray-700 text-sm font-bold mb-2">
+                                                                    {{ __('messages.modal_operations_subcategory') }}</label>
 
                                                                 <div wire:ignore>
                                                                     <select wire:model="registeredSubcategoryItem"
@@ -588,7 +590,7 @@
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Status
+                                                            class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.modal_operations_state') }}
                                                         </label>
                                                         <select wire:model="operation_status"
                                                             class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
@@ -614,13 +616,13 @@
                                                     <button type="button" wire:click.prevent="store()"
                                                         wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Register
+                                                        {{ __('messages.button_register') }}
                                                     </button>
                                                 </span>
                                                 <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                                     <button wire:click="closeModal()" type="button"
                                                         class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Cancel
+                                                        {{ __('messages.button_cancel') }}
                                                     </button>
                                                 </span>
                                             </div>
@@ -651,21 +653,23 @@
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id, description) {
             Swal.fire({
-                title: 'Are you sure you want to delete ' +
+                title: '{!! __('messages.delete_confirmation_title') !!} ' +
                     '<span style="color:#9333ea">' + description + '</span>' + '?',
-                text: "You won't be able to revert this!",
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __('messages.delete_confirmation_confirm_button') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('operations', 'delete',
                         id); // Envía el Id al método delete
                     Swal.fire(
-                        'Deleted!',
-                        'Your Data ' + description + ' has been deleted.',
+                        '{!! __('messages.delete_success_title') !!}',
+                        '{{ __('messages.delete_success_message_your_data') }} ' +
+                        description +
+                        ' {{ __('messages.delete_success_message_your_data_has_been') }}',
                         'success'
                     );
                 }
@@ -710,20 +714,20 @@
     document.addEventListener('livewire:load', function() {
         Livewire.on('showConfirmation', () => {
             Swal.fire({
-                title: 'Are you sure you want to delete these items?',
-                text: "You won't be able to revert this!",
+                title: "{{ __('messages.delete_confirmation_text_all_items') }}",
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('operations',
                         'deleteMultiple'); // Envía el Id al método delete
                     Swal.fire(
-                        'Deleted!',
-                        'Your Data has been deleted.',
+                        '{!! __('messages.delete_success_title') !!}',
+                        '{{ __('messages.delete_confirmation_text_all') }}',
                         'success'
                     );
 

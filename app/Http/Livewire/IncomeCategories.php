@@ -168,17 +168,7 @@ protected function getDataForUser()
         'category_name' => 'required|string|max:30|unique:categories,category_name,' . $this->data_id,
         'category_description' => 'required|string|max:50',
         'main_category_id' => 'required|exists:main_categories,id',
-        ],[
-    'category_name.required' => 'El nombre de categoría es obligatorio.',
-    'category_name.string' => 'El nombre de categoría debe ser una cadena de texto.',
-    'category_name.max' => 'El nombre de categoría no debe superar los 30 caracteres.',
-    'category_name.unique' => 'El nombre de categoría ya está en uso.',
-    'category_description.required' => 'La descripción de categoría es obligatoria.',
-    'category_description.string' => 'La descripción de categoría debe ser una cadena de texto.',
-    'category_description.max' => 'La descripción de categoría no debe superar los 50 caracteres.',
-    'main_category_id.required' => 'El ID de categoría principal es obligatorio.',
-    'main_category_id.exists' => 'El ID de categoría principal no es válido.',
-]);
+        ]);
 
     
         $category = Category::updateOrCreate(['id' => $this->data_id], [
@@ -213,7 +203,8 @@ protected function getDataForUser()
     }
 }
         session()->flash('message', 
-            $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
+
    
         $this->closeModal();
         $this->resetInputFields();
@@ -279,7 +270,7 @@ private function deleteAllAssignments($storeCategory)
             SubcategoryToAssign::where('subcategory_id', $subcategory->id)->delete();
         }
 
-        session()->flash('removed', 'Users have been removed!');
+        session()->flash('removed', __('messages.users_removed'));
         $this->reset(['selectedUserId', 'user_id_assign','selectedUserIdDelete']);
         
         $this->user_id_assign = 'All Users';
@@ -289,7 +280,7 @@ private function deleteAllAssignments($storeCategory)
          $this->emit('sessionRemoved');
     } else {
         // Puedes agregar un mensaje de flash específico si no hay asignaciones en CategoriesToAssign
-        session()->flash('noAssignments', 'No user assignments found for this category!');
+        session()->flash('noAssignments', __('messages.no_user_assignments'));
     }
 }
 
@@ -309,7 +300,7 @@ private function deleteUnselectedUsers($storeCategory)
         
         // Refresh the modal or any other necessary action
     $this->resfreschModalUserAssignment($storeCategory->id);
-            session()->flash('removed', "User has been removed!");
+           session()->flash('removed', __('messages.user_removed'));
        $this->emit('sessionRemoved'); 
     }
 }
@@ -338,7 +329,7 @@ private function updateOrCreateAssignments($storeCategory)
 
         if ($isCreate) {
            
-        session()->flash('assigned', 'User assigned successfully!');
+        session()->flash('assigned', __('messages.user_assigned'));
         $this->emit('sessionAssigned');
     }
 }
@@ -363,7 +354,7 @@ public function AssignToSubCategoryUser($subcategoryName, $selectedUserId)
 
         if ($existingAssignment) {
             // User is already assigned to the subcategory
-            session()->flash('info', 'User is already assigned to this subcategory.');
+            session()->flash('info', __('messages.user_already_assigned'));
         } else {
             
             if ($selectedUserId === 'AllUsers') {
@@ -382,7 +373,7 @@ public function AssignToSubCategoryUser($subcategoryName, $selectedUserId)
             }
 
             $this->emit('sessionAssignedSubcategory');
-            session()->flash('assignedSubcategory', 'Users assigned to subcategory successfully');
+            session()->flash('assignedSubcategory', __('messages.users_assigned_to_subcategory'));
         }
     } else {
         // Subcategory not found
@@ -407,7 +398,8 @@ private function assignUserToSubcategory($subcategory, $selectedUserId)
         ['user_id_admin' => auth()->user()->id]
     );
 
-    session()->flash('assignedSubcategory', "User $user->username assigned to subcategory successfully");
+   session()->flash('assignedSubcategory', "User $user->username " . __('messages.assignedSubcategory'));
+
 }
 
 
@@ -433,7 +425,7 @@ private function assignAllUsersToSubcategory($subcategory, $selectedUserId, $cat
         );
     }
 
-    session()->flash('assignedSubcategory', "Users have been assigned to the subcategory successfully");
+   session()->flash('assignedSubcategory', __('messages.users_assigned_to_subcategory_successfully'));
 }
 
 
@@ -478,14 +470,15 @@ public function deleteSubcategoryAssignments($subcategoryName, $selectedUserIdDe
         if ($selectedUserIdDelete === 'removedAll') {
             // Eliminar todos los usuarios asignados a la subcategoría
             SubcategoryToAssign::where('subcategory_id', $subcategory->id)->delete();
-            session()->flash('removedAllSubcategory', "All users have been removed from the Subcategory!");
+            session()->flash('removedAllSubcategory', __('messages.all_users_removed_from_subcategory'));
         } else {
             // Eliminar el usuario específico de la subcategoría
             SubcategoryToAssign::where('subcategory_id', $subcategory->id)
                 ->where('user_id_subcategory', $selectedUserIdDelete)
                 ->delete();
 
-            session()->flash('removedSubcategory', "User $user->username has been removed from the Subcategory!");
+            session()->flash('removedSubcategory', "User $user->username, " . __('messages.removedSubcategory'));
+
         }
 
         // Refresh the modal or any other necessary action
@@ -591,7 +584,8 @@ public function delete($id)
         // Eliminar la categoría
         $categoryToDelete->delete();
 
-         session()->flash('message', $category_name. ' Deleted Successfully' );
+        session()->flash('message', $category_name .  __('messages.category_deleted_successfully'));
+
     } else {
         // Si estás intentando eliminar la categoría especial, puedes manejarlo como desees,
         // por ejemplo, mostrar un mensaje de advertencia o simplemente no hacer nada.

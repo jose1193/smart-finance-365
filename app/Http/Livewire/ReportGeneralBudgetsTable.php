@@ -318,7 +318,7 @@ public function emailStore5()
         });
     }
 
-    session()->flash('message', 'Email Sent Successfully.');
+    session()->flash('message', __('messages.email_sent_successfully'));
     $this->closeModal5();
     $this->resetInputFields5();
     $this->dataSelectBudget();

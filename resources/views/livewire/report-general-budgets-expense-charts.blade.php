@@ -6,7 +6,7 @@
                  <select wire:model="selectedUser6" id="selectUserChart6" wire:change="updateBudgetExpenseData"
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select User</option>
+                     <option value="">{{ __('messages.table_columns_categories.select_a_user') }}</option>
                      @if (auth()->user()->hasRole('Admin'))
                          @foreach ($users as $user)
                              <option value="{{ $user->id }}">{{ $user->name }}
@@ -27,7 +27,7 @@
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                      wire:ignore>
-                     <option value="">Select Month</option>
+                     <option value="">{{ __('messages.select_a_month') }}</option>
                      @foreach ($this->months() as $month)
                          <option value="{{ $month['number'] }}">{{ $month['number'] }} -
                              {{ $month['name'] }}</option>
@@ -42,7 +42,7 @@
                  <select wire:model="selectedYear4" id="selectYearChart5" wire:change="updateBudgetExpenseData"
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select Year</option>
+                     <option value="">{{ __('messages.select_a_year') }}</option>
                      @foreach ($years as $year)
                          <option value="{{ $year }}">{{ $year }}</option>
                      @endforeach
@@ -64,17 +64,17 @@
              <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
                  onclick="downloadImage4()">
                  <span class="font-semibold"><i class="fa-regular fa-image px-1"></i></span>
-                 Download
+                 {{ __('messages.download') }}
              </x-button>
              <x-button class="bg-purple-600 hover:bg-purple-700 shadow-lg hover:shadow-purple-500/50"
                  onclick="generatePDF4()">
                  <span class="font-semibold"><i class="fa-regular fa-file-pdf px-1"></i></span>
-                 Convert To PDF
+                 {{ __('messages.convert_to_pdf') }}
              </x-button>
              <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50" wire:click="resetFields6"
                  wire:loading.attr="disabled">
                  <span class="font-semibold"><i class="fa-solid fa-power-off px-1"></i></span>
-                 Reset Fields
+                 {{ __('messages.reset_fields') }}
              </x-button>
          </div>
          <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
@@ -102,7 +102,8 @@
                  wire:key="{{ $BudgetExpenseChart1 }},{{ $BudgetExpenseChart2 }},{{ $BudgetExpenseChart3 }}">
 
                  @php
-                     $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                     $currencyType =
+                         $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
                  @endphp
 
                  <div class="grid gap-6 mb-8 md:grid-cols-2">
@@ -114,7 +115,10 @@
                              $data = [];
 
                              foreach ($operationsFetchMonths as $item) {
-                                 $amount = $SelectMainCurrencyTypeRender === 'USD' ? $item->total_currency : $item->total_amount;
+                                 $amount =
+                                     $SelectMainCurrencyTypeRender === 'USD'
+                                         ? $item->total_currency
+                                         : $item->total_amount;
 
                                  $data[] = $amount;
                              }
@@ -395,17 +399,17 @@
                              <p class="text-xs font-bold text-center text-blue-500 capitalize   dark:text-gray-400 ">
                                  @if ($userNameSelected5)
                                  @else
-                                     Please select a user -
+                                     {{ __('messages.please_select_user') }} -
                                  @endif
 
                                  @if ($selectedMonthName2)
                                  @else
-                                     Please select a month
+                                     {{ __('messages.please_select_month') }}
                                  @endif
 
                                  @if ($selectedYear4)
                                  @else
-                                     - Please select a year
+                                     - {{ __('messages.please_select_year') }}
                                  @endif
 
                              </p>

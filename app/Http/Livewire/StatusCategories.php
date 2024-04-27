@@ -78,14 +78,15 @@ public function store()
     if ($existingData) {
         
         
-        session()->flash('error', 'The option already exists in the database.');
-    } else {
-        // El correo electrónico no existe, puedes proceder a crear el registro
-       
+       session()->flash('error', __('messages.option_already_exists'));
 
+    } else {
+       
+       
         StatuOptions::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-        session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+         session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
     }
 
     
@@ -111,6 +112,7 @@ public function delete($id)
     {
          
         StatuOptions::find($id)->delete();
-        session()->flash('message', 'Data Deleted Successfully.');
+        session()->flash('message', __('messages.data_deleted_successfully'));
+
     }
 }

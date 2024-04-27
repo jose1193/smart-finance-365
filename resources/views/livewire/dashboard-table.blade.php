@@ -18,8 +18,9 @@
 
                 @can('manage admin')
                     <div class="my-7 flex justify-end space-x-2">
-                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" class="w-full sm:w-full lg:w-60" />
+                        <x-input id="name" type="text" wire:model="search"
+                            placeholder=" {{ __('messages.inpur_search') }}" autofocus autocomplete="off"
+                            class="dark:border-gray-600 dark:bg-gray-700 focus:border-blue-400 focus:outline-none focus:shadow-outline-blue dark:text-gray-300 dark:focus:shadow-outline-blue " />
                     </div>
                 @endcan
                 <!-- Tables -->
@@ -29,23 +30,23 @@
                             <thead>
                                 <tr
                                     class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                    <th class="px-4 py-3">User</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.user') }}</th>
 
-                                    <th class="px-4 py-3">Description</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.description') }}</th>
 
-                                    <th class="px-4 py-3">Operation</th>
-                                    <th class="px-4 py-3">Rate CONV/USD</th>
-                                    <th class="px-4 py-3">Total In USD</th>
-                                    <th class="px-4 py-3">State</th>
-                                    <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.operation') }}</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.rate') }}</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.total_in_usd') }}</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.state') }}</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.date') }}</th>
 
-                                    <th class="px-4 py-3">Action</th>
+                                    <th class="px-4 py-3">{{ __('messages.return_table_headings.action') }}</th>
 
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                 @forelse($data as $item)
-                                    <tr class="text-gray-700 text-xs uppercase  dark:text-gray-400">
+                                    <tr class="text-gray-700 text-xs uppercase  dark:text-gray-400" translate="no">
                                         <td class="px-4 py-3 ">
 
                                             <div class="flex items-center text-sm">
@@ -131,7 +132,13 @@
 
                                         </td>
                                         <td class="px-4 py-3 text-xs text-center">
-                                            {{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}
+                                            @if (app()->getLocale() === 'en')
+                                                <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('m/d/Y') }}</span>
+                                            @elseif(app()->getLocale() === 'pt')
+                                                <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('d/m/Y') }}</span>
+                                            @else
+                                                <span>{{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}</span>
+                                            @endif
                                         </td>
 
                                         <td class="px-4 py-3 text-sm text-center">
@@ -154,7 +161,7 @@
                                             <div class="grid justify-items-center w-full mt-5">
                                                 <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                     role="alert">
-                                                    No Data Records
+                                                    {{ __('messages.no_data_records') }}
                                                 </div>
                                             </div>
                                         </td>
@@ -183,7 +190,7 @@
                                         <div class="text-center"></div>
                                         <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                             id="exampleModalLabel">
-                                            Operation Management
+                                            {{ __('messages.label_operation_management') }}
                                         </h5>
                                         <!--Close button-->
                                         <button type="button" wire:click="closeModal()"
@@ -202,7 +209,7 @@
                                                 <div class="mb-4">
                                                     <label for="operation_description"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Description</label>
+                                                        {{ __('messages.label_description') }}</label>
                                                     <input type="text" autocomplete="off"
                                                         id="operation_description"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -216,12 +223,13 @@
                                                 <div class="mb-4">
                                                     <label for="operation_amount"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Select Conversion From</label>
+                                                        {{ __('messages.label_conversion_from') }}</label>
                                                     <div wire:ignore>
                                                         <select wire:model="selectedCurrencyFrom"
                                                             wire:change="showSelectedCurrency"
                                                             id="selectedCurrencyFrom" style="width: 100%;">
-                                                            <option value="">Select Option</option>
+                                                            <option value="">
+                                                                {{ __('messages.label_select_option') }}</option>
                                                             <option value="Blue-ARS">Argentine Peso (ARS)
                                                             </option>
                                                             @if ($listCurrencies)
@@ -242,7 +250,7 @@
                                                 <div class="mb-4">
                                                     <label for="operation_amount"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Operation With <span
+                                                        {{ __('messages.label_operation_with') }} <span
                                                             class="text-blue-700">{{ $this->selectedCurrencyFromARS }}</label>
 
 
@@ -265,7 +273,7 @@
                                                 <div class="mb-4">
                                                     <label for="operation_currency"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Rate CONV/USD </label>
+                                                        {{ __('messages.label_rate_conv_usd') }} </label>
 
                                                     <input type="text" autocomplete="off" readonly
                                                         id="operation_currency" wire:model="operation_currency"
@@ -285,7 +293,7 @@
                                                 <div class="mb-4 relative">
                                                     <label for="operation_currency"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Total in USD
+                                                        {{ __('messages.label_total_in_usd') }}
                                                     </label>
 
                                                     <div class="flex items-center relative">
@@ -310,7 +318,7 @@
                                                 <div class="mb-4">
                                                     <label for="operation_date"
                                                         class="block text-gray-700 text-sm font-bold mb-2">
-                                                        Date</label>
+                                                        {{ __('messages.label_date') }}</label>
 
                                                     <div wire:ignore>
                                                         <input type="text" readonly id="myDatePicker"
@@ -326,7 +334,8 @@
 
                                                 <div class="mb-4">
                                                     <label for="exampleFormControlInput2"
-                                                        class="block text-gray-700 text-sm font-bold mb-2">Category
+                                                        class="block text-gray-700 text-sm font-bold mb-2">
+                                                        {{ __('messages.label_category') }}
                                                     </label>
 
                                                     <div wire:ignore>
@@ -362,7 +371,7 @@
                                                 @if ($showSubcategories)
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Subcategory</label>
+                                                            class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.label_subcategory') }}</label>
                                                         <div wire:ignore>
                                                             <select wire:model="registeredSubcategoryItem"
                                                                 id="select2SubcategoryId" style="width: 100%;">
@@ -456,7 +465,7 @@
 
                                                 <div class="mb-4">
                                                     <label for="exampleFormControlInput2"
-                                                        class="block text-gray-700 text-sm font-bold mb-2">State
+                                                        class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.label_state') }}
                                                     </label>
                                                     <select wire:model="operation_status"
                                                         class="block w-full mt-1 text-sm dark:text-gray-300 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
@@ -482,13 +491,13 @@
                                                 <button type="button" wire:click.prevent="store()"
                                                     wire:loading.attr="disabled" wire:target="store"
                                                     class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                    Register
+                                                    {{ __('messages.button_register') }}
                                                 </button>
                                             </span>
                                             <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                                 <button wire:click="closeModal()" type="button"
                                                     class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                    Cancel
+                                                    {{ __('messages.button_cancel') }}
                                                 </button>
                                             </span>
                                         </div>
@@ -519,21 +528,21 @@
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id, description) {
             Swal.fire({
-                title: 'Are you sure you want to delete ' +
+                title: '{!! __('messages.delete_confirmation_title') !!}' +
                     '<span style="color:#9333ea">' + description + '</span>' + '?',
-                text: "You won't be able to revert this!",
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __('messages.delete_confirmation_confirm_button') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('dashboard-table', 'delete',
                         id); // Envía el Id al método delete
                     Swal.fire(
-                        'Deleted!',
-                        'Your Data has been deleted.',
+                        '{!! __('messages.delete_success_title') !!}',
+                        '{{ __('messages.delete_confirmation_text_all') }}',
                         'success'
                     );
                 }

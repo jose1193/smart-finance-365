@@ -129,7 +129,7 @@ private function updateMonthDataInternal()
     
     if ($this->selectedMonth) {
         $selectedDate = Carbon::create()->month($this->selectedMonth);
-        $this->selectedMonthName = $selectedDate->format('F');
+        $this->selectedMonthName = $selectedDate->translatedFormat('F');
     } else {
         $this->selectedMonthName = ''; 
     }
@@ -336,7 +336,7 @@ public function emailStore4()
         });
     }
 
-    session()->flash('message', 'Email Sent Successfully.');
+    session()->flash('message', __('messages.email_sent_successfully'));
     $this->closeModal4();
     $this->resetInputFields3();
       

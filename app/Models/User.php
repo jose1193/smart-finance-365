@@ -141,4 +141,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Budget::class);
     }
     
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function blogCategories() 
+    {
+        return $this->hasMany(BlogCategory::class);
+    }
 }

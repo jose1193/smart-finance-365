@@ -10,8 +10,8 @@
 
                 <div class="text-white text-center">
 
-                    <h1 class=" text-gray-300 text-4xl  text-center font-semibold mb-3">Login</h1>
-                    <p class="text-gray-200 text-base text-center">Please log in to access your account.</p>
+                    <h1 class=" text-gray-300 text-4xl  text-center font-semibold mb-3">{{ __('messages.sign_in') }}</h1>
+                    <p class="text-gray-200 text-base text-center">{{ __('messages.please_log_in') }}</p>
                 </div>
             </div>
 
@@ -23,7 +23,7 @@
                 <x-logo />
             </a>
             <p class="text-xl font-bold text-blue-500 text-center ">
-                Welcome back!</p>
+                {{ __('messages.welcome_back') }}</p>
 
             <form method="POST" id="form" action="{{ route('login') }}" class=" " autocomplete="off">
                 @csrf
@@ -56,11 +56,12 @@
                                     fill="#EA4335" />
                             </svg>
 
-                            Continue with Google
+                            {{ __('messages.continue_with_google') }}
                         </a>
                         <div class="relative flex items-center justify-center my-8">
                             <span class="absolute inset-x-0 h-px bg-gray-300"></span>
-                            <span class="relative bg-white px-4 text-sm text-gray-400">Or Login With</span>
+                            <span class="relative bg-white px-4 text-sm text-gray-400">
+                                {{ __('messages.or_login_with') }}</span>
                         </div>
 
                         <div class="relative mb-9">
@@ -79,7 +80,7 @@
                                     autofocus
                                     class="bg-gray-50 border border-gray-300 px-5 py-3 mt-2 mb-2 text-gray-900 text-sm rounded-lg focus:ring-indigo-500
                                  focus:border-indigo-500 block w-full pl-10  p-2.5  dark:border-gray-700  dark:focus:border-indigo-400 focus:outline-none focus:ring focus:ring-opacity-40"
-                                    placeholder="Email or Username">
+                                    placeholder="{{ __('messages.email_or_username') }}">
                             </div>
                         </div>
 
@@ -101,7 +102,7 @@
                                     autofocus autocomplete="off" id="input-group-1"
                                     class="bg-gray-50 border border-gray-300 px-5 py-3 mt-2 mb-2 text-gray-900 text-sm rounded-lg focus:ring-indigo-500
                                  focus:border-indigo-500 block w-full pl-10  p-2.5  dark:border-gray-700  dark:focus:border-indigo-400 focus:outline-none focus:ring focus:ring-opacity-40"
-                                    placeholder="Password">
+                                    placeholder="{{ __('messages.password') }}">
                                 <span id="toggle-password" class="password-toggle" onclick="togglePasswordVisibility()">
                                     <i class=" text-gray-500 fa-regular fa-eye"></i>
                                 </span>
@@ -115,21 +116,21 @@
                         <div class="block">
                             <label for="remember_me" class="flex items-center">
                                 <x-checkbox id="remember_me" name="remember" />
-                                <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                                <span class="ml-2 text-sm text-gray-600"> {{ __('messages.remember_me') }}</span>
                             </label>
                         </div>
                         <div class="flex items-center justify-end ">
                             @if (Route::has('password.request'))
                                 <a class="no-underline text-sm text-gray-600 hover:text-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     href="{{ route('password.request') }}">
-                                    {{ __('Forgot Password?') }}
+                                    {{ __('messages.forgot_password') }}
                                 </a>
                             @endif
                         </div>
                     </div>
                     <button type="submit" id="SubmitForm"
                         class="block rounded-lg bg-blue-600 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-indigo-300 transition duration-500 ease-in-out hover:bg-blue-800 focus-visible:ring active:bg-blue-600 md:text-base">
-                        {{ __('Login') }}</button>
+                        {{ __('messages.login') }}</button>
 
 
 
@@ -138,10 +139,10 @@
                 </div>
 
                 <div class="flex items-center justify-center  ">
-                    <p class="text-center text-sm text-gray-500">Don't have an account? <a
+                    <p class="text-center text-sm text-gray-500">{{ __('messages.dont_have_account') }} <a
                             href="{{ route('register') }}"
-                            class="text-indigo-500 transition duration-100 hover:text-indigo-600 active:text-indigo-700">Sign
-                            Up </a>
+                            class="text-indigo-500 transition duration-100 hover:text-indigo-600 active:text-indigo-700">{{ __('messages.register_me') }}
+                        </a>
                     </p>
                 </div>
             </form>
@@ -191,7 +192,7 @@
                     // Utiliza una expresión regular para validar la contraseña
                     return /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).*$/.test(value);
                 },
-                "The password must contain at least one uppercase, one lowercase, one number, and one special character"
+                "{{ __('messages.form_register_password_customPassword') }}"
             );
 
             $("#form").validate({
@@ -203,21 +204,23 @@
                     },
                     password: {
                         required: true,
+                        minlength: 5,
                     },
                 },
                 messages: {
                     password: {
-                        required: "Please provide a password",
+                        required: "{{ __('messages.form_register_password_required') }}",
+                        minlength: "{{ __('messages.form_register_password_minlength') }}",
                     },
                     identity: {
-                        required: "Please provide an Email or Username",
+                        required: "{{ __('messages.form_register_email_or_username_required') }}",
                     },
                 },
                 submitHandler: function(form) {
                     // Deshabilita el botón, cambia la opacidad y muestra "Initializing..."
                     $("#SubmitForm").prop("disabled", true);
                     $("#SubmitForm").css("opacity", "0.5");
-                    $("#SubmitForm").html("Initializing...");
+                    $("#SubmitForm").html("{{ __('messages.initializing') }}");
 
                     // Continúa con el envío del formulario
                     form.submit();
@@ -260,4 +263,38 @@
     </style>
     <!--END JQUERY VALIDATE -->
 
+
+
+    <script type="text/javascript">
+        function callbackThen(response) {
+            // read Promise object
+            response.json().then(function(data) {
+                console.log(data);
+                if (data.success && data.score >= 0.6) {
+                    console.log('valid reCAPTCHA');
+                    // Habilitar el envío del formulario si el reCAPTCHA es válido
+                    $("#SubmitForm").prop("disabled", false);
+                    $("#SubmitForm").css("opacity", "1");
+                    $("#SubmitForm").html(translations.login);
+                } else {
+                    // Deshabilitar el envío del formulario si el reCAPTCHA falla
+                    $("#SubmitForm").prop("disabled", true);
+                    $("#SubmitForm").css("opacity", "0.5");
+                    $("#SubmitForm").html("reCAPTCHA Error");
+                    document.getElementById('form').addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        alert('reCAPTCHA error');
+                    });
+                }
+            });
+        }
+
+        function callbackCatch(error) {
+            console.error('Error:', error)
+        }
+    </script>
+    {!! htmlScriptTagJsApi([
+        'callback_then' => 'callbackThen',
+        'callback_catch' => 'callbackCatch',
+    ]) !!}
 </x-guest-layout>

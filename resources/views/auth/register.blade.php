@@ -9,8 +9,9 @@
 
                 <div class="text-white text-center">
 
-                    <h1 class=" text-gray-300 text-4xl  text-center font-semibold mb-3">Sign Up</h1>
-                    <p class="text-gray-200 text-base text-center">It's Easley to sign up now</p>
+                    <h1 class=" text-gray-300 text-4xl  text-center font-semibold mb-3">
+                        {{ __('messages.register_heading') }}</h1>
+                    <p class="text-gray-200 text-base text-center">{{ __('messages.its_easy_to_sign_up_now') }}</p>
                 </div>
             </div>
 
@@ -22,8 +23,8 @@
                 <x-logo />
             </a>
             <p class="text-xl font-bold text-blue-600 text-center ">
-                Let's Get Started</p>
-            <p class="text-gray-400 text-base text-center">Fill out the form to create an account</p>
+                {{ __('messages.lets_get_started') }}</p>
+            <p class="text-gray-400 text-base text-center">{{ __('messages.fill_out_the_form') }}</p>
 
             <form method="POST" action="{{ route('register') }}" id="form" autocomplete="off">
                 @csrf
@@ -50,7 +51,7 @@
                                     class="bg-gray-50 border border-gray-300 px-5 py-3 mt-2 mb-2 text-gray-900 text-sm rounded-lg focus:ring-indigo-500
                                  focus:border-indigo-500 block w-full pl-10  p-2.5  dark:border-gray-700  dark:focus:border-indigo-400 focus:outline-none focus:ring focus:ring-opacity-40"
                                     type="text" name="name" :value="old('name')" required autofocus
-                                    autocomplete="off" placeholder="Name" />
+                                    autocomplete="off" placeholder="{{ __('messages.name') }}" />
 
                             </div>
                         </div>
@@ -72,7 +73,7 @@
                                     class="bg-gray-50 border border-gray-300 px-5 py-3 mt-2 mb-2 text-gray-900 text-sm rounded-lg focus:ring-indigo-500
                                  focus:border-indigo-500 block w-full pl-10  p-2.5  dark:border-gray-700  dark:focus:border-indigo-400 focus:outline-none focus:ring focus:ring-opacity-40"
                                     type="email" name="email" :value="old('email')" required autocomplete="off"
-                                    placeholder="Email" />
+                                    placeholder="{{ __('messages.email') }}" />
                                 <span id="emailError" class="text-red-500"></span>
 
                             </div>
@@ -96,7 +97,7 @@
                                 <x-input id="password"
                                     class="bg-gray-50 border border-gray-300 px-5 py-3 mt-2 mb-2 text-gray-900 text-sm rounded-lg focus:ring-indigo-500
                                  focus:border-indigo-500 block w-full pl-10  p-2.5  dark:border-gray-700  dark:focus:border-indigo-400 focus:outline-none focus:ring focus:ring-opacity-40"
-                                    type="password" name="password" placeholder="Password" required
+                                    type="password" name="password" placeholder="{{ __('messages.password') }}" required
                                     autocomplete="new-password" />
 
                                 <span id="toggle-password" class="password-toggle" onclick="togglePasswordVisibility()">
@@ -150,7 +151,8 @@
 
                     <div class="relative flex items-center justify-center ">
                         <span class="absolute inset-x-0 h-px bg-gray-300"></span>
-                        <span class="relative bg-white px-4 text-sm text-gray-400">Or Sign Up With</span>
+                        <span
+                            class="relative bg-white px-4 text-sm text-gray-400">{{ __('messages.continue_with_google') }}</span>
                     </div>
                     <a href="/google-auth/redirect"
                         class="flex items-center my-5 justify-center gap-2  rounded-lg shadow-md border border-gray-300 bg-white px-8 py-3 text-center text-sm font-semibold text-gray-800 outline-none ring-gray-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:text-base">
@@ -170,7 +172,7 @@
                                 fill="#EA4335" />
                         </svg>
 
-                        Continue with Google
+                        {{ __('messages.continue_with_google') }}
                     </a>
 
 
@@ -178,9 +180,9 @@
 
 
                 <div class="flex items-center justify-center  ">
-                    <p class="text-center text-sm text-gray-500">Already registered? <a href="{{ route('login') }}"
-                            class="text-indigo-500 transition duration-100 hover:text-indigo-600 active:text-indigo-700">Sign
-                            In </a>
+                    <p class="text-center text-sm text-gray-500">{{ __('messages.already_registered') }} <a
+                            href="{{ route('login') }}"
+                            class="text-indigo-500 transition duration-100 hover:text-indigo-600 active:text-indigo-700">{{ __('messages.sign_in') }}</a>
                     </p>
                 </div>
             </form>
@@ -234,7 +236,7 @@
                 passwordInput.setCustomValidity('');
             } else {
                 passwordInput.setCustomValidity(
-                    'La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial'
+                    '{{ __('messages.password_requirements') }}'
                 );
             }
         });
@@ -250,12 +252,12 @@
             $.validator.addMethod("customPassword", function(value, element) {
                     return /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).*$/.test(value);
                 },
-                "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
+                "{{ __('messages.form_register_password_customPassword') }}"
             );
 
             $.validator.addMethod("soloLetrasConEspacios", function(value, element) {
                 return this.optional(element) || /^[A-Za-z\s]+$/.test(value);
-            }, "Por favor, introduzca solo letras");
+            }, "{{ __('messages.only_letters') }}");
 
 
             var form = $("#form");
@@ -283,12 +285,21 @@
                     },
                 },
                 messages: {
-                    password: {
-                        required: "Por favor, proporcione una contraseña",
-                    },
                     name: {
-                        soloLetras: "Por favor, introduzca solo letras"
-                    }
+                        required: "{{ __('messages.form_register_name_required') }}",
+                        minlength: "{{ __('messages.form_register_name_minlength') }}",
+                        maxlength: "{{ __('messages.form_register_name_maxlength') }}",
+                        soloLetrasConEspacios: "{{ __('messages.form_register_name_soloLetrasConEspacios') }}",
+                    },
+                    email: {
+                        required: "{{ __('messages.form_register_email_required') }}",
+                        email: "{{ __('messages.form_register_email_email') }}",
+                    },
+                    password: {
+                        required: "{{ __('messages.form_register_password_required') }}",
+                        minlength: "{{ __('messages.form_register_password_minlength') }}",
+                        customPassword: "{{ __('messages.form_register_password_customPassword') }}",
+                    },
                 },
                 submitHandler: function(form) {
                     submitButton.prop("disabled", true).css("opacity", 0.5).text("Enviando...");
@@ -312,7 +323,7 @@
                     },
                     success: function(response) {
                         if (response.message === 'Email no está disponible') {
-                            emailError.text('El correo electrónico ya ha sido tomado.');
+                            emailError.text('{{ __('messages.email_taken') }}');
                             submitButton.prop("disabled", true);
                         } else {
                             emailError.text('');
@@ -358,4 +369,37 @@
     </style>
     <!--END JQUERY VALIDATE -->
 
+
+    <script type="text/javascript">
+        function callbackThen(response) {
+            // read Promise object
+            response.json().then(function(data) {
+                console.log(data);
+                if (data.success && data.score >= 0.6) {
+                    console.log('valid reCAPTCHA');
+                    // Habilitar el envío del formulario si el reCAPTCHA es válido
+                    $("#SubmitForm").prop("disabled", false);
+                    $("#SubmitForm").css("opacity", "1");
+                    $("#SubmitForm").html(translations.register_me);
+                } else {
+                    // Deshabilitar el envío del formulario si el reCAPTCHA falla
+                    $("#SubmitForm").prop("disabled", true);
+                    $("#SubmitForm").css("opacity", "0.5");
+                    $("#SubmitForm").html("reCAPTCHA Error");
+                    document.getElementById('form').addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        alert('reCAPTCHA error');
+                    });
+                }
+            });
+        }
+
+        function callbackCatch(error) {
+            console.error('Error:', error)
+        }
+    </script>
+    {!! htmlScriptTagJsApi([
+        'callback_then' => 'callbackThen',
+        'callback_catch' => 'callbackCatch',
+    ]) !!}
 </x-guest-layout>

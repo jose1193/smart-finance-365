@@ -327,7 +327,7 @@ public function resetFields2()
         });
     }
 
-    session()->flash('message', 'Email Sent Successfully.');
+    session()->flash('message', __('messages.email_sent_successfully'));
     $this->closeModal2();
     $this->resetInputFields2();
     $this->dataSelect();

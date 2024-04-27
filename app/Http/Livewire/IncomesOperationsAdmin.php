@@ -55,8 +55,8 @@ public $selectedCurrencyFromARS;
  public $selectAll = false;
 public $checkedSelected = [];
 
- public $sortBy = 'operations.id'; // Columna predeterminada para ordenar
- public $sortDirection = 'desc'; // Dirección predeterminada para ordenar   
+ public $sortBy = 'operations.id'; 
+ public $sortDirection = 'desc'; 
 
  protected $rules = [
         'user_selected' => 'required', // Agrega las reglas de validación que necesites
@@ -142,7 +142,10 @@ public function refreshCategories()
 
      public function render()
     {
-        
+          $user = auth()->user();
+        if (!$user || !$user->hasRole('Admin')) {
+            abort(403, 'This action is Forbidden.');
+        }
         return view('livewire.incomes-operations-admin');
     }
 
@@ -157,6 +160,7 @@ $this->data = $this->updateDataIncomeOperations();
  $this->updateKey = now()->timestamp;
 
 }
+
 public function updateDataIncomeOperations()
 {
     $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
@@ -172,20 +176,28 @@ public function updateDataIncomeOperations()
             'categories.category_name',
             'statu_options.status_description',
             DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name')
-        )
-        ->orderBy($this->sortBy, $this->sortDirection);
+        );
 
-    // Add condition for the selected user only if configured
+    // Ordenar según lo especificado en el encabezado de la columna
+    if ($this->sortBy === 'operations.operation_date') {
+        $query->orderBy('operations.operation_date', $this->sortDirection);
+    } else {
+        $query->orderBy($this->sortBy, $this->sortDirection);
+    }
+
+    // Agregar condición para el usuario seleccionado solo si está configurado
     if ($this->selectedUser7) {
         $this->applyUserConditions($query);
     } else {
-        // If no user is selected, get all users
+        // Si no se selecciona ningún usuario, obtener todos los usuarios
         $this->categoriesRender = $this->getAllCategories();
         $this->statusOptionsRender = $this->getAllStatusOptions();
     }
 
     return $query->get();
 }
+
+
 
 // Método para cambiar la cantidad de elementos por página
     public function updatedPerPage()
@@ -538,7 +550,8 @@ if (empty($this->operation_date)) {
 
     $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-    session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+     session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
     
     
     $this->SubcategoryOperationAssignment($operation);
@@ -613,8 +626,9 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     $this->showSubcategories = !empty($this->subcategory_id);
 
     $this->subcategoryMessage = $this->showSubcategories
-        ? null
-        : 'The category has no subcategories. Please follow the registration process.';
+    ? null
+    : __('messages.subcategory_no_subcategories');
+
     
     // Configura la subcategoría registrada como seleccionada
     $this->registeredSubcategoryItem = $registeredSubcategoryId;
@@ -628,7 +642,8 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
     $operation->delete();
      $this->updateData();
-    session()->flash('message', $description. ' Deleted Successfully' );
+      session()->flash('message', $description .  __('messages.category_deleted_successfully'));
+    
 }
     
 
@@ -674,7 +689,7 @@ public function deleteMultiple()
     if (count($this->checkedSelected) > 0) {
         Operation::whereIn('id', $this->checkedSelected)->delete();
         $this->checkedSelected = [];
-        session()->flash('message', 'Data Deleted Successfully');
+        session()->flash('message', __('messages.data_deleted_successfully'));
         $this->selectAll = false;
         
     }

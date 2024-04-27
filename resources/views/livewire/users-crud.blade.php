@@ -13,12 +13,7 @@
             <!-- END HEADER -->
 
             <!-- PANEL MAIN CATEGORIES -->
-            <!--INCLUDE ALERTS MESSAGES-->
 
-            <x-message-success />
-
-
-            <!-- END INCLUDE ALERTS MESSAGES-->
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
@@ -30,20 +25,28 @@
                             <i class="fa-solid fa-users mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('User data') }}
+                                {{ __('messages.user_data') }}
+
                             </x-slot>
                             <a href="{{ route('users') }}">
-                                <span>User data</span></a>
+                                <span>{{ __('messages.user_data') }}
+                                </span></a>
                         </div>
 
                     </div>
+                    <!--INCLUDE ALERTS MESSAGES-->
+
+                    <x-message-success />
+
+
+                    <!-- END INCLUDE ALERTS MESSAGES-->
                     @can('manage admin')
                         <div class=" my-7 flex justify-between space-x-2">
-                            <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                            <x-button wire:click="create()"><span class="font-semibold"> {{ __('messages.create_new') }} <i
                                         class="fa-solid fa-user"></i> </span>
                             </x-button>
-                            <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                                autocomplete="off"
+                            <x-input id="name" type="text" wire:model="search"
+                                placeholder="{{ __('messages.inpur_search') }}" autofocus autocomplete="off"
                                 class="dark:border-gray-600 dark:bg-gray-700 focus:border-blue-400 focus:outline-none focus:shadow-outline-blue dark:text-gray-300 dark:focus:shadow-outline-blue " />
                         </div>
                     @endcan
@@ -51,7 +54,7 @@
                         @if (count($checkedSelected) >= 1)
                             <button wire:click="confirmDelete"
                                 class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                Delete Multiple ({{ count($checkedSelected) }})
+                                {{ __('messages.delete_multiple') }} ({{ count($checkedSelected) }})
                             </button>
                         @endif
                     </div>
@@ -63,13 +66,13 @@
                                     <tr
                                         class="text-xs font-semibold tracking-wide text-center text-white uppercase border-b dark:border-gray-700 bg-blue-600 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
-                                        <th class="px-4 py-3">Name</th>
+                                        <th class="px-4 py-3"> {{ __('messages.name') }}</th>
                                         <th class="px-4 py-3">Username</th>
                                         <th class="px-4 py-3">Email</th>
-                                        <th class="px-4 py-3">Date</th>
+                                        <th class="px-4 py-3"> {{ __('messages.date') }}</th>
                                         <th class="px-4 py-3">Role</th>
                                         @can('manage admin')
-                                            <th class="px-4 py-3">Action</th>
+                                            <th class="px-4 py-3"> {{ __('messages.action') }}</th>
                                         @endcan
                                         <th class="px-4 py-3">
                                             @if (!$data->isEmpty())
@@ -80,7 +83,7 @@
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-center  dark:text-gray-400">
+                                        <tr class="text-gray-700 text-center  dark:text-gray-400" translate="no">
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
@@ -96,7 +99,14 @@
                                                 {{ $item->email }}
                                             </td>
                                             <td class="px-4 py-3 text-sm">
-                                                {{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}
+                                                @if (app()->getLocale() === 'en')
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('m/d/Y') }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d/m/Y') }}</span>
+                                                @else
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</span>
+                                                @endif
+
                                             </td>
                                             <td class="px-4 py-3 text-sm">
                                                 @if ($item->role_name === 'Admin')
@@ -139,7 +149,7 @@
                                                         <!-- Tooltip -->
                                                         <div x-show="showTooltip" x-cloak
                                                             class="absolute left-1/3 -ml-5 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded mt-3 z-10">
-                                                            Delete User Operations
+                                                            {{ __('messages.delete_user_operations') }}
                                                         </div>
                                                     </button>
 
@@ -159,7 +169,7 @@
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
-                                                        No Data Records
+                                                        {{ __('messages.no_data_records') }}
                                                     </div>
                                                 </div>
                                             </td>
@@ -188,7 +198,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Users Managament
+                                                {{ __('messages.users_management') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -209,11 +219,12 @@
                                                 <div class="">
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                                                            class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.name') }}</label>
                                                         <input type="text" id="name" autocomplete="off"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             id="exampleFormControlInput1" required maxlength="20"
-                                                            placeholder="Enter Name" wire:model="name">
+                                                            placeholder="{{ __('messages.enter_name') }}"
+                                                            wire:model="name">
                                                         @error('name')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -236,7 +247,8 @@
                                                         <input type="email" id="email" autocomplete="off"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             id="exampleFormControlInput1" maxlength="50"
-                                                            placeholder="Enter Email" wire:model="email">
+                                                            placeholder="{{ __('messages.enter_email') }}"
+                                                            wire:model="email">
                                                         @error('email')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -303,13 +315,13 @@
                                                     <button type="button" wire:click.prevent="store()"
                                                         wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Register
+                                                        {{ __('messages.button_register') }}
                                                     </button>
                                                 </span>
                                                 <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                                     <button wire:click="closeModal()" type="button"
                                                         class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Cancel
+                                                        {{ __('messages.button_cancel') }}
                                                     </button>
                                                 </span>
                                             </div>

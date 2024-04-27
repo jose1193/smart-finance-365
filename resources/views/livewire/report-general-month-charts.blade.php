@@ -5,7 +5,7 @@
              <div wire:ignore>
                  <select wire:model="selectedUser4" wire:change="updateMonthData" id="selectUserChart4" style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select User</option>
+                     <option value="">{{ __('messages.table_columns_categories.select_a_user') }}</option>
                      @if (auth()->user()->hasRole('Admin'))
                          @foreach ($users as $user)
                              <option value="{{ $user->id }}">{{ $user->name }}
@@ -25,7 +25,7 @@
                  <select wire:model="selectedMonth" wire:change="updateMonthData" id="selectMonthChart"
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select Month</option>
+                     <option value="">{{ __('messages.select_a_month') }}</option>
                      @foreach ($this->months() as $month)
                          <option value="{{ $month['number'] }}">{{ $month['number'] }} -
                              {{ $month['name'] }}</option>
@@ -38,7 +38,7 @@
                  <select wire:model="selectedYear3" id="selectYearChart3" wire:change="updateMonthData"
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select Year</option>
+                     <option value="">{{ __('messages.select_a_year') }}</option>
                      @foreach ($years as $year)
                          <option value="{{ $year }}">{{ $year }}</option>
                      @endforeach
@@ -60,17 +60,17 @@
              <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
                  onclick="downloadImage3()">
                  <span class="font-semibold"><i class="fa-regular fa-image px-1"></i></span>
-                 Download
+                 {{ __('messages.download') }}
              </x-button>
              <x-button class="bg-purple-600 hover:bg-purple-700 shadow-lg hover:shadow-purple-500/50"
                  onclick="generatePDF3()">
                  <span class="font-semibold"><i class="fa-regular fa-file-pdf px-1"></i></span>
-                 Convert To PDF
+                 {{ __('messages.convert_to_pdf') }}
              </x-button>
              <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50" wire:click="resetFields4"
                  wire:loading.attr="disabled">
                  <span class="font-semibold"><i class="fa-solid fa-power-off px-1"></i></span>
-                 Reset Fields
+                 {{ __('messages.reset_fields') }}
              </x-button>
          </div>
          <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
@@ -96,7 +96,8 @@
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
                  <select wire:model="main_category_id" wire:change="updateMonthData"
                      class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
-                     <option value="">All Categories
+                     <option value="">{{ __('messages.all_categories') }}
+
                      </option>
                      @foreach ($mainCategoriesRender as $item)
                          <option value="{{ $item->id }}">
@@ -148,7 +149,8 @@
                  <div class="grid gap-6 mb-8 md:grid-cols-2 " id="content3">
                      <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800 my-5">
                          @php
-                             $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                             $currencyType =
+                                 $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
                          @endphp
 
                          <canvas id="{{ $MonthlyChart1 }}" height="200"></canvas>
@@ -245,7 +247,8 @@
 
                          <div class="text-center justify-center mt-10 my-3 flex">
                              @php
-                                 $selectedCategoryId = $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
+                                 $selectedCategoryId =
+                                     $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
                                  $totalCategories = [];
 
                                  foreach ($mainCategoriesRender as $item) {
@@ -451,14 +454,18 @@
 
                          <div class="text-center justify-center mt-10 my-3 flex">
                              @php
-                                 $selectedCategoryId = $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
+                                 $selectedCategoryId =
+                                     $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
                                  $totalCategories = [];
 
                                  foreach ($mainCategoriesRender as $item) {
                                      $totalCategory = 0;
                                      foreach ($operationsFetchMonths as $operationItem) {
                                          // Determine the amount based on the condition
-                                         $amount = $SelectMainCurrencyTypeRender === 'USD' ? $operationItem->total_currency : $operationItem->total_amount;
+                                         $amount =
+                                             $SelectMainCurrencyTypeRender === 'USD'
+                                                 ? $operationItem->total_currency
+                                                 : $operationItem->total_amount;
 
                                          if ($operationItem->main_category_id == $item->id) {
                                              $totalCategory += $amount;
@@ -639,14 +646,18 @@
 
                          <div class="text-center justify-center mt-10 my-3 flex">
                              @php
-                                 $selectedCategoryId = $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
+                                 $selectedCategoryId =
+                                     $main_category_id ?? ($operationsFetchMonths->first()->main_category_id ?? null);
                                  $totalCategories = [];
 
                                  foreach ($mainCategoriesRender as $item) {
                                      $totalCategory = 0;
                                      foreach ($operationsFetchMonths as $operationItem) {
                                          // Determine the amount based on the condition
-                                         $amount = $SelectMainCurrencyTypeRender === 'USD' ? $operationItem->operation_currency_total : $operationItem->operation_amount;
+                                         $amount =
+                                             $SelectMainCurrencyTypeRender === 'USD'
+                                                 ? $operationItem->operation_currency_total
+                                                 : $operationItem->operation_amount;
 
                                          if ($operationItem->main_category_id == $item->id) {
                                              $totalCategory += $amount;

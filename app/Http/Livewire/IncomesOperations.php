@@ -63,7 +63,7 @@ public $checkedSelected = [];
 
 public function render()
     {
-       $data = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+        $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
     ->join('users', 'operations.user_id', '=', 'users.id')
     ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
     ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
@@ -73,16 +73,22 @@ public function render()
     ->where('categories.main_category_id', 1)
     ->where(function ($query) {
         $query->where('categories.category_name', 'like', '%' . $this->search . '%')
-              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%');
+              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%')
+              ->orWhere('operations.id', 'like', '%' . $this->search . '%'); 
     })
     ->select(
         'operations.*',
         'categories.category_name',
         'statu_options.status_description',
         DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name')
-    )
-    ->orderBy($this->sortBy, $this->sortDirection)
-     ->paginate($this->perPage);
+    );
+       if ($this->sortBy === 'operations.operation_date') {
+        $query->orderBy('operations.operation_date', $this->sortDirection);
+    } else {
+        $query->orderBy($this->sortBy, $this->sortDirection);
+    }
+
+    $data = $query->paginate($this->perPage);
 
     $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
     ->pluck('category_id');
@@ -397,7 +403,9 @@ if (empty($this->operation_date)) {
 
     $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-    session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+     session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
+    
     
     
     $this->SubcategoryOperationAssignment($operation);
@@ -468,9 +476,9 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     // Muestra el select2 de subcategorías solo si hay subcategorías disponibles
     $this->showSubcategories = !empty($this->subcategory_id);
 
-    $this->subcategoryMessage = $this->showSubcategories
-        ? null
-        : 'The category has no subcategories. Please follow the registration process.';
+     $this->subcategoryMessage = $this->showSubcategories
+    ? null
+    : __('messages.subcategory_no_subcategories');
     
     // Configura la subcategoría registrada como seleccionada
     $this->registeredSubcategoryItem = $registeredSubcategoryId;
@@ -483,7 +491,7 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     $operation = Operation::find($id);
     $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
     $operation->delete();
-    session()->flash('message', $description. ' Deleted Successfully' );
+     session()->flash('message', $description .  __('messages.category_deleted_successfully'));
 }
 
 
@@ -535,7 +543,7 @@ public function deleteMultiple()
     if (count($this->checkedSelected) > 0) {
         Operation::whereIn('id', $this->checkedSelected)->delete();
         $this->checkedSelected = [];
-        session()->flash('message', 'Data Deleted Successfully');
+        session()->flash('message', __('messages.data_deleted_successfully'));
         $this->selectAll = false;
         
     }

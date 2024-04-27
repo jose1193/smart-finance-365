@@ -99,11 +99,25 @@
     <!-- End jQuery Mask -->
 
     @livewireStyles
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QYG8XFL26W"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QYG8XFL26W');
+    </script>
 </head>
 
 <body class="font-sans antialiased">
     <x-banner />
 
+    @include('cookie-consent::index')
     <div class="min-h-screen bg-gray-100">
 
 

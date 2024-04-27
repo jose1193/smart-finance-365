@@ -30,20 +30,20 @@
                             <i class="fa-solid fa-cash-register mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Expenses Categories') }}
+                                {{ __('messages.expense_categories') }}
                             </x-slot>
                             <a href="{{ route('expenses-categories') }}">
-                                <span>Expenses Categories</span></a>
+                                <span>{{ __('messages.expense_categories') }}</span></a>
                         </div>
 
                     </div>
                     @can('manage admin')
                         <div class=" my-7 flex justify-between space-x-2">
-                            <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                            <x-button wire:click="create()"><span class="font-semibold"> {{ __('messages.create_new') }} <i
                                         class="fa-regular fa-folder-open"></i> </span>
                             </x-button>
-                            <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                                autocomplete="off"
+                            <x-input id="name" type="text" wire:model="search"
+                                placeholder="{{ __('messages.inpur_search') }}" autofocus autocomplete="off"
                                 class="dark:border-gray-600 dark:bg-gray-700 focus:border-blue-400 focus:outline-none focus:shadow-outline-blue dark:text-gray-300 dark:focus:shadow-outline-blue " />
                         </div>
                     @endcan
@@ -57,19 +57,26 @@
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
                                         <th class="px-4 py-3">Item</th>
-                                        <th class="px-4 py-3">Category</th>
-                                        <th class="px-4 py-3">Assigned Categories </th>
-                                        <th class="px-4 py-3">Subcategory</th>
-                                        <th class="px-4 py-3">Assigned Subcategory </th>
-                                        <th class="px-4 py-3">Date</th>
+                                        <th class="px-4 py-3">{{ __('messages.table_columns_categories.category') }}
+                                        </th>
+                                        <th class="px-4 py-3">{{ __('messages.table_columns_categories.subcategory') }}
+                                        </th>
+                                        <th class="px-4 py-3">
+                                            {{ __('messages.table_columns_categories.assigned_categories') }}</th>
+                                        <th class="px-4 py-3">
+                                            {{ __('messages.table_columns_categories.assigned_subcategory') }} </th>
+                                        <th class="px-4 py-3">{{ __('messages.table_columns_categories.date') }} </th>
+
                                         @can('manage admin')
-                                            <th class="px-4 py-3">Action</th>
+                                            <th class="px-4 py-3">{{ __('messages.table_columns_categories.actions') }}
+                                            </th>
                                         @endcan
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-center uppercase dark:text-gray-400">
+                                        <tr class="text-gray-700 text-center uppercase dark:text-gray-400"
+                                            translate="no">
                                             <td class="px-4 py-3 text-xs text-center">
 
                                                 {{ $loop->iteration }}
@@ -130,7 +137,13 @@
                                                 {{ implode(', ', array_unique($assignedUsernames)) }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}
+                                                @if (app()->getLocale() === 'en')
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('m/d/Y') }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d/m/Y') }}</span>
+                                                @else
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</span>
+                                                @endif
                                             </td>
                                             @can('manage admin')
                                                 <td class="px-4 py-3 text-sm">
@@ -145,7 +158,7 @@
                                                             <!-- Tooltip -->
                                                             <div x-show="showTooltip" x-cloak
                                                                 class="absolute left-0 bg-gray-800 text-white px-2 py-1 rounded mt-3 z-10">
-                                                                Category Assignment
+                                                                {{ __('messages.table_columns_categories.category_assignment') }}
                                                             </div>
                                                         </button>
                                                         <button wire:click="edit({{ $item->id }})"
@@ -156,7 +169,7 @@
                                                             class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                                 class="fa-solid fa-trash"></i></button>
                                                     @else
-                                                        Default Category
+                                                        {{ __('messages.table_columns_categories.default_category') }}
                                                     @endif
                                                 </td>
                                             @endcan
@@ -168,7 +181,7 @@
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
-                                                        No Data Records
+                                                        {{ __('messages.no_data_records') }}
                                                     </div>
                                                 </div>
                                             </td>
@@ -197,7 +210,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Expenses Category
+                                                {{ __('messages.expense_categories') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -216,7 +229,7 @@
                                                 <div class="">
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput1"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Category</label>
+                                                            class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.label_category') }}</label>
                                                         <input type="text" autocomplete="off"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             id="exampleFormControlInput1" required maxlength="40"
@@ -227,7 +240,7 @@
                                                     </div>
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                                                            class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.label_description') }}</label>
                                                         <input type="text" autocomplete="off"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                             id="exampleFormControlInput1" maxlength="50"
@@ -240,14 +253,14 @@
 
                                                     <div class="mb-4">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Subcategory:</label>
+                                                            {{ __('messages.label_subcategory') }}:</label>
 
                                                         @foreach ($subcategory_name as $index => $subcategory)
                                                             <div class="mb-4 flex items-center">
                                                                 <input type="text" autocomplete="off"
                                                                     wire:model="subcategory_name.{{ $index }}"
                                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
-                                                                    placeholder="Enter Subcategory {{ $index + 1 }}">
+                                                                    placeholder="{{ __('messages.label_subcategory') }} {{ $index + 1 }}">
 
                                                                 @if ($index >= 0)
                                                                     <button
@@ -265,12 +278,14 @@
 
                                                         <button
                                                             class="relative bg-teal-600 duration-500 ease-in-out hover:bg-teal-700 text-white text-sm font-bold py-2 px-4 rounded"
-                                                            wire:click.prevent="addSubcategory">+ Subcategory</button>
+                                                            wire:click.prevent="addSubcategory">+
+                                                            {{ __('messages.label_subcategory') }}</button>
                                                     </div>
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">Type
+                                                            class="block text-gray-700 text-sm font-bold mb-2">
+                                                            {{ __('messages.label_type_subcategory') }}
                                                         </label>
                                                         <select wire:model="main_category_id"
                                                             class="block w-full mt-1 text-sm dark:text-gray-700 dark:border-gray-600 dark:bg-white form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
@@ -298,13 +313,13 @@
                                                     <button type="button" wire:click.prevent="store()"
                                                         wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Finish
+                                                        {{ __('messages.button_register') }}
                                                     </button>
                                                 </span>
                                                 <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                                     <button wire:click="closeModal()" type="button"
                                                         class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Cancel
+                                                        {{ __('messages.button_cancel') }}
                                                     </button>
                                                 </span>
                                             </div>
@@ -334,7 +349,7 @@
                                             <div class="text-center"></div>
                                             <h5 class=" text-xl font-medium leading-normal text-gray-700 text-center dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Assigning Users To <span
+                                                {{ __('messages.table_columns_categories.assigning_users_to') }} <span
                                                     class="text-emerald-700 capitalize">{{ $categoryNameSelected }}</span>
                                             </h5>
                                             <!--Close button-->
@@ -354,7 +369,7 @@
                                                 <div class="">
                                                     <div class="mb-4">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Category:</label>
+                                                            {{ __('messages.label_category') }}:</label>
 
                                                         <input type="text" autocomplete="off"
                                                             wire:model="categoryNameSelected" readonly
@@ -373,7 +388,9 @@
                                                         <div wire:ignore>
                                                             <select multiple wire:model="user_id_assign"
                                                                 id="selectUserAssign" style="width: 100%">
-                                                                <option value="all">All Users</option>
+                                                                <option value="all">
+                                                                    {{ __('messages.table_columns_categories.select_all_users') }}
+                                                                </option>
                                                                 @foreach ($users->groupBy('name') as $nameUser => $groupedEmails)
                                                                     <optgroup label="{{ $nameUser }}">
                                                                         @foreach ($groupedEmails as $email)
@@ -470,7 +487,7 @@
                                                         @if ($userAssignments && count($userAssignments) > 0)
                                                             <label
                                                                 class="block text-gray-700 text-lg font-bold mb-2 text-end">
-                                                                Subcategories:
+                                                                {{ __('messages.table_columns_categories.subcategories') }}:
                                                             </label>
 
 
@@ -483,7 +500,8 @@
                                                                         <label
                                                                             for="user_id_assignSubcategory_{{ $index }}"
                                                                             class="block text-gray-700 text-sm font-bold mb-2 capitalize">
-                                                                            {{ $index + 1 }}) Select Users To assign
+                                                                            {{ $index + 1 }})
+                                                                            {{ __('messages.table_columns_categories.select_users_to_assign') }}
                                                                             :
 
                                                                         </label>
@@ -510,7 +528,8 @@
                                                                                 :class="borderClass"
                                                                                 wire:loading.attr="disabled">
 
-                                                                                <option value="">-- Select a User
+                                                                                <option value="">--
+                                                                                    {{ __('messages.table_columns_categories.select_a_user') }}
                                                                                     --</option>
 
                                                                                 @php
@@ -540,8 +559,9 @@
 
                                                                                 {{-- Show the option "-- Assign All Users --" only if there are available users --}}
                                                                                 @if ($availableUsersCount > 0)
-                                                                                    <option value="AllUsers">-- Assign
-                                                                                        All Users --</option>
+                                                                                    <option value="AllUsers">--
+                                                                                        {{ __('messages.table_columns_categories.assign_all_users') }}
+                                                                                        --</option>
                                                                                 @endif
 
                                                                                 @foreach ($sortedUserIds as $userId)
@@ -624,13 +644,14 @@
                                                                                 :class="borderClassSubcategory"
                                                                                 wire:loading.attr="disabled">
 
-                                                                                <option value="">-- Select a
-                                                                                    User
+                                                                                <option value="">--
+                                                                                    {{ __('messages.table_columns_categories.select_a_user') }}
                                                                                     --</option>
                                                                                 {{-- Mostrar la opción "-- Remove All User --" solo si hay usuarios --}}
                                                                                 @if (count($assignment['users']) > 0)
                                                                                     <option value="removedAll">--
-                                                                                        Remove All Users --</option>
+                                                                                        {{ __('messages.table_columns_categories.remove_all_users') }}
+                                                                                        --</option>
                                                                                 @endif
                                                                                 @foreach ($assignment['users'] as $user)
                                                                                     <option
@@ -679,7 +700,7 @@
                                                 <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                                                     <button type="button"wire:click="closeModalUserAssignment()"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Finish
+                                                        {{ __('messages.button_register') }}
                                                     </button>
                                                 </span>
 
@@ -712,21 +733,23 @@
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id, category_name) {
             Swal.fire({
-                title: 'Are you sure you want to delete ' +
+                title: '{!! __('messages.delete_confirmation_title') !!} ' +
                     '<span style="color:#9333ea">' + category_name + '</span>' + '?',
-                text: "You won't be able to revert this!",
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('expenses-categories', 'delete',
                         id); // Envía el Id al método delete
                     Swal.fire(
-                        'Deleted!',
-                        'Your Data ' + category_name + ' has been deleted.',
+                        '{!! __('messages.delete_success_title') !!}',
+                        '{{ __('messages.delete_success_message_your_data') }} ' +
+                        category_name +
+                        ' {{ __('messages.delete_success_message_your_data_has_been') }}',
                         'success'
                     );
                 }
@@ -734,6 +757,7 @@
         });
     });
 </script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteDataUserSubcategory', function(subcategoryName, selectedUserIdDelete) {
@@ -746,13 +770,13 @@
 
         function showDeleteConfirmation(subcategoryName, selectedUserIdDelete) {
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
-                text: "You won't be able to revert this!",
+                title: "{{ __('messages.delete_confirmation_text2') }}",
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
                     deleteItem(subcategoryName, selectedUserIdDelete);
@@ -765,14 +789,14 @@
                 selectedUserIdDelete);
             Swal.fire(
                 'Deleted!',
-                'Your Data has been deleted.',
+                '{{ __('messages.delete_confirmation_text_all') }}',
                 'success'
             );
         }
 
         function showUserNotSelectedAlert() {
             Swal.fire({
-                title: 'Please select a user first',
+                '{{ __('messages.please_select_user_first') }}',
                 icon: 'info',
                 confirmButtonColor: '#3085d6',
                 confirmButtonText: 'OK'

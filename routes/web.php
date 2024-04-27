@@ -28,6 +28,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Livewire\Budgets;
 use App\Http\Livewire\IncomesOperationsAdmin;
 use App\Http\Livewire\OperationsAdmin;
+use App\Http\Livewire\PostCrud;
+use App\Http\Livewire\ShowPost;
+use App\Http\Livewire\LatestPosts;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,6 +105,9 @@ Route::get('/google-auth/callback', function () {
 
 ///------------- END ROUTE GOOGLE AUTH ---------///
 
+Route::get('/posts/{postId}', ShowPost::class)->name('posts.show');
+Route::get('latest-posts', LatestPosts::class)->name('latest-posts');
+
 
 Route::middleware([
     'auth:sanctum',
@@ -138,4 +144,8 @@ Route::middleware([
     Route::get('expenses-admin', OperationsAdmin::class)->name('expenses-admin');
 
     //Route::get('expense/{budget}', Operations::class)->name('expense');
+
+     Route::get('posts', PostCrud::class)->name('posts');
 });
+
+

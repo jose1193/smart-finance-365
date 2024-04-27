@@ -30,20 +30,21 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Budget Management') }}
+                                {{ __('messages.budget_management') }}
                             </x-slot>
                             <a href="{{ route('budgets') }}">
-                                <span>Budget Management</span></a>
+                                <span> {{ __('messages.budget_management') }}</span></a>
                         </div>
 
                     </div>
 
                     <div class=" my-7 flex justify-between space-x-2">
-                        <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                        <x-button wire:click="create()"><span class="font-semibold"> {{ __('messages.create_new') }} <i
                                     class="fa-solid fa-money-bill-wave"></i></span>
                         </x-button>
-                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
+                        <x-input id="name" type="text" wire:model="search"
+                            placeholder="{{ __('messages.inpur_search') }}" autofocus autocomplete="off"
+                            class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
                     </div>
                     <!-- resources/views/tu-vista.blade.php -->
 
@@ -55,16 +56,17 @@
                                 <thead>
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3">Nro</th>
+                                        <th class="px-4 py-3">{{ __('messages.nro') }}</th>
                                         @if (auth()->user()->hasRole('Admin'))
-                                            <th class="px-4 py-3">User</th>
+                                            <th class="px-4 py-3">{{ __('messages.user') }}</th>
                                         @endif
-                                        <th class="px-4 py-3">Budget</th>
-                                        <th class="px-4 py-3">Currency</th>
-                                        <th class="px-4 py-3">Rate CONV/USD</th>
-                                        <th class="px-4 py-3">Total In USD</th>
-                                        <th class="px-4 py-3">Date</th>
-                                        <th class="px-4 py-3">Action</th>
+                                        <th class="px-4 py-3">{{ __('messages.budget') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.currency') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.rate_conv_usd') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.total_in_usd') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.date') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.action') }}</th>
+
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -109,7 +111,8 @@
                                                 <button wire:click="edit({{ $item->id }})"
                                                     class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-pen-to-square"></i></button>
-                                                <button wire:click="$emit('deleteData',{{ $item->id }})"
+                                                <button
+                                                    wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->budget_currency_total }}')"
                                                     class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
                                                         class="fa-solid fa-trash"></i></button>
 
@@ -122,7 +125,7 @@
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
-                                                        No Data Records
+                                                        {{ __('messages.no_data_records') }}
                                                     </div>
                                                 </div>
                                             </td>
@@ -151,7 +154,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Budget Management
+                                                {{ __('messages.budget_management') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -172,7 +175,8 @@
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput1"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            User Email:</label>
+                                                            {{ __('messages.user_email') }}
+                                                        </label>
                                                         @if (auth()->user()->hasRole('Admin'))
                                                             <div wire:ignore>
                                                                 <select id="select4EmailsUser" style="width: 100%"
@@ -228,7 +232,8 @@
                                                     <div class="mb-4">
                                                         <label for="selectedCurrencyFrom"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Select Conversion From</label>
+                                                            {{ __('messages.select_conversion_from') }}
+                                                        </label>
                                                         <div wire:ignore>
                                                             <select wire:model="selectedCurrencyFrom"
                                                                 wire:change="showSelectedCurrency"
@@ -254,7 +259,7 @@
                                                     <div class="mb-4">
                                                         <label for="budget_operation"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Operation With <span
+                                                            {{ __('messages.label_operation_with') }} <span
                                                                 class="text-blue-700">{{ $this->selectedCurrencyFrom }}</label>
 
 
@@ -305,7 +310,7 @@
                                                     <div class="mb-4">
                                                         <label for="budget_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Rate CONV/USD </label>
+                                                            {{ __('messages.rate_conv_usd') }} </label>
 
                                                         <input type="text" autocomplete="off" id="budget_currency"
                                                             wire:model="budget_currency" readonly
@@ -325,7 +330,7 @@
                                                     <div class="mb-4 relative">
                                                         <label for="budget_currency"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Total in USD
+                                                            {{ __('messages.total_in_usd') }}
                                                         </label>
 
                                                         <div class="flex items-center relative">
@@ -350,7 +355,7 @@
                                                     <div class="mb-4">
                                                         <label for="budget_date"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Date</label>
+                                                            {{ __('messages.date') }}</label>
                                                         <div wire:ignore>
                                                             <input type="text" id="myDatePicker" readonly
                                                                 wire:model="budget_date" placeholder="dd/mm/yyyy"
@@ -369,13 +374,13 @@
                                                     <button type="button" wire:click.prevent="store()"
                                                         wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Register
+                                                        {{ __('messages.button_register') }}
                                                     </button>
                                                 </span>
                                                 <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                                     <button wire:click="closeModal()" type="button"
                                                         class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Cancel
+                                                        {{ __('messages.button_cancel') }}
                                                     </button>
                                                 </span>
                                             </div>
@@ -404,23 +409,24 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        Livewire.on('deleteData', function(id) {
+        Livewire.on('deleteData', function(id, budget_currency_total) {
             console.log('Evento "deleteData" emitido con ID: ' + id);
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
-                text: "You won't be able to revert this!",
+                title: '{{ __('messages.delete_confirmation_title_budget') }}' +
+                    '<span style="color:#9333ea">' + budget_currency_total + ' $</span>' + '?',
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('budgets', 'delete',
                         id); // Envía el Id al método delete
                     Swal.fire(
-                        'Deleted!',
-                        'Your Data has been deleted.',
+                        '{!! __('messages.delete_success_title2') !!}',
+                        '{{ __('messages.delete_budget') }}',
                         'success'
                     );
                 }

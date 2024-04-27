@@ -66,7 +66,7 @@ public $sortDirection = 'desc'; // Dirección predeterminada para ordenar
 
     public function render()
     {
-    $data = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+    $query =  Operation::join('categories', 'operations.category_id', '=', 'categories.id')
     ->join('users', 'operations.user_id', '=', 'users.id')
     ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
     ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
@@ -78,7 +78,8 @@ public $sortDirection = 'desc'; // Dirección predeterminada para ordenar
     ->where('categories.main_category_id', 2)
     ->where(function ($query) {
         $query->where('categories.category_name', 'like', '%' . $this->search . '%')
-              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%');
+              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%')
+              ->orWhere('operations.id', 'like', '%' . $this->search . '%'); 
     })
     ->select(
         'operations.*',
@@ -88,9 +89,14 @@ public $sortDirection = 'desc'; // Dirección predeterminada para ordenar
         'budget_expenses.operation_id as budget_expense_operation_id',
         'budgets.budget_date as date',
         'budgets.id as budget_id'
-    )
-    ->orderBy($this->sortBy, $this->sortDirection)
-     ->paginate($this->perPage);
+    );
+    if ($this->sortBy === 'operations.operation_date') {
+        $query->orderBy('operations.operation_date', $this->sortDirection);
+    } else {
+        $query->orderBy($this->sortBy, $this->sortDirection);
+    }
+
+    $data = $query->paginate($this->perPage);
 
 
     $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
@@ -416,7 +422,8 @@ if (empty($this->operation_date)) {
 
     $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-    session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+    session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
     
     
     
@@ -486,8 +493,8 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     $this->showSubcategories = !empty($this->subcategory_id);
 
     $this->subcategoryMessage = $this->showSubcategories
-        ? null
-        : 'The category has no subcategories. Please follow the registration process.';
+    ? null
+    : __('messages.subcategory_no_subcategories');
 
     // Configura la subcategoría registrada como seleccionada
     $this->registeredSubcategoryItem = $registeredSubcategoryId;
@@ -504,14 +511,14 @@ public function BudgetExpense($budgetId, Operation $operation)
         if (empty($budgetId) || $budgetId === 'na') {
             // Elimina la entrada existente si $budgetId está vacío o es 'NO'
             BudgetExpense::where(['operation_id' => $operationId])->delete();
-            session()->flash('message', __('Data Deleted Successfully'));
+             session()->flash('message', __('messages.data_deleted_successfully'));
         } else {
             // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
             BudgetExpense::updateOrCreate(
                 ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
                 // Puedes agregar aquí otros campos que desees actualizar o crear
             );
-            session()->flash('message', __('Data Created/Updated Successfully'));
+            session()->flash('message', __('messages.data_created_successfully'));
         }
     } else {
         // session()->flash('info', __('Invalid operation'));
@@ -525,7 +532,7 @@ public function BudgetExpense($budgetId, Operation $operation)
     $operation = Operation::find($id);
     $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
     $operation->delete();
-    session()->flash('message', $description. ' Deleted Successfully' );
+     session()->flash('message', $description .  __('messages.category_deleted_successfully'));
 }
 
 
@@ -575,7 +582,7 @@ public function deleteMultiple()
     if (count($this->checkedSelected) > 0) {
         Operation::whereIn('id', $this->checkedSelected)->delete();
         $this->checkedSelected = [];
-        session()->flash('message', 'Data Deleted Successfully');
+        session()->flash('message', __('messages.data_deleted_successfully'));
         $this->selectAll = false;
         
     }

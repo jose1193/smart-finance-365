@@ -23,10 +23,15 @@ class DashboardCards extends Component
     if (auth()->user()->hasRole('Admin')) {
    
     
-    $this->labelBudget = 'Total Users Budget  ' . $currentMonth2;
-    $this->labelCountOperation = 'Total Users Operations ';
-    $this->labelIncome = 'Total Users Income ';
-    $this->labelExpense = 'Total Users Expense ';
+    // Obtener el nombre del mes actual y traducir
+$currentMonth = ucfirst(Carbon::now()->translatedFormat('F'));
+
+
+$this->labelBudget = __('messages.dashboard_user_total_users_budget') . ' ' . $currentMonth;
+$this->labelCountOperation = __('messages.dashboard_user_total_users_operations');
+$this->labelIncome = __('messages.dashboard_user_total_users_income');
+$this->labelExpense = __('messages.dashboard_user_total_users_expense');
+
 
     $this->income = Operation::whereHas('category', function ($query) {
         $query->where('main_category_id', 1); // 1 es el ID de la categoría 'income'
@@ -54,10 +59,11 @@ class DashboardCards extends Component
    
 }
  else {
-    $this->labelBudget = 'General Budget ' . $currentMonth2; 
-    $this->labelCountOperation = 'Total Operations ';
-    $this->labelIncome = ' Income ';
-    $this->labelExpense = 'Expense ';
+$this->labelBudget = __('messages.dashboard_user_general_budget') . ' ' . $currentMonth2; 
+$this->labelCountOperation = __('messages.dashboard_user_total_operations');
+$this->labelIncome = __('messages.dashboard_user_income');
+$this->labelExpense = __('messages.dashboard_user_expense');
+
 
   
 // Calcula la suma de 'operation_currency_total' para la categoría 'income' (ID 1)

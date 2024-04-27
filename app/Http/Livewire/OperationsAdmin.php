@@ -177,7 +177,10 @@ $this->updateDataExpense();
 
      public function render()
     {
-       
+         $user = auth()->user();
+        if (!$user || !$user->hasRole('Admin')) {
+            abort(403, 'This action is Forbidden.');
+        }
         return view('livewire.operations-admin');
     }
 
@@ -214,8 +217,13 @@ public function updateDataExpenseOperations()
             'budget_expenses.operation_id as budget_expense_operation_id',
             'budgets.budget_date as date',
             'budgets.id as budget_id'
-        )
-         ->orderBy($this->sortBy, $this->sortDirection);
+        );
+        // Ordenar según lo especificado en el encabezado de la columna
+    if ($this->sortBy === 'operations.operation_date') {
+        $query->orderBy('operations.operation_date', $this->sortDirection);
+    } else {
+        $query->orderBy($this->sortBy, $this->sortDirection);
+    }
 
     // Agregar la condición para el usuario seleccionado solo si está configurado
     if ($this->selectedUser8) {
@@ -578,7 +586,8 @@ if (empty($this->operation_date)) {
 
     $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-    session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+    session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
     
     
     
@@ -656,8 +665,8 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     $this->showSubcategories = !empty($this->subcategory_id);
 
     $this->subcategoryMessage = $this->showSubcategories
-        ? null
-        : 'The category has no subcategories. Please follow the registration process.';
+    ? null
+    : __('messages.subcategory_no_subcategories');
 
     // Configura la subcategoría registrada como seleccionada
     $this->registeredSubcategoryItem = $registeredSubcategoryId;
@@ -673,14 +682,14 @@ public function BudgetExpense($budgetId, Operation $operation)
         // Verifica si $budgetId es "na" para eliminar la entrada
         if ($budgetId === 'na') {
             BudgetExpense::where(['operation_id' => $operationId])->delete();
-            session()->flash('message', __('Data Deleted Successfully'));
+             session()->flash('message', __('messages.data_deleted_successfully'));
         } else {
             // Si $budgetId tiene otro valor, realiza un updateOrCreate
             BudgetExpense::updateOrCreate(
                 ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
                 // Puedes agregar aquí otros campos que desees actualizar o crear
             );
-            session()->flash('message', __('Data Created/Updated Successfully'));
+             session()->flash('message', __('messages.data_created_successfully'));
         }
     } else {
         // session()->flash('info', __('Invalid operation'));
@@ -695,7 +704,7 @@ public function delete($id)
     $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
     $operation->delete();
      $this->updateDataExpense();
-    session()->flash('message', $description. ' Deleted Successfully' );
+     session()->flash('message', $description .  __('messages.category_deleted_successfully'));
 }
 
     
@@ -742,7 +751,7 @@ public function deleteMultiple()
     if (count($this->checkedSelected) > 0) {
         Operation::whereIn('id', $this->checkedSelected)->delete();
         $this->checkedSelected = [];
-        session()->flash('message', 'Data Deleted Successfully');
+        session()->flash('message', __('messages.data_deleted_successfully'));
         $this->selectAll = false;
         
     }

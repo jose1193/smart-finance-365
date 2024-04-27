@@ -80,7 +80,9 @@ public function store()
 
         EmailManagement::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-        session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+        session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
+
     }
 
     
@@ -106,7 +108,7 @@ public function delete($id)
     {
          
         EmailManagement::find($id)->delete();
-        session()->flash('message', 'Data Deleted Successfully.');
+        session()->flash('message', __('messages.data_deleted_successfully'));
     }
 
 }

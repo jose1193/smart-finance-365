@@ -26,10 +26,12 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Support Contact') }}
+                                {{ __('messages.support_contact') }}
+
                             </x-slot>
                             <a href="{{ route('support-contact') }}">
-                                <span>Support Contact</span></a>
+                                <span>{{ __('messages.support_contact') }}
+                                </span></a>
                         </div>
 
                     </div>
@@ -100,18 +102,19 @@
                     @endif
                     <!-- END SHOW MESSAGE -->
                     <div class=" my-7 flex justify-between space-x-2">
-                        <x-button wire:click="create()"><span class="font-semibold"> New Message <i
+                        <x-button wire:click="create()"><span class="font-semibold"> {{ __('messages.new_message') }} <i
                                     class="fa-solid fa-envelope-open-text"></i></span>
                         </x-button>
-                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
+                        <x-input id="name" type="text" wire:model="search"
+                            placeholder="{{ __('messages.inpur_search') }}" autofocus autocomplete="off"
+                            class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
                     </div>
 
                     <div class="flex justify-end mb-5">
                         @if (count($checkedSelected) >= 1)
                             <button wire:click="confirmDelete"
                                 class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                Delete Multiple ({{ count($checkedSelected) }})
+                                {{ __('messages.delete_multiple') }} ({{ count($checkedSelected) }})
                             </button>
                         @endif
                     </div>
@@ -123,12 +126,12 @@
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
-                                        <th class="px-4 py-3">From</th>
-                                        <th class="px-4 py-3">To</th>
+                                        <th class="px-4 py-3">{{ __('messages.from') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.to') }}</th>
                                         <th class="px-4 py-3">Email</th>
-                                        <th class="px-4 py-3">Subject</th>
-                                        <th class="px-4 py-3">Message</th>
-                                        <th class="px-4 py-3 ">Action</th>
+                                        <th class="px-4 py-3">{{ __('messages.subject') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.message') }}</th>
+                                        <th class="px-4 py-3 ">{{ __('messages.action') }}</th>
                                         @can('manage admin')
                                             <th class="px-4 py-3">
                                                 @if (!$data->isEmpty())
@@ -140,7 +143,8 @@
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
+                                        <tr class="text-gray-700 text-xs text-center uppercase dark:text-gray-400"
+                                            translate="no">
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
@@ -188,7 +192,7 @@
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
-                                                        No Data Records
+                                                        {{ __('messages.no_data_records') }}
                                                     </div>
                                                 </div>
                                             </td>
@@ -217,7 +221,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Support Contact Form
+                                                {{ __('messages.support_contact_form') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -237,17 +241,19 @@
                                                     <div class="mb-4">
                                                         <label for=""
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Name</label>
+                                                            {{ __('messages.name') }}</label>
                                                         @if (auth()->user()->hasRole('Admin'))
                                                             <input type="text" autocomplete="off"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                                maxlength="20" placeholder="Enter Name" readonly
-                                                                wire:model="name"
+                                                                maxlength="20"
+                                                                placeholder=" {{ __('messages.enter_name') }}"
+                                                                readonly wire:model="name"
                                                                 @if (auth()->user()->hasRole('Admin')) wire:change="updatedEmail($event.target.value)" @endif>
                                                         @else
                                                             <input type="text" autocomplete="off"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                                maxlength="20" placeholder="Enter Name"
+                                                                maxlength="20"
+                                                                placeholder="{{ __('messages.enter_name') }}"
                                                                 value="{{ auth()->user()->name }}" readonly>
                                                         @endif
                                                         @error('name')
@@ -261,12 +267,14 @@
                                                         @if (auth()->user()->hasRole('User'))
                                                             <input type="text" autocomplete="off"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                                maxlength="20" placeholder="Enter Name"
+                                                                maxlength="20"
+                                                                placeholder="{{ __('messages.enter_name') }}"
                                                                 value="{{ auth()->user()->email }}" readonly>
                                                             <input type="email" autocomplete="off"
                                                                 wire:model="email"
                                                                 class="hidden shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                                placeholder="Enter Email" readonly>
+                                                                placeholder="{{ __('messages.enter_email') }}"
+                                                                readonly>
                                                         @else
                                                             <div wire:ignore>
                                                                 <select wire:model="email" id="select2EMailUserId"
@@ -313,12 +321,12 @@
 
                                                     <div class="mb-4">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Subject</label>
+                                                            {{ __('messages.subject') }}</label>
 
 
                                                         <input type="text" autocomplete="off" wire:model="subject"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            placeholder="Enter Subject">
+                                                            placeholder="{{ __('messages.enter_subject') }}">
                                                         @error('subject')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -326,7 +334,7 @@
 
                                                     <div class="mb-4">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Message</label>
+                                                            {{ __('messages.message') }}</label>
 
 
                                                         <textarea rows="3" wire:model="message"
@@ -344,13 +352,13 @@
                                                     <button type="button" wire:click.prevent="store()"
                                                         wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Send
+                                                        {{ __('messages.send') }}
                                                     </button>
                                                 </span>
                                                 <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                                     <button wire:click="closeModal()" type="button"
                                                         class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Cancel
+                                                        {{ __('messages.button_cancel') }}
                                                     </button>
                                                 </span>
                                             </div>
@@ -382,20 +390,20 @@
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id) {
             Swal.fire({
-                title: 'Are you sure you want to delete this item?',
-                text: "You won't be able to revert this!",
+                title: "{{ __('messages.delete_confirmation_title_delete') }}",
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('support-contact', 'delete',
                         id); // Envía el Id al método delete
                     Swal.fire(
-                        'Deleted!',
-                        'Your Data has been deleted.',
+                        '{!! __('messages.delete_success_title2') !!}',
+                        '{{ __('messages.delete_confirmation_text_all') }}',
                         'success'
                     );
                 }
@@ -408,20 +416,20 @@
     document.addEventListener('livewire:load', function() {
         Livewire.on('showConfirmation', () => {
             Swal.fire({
-                title: 'Are you sure you want to delete these items?',
-                text: "You won't be able to revert this!",
+                title: "{{ __('messages.delete_confirmation_text_all_items') }}",
+                text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
                     Livewire.emitTo('support-contact',
                         'deleteMultiple'); // Envía el Id al método delete
                     Swal.fire(
-                        'Deleted!',
-                        'Your Data has been deleted.',
+                        '{!! __('messages.delete_success_title2') !!}',
+                        '{{ __('messages.delete_confirmation_text_all') }}',
                         'success'
                     );
 

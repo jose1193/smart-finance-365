@@ -78,17 +78,8 @@ public function store()
     'email' => 'required|email|string|max:40',
 ];
 
-$customMessages = [
-    'name_support.required' => 'El campo nombre es obligatorio',
-    'name_support.string' => 'El campo nombre debe ser una cadena de texto',
-    'name_support.max' => 'El campo nombre no debe superar los 20 caracteres',
-    'email.required' => 'El campo email es obligatorio',
-    'email.email' => 'El campo email debe ser una dirección de correo electrónico válida',
-    'email.string' => 'El campo email debe ser una cadena de texto',
-    'email.max' => 'El campo email no debe superar los 40 caracteres',
-];
 
-    $validatedData = $this->validate($validationRules,$customMessages);
+    $validatedData = $this->validate($validationRules);
 
     $existingEmail = AdminEmail::where('email', $this->email)->first();
 

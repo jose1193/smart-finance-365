@@ -126,13 +126,7 @@ class SupportContact extends Component
         'message' => 'required|string|max:255',
     ];
 
-    $validatedData = $this->validate($validationRules, [
-    'name.required' => 'El campo nombre es obligatorio.',
-    'name.string' => 'El campo nombre debe ser una cadena de texto.',
-    'name.max' => 'El campo nombre no debe superar los 20 caracteres.',
-    'name.regex' => 'El campo nombre solo debe contener letras y espacios.',
-    'email.required' => 'El campo email es obligatorio.',
-]);
+    $validatedData = $this->validate($validationRules);
 
     // Asigna el user_id si el usuario está autenticado
     $validatedData['user_id'] = auth()->user()->id;
@@ -168,7 +162,8 @@ if (auth()->user()->hasRole('User')) {
     SupportContactForm::updateOrCreate(['id' => $this->data_id], $validatedData);
   
 
-    session()->flash('message', $this->data_id ? 'Data Updated Successfully' : 'Data Created Successfully');
+     session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
 
     $this->closeModal();
     $this->resetInputFields();
@@ -193,7 +188,7 @@ public function delete($id)
 {
    
     SupportContactForm::find($id)->delete();
-    session()->flash('message', 'Data Deleted Successfully');
+     session()->flash('message', __('messages.data_deleted_successfully'));
 }
 
  public function updatedSelectAll($value)
@@ -223,7 +218,7 @@ public function deleteMultiple()
     if (count($this->checkedSelected) > 0) {
         SupportContactForm::whereIn('id', $this->checkedSelected)->delete();
         $this->checkedSelected = [];
-        session()->flash('message', 'Data Deleted Successfully');
+        session()->flash('message', __('messages.data_deleted_successfully'));
         $this->selectAll = false;
     }
 }

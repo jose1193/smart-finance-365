@@ -72,7 +72,7 @@ public function months()
 
     for ($i = 1; $i <= 12; $i++) {
         $dateInMonth = Carbon::create($currentYear, $i, 1);
-        $monthName = $dateInMonth->format('F');
+         $monthName = $dateInMonth->translatedFormat('F');
 
         $months[] = [
             'number' => $i,

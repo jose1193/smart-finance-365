@@ -7,7 +7,7 @@
                  <select wire:model="selectedUser5" wire:change="updateChartBudgetData" id="selectUserChart5"
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select User</option>
+                     <option value=""> {{ __('messages.table_columns_categories.select_a_user') }}</option>
                      @if (auth()->user()->hasRole('Admin'))
                          @foreach ($users as $user)
                              <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -28,7 +28,7 @@
                  <select wire:model="selectedYear4" id="selectYearChart4" wire:change="updateChartBudgetData"
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                     <option value="">Select Year</option>
+                     <option value="">{{ __('messages.select_a_year') }}</option>
                      @foreach ($years as $year)
                          <option value="{{ $year }}">{{ $year }}</option>
                      @endforeach
@@ -52,23 +52,22 @@
              <x-button class="bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-green-500/50"
                  onclick="downloadImage()">
                  <span class="font-semibold"><i class="fa-regular fa-image px-1"></i></span>
-                 Download
+                 {{ __('messages.download') }}
              </x-button>
              <x-button class="bg-purple-600 hover:bg-purple-700 shadow-lg hover:shadow-purple-500/50"
                  onclick="generatePDF()">
                  <span class="font-semibold"><i class="fa-regular fa-file-pdf px-1"></i></span>
-                 Convert To PDF
+                 {{ __('messages.convert_to_pdf') }}
              </x-button>
              <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50" wire:click="resetFields5"
                  wire:loading.attr="disabled">
                  <span class="font-semibold"><i class="fa-solid fa-power-off px-1"></i></span>
-                 Reset Fields
+                 {{ __('messages.reset_fields') }}
              </x-button>
          </div>
          @if ($date_start && $date_end && $date_start > $date_end)
-             <p class="text-red-700 mt-2 text-center font-semibold">Error: La fecha de inicio no puede
-                 ser posterior a
-                 la fecha de finalización.</p>
+             <p class="text-red-700 mt-2 text-center font-semibold">{{ __('messages.start_date_after_end_date') }}
+             </p>
          @endif
          <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -142,7 +141,10 @@
                                  <div
                                      class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center capitalize border-b bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-700">
                                      @php
-                                         $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                         $currencyType =
+                                             $SelectMainCurrencyTypeRender === 'Blue-ARS'
+                                                 ? 'ARS'
+                                                 : $SelectMainCurrencyTypeRender;
                                      @endphp
 
                                      <p class="text-gray-500 dark:text-gray-400 font-semibold">General
@@ -261,7 +263,7 @@
                              var dataBar = {
                                  labels: [
                                      @for ($i = 1; $i <= 12; $i++)
-                                         "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                                         "{{ ucfirst(\Carbon\Carbon::create()->month($i)->translatedFormat('F')) }}",
                                      @endfor
                                  ],
                                  datasets: [{
@@ -346,7 +348,10 @@
                                  <div
                                      class="rounded w-3/5 px-6 py-6 text-xs font-bold tracking-wide text-center capitalize border-b bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-700">
                                      @php
-                                         $currencyType2 = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                         $currencyType2 =
+                                             $SelectMainCurrencyTypeRender === 'Blue-ARS'
+                                                 ? 'ARS'
+                                                 : $SelectMainCurrencyTypeRender;
                                      @endphp
 
                                      <p class="text-gray-500 dark:text-gray-400 font-semibold">General
@@ -465,7 +470,7 @@
                              var dataBar = {
                                  labels: [
                                      @for ($i = 1; $i <= 12; $i++)
-                                         "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                                         "{{ ucfirst(\Carbon\Carbon::create()->month($i)->translatedFormat('F')) }}",
                                      @endfor
                                  ],
                                  datasets: [{
@@ -544,7 +549,7 @@
                              var dataBar = {
                                  labels: [
                                      @for ($i = 1; $i <= 12; $i++)
-                                         "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                                         "{{ ucfirst(\Carbon\Carbon::create()->month($i)->translatedFormat('F')) }}",
                                      @endfor
                                  ],
 
@@ -711,7 +716,10 @@
                      <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800">
                          <h4 class="mb-4 font-semibold text-gray-800 text-center dark:text-gray-300">
                              Top 10 {{ $categoryName }} @php
-                                 $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                 $currencyType =
+                                     $SelectMainCurrencyTypeRender === 'Blue-ARS'
+                                         ? 'ARS'
+                                         : $SelectMainCurrencyTypeRender;
                              @endphp {{ $currencyType }}
                          </h4>
                          <canvas id="{{ $GeneralChart7 }}" width="400" height="200"></canvas>
@@ -788,7 +796,10 @@
                      <div class="min-w-0 p-4 bg-white rounded-lg capitalize shadow-xs dark:bg-gray-800">
                          <h4 class="mb-4 font-semibold text-gray-800 text-center dark:text-gray-300">
                              Top 10 {{ $categoryName2 }} @php
-                                 $currencyType = $SelectMainCurrencyTypeRender === 'Blue-ARS' ? 'ARS' : $SelectMainCurrencyTypeRender;
+                                 $currencyType =
+                                     $SelectMainCurrencyTypeRender === 'Blue-ARS'
+                                         ? 'ARS'
+                                         : $SelectMainCurrencyTypeRender;
                              @endphp {{ $currencyType }}
                          </h4>
                          <canvas id="{{ $GeneralChart8 }}" width="400" height="200"></canvas>

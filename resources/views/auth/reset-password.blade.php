@@ -23,7 +23,7 @@
             </div>
 
             <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
+                <x-label for="password" value="{{ __('messages.password') }}" />
                 <x-input id="password"
                     class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border
                                  border-gray-200 rounded-md dark:placeholder-gray-600
@@ -34,7 +34,7 @@
             </div>
 
             <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
+                <x-label for="password_confirmation" value="{{ __('messages.confirm_password') }}" />
                 <x-input id="password_confirmation"
                     class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border
                                  border-gray-200 rounded-md dark:placeholder-gray-600
@@ -46,7 +46,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <x-button>
-                    {{ __('Reset Password') }}
+                    {{ __('messages.reset_password') }}
                 </x-button>
             </div>
         </form>

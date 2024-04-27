@@ -18,11 +18,12 @@
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
                         {{ number_format($totalIncome, 0, '.', ',') }} USD
                     </p>
-                    <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName }} Budget</p>
+                    <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName }}
+                        {{ __('messages.label_category_budget') }}</p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
                         {{ number_format($totalBudget, 0, '.', ',') }} USD
                     </p>
-                    <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference </p>
+                    <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ __('messages.label_difference') }} </p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
                         {{ number_format($totalIncome - $totalBudget, 0, '.', ',') }} USD </p>
 
@@ -79,7 +80,7 @@
                             // Añadir texto adicional "of Expense"
                             ctx.fillStyle = '#808080'; // Color gris
                             ctx.font = '14px Roboto';
-                            ctx.fillText('of {{ $categoryName }} Budget', centerX, centerY +
+                            ctx.fillText('of {{ $categoryName }} ', centerX, centerY +
                                 30); // Ajusta la posición vertical según sea necesario
                         }
                     },
@@ -110,7 +111,8 @@
             var dataBar = {
                 labels: [
                     @for ($i = 1; $i <= 12; $i++)
-                        "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+
+                        "{{ ucfirst(\Carbon\Carbon::create()->month($i)->translatedFormat('F')) }}",
                     @endfor
                 ],
                 datasets: [{
@@ -184,12 +186,12 @@
                                 class="text-xs font-bold tracking-wide text-center text-gray-600 capitaliza border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-700">
 
                                 <th class="px-4 py-3 " colspan="5">
-                                    {{ $categoryName }} (USD) - {{ now()->format('F Y') }}
+                                    {{ $categoryName }} (USD) - {{ ucfirst(now()->translatedFormat('F Y')) }}
                                 </th>
                             </tr>
                             <tr
                                 class=" border-b-2 border-teal-500 text-xs font-bold tracking-wide text-center text-gray-600 capitalize   bg-gray-100 dark:border-gray-400 dark:text-gray-400 dark:bg-gray-700">
-                                <th class="px-4 py-3">Month</th>
+                                <th class="px-4 py-3">{{ __('messages.label_month_th') }}</th>
 
                                 <th class="px-4 py-3">Actual</th>
 
@@ -288,11 +290,13 @@
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
                         {{ number_format($totalExpenses, 0, '.', ',') }} USD
                     </p>
-                    <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName2 }} Budget</p>
+                    <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ $categoryName2 }}
+                        {{ __('messages.label_category_budget') }}</p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold mb-7">
                         {{ number_format($totalBudget, 0, '.', ',') }} USD
                     </p>
-                    <p class="text-gray-500 dark:text-gray-400 font-semibold">Difference </p>
+                    <p class="text-gray-500 dark:text-gray-400 font-semibold">{{ __('messages.label_difference') }}
+                    </p>
                     <p class="text-gray-600 dark:text-gray-300 text-lg font-bold">
                         {{ number_format($totalExpenses - $totalBudget, 0, '.', ',') }} USD </p>
 
@@ -345,7 +349,7 @@
                             // Añadir texto adicional "of Expense"
                             ctx.fillStyle = '#808080'; // Color gris
                             ctx.font = '14px Roboto';
-                            ctx.fillText('of {{ $categoryName2 }} Budget', centerX, centerY +
+                            ctx.fillText('of {{ $categoryName2 }}', centerX, centerY +
                                 30); // Ajusta la posición vertical según sea necesario
                         }
                     },
@@ -379,7 +383,7 @@
             var dataBar = {
                 labels: [
                     @for ($i = 1; $i <= 12; $i++)
-                        "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                        "{{ ucfirst(\Carbon\Carbon::create()->month($i)->translatedFormat('F')) }}",
                     @endfor
                 ],
                 datasets: [{
@@ -453,12 +457,12 @@
                                 class="text-xs font-bold tracking-wide text-center text-gray-600 capitaliza border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-700">
 
                                 <th class="px-4 py-3 " colspan="5">
-                                    {{ $categoryName2 }} (USD) - {{ now()->format('F Y') }}
+                                    {{ $categoryName2 }} (USD) - {{ ucfirst(now()->translatedFormat('F Y')) }}
                                 </th>
                             </tr>
                             <tr
                                 class=" border-b-2 border-[#7e3af2] text-xs font-bold tracking-wide text-center text-gray-600 capitalize   bg-gray-100 dark:border-gray-400 dark:text-gray-400 dark:bg-gray-700">
-                                <th class="px-4 py-3">Month</th>
+                                <th class="px-4 py-3">{{ __('messages.label_month_th') }}</th>
 
                                 <th class="px-4 py-3">Actual</th>
 
@@ -552,7 +556,7 @@
             var dataBar = {
                 labels: [
                     @for ($i = 1; $i <= 12; $i++)
-                        "{{ \Carbon\Carbon::create()->month($i)->format('F') }}",
+                        "{{ ucfirst(\Carbon\Carbon::create()->month($i)->translatedFormat('F')) }}",
                     @endfor
                 ],
 

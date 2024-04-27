@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use App\Models\User;
 use App\Models\MainCategories;
 use App\Models\Category;
+use App\Models\BlogCategory;
 use App\Models\StatuOptions;
 
 class DatabaseSeeder extends Seeder
@@ -144,5 +145,15 @@ foreach ($statusOptions as $statusData) {
     StatuOptions::create($statusData);
 }
         // END MAIN CATEGORIES STATUS OPTIONS
+
+
+        // Crear la categoría "General" para blog
+       BlogCategory::create([
+            'blog_category_name' => 'Blog',
+            'blog_category_description' => 'Valor por defecto',
+            'blog_category_image' => 'Valor por defecto',
+            'user_id' => 1,
+        ]);
+    // end  
     }
 }

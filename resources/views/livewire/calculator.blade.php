@@ -31,10 +31,10 @@
                                  <i class="fa-solid fa-circle-dollar-to-slot mr-3"></i>
 
                                  <x-slot name="title">
-                                     {{ __('Rates Calculator') }}
+                                     {{ __('messages.rates_exchange_calculator') }}
                                  </x-slot>
                                  <a href="{{ route('calculator') }}">
-                                     <span>Rates Exchange Calculator </span></a>
+                                     <span>{{ __('messages.rates_exchange_calculator') }} </span></a>
                              </div>
 
                          </div>
@@ -76,7 +76,7 @@
                              <div id="myTabContent">
                                  <h5
                                      class="text-base font-bold  text-left text-gray-600 capitalize my-3  dark:text-gray-400 ">
-                                     ARS To Currency
+                                     ARS To {{ __('messages.rates_exchange_currency') }}
                                  </h5>
 
                                  <div class="hidden py-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="item1"
@@ -86,7 +86,8 @@
                                      <div class="flex flex-col md:flex-row lg:space-x-4">
                                          <input id="amount2" autocomplete="off"
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Amount (ARS)" name="amount2" maxlength="30" required />
+                                             placeholder="{{ __('messages.rates_exchange_input_amount') }} (ARS)"
+                                             name="amount2" maxlength="30" required />
 
                                          <input
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
@@ -94,8 +95,8 @@
                                              readonly />
                                          <input id="totalbudget2" readonly
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Currency Exchange" maxlength="30" name="totalbudget2"
-                                             required />
+                                             placeholder="{{ __('messages.rates_exchange_currency_input') }}"
+                                             maxlength="30" name="totalbudget2" required />
                                      </div>
 
                                      <script>
@@ -142,15 +143,16 @@
                                      <div class="flex flex-col md:flex-row lg:space-x-4">
                                          <input id="amount3" autocomplete="off"
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Amount (ARS)" name="amount3" maxlength="30" required />
+                                             placeholder="{{ __('messages.rates_exchange_input_amount') }} (ARS)"
+                                             name="amount3" maxlength="30" required />
                                          <input
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                              name="dollarchange3" value="${{ $data['oficial']['value_sell'] }}" required
                                              readonly />
                                          <input id="totalbudget3" readonly
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Currency Exchange" maxlength="30" name="totalbudget3"
-                                             required />
+                                             placeholder="{{ __('messages.rates_exchange_currency_input') }}"
+                                             maxlength="30" name="totalbudget3" required />
                                      </div>
 
                                      <script>
@@ -198,15 +200,16 @@
                                      <div class="flex flex-col md:flex-row lg:space-x-4">
                                          <input id="amount4" autocomplete="off"
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Amount (ARS)" name="amount4" maxlength="30" required />
+                                             placeholder="{{ __('messages.rates_exchange_input_amount') }} (ARS)"
+                                             name="amount4" maxlength="30" required />
                                          <input
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                              name="dollarchange4" value="€{{ $data['oficial_euro']['value_sell'] }}"
                                              required readonly />
                                          <input id="totalbudget4" readonly
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Currency Exchange" maxlength="30" name="totalbudget4"
-                                             required />
+                                             placeholder="{{ __('messages.rates_exchange_currency_input') }}"
+                                             maxlength="30" name="totalbudget4" required />
                                      </div>
 
 
@@ -255,15 +258,16 @@
                                      <div class="flex flex-col md:flex-row lg:space-x-4">
                                          <input id="amount5" autocomplete="off"
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Amount (ARS)" name="amount5" maxlength="30" required />
+                                             placeholder="{{ __('messages.rates_exchange_input_amount') }} (ARS)"
+                                             name="amount5" maxlength="30" required />
                                          <input
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                              name="dollarchange5" value="€{{ $data['blue_euro']['value_sell'] }}"
                                              required readonly />
                                          <input id="totalbudget5" readonly
                                              class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                             placeholder="Currency Exchange" maxlength="30" name="totalbudget5"
-                                             required />
+                                             placeholder="{{ __('messages.rates_exchange_currency_input') }}"
+                                             maxlength="30" name="totalbudget5" required />
                                      </div>
 
                                      <script>
@@ -341,7 +345,7 @@
                          <div id="myTabContent2" class="mb-5">
                              <h5
                                  class="text-base font-bold  text-left text-gray-600 capitalize my-3  dark:text-gray-400 ">
-                                 Currency To ARS
+                                 {{ __('messages.rates_exchange_currency') }} To ARS
                              </h5>
                              <div class="hidden py-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="tab1"
                                  role="tabpanel" aria-labelledby="tab1-tab">
@@ -349,14 +353,15 @@
                                  <div class="flex flex-col md:flex-row lg:space-x-4">
                                      <input id="amount10" autocomplete="off"
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="$ Currency Amount" name="amount10" maxlength="30" required />
+                                         placeholder="$ {{ __('messages.rates_exchange_currency_input_tab') }}"
+                                         name="amount10" maxlength="30" required />
                                      <input
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                          name="dollarchange10" value="${{ $data['blue']['value_sell'] }}" required
                                          readonly />
                                      <input id="totalbudget10" readonly
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="ARS Exchange" maxlength="30" name="totalbudget10" required />
+                                         placeholder="ARS Total" maxlength="30" name="totalbudget10" required />
                                  </div>
 
                                  <script>
@@ -406,14 +411,15 @@
                                  <div class="flex flex-col md:flex-row lg:space-x-4">
                                      <input id="amount11" autocomplete="off"
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="$ Currency Amount" name="amount11" maxlength="30" required />
+                                         placeholder="$ {{ __('messages.rates_exchange_currency_input_tab') }}"
+                                         name="amount11" maxlength="30" required />
                                      <input
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                          name="dollarchange11" value="${{ $data['oficial']['value_sell'] }}" required
                                          readonly />
                                      <input id="totalbudget11" readonly
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="ARS Exchange" maxlength="30" name="totalbudget11" required />
+                                         placeholder="ARS Total" maxlength="30" name="totalbudget11" required />
                                  </div>
 
                                  <script>
@@ -464,14 +470,15 @@
                                  <div class="flex flex-col md:flex-row lg:space-x-4">
                                      <input id="amount12" autocomplete="off"
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="€ Currency Amount" name="amount12" maxlength="30" required />
+                                         placeholder="€ {{ __('messages.rates_exchange_currency_input_tab') }}"
+                                         name="amount12" maxlength="30" required />
                                      <input
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                          name="dollarchange12" value="€{{ $data['oficial_euro']['value_sell'] }}"
                                          required readonly />
                                      <input id="totalbudget12" readonly
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="ARS Exchange" maxlength="30" name="totalbudget12" required />
+                                         placeholder="ARS Total" maxlength="30" name="totalbudget12" required />
                                  </div>
 
                                  <script>
@@ -524,14 +531,15 @@
                                  <div class="flex flex-col md:flex-row lg:space-x-4">
                                      <input id="amount13" autocomplete="off"
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="€ Currency Amount" name="amount13" maxlength="30" required />
+                                         placeholder="€ {{ __('messages.rates_exchange_currency_input_tab') }}"
+                                         name="amount13" maxlength="30" required />
                                      <input
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
                                          name="dollarchange13" value="€{{ $data['blue_euro']['value_sell'] }}"
                                          required readonly />
                                      <input id="totalbudget13" readonly
                                          class="block w-full text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
-                                         placeholder="ARS Exchange" maxlength="30" name="totalbudget13" required />
+                                         placeholder="ARS Total" maxlength="30" name="totalbudget13" required />
                                  </div>
 
                                  <script>
@@ -594,7 +602,7 @@
                                  <table class="w-full whitespace-no-wrap">
                                      <thead>
                                          <tr
-                                             class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
+                                             class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
 
                                              <th class="px-4 py-3">Item</th>
                                              <th class="px-4 py-3">Compra</th>
@@ -602,7 +610,8 @@
 
                                          </tr>
                                      </thead>
-                                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                     <tbody
+                                         class="bg-white divide-y text-center dark:divide-gray-700 dark:bg-gray-800">
 
                                          <tr class="text-gray-700  uppercase dark:text-gray-400">
 
@@ -671,7 +680,7 @@
                                                              <img src="https://creazilla-store.fra1.digitaloceanspaces.com/emojis/62260/argentina-flag-emoji-clipart-md.png"
                                                                  class="w-8 rounded-lg" alt="Avatar" />
                                                              <span class="ml-2">
-                                                                 {{ \Carbon\Carbon::parse($data['last_update'])->format('l j \d\e F, H:i:s') }}</span>
+                                                                 {{ ucfirst(\Carbon\Carbon::parse($data['last_update'])->translatedFormat('l j \d\e F, H:i:s')) }}</span>
                                                          </div>
 
                                                      </div>

@@ -26,20 +26,23 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('Emails Management') }}
+                                {{ __('messages.emails_management') }}
+
                             </x-slot>
                             <a href="{{ route('emails') }}">
-                                <span>Emails Management</span></a>
+                                <span>{{ __('messages.emails_management') }}
+                                </span></a>
                         </div>
 
                     </div>
 
                     <div class=" my-7 flex justify-between space-x-2">
-                        <x-button wire:click="create()"><span class="font-semibold"> Create New <i
+                        <x-button wire:click="create()"><span class="font-semibold"> {{ __('messages.create_new') }} <i
                                     class="fa-solid fa-envelope-open-text"></i></span>
                         </x-button>
-                        <x-input id="name" type="text" wire:model="search" placeholder="Search..." autofocus
-                            autocomplete="off" class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
+                        <x-input id="name" type="text" wire:model="search"
+                            placeholder="{{ __('messages.inpur_search') }}" autofocus autocomplete="off"
+                            class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
                     </div>
 
                     <!-- Tables -->
@@ -50,15 +53,15 @@
                                     <tr
                                         class="text-xs font-bold tracking-wide text-left text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Nro</th>
-                                        <th class="px-4 py-3">Name</th>
+                                        <th class="px-4 py-3">{{ __('messages.name') }}</th>
                                         <th class="px-4 py-3">Email</th>
-                                        <th class="px-4 py-3">Date</th>
-                                        <th class="px-4 py-3">Action</th>
+                                        <th class="px-4 py-3">{{ __('messages.date') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.action') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                     @forelse($data as $item)
-                                        <tr class="text-gray-700 text-xs  uppercase dark:text-gray-400">
+                                        <tr translate="no" class="text-gray-700 text-xs  uppercase dark:text-gray-400">
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $loop->iteration }}
@@ -91,7 +94,7 @@
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
-                                                        No Data Records
+                                                        {{ __('messages.no_data_records') }}
                                                     </div>
                                                 </div>
                                             </td>
@@ -120,7 +123,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                Email Management
+                                                {{ __('messages.emails_management') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -140,10 +143,12 @@
                                                     <div class="mb-4">
                                                         <label for=""
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            Name</label>
+                                                            {{ __('messages.name') }}</label>
                                                         <input type="text" autocomplete="off"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            maxlength="20" placeholder="Enter Name" wire:model="name">
+                                                            maxlength="20"
+                                                            placeholder=" {{ __('messages.enter_name') }}"
+                                                            wire:model="name">
                                                         @error('name')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -155,7 +160,7 @@
 
                                                         <input type="email" autocomplete="off" wire:model="email"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                            placeholder="Enter Email">
+                                                            placeholder="{{ __('messages.enter_email') }}">
                                                         @error('email')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
@@ -169,13 +174,13 @@
                                                     <button type="button" wire:click.prevent="store()"
                                                         wire:loading.attr="disabled" wire:target="store"
                                                         class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Register
+                                                        {{ __('messages.button_register') }}
                                                     </button>
                                                 </span>
                                                 <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
                                                     <button wire:click="closeModal()" type="button"
                                                         class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                                        Cancel
+                                                        {{ __('messages.button_cancel') }}
                                                     </button>
                                                 </span>
                                             </div>

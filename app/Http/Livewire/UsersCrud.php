@@ -95,25 +95,6 @@ return view('livewire.users-crud', [
     'email' => 'required|email|unique:users,email,' . $this->data_id,
     'role' => 'required',
    'password' => 'required|string|min:8|max:115|regex:/^[^\s]+$/',
-], [
-    'name' => [
-        'required' => 'El campo nombre es obligatorio',
-        'string' => 'El campo nombre debe ser una cadena de texto',
-        'max' => 'El campo nombre no debe superar los 40 caracteres',
-        'regex' => 'El campo nombre solo debe contener letras',
-    ],
-    'email.required' => 'El campo correo electrónico es obligatorio',
-    'email.email' => 'Por favor, ingrese una dirección de correo electrónico válida',
-    'email.unique' => 'Esta dirección de Email ya ha sido registrada',
-    'email.max' => 'El campo Email no debe superar los 50 caracteres',
-    'username.required' => 'El campo nombre de usuario es obligatorio',
-    'username.unique' => 'Este nombre de usuario ya está en uso',
-    'username.max' => 'El campo nombre de usuario no debe superar los 40 caracteres',
-    'username.regex' => 'El campo Username no debe tener espacios',
-    'password.required' => 'El campo contraseña es obligatorio',
-    'password.string' => 'La contraseña debe ser una cadena de texto',
-    'password.min' => 'La contraseña debe tener al menos 8 caracteres',
-    'password.regex' => 'La contraseña no debe tener espacios',
 ]);
 
 // Verificar si el usuario existe antes de realizar la actualización
@@ -174,7 +155,9 @@ if ($user) {
 
 
 
-session()->flash('message', $this->data_id ? 'Data Updated Successfully.' : 'Data Created Successfully.');
+ session()->flash('message', 
+    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
+
    
         $this->closeModal();
         $this->resetInputFields();
@@ -213,7 +196,8 @@ public function delete($id)
         $user->delete();
 
         // Define el mensaje de sesión con el correo electrónico del usuario eliminado
-        session()->flash('message', "$email - Data Deleted Successfully.");
+         session()->flash('message', $email .  __('messages.category_deleted_successfully'));
+        
     } else {
         // Si el usuario no se encuentra, muestra un mensaje de error
         session()->flash('message', 'Usuario no encontrado.');

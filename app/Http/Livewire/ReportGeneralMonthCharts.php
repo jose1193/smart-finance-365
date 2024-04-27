@@ -79,7 +79,8 @@ public function months()
 
     for ($i = 1; $i <= 12; $i++) {
         $dateInMonth = Carbon::create($currentYear, $i, 1);
-        $monthName = $dateInMonth->format('F');
+        $monthName = $dateInMonth->translatedFormat('F');
+
 
         $months[] = [
             'number' => $i,
@@ -127,7 +128,7 @@ private function updateMonthDataInternal()
     
     if ($this->selectedMonth) {
     $selectedDate = Carbon::create()->month($this->selectedMonth);
-    $this->selectedMonthName = $selectedDate->format('F');
+    $this->selectedMonthName = $selectedDate->translatedFormat('F');
 
     $this->selectedMonthNameEs = Carbon::create()->month($this->selectedMonth)->locale('es')->isoFormat('MMMM');
 

@@ -122,7 +122,8 @@ private function updateBudgetMonthDataInternal()
 
     if ($this->selectedMonthBudget) {
         $selectedDate = Carbon::create()->month($this->selectedMonthBudget);
-        $this->selectedMonthName = $selectedDate->format('F');
+        $this->selectedMonthName = $selectedDate->translatedFormat('F');
+
     } else {
         $this->selectedMonthName = ''; 
     }
@@ -305,7 +306,7 @@ public function emailStore6()
         });
     }
 
-    session()->flash('message', 'Email Sent Successfully.');
+    session()->flash('message', __('messages.email_sent_successfully'));
     $this->closeModal4();
     $this->resetInputFields3();
     $this->dataSelect();
