@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Operation extends Model
+class ProcessOperation extends Model
 {
     use HasFactory;
-    protected $fillable = [
+
+     protected $fillable = [
         'operation_description',
         'operation_currency_type',
         'operation_amount',
@@ -20,6 +21,7 @@ class Operation extends Model
         'operation_year',
         'category_id',
         'user_id',
+        
     ];
    public function user()
     {
@@ -37,18 +39,19 @@ class Operation extends Model
         return $this->belongsTo(StatuOptions::class, 'operation_status');
     }
 
-    public function operationSubcategories()
+   
+  public function ProcessBudgetIncome()
     {
-        return $this->hasMany(OperationSubcategories::class, 'operation_id');
+        return $this->hasMany(ProcessBudgetIncome::class, 'process_operation_id');
     }
 
-  public function budgetExpenses()
+    public function ProcessBudgetExpense()
     {
-        return $this->hasMany(BudgetExpense::class, 'operation_id');
-    }
- public function budgetIncomes()
-    {
-        return $this->hasMany(BudgetIncome::class, 'operation_id');
+        return $this->hasMany(ProcessBudgetExpense::class, 'process_operation_id');
     }
 
+    public function operationProcessSubcategories()
+    {
+        return $this->hasMany(ProcessOperationSubcategories::class, 'process_operation_id');
+    }
 }

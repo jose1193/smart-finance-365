@@ -67,6 +67,18 @@ function data() {
         togglePagesMenu6() {
             this.isPagesMenuOpen6 = !this.isPagesMenuOpen6;
         },
+        isPagesMenuOpen7: false,
+        togglePagesMenu7() {
+            this.isPagesMenuOpen7 = !this.isPagesMenuOpen7;
+        },
+        isPagesMenuOpen8: false,
+        togglePagesMenu8() {
+            this.isPagesMenuOpen8 = !this.isPagesMenuOpen8;
+        },
+        isPagesMenuOpen9: false,
+        togglePagesMenu9() {
+            this.isPagesMenuOpen9 = !this.isPagesMenuOpen9;
+        },
         // Modal
         isModalOpen: false,
         trapCleanup: null,

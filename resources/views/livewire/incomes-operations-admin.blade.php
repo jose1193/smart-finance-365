@@ -1,4 +1,7 @@
 <div :class="{ 'theme-dark': dark }" x-data="data()" lang="en">
+
+
+
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
         <!-- MENU SIDEBAR -->
         <x-menu-sidebar />
@@ -22,11 +25,11 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('messages.income_management') }}
+                                {{ __('messages.budget_income_management') }}
 
                             </x-slot>
-                            <a href="{{ route('incomes') }}">
-                                <span>{{ __('messages.income_management') }}
+                            <a href="">
+                                <span>{{ __('messages.budget_income_management') }}
                                 </span></a>
                         </div>
 
@@ -35,11 +38,9 @@
                     <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
                         <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
 
-
-
                             <div wire:ignore>
-                                <select style="width: 100%" id="selectUser7" wire:model="selectedUser7"
-                                    wire:change="updateData">
+                                <select style="width: 100%" id="selectUser8" wire:model="selectedUser8"
+                                    wire:change="updateDataExpense">
                                     <option value="">{{ __('messages.table_columns_categories.select_a_user') }}
                                     </option>
 
@@ -57,7 +58,9 @@
                         </div>
 
 
+
                     </div>
+
                     <!--INCLUDE ALERTS MESSAGES-->
 
                     <x-message-success />
@@ -82,8 +85,8 @@
                         <!-- PAGINATOR JQUERY START -->
                         <div class="flex items-center justify-between -mt-5">
                             <div class="my-5 ">
-                                <label for="perPage"
-                                    class="text-gray-800 dark:text-gray-300 mr-1 ">{{ __('messages.show') }}</label>
+                                <label for="perPage" class="text-gray-800 dark:text-gray-300 mr-1 ">
+                                    {{ __('messages.show') }} </label>
                                 <select id="per-page"
                                     class="bg-white p-2 dark:border-gray-700  dark:text-gray-300 dark:bg-gray-800">
                                     <option value="10">10</option>
@@ -92,8 +95,8 @@
                                     <option value="100">100</option>
                                     <option value="200">200</option>
                                 </select>
-                                <label for="perPage"
-                                    class="text-gray-800 dark:text-gray-300 ml-1 ">{{ __('messages.entries') }}</label>
+                                <label for="perPage" class="text-gray-800 dark:text-gray-300 ml-1 ">
+                                    {{ __('messages.entries') }} </label>
                             </div>
                             <div class="mt-4">
 
@@ -105,29 +108,21 @@
                         <!-- Tables -->
                         <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                             <div class="w-full overflow-x-auto">
-
-                                <table class="w-full
-                                    whitespace-no-wrap"
-                                    wire:key="miTablaKey-{{ $selectedUser7 }}-{{ uniqid() }}" id="miTabla">
+                                <table class="w-full whitespace-no-wrap"
+                                    wire:key="miTablaKey-{{ $selectedUser8 }}-{{ uniqid() }}" id="miTabla">
                                     <thead>
-
                                         <tr
                                             class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                            <th class="px-4 py-3" wire:click="sortBy('operations.id')">
-                                                Id
+                                            <th class="px-4 py-3" wire:click="sortBy('operations.id')">Id
                                                 @if ($sortBy === 'operations.id')
                                                     @if ($sortDirection === 'asc')
                                                         <i class="fa-solid fa-arrow-up"></i>
                                                     @else
                                                         <i class="fa-solid fa-arrow-down"></i>
                                                     @endif
-                                                @else
-                                                    <!-- Si no se está ordenando por 'operations.id', muestra la flecha hacia abajo por defecto -->
-                                                    <i class="fa-solid fa-arrow-down"></i>
                                                 @endif
                                             </th>
-
-
+                                            <th class="px-4 py-3">{{ __('messages.budget') }}</th>
                                             <th class="px-4 py-3">{{ __('messages.operations_username') }}</th>
                                             <th class="px-4 py-3">{{ __('messages.operations_category') }}</th>
                                             <th class="px-4 py-3">{{ __('messages.operations_subcategory') }}</th>
@@ -137,24 +132,15 @@
                                             <th class="px-4 py-3">{{ __('messages.operations_rate_conv_usd') }}</th>
                                             <th class="px-4 py-3">{{ __('messages.operations_total_in_usd') }}</th>
                                             <th class="px-4 py-3">{{ __('messages.operations_status') }}</th>
-                                            <th class="px-4 py-3" wire:click="sortBy('operations.operation_date')">
-                                                {{ __('messages.operations_date') }}
-                                                @if ($sortBy === 'operations.operation_date')
+                                            <th class="px-4 py-3" wire:click="sortBy('operations.id')">
+                                                {{ __('messages.operations_date') }} @if ($sortBy === 'operations.id')
                                                     @if ($sortDirection === 'asc')
                                                         <i class="fa-solid fa-arrow-up"></i>
                                                     @else
                                                         <i class="fa-solid fa-arrow-down"></i>
                                                     @endif
-                                                @elseif ($sortBy === 'operations.id' && $sortDirection === 'desc')
-                                                    <!-- Si el ordenamiento actual es por 'operations.id' de forma descendente -->
-                                                    <i class="fa-solid fa-arrow-down"></i>
-                                                @else
-                                                    <!-- Mostrar la flecha hacia arriba por defecto -->
-                                                    <i class="fa-solid fa-arrow-up"></i>
                                                 @endif
                                             </th>
-
-
                                             <th class="px-4 py-3">{{ __('messages.action') }}</th>
                                             <th class="px-4 py-3">
                                                 @if (!$data->isEmpty())
@@ -166,10 +152,15 @@
                                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                                         @forelse($data as $item)
                                             <tr translate="no"
-                                                class="text-gray-700 text-xs text-center  uppercase dark:text-gray-400">
+                                                class="text-gray-700 text-xs text-center uppercase dark:text-gray-400">
                                                 <td class="px-4 py-3 text-center">
 
                                                     {{ $item->id }}
+
+                                                </td>
+                                                <td class="px-4 py-3 text-xs">
+                                                    {{ isset($item->date)? \Carbon\Carbon::parse($item->date)->locale('es')->isoFormat('MMMM [de] YYYY') . ' - ': '' }}
+                                                    {{ isset($item->budget_currency_total) && $item->budget_currency_total != 0 ? number_format($item->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
 
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
@@ -187,8 +178,8 @@
                                                     {{ $item->operation_description }}
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
-
                                                     {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
+
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
 
@@ -197,12 +188,12 @@
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
 
-                                                    {{ is_numeric($item->operation_currency) ? number_format($item->operation_currency, 2, '.', ',') : $item->operation_currency }}
 
+                                                    {{ is_numeric($item->operation_currency) ? number_format($item->operation_currency, 2, '.', ',') : $item->operation_currency }}
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
-                                                    {{ number_format($item->operation_currency_total, 2, '.', ',') }}
 
+                                                    {{ number_format($item->operation_currency_total, 2, '.', ',') }}
                                                     $
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
@@ -233,7 +224,6 @@
 
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
-
 
                                                     @if (app()->getLocale() === 'en')
                                                         <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('m/d/Y') }}</span>
@@ -281,6 +271,8 @@
                                                 class="ml-2 px-3 py-1 rounded text-gray-700 dark:text-gray-400">Next</button>
                                         </div>
                                     </div>
+
+
 
                                     <script>
                                         $(document).ready(function() {
@@ -377,13 +369,10 @@
                                     </script>
 
 
-
                                 </div>
 
                                 <!-- PAGINATOR JQUERY END -->
                             </div>
-
-
                             <!-- MODAL -->
                             @if ($isOpen)
                                 <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
@@ -403,11 +392,10 @@
                                                 <div class="text-center"></div>
                                                 <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                     id="exampleModalLabel">
-                                                    {{ __('messages.income_management') }}
+                                                    {{ __('messages.budget_income_management') }}
 
                                                 </h5>
                                                 <!--Close button-->
-
                                                 <button type="button" wire:click="closeModal()"
                                                     class="p-0.5 bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white rounded-full box-content  border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                                                     data-te-modal-dismiss aria-label="Close">
@@ -426,6 +414,7 @@
                                                             <label for="operation_description"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
                                                                 {{ __('messages.modal_operations_user') }}</label>
+
                                                             <div wire:ignore>
                                                                 <select id="users_select"
                                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -453,6 +442,7 @@
                                                                         const index = $(this).data('index');
                                                                         @this.set('user_selected', selectedEmails);
                                                                         @this.call('updateCategoryUser');
+                                                                        @this.call('updateBudgetUser');
                                                                     });
                                                                 });
                                                             </script>
@@ -462,6 +452,68 @@
                                                             @enderror
                                                         </div>
                                                         <div class="mb-4">
+                                                            <label for="exampleFormControlInput1"
+                                                                class="block text-gray-700 text-sm font-bold mb-2">
+                                                                {{ __('messages.select_a_budget') }}
+                                                                :</label>
+
+                                                            <select
+                                                                class="shadow capitalize appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                                style="width: 100%" wire:model="budget_id">
+                                                                <option></option>
+                                                                <option value="na">N/A</option>
+                                                                @if ($this->selectedUser8 && $budgets->count() > 0)
+                                                                    @foreach ($budgets->groupBy('budget_date') as $date => $groupedBudgets)
+                                                                        @php
+                                                                            $formattedDate = \Carbon\Carbon::parse(
+                                                                                $date,
+                                                                            )
+                                                                                ->locale('es')
+                                                                                ->isoFormat('MMMM [de] YYYY');
+                                                                        @endphp
+
+                                                                        @foreach ($groupedBudgets as $budget)
+                                                                            <option value="{{ $budget->id }}"
+                                                                                @if ($budget->id == $budget_id) selected @endif>
+                                                                                {{ $formattedDate }} -
+                                                                                {{ $budget->budget_currency_total }} $
+                                                                            </option>
+                                                                        @endforeach
+                                                                    @endforeach
+
+                                                                @endif
+
+                                                            </select>
+
+
+
+
+                                                            <script>
+                                                                document.addEventListener('livewire:load', function() {
+                                                                    Livewire.hook('message.sent', () => {
+                                                                        // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                        $('#budget_id_select').select2({
+                                                                            width: 'resolve' // need to override the changed default
+                                                                        });
+                                                                    });
+                                                                });
+
+                                                                $(document).ready(function() {
+                                                                    // Inicializa Select2
+                                                                    $('#budget_id_select').select2();
+
+                                                                    // Escucha el cambio en Select2 y actualiza Livewire
+                                                                    $('#budget_id_select').on('change', function(e) {
+                                                                        @this.set('budget_id', $(this).val());
+                                                                    });
+                                                                });
+                                                            </script>
+                                                            @error('budget_id')
+                                                                <span class="text-red-500">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+
+                                                        <div class="mb-4">
                                                             <label for="operation_description"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
                                                                 {{ __('messages.modal_operations_description') }}</label>
@@ -469,13 +521,12 @@
                                                                 id="operation_description"
                                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                                 maxlength="50"
-                                                                placeholder="{{ __('messages.enter_income_description') }}"
+                                                                placeholder="{{ __('messages.enter_expense_description') }}"
                                                                 wire:model="operation_description">
                                                             @error('operation_description')
                                                                 <span class="text-red-500">{{ $message }}</span>
                                                             @enderror
                                                         </div>
-
                                                         <div class="mb-4">
                                                             <label for="operation_amount"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
@@ -519,7 +570,8 @@
                                                                     autocomplete="off" id="operation_amount"
                                                                     wire:model="operation_amount"
                                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8"
-                                                                    placeholder="{{ __('messages.enter_income_transaction_amount') }}">
+                                                                    placeholder="{{ __('messages.enter_income_transaction_amount') }}
+">
 
                                                                 <span
                                                                     class="absolute right-0 top-0 mt-2 mr-2 text-gray-500">{{ $this->selectedCurrencyFromARS }}</span>
@@ -534,7 +586,8 @@
                                                         <div class="mb-4">
                                                             <label for="operation_currency"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
-                                                                {{ __('messages.modal_operations_rate_conv_usd') }}</label>
+                                                                {{ __('messages.modal_operations_rate_conv_usd') }}
+                                                            </label>
 
                                                             <input type="text" autocomplete="off"
                                                                 id="operation_currency"
@@ -582,21 +635,21 @@
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
                                                                 {{ __('messages.modal_operations_date') }}</label>
                                                             <div wire:ignore>
-                                                                <input type="text" readonly id="myDatePicker"
-                                                                    autocomplete="off" wire:model="operation_date"
-                                                                    placeholder="dd/mm/yyyy"
+                                                                <input type="text" id="myDatePicker" readonly
+                                                                    wire:model="operation_date"
+                                                                    placeholder="dd/mm/yyyy" autocomplete="off"
                                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                             </div>
                                                             @error('operation_date')
                                                                 <span class="text-red-500">{{ $message }}</span>
                                                             @enderror
-
                                                         </div>
 
                                                         <div class="mb-4">
                                                             <label for="exampleFormControlInput2"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
-                                                                {{ __('messages.modal_operations_income_category') }}
+                                                                {{ __('messages.modal_operations_expense_category') }}
+
                                                             </label>
 
                                                             <select wire:model="category_id"
@@ -615,9 +668,9 @@
                                                                 <span class="text-red-500">{{ $message }}</span>
                                                             @enderror
                                                         </div>
-
                                                         @if ($subcategoryMessage)
-                                                            <p class="text-gray-500">{{ $subcategoryMessage }}</p>
+                                                            <p class="text-gray-600 mb-3">{{ $subcategoryMessage }}
+                                                            </p>
                                                         @endif
                                                         <div id="subcategory-container" class="my-5"
                                                             wire:key="subcategory-{{ $category_id }}">
@@ -625,7 +678,9 @@
                                                             @if ($showSubcategories)
                                                                 <div class="mb-4">
                                                                     <label for="exampleFormControlInput2"
-                                                                        class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.modal_operations_subcategory') }}</label>
+                                                                        class="block text-gray-700 text-sm font-bold mb-2">
+                                                                        {{ __('messages.modal_operations_subcategory') }}</label>
+
                                                                     <div wire:ignore>
                                                                         <select wire:model="registeredSubcategoryItem"
                                                                             id="select2SubcategoryId"
@@ -670,7 +725,6 @@
                                                                                 @endforeach
                                                                             @endif
                                                                         </select>
-
                                                                         <script>
                                                                             $(document).ready(function() {
                                                                                 $('#select2SubcategoryId').select2();
@@ -695,6 +749,7 @@
                                                                     @endif
                                                                 </div>
                                                             @endif
+
                                                             <script>
                                                                 document.addEventListener('livewire:load', function() {
                                                                     Livewire.hook('message.sent', () => {
@@ -737,9 +792,6 @@
                                                                 }
                                                             </script>
                                                         </div>
-
-
-
 
                                                         <div class="mb-4">
                                                             <label for="exampleFormControlInput2"
@@ -784,7 +836,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                             @endif
                             <!-- MODAL -->
                         </div>
@@ -802,11 +853,14 @@
 
 </div>
 
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id, description) {
+            console.log('Evento "deleteData" emitido con ID: ' + id);
             Swal.fire({
-                title: '{!! __('messages.delete_confirmation_title') !!}' +
+                title: '{!! __('messages.delete_confirmation_title') !!} ' +
                     '<span style="color:#9333ea">' + description + '</span>' + '?',
                 text: "{{ __('messages.delete_confirmation_text') }}",
                 icon: 'warning',
@@ -820,7 +874,7 @@
                         id); // Envía el Id al método delete
                     Swal.fire(
                         '{!! __('messages.delete_success_title') !!}',
-                        '{{ __('messages.delete_success_message_your_data') }}  ' +
+                        '{{ __('messages.delete_success_message_your_data') }}' +
                         description +
                         ' {{ __('messages.delete_success_message_your_data_has_been') }}',
                         'success'
@@ -854,9 +908,22 @@
 
 
 
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        $(document).ready(function() {
+            $('#miTabla').DataTable();
+        });
+        Livewire.on('reinitDataTable', function() {
+            $('#miTabla').DataTable().destroy();
+            $('#miTabla').DataTable();
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function() {
-        Livewire.on('modalOpenedAutonumeric2', function() {
+        Livewire.on('modalOpenedAutonumeric3', function() {
             $('#operation_amount').mask('#.##0,00', {
                 reverse: true
             });
@@ -866,13 +933,14 @@
 
 <script>
     $(document).ready(function() {
-        Livewire.on('modalOpenedAutonumeric3', function() {
+        Livewire.on('modalOpenedAutonumeric4', function() {
             $('#operation_currency').mask('#.##0,00', {
                 reverse: true
             });
         });
     });
 </script>
+
 
 
 <script>

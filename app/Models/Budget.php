@@ -29,6 +29,19 @@ class Budget extends Model
         return $this->hasMany(BudgetExpense::class);
     }
 
+    public function incomes()
+    {
+        return $this->hasMany(BudgetIncome::class);
+    }
     
+    public function processBudgetexpenses()
+    {
+        return $this->hasMany(ProcessBudgetExpense::class);
+    }
+
+    public function processBudgetincomes()
+    {
+        return $this->hasMany(ProcessBudgetIncome::class);
+    }
 
 }

@@ -61,11 +61,17 @@
                                 </button>
                             </li>
 
-
                             <li class="mr-2">
                                 <button
                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
                                     @click="activeTab = '4'" :class="{ 'bg-blue-700': activeTab === '4' }">
+                                    {{ __('messages.budget_income') }}
+                                </button>
+                            </li>
+                            <li class="mr-2">
+                                <button
+                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm lg:text-base"
+                                    @click="activeTab = '5'" :class="{ 'bg-blue-700': activeTab === '5' }">
                                     {{ __('messages.budget_expense') }}
                                 </button>
                             </li>
@@ -89,8 +95,12 @@
                             @livewire('report-general-budgets-table')
 
                             <!-- REPORT BUDGETS MONTH TABLE  -->
+                            <!-- Livewire/ReportGeneralBudgetsIncomeMonthTable.php  -->
+                            @livewire('report-general-budgets-income-month-table')
                             <!-- Livewire/ReportGeneralBudgetsMonthTable.php  -->
                             @livewire('report-general-budgets-month-table')
+                            <!-- REPORT BUDGETS INCOME MONTH TABLE  -->
+
 
                         </div>
                     </div>

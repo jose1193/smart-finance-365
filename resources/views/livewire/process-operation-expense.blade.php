@@ -25,10 +25,10 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('messages.income_management') }}
+                                {{ __('messages.task_expenses') }}
                             </x-slot>
                             <a href="{{ route('incomes') }}">
-                                <span> {{ __('messages.income_management') }}</span></a>
+                                <span> {{ __('messages.task_expenses') }}</span></a>
                         </div>
 
                     </div>
@@ -79,8 +79,8 @@
                                 <thead>
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">Id
-                                            @if ($sortBy === 'operations.id')
+                                        <th class="px-4 py-3" wire:click="sortBy('process_operations.id')">Id
+                                            @if ($sortBy === 'process_operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>
                                                 @else
@@ -248,7 +248,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                {{ __('messages.income_management') }}
+                                                {{ __('messages.task_expenses') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -436,7 +436,20 @@
                                                     <div class="mb-4">
                                                         <label for="operation_date"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            {{ __('messages.modal_operations_date') }}</label>
+                                                            {{ __('messages.modal_operations_scheduled_date') }}
+                                                            <span x-data="{ isOpen: false }" class="relative ml-1">
+                                                                <!-- Trigger para mostrar el tooltip -->
+                                                                <i @mouseover="isOpen = true"
+                                                                    @mouseleave="isOpen = false"
+                                                                    class="fa-regular fa-circle-question text-red-500 cursor-pointer"></i>
+                                                                <!-- Tooltip -->
+                                                                <div x-show="isOpen"
+                                                                    class="absolute bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
+                                                                    {{ __('messages.modal_operations_scheduled_date_tooltip') }}
+
+                                                                </div>
+                                                            </span>
+                                                        </label>
                                                         <div wire:ignore>
                                                             <input type="text" readonly id="myDatePicker"
                                                                 autocomplete="off" wire:model="operation_date"
@@ -452,7 +465,7 @@
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            {{ __('messages.modal_operations_income_category') }}
+                                                            {{ __('messages.modal_operations_expense_category') }}
                                                         </label>
 
                                                         <div wire:ignore>
@@ -668,7 +681,7 @@
                 confirmButtonText: '{{ __('messages.delete_confirmation_confirm_button') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.emitTo('incomes-operations', 'delete', id);
+                    Livewire.emitTo('process-operation-expense', 'delete', id);
                     Swal.fire(
                         '{!! __('messages.delete_success_title') !!}',
                         '{{ __('messages.delete_success_message_your_data') }} ' +
@@ -728,7 +741,7 @@
                 confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.emitTo('incomes-operations',
+                    Livewire.emitTo('process-operation-expense',
                         'deleteMultiple'); // Envía el Id al método delete
                     Swal.fire(
                         '{!! __('messages.delete_success_title') !!}',

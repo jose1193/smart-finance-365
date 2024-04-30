@@ -6,24 +6,25 @@ use Livewire\Component;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\SubcategoryToAssign;
-use App\Models\OperationSubcategories;
+use App\Models\ProcessOperationSubcategories;
 use App\Models\CategoriesToAssign;
 use App\Models\StatuOptions;
 use App\Models\Operation;
+use App\Models\ProcessOperation;
+use App\Models\ProcessBudgetExpense;
+
 use App\Models\Budget;
-use App\Models\BudgetIncome;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- guzzle query api
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-
-class IncomesOperations extends Component
+class ProcessOperationExpense extends Component
 {
     use WithPagination;
     
-public  $operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
+public  $process_operation_date,$operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
 
 public $search = '';
 public $categoriesRender;
@@ -49,50 +50,49 @@ public $registeredSubcategoryItem;
 
 public $selectedCurrencyFromARS;
 
- public $selectAll = false;
+public $selectAll = false;
 public $checkedSelected = [];
 
- public $sortBy = 'operations.id'; // Columna predeterminada para ordenar
+ public $sortBy = 'process_operations.id'; // Columna predeterminada para ordenar
  public $sortDirection = 'desc'; // Dirección predeterminada para ordenar
  public $perPage = 10; 
  
+ public $budgets, $budget_id;
  
-public $budgets;
-public $budget_id;
-
     public function authorize()
 {
     return true;
 }
 
+
  public function render()
     {
-    $query =  Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-    ->join('users', 'operations.user_id', '=', 'users.id')
+    $query =  ProcessOperation::join('categories', 'process_operations.category_id', '=', 'categories.id')
+    ->join('users', 'process_operations.user_id', '=', 'users.id')
     ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
-    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
-    ->leftJoin('budget_incomes', 'budget_incomes.operation_id', '=', 'operations.id')
-    ->leftJoin('budgets', 'budget_incomes.budget_id', '=', 'budgets.id')
+    ->join('statu_options', 'process_operations.operation_status', '=', 'statu_options.id')
+    ->leftJoin('process_operation_subcategories', 'process_operation_subcategories.process_operation_id', '=', 'process_operations.id')
+    ->leftJoin('subcategories', 'process_operation_subcategories.subcategory_id', '=', 'subcategories.id')
+    ->leftJoin('process_budget_expenses', 'process_budget_expenses.process_operation_id', '=', 'process_operations.id')
+    ->leftJoin('budgets', 'process_budget_expenses.budget_id', '=', 'budgets.id')
     ->where('users.id', auth()->id())
-    ->where('categories.main_category_id', 1)
+    ->where('categories.main_category_id', 2)
     ->where(function ($query) {
         $query->where('categories.category_name', 'like', '%' . $this->search . '%')
-              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%')
-              ->orWhere('operations.id', 'like', '%' . $this->search . '%'); 
+              ->orWhere('process_operations.operation_description', 'like', '%' . $this->search . '%')
+              ->orWhere('process_operations.id', 'like', '%' . $this->search . '%'); 
     })
     ->select(
-        'operations.*',
+        'process_operations.*',
         'categories.category_name','budgets.budget_currency_total',
         'statu_options.status_description',
         DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name'),
-        'budget_incomes.operation_id as budget_expense_operation_id',
+        'process_budget_expenses.process_operation_id as budget_income_operation_id',
         'budgets.budget_date as date',
         'budgets.id as budget_id'
     );
-    if ($this->sortBy === 'operations.operation_date') {
-        $query->orderBy('operations.operation_date', $this->sortDirection);
+    if ($this->sortBy === 'process_operations.operation_date') {
+        $query->orderBy('process_operations.operation_date', $this->sortDirection);
     } else {
         $query->orderBy($this->sortBy, $this->sortDirection);
     }
@@ -103,22 +103,22 @@ public $budget_id;
     $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
     ->pluck('category_id');
 
-    $this->categoriesRender = Category::where('main_category_id', 1)
+    $this->categoriesRender = Category::where('main_category_id', 2)
     ->whereIn('id', $assignedCategories)
     ->orWhere(function ($query) use ($assignedCategories) {
         $query->whereNotIn('id', $assignedCategories)
               ->whereNotExists(function ($subQuery) {
-                  $subQuery->select(DB::raw(1))
+                  $subQuery->select(DB::raw(2))
                            ->from('categories_to_assigns')
                            ->whereColumn('categories_to_assigns.category_id', 'categories.id');
               })
-              ->where('main_category_id', 1); 
+              ->where('main_category_id', 2); 
     })
     ->orderBy('id', 'asc')
     ->get();
 
     
-    $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
+    $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
                                   ->orderBy('id', 'asc')
                                   ->get();
        
@@ -128,10 +128,9 @@ public $budget_id;
 
      
 
-        return view('livewire.incomes-operations', [
+        return view('livewire.process-operation-expense', [
             'data' => $data]);
     }
-
 
     
     // Método para cambiar la cantidad de elementos por página
@@ -328,7 +327,7 @@ public function updatedOperationAmount()
     public function edit($id)
     {
        
-        $list = Operation::findOrFail($id);
+        $list = ProcessOperation::findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
         $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
@@ -345,7 +344,7 @@ public function updatedOperationAmount()
         $this->selectedCategoryId = $list->category_id;
         $this->showSubcategories = true;
 
-        $registeredSubcategory = $list->operationSubcategories->first();
+        $registeredSubcategory = $list->operationProcessSubcategories->first();
         $this->updatedCategoryId($list->category_id, optional($registeredSubcategory)->subcategory_id);
 
     
@@ -386,15 +385,16 @@ if (empty($this->operation_date)) {
     
     $validatedData = $this->validate($validationRules);
 
-  
+ 
     // Agregar user_id al array validado
     $validatedData['user_id'] = auth()->user()->id;
-     $validatedData['budget_id'] = $this->budget_id;
+
 
     // Calcular el mes y el año  usando Carbon
     $operationDate = \Carbon\Carbon::createFromFormat('Y-m-d', $validatedData['operation_date']);
     $validatedData['operation_month'] = $operationDate->format('m');
     $validatedData['operation_year'] = $operationDate->format('Y');
+    $validatedData['process_operation_date'] = $operationDate->format('Y-m-d');
 
     // Elimina cualquier carácter no numérico, como comas y puntos
    $numericValue = str_replace([',', '.'], '', $validatedData['operation_amount']);
@@ -418,7 +418,7 @@ if (empty($this->operation_date)) {
    
      
 
-    $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
+    $operation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
      session()->flash('message', 
     $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
@@ -427,20 +427,21 @@ if (empty($this->operation_date)) {
     
     $this->SubcategoryOperationAssignment($operation);
 
-     // Llama a la función solo si 'budget_id' está presente
-    $this->BudgetIncome($validatedData['budget_id'] ?? null, $operation);
+
+    // Llama a la función solo si 'budget_id' está presente
+$this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $operation);
 
     $this->closeModal();
    
 }
 
 
-public function SubcategoryOperationAssignment(Operation $operation)
+public function SubcategoryOperationAssignment(ProcessOperation $operation)
 {
     // Verificar si $this->registeredSubcategoryItem no es 'N/A' y no está vacío
     if ($this->registeredSubcategoryItem != 'N/A' && !empty($this->registeredSubcategoryItem)) {
         // Buscar una subcategoría existente para la operación
-        $existingSubcategory = OperationSubcategories::where('operation_id', $operation->id)->first();
+        $existingSubcategory = ProcessOperationSubcategories::where('process_operation_id', $operation->id)->first();
 
         if ($existingSubcategory) {
             // Si la subcategoría ya existe, actualizarla
@@ -450,43 +451,18 @@ public function SubcategoryOperationAssignment(Operation $operation)
             ]);
         } else {
             // Si no existe, crear una nueva subcategoría
-            OperationSubcategories::create([
-                'operation_id' => $operation->id,
+            ProcessOperationSubcategories::create([
+                'process_operation_id' => $operation->id,
                 'subcategory_id' => $this->registeredSubcategoryItem,
                 'user_id_subcategory' => $operation->user_id,
             ]);
         }
     } else {
         // Si $this->registeredSubcategoryItem es 'N/A' o está vacío, eliminar registros en OperationSubcategories
-        OperationSubcategories::where('operation_id', $operation->id)->delete();
+        ProcessOperationSubcategories::where('process_operation_id', $operation->id)->delete();
     }
 
     $this->resetInputFields();
-}
-
-
-public function BudgetIncome($budgetId, Operation $operation)
-{
-    $operationId = $operation->id;
-    $categoryId = $operation->category_id;
-
-    if ($operationId) {
-        // Verifica si $budgetId está vacío o es igual a 'NO'
-        if (empty($budgetId) || $budgetId === 'na') {
-            // Elimina la entrada existente si $budgetId está vacío o es 'NO'
-            BudgetIncome::where(['operation_id' => $operationId])->delete();
-             session()->flash('message', __('messages.data_deleted_successfully'));
-        } else {
-            // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
-            BudgetIncome::updateOrCreate(
-                ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
-                // Puedes agregar aquí otros campos que desees actualizar o crear
-            );
-            session()->flash('message', __('messages.data_created_successfully'));
-        }
-    } else {
-        // session()->flash('info', __('Invalid operation'));
-    }
 }
 
 
@@ -528,10 +504,34 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
 }
 
 
+public function ProcessBudgetExpense($budgetId, ProcessOperation $operation)
+{
+    $operationId = $operation->id;
+    $categoryId = $operation->category_id;
+
+    if ($operationId) {
+        // Verifica si $budgetId está vacío o es igual a 'NO'
+        if (empty($budgetId) || $budgetId === 'na') {
+            // Elimina la entrada existente si $budgetId está vacío o es 'NO'
+            ProcessBudgetExpense::where(['process_operation_id' => $operationId])->delete();
+             session()->flash('message', __('messages.data_deleted_successfully'));
+        } else {
+            // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
+            ProcessBudgetExpense::updateOrCreate(
+                ['process_operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
+                // Puedes agregar aquí otros campos que desees actualizar o crear
+            );
+            session()->flash('message', __('messages.data_created_successfully'));
+        }
+    } else {
+        // session()->flash('info', __('Invalid operation'));
+    }
+}
+
 
     public function delete($id)
 {
-    $operation = Operation::find($id);
+    $operation = ProcessOperation::find($id);
     $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
     $operation->delete();
      session()->flash('message', $description .  __('messages.category_deleted_successfully'));
@@ -561,12 +561,12 @@ public function getItemsIds()
    
     
     // Retorna un array con los IDs de los elementos disponibles
-    return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+    return ProcessOperation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('users', 'operations.user_id', '=', 'users.id')
         ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
         ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
-        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
+        ->leftJoin('process_operation_subcategories', 'process_operation_subcategories.process_operation_id', '=', 'operations.id')
+        ->leftJoin('subcategories', 'process_operation_subcategories.subcategory_id', '=', 'subcategories.id')
         ->where('users.id', Auth::id()) // Filtra por el ID del usuario autenticado
         ->where('main_categories.id', 1) // Filtra por la categoría principal con ID 1
         ->pluck('operations.id')
@@ -584,7 +584,7 @@ public function confirmDelete()
 public function deleteMultiple()
 {
     if (count($this->checkedSelected) > 0) {
-        Operation::whereIn('id', $this->checkedSelected)->delete();
+        ProcessOperation::whereIn('id', $this->checkedSelected)->delete();
         $this->checkedSelected = [];
         session()->flash('message', __('messages.data_deleted_successfully'));
         $this->selectAll = false;

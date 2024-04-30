@@ -7,15 +7,17 @@ document.addEventListener("livewire:load", function () {
     var selectUser6 = $("#selectUser6");
     var selectUser7 = $("#selectUser7");
     var selectUser8 = $("#selectUser8");
+    var selectUser9 = $("#selectUser9");
     var selectCategory = $("#selectCategory");
     var selectYear = $("#selectYear");
     var selectYear2 = $("#selectYear2");
     var selectYear3 = $("#selectYear3");
     var selectYear4 = $("#selectYear4");
     var selectYear5 = $("#selectYear5");
+    var selectYear6 = $("#selectYear6");
     var selectMonth = $("#selectMonth");
     var selectBudgetMonth = $("#selectBudgetMonth");
-
+    var selectBudgetMonthIncome = $("#selectBudgetMonthIncome");
     var selectUserChart = $("#selectUserChart");
     var selectYearChart = $("#selectYearChart");
     var selectUserChart2 = $("#selectUserChart2");
@@ -67,14 +69,17 @@ document.addEventListener("livewire:load", function () {
     initializeSelect2(selectUser6, "userSelected6");
     initializeSelect2(selectUser7, "userSelected7");
     initializeSelect2(selectUser8, "userSelected8");
+    initializeSelect2(selectUser9, "userSelected9");
     initializeSelect2(selectCategory, "categorySelected");
     initializeSelect2(selectYear, "YearSelected");
     initializeSelect2(selectYear2, "YearSelected2");
     initializeSelect2(selectYear3, "YearSelected3");
     initializeSelect2(selectYear4, "YearSelected4");
     initializeSelect2(selectYear5, "YearSelected5");
+    initializeSelect2(selectYear6, "YearSelected6");
     initializeSelect2(selectMonth, "MonthSelected");
     initializeSelect2(selectBudgetMonth, "MonthSelectedBudget");
+    initializeSelect2(selectBudgetMonthIncome, "MonthSelectedIncomeBudget");
     initializeSelect2(selectUserChart, "userSelectedChart");
     initializeSelect2(selectYearChart, "YearSelectedChart");
     initializeSelect2(selectUserChart2, "userSelectedChart2");

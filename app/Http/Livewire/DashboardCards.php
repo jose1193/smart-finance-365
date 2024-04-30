@@ -53,8 +53,8 @@ $this->labelExpense = __('messages.dashboard_user_total_users_expense');
 
 
 
-    $this->total_users_operations = Operation::whereMonth('created_at', $currentMonth)
-     ->whereYear('created_at',  $currentYear) ->count();
+    $this->total_users_operations = Operation::whereMonth('operation_month', $currentMonth)
+     ->whereYear('operation_year',  $currentYear)->count();
 
    
 }

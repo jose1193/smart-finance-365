@@ -1,4 +1,4 @@
- <div x-show="activeTab === '5'">
+ <div x-show="activeTab === '4'">
      <!-- REPORT MONTHS TABLE  -->
      <div id="report-table">
          <!--INCLUDE ALERTS MESSAGES-->
@@ -10,8 +10,8 @@
 
 
                  <div wire:ignore>
-                     <select id="selectUser6" style="width: 100%" wire:model="selectedUser6"
-                         wire:change="updateBudgetMonthData">
+                     <select id="selectUser9" style="width: 100%" wire:model="selectedUser9"
+                         wire:change="updateBudgetIncomeMonthData">
                          <option value="">{{ __('messages.table_columns_categories.select_a_user') }}</option>
 
                          @if (auth()->user()->hasRole('Admin'))
@@ -29,8 +29,8 @@
 
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0">
                  <div wire:ignore>
-                     <select id="selectBudgetMonth" wire:model="selectedMonthBudget" wire:change="updateBudgetMonthData"
-                         style="width: 100%">
+                     <select id="selectBudgetMonthIncome" wire:model="selectedMonthBudgetIncome"
+                         wire:change="updateBudgetIncomeMonthData" style="width: 100%">
                          <option value="">{{ __('messages.select_a_month') }}</option>
                          @foreach ($this->months() as $month)
                              <option value="{{ $month['number'] }}">{{ $month['number'] }} -
@@ -42,8 +42,8 @@
 
              <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
                  <div wire:ignore>
-                     <select wire:model="selectedYear5" style="width:100%" id="selectYear5"
-                         wire:change="updateBudgetMonthData">
+                     <select wire:model="selectedYear6" style="width:100%" id="selectYear6"
+                         wire:change="updateBudgetIncomeMonthData">
                          <option value="">{{ __('messages.select_a_year') }}</option>
 
                          @foreach ($years as $year)
@@ -67,7 +67,7 @@
                      {{ __('messages.download') }}
                  </x-button>
                  <x-button class="bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50"
-                     wire:click="resetFields6" wire:loading.attr="disabled">
+                     wire:click="resetFields7" wire:loading.attr="disabled">
                      <span class="font-semibold"><i class="fa-solid fa-power-off px-1"></i></span>
                      {{ __('messages.reset_fields') }}
                  </x-button>
@@ -129,7 +129,7 @@
                                                          @this.set('emails_user6', selectedEmails);
 
                                                          // Add this line to refresh the Livewire component without reloading the page
-                                                         @this.call('updateBudgetMonthData');
+                                                         @this.call('updateBudgetIncomeMonthData');
                                                      });
                                                  });
                                              </script>
@@ -143,8 +143,8 @@
                                  </div>
                                  <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                      <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                         <button wire:click.prevent="emailStore6()" wire:loading.attr="disabled"
-                                             wire:target="emailStore6" type="button"
+                                         <button wire:click.prevent="emailStore7()" wire:loading.attr="disabled"
+                                             wire:target="emailStore7" type="button"
                                              class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                              {{ __('messages.send') }}
                                          </button>
@@ -179,7 +179,7 @@
              <!-- Tables -->
              <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
                  <div class="w-full overflow-x-auto">
-                     <table class="w-full whitespace-no-wrap " id="tableId6">
+                     <table class="w-full whitespace-no-wrap " id="tableId7">
                          <thead>
                              <tr
                                  class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
@@ -191,22 +191,22 @@
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">
-                                     @if ($selectedMonthName)
-                                         {{ $selectedMonthName }}
+                                     @if ($selectedMonthIncomeName)
+                                         {{ $selectedMonthIncomeName }}
                                      @else
                                          {{ __('messages.month_not_selected') }}
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">
-                                     @if ($selectedYear5)
-                                         {{ $selectedYear5 }}
+                                     @if ($selectedYear6)
+                                         {{ $selectedYear6 }}
                                      @else
                                          {{ __('messages.year_not_selected') }}
                                      @endif
                                  </th>
                                  <th class="px-4 py-3">
                                      <select wire:model="SelectMainCurrencyTypeRender"
-                                         wire:change="updateBudgetMonthData"
+                                         wire:change="updateBudgetIncomeMonthData"
                                          class="w-full text-sm dark:text-gray-800 dark:border-gray-600 dark:bg-gray-700 form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray">
 
                                          <option value="USD">USD</option>
@@ -227,7 +227,7 @@
                                                  : $SelectMainCurrencyTypeRender;
                                      @endphp
                                  </th>
-                                 @if ($selectedMonthName)
+                                 @if ($selectedMonthIncomeName)
                                      <th class="px-4 py-3 hidden ">
 
                                          @php
@@ -317,7 +317,7 @@
                                          {{ $item->operation_description }}
                                      </td>
                                      <td class="px-4 py-3 text-center">
-                                         {{ $selectedMonthName }}
+                                         {{ $selectedMonthIncomeName }}
                                      </td>
                                      <td class="px-4 py-3 text-center">
                                          @if (app()->getLocale() === 'en')
@@ -514,10 +514,10 @@
      <script>
          document.addEventListener('livewire:load', function() {
 
-             Livewire.on('exportTableToExcel6', function(params) {
+             Livewire.on('exportTableToExcel7', function(params) {
 
                  // Quitar el símbolo "$" y la coma "," antes de exportar
-                 $('#tableId6 td').each(function() {
+                 $('#tableId7 td').each(function() {
                      var cellText = $(this).text();
                      // Utilizar una expresión regular para quitar todas las ocurrencias de "$" y ","
                      var cleanedText = cellText.replace(/[$,]/g, '');
@@ -533,20 +533,21 @@
 
                  // Obtener el nombre de usuario de los datos de la tabla
                  const username = params.userName;
-                 const selectedYear5 = params.selectedYear5;
-                 const selectedMonthName = params.selectedMonthName;
+                 const selectedYear6 = params.selectedYear6;
+                 const selectedMonthIncomeName = params.selectedMonthIncomeName;
 
                  // Convertir el nombre de usuario a mayúsculas
                  const capitalizedUsername = username.toUpperCase();
 
                  // Concatenar el nombre del usuario y la fecha al nombre del archivo
-                 var filename = "monthly-expense-report-" + capitalizedUsername + "-" + selectedMonthName +
+                 var filename = "monthly-income-report-" + capitalizedUsername + "-" +
+                     selectedMonthIncomeName +
                      "-" +
-                     selectedYear5 + "-" +
+                     selectedYear6 + "-" +
                      formattedDate;
 
                  // Exportar la tabla a Excel
-                 $("#tableId6").table2excel({
+                 $("#tableId7").table2excel({
                      exclude: ".no-export",
                      name: "Worksheet Name",
                      filename: filename

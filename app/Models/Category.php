@@ -50,4 +50,9 @@ public function income()
     {
         return $this->hasMany(BudgetExpense::class);
     }
+
+     public function budgetIncomes()
+    {
+        return $this->hasMany(BudgetIncome::class);
+    }
 }

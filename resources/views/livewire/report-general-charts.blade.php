@@ -88,6 +88,7 @@
 
                             <!-- Livewire/ReportGeneralBudgetExpenseCharts.php  -->
                             @livewire('report-general-budgets-expense-charts')
+
                         </div>
                     </div>
 

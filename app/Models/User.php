@@ -150,4 +150,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(BlogCategory::class);
     }
+
+     public function processOperation()
+    {
+        return $this->hasMany(ProcessOperation::class);
+    }
+
+     public function operationProcessSubcategory()
+    {
+        return $this->hasMany(ProcessOperationSubcategories::class, 'user_id_subcategory');
+    }
 }

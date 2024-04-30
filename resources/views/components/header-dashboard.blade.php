@@ -36,9 +36,7 @@
                      </template>
                  </button>
              </li>
-             <!-- LENGUAGE BUTTON -->
-             @livewire('language-selector')
-             <!-- LENGUAGE BUTTON END -->
+
              <!-- Profile menu -->
              <x-dropdown align="right" width="48">
                  <x-slot name="trigger">

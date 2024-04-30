@@ -38,4 +38,9 @@ class Subcategory extends Model
         return $this->hasMany(OperationSubcategories::class, 'subcategory_id');
     }
     
+     // Relación hasMany con OperationSubcategories
+    public function operationProcessSubcategories()
+    {
+        return $this->hasMany(ProcessOperationSubcategories::class, 'subcategory_id');
+    }
 }
