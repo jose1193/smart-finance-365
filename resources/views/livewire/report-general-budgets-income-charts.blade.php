@@ -3,7 +3,7 @@
      <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
              <div wire:ignore>
-                 <select wire:model="selectedUser10" id="selectUserChart7" wire:change="updateBudgetIncomeData"
+                 <select wire:model="selectedUser10" id="selectUserChart10" wire:change="updateBudgetIncomeData"
                      style="width: 100%"
                      class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                      <option value="">{{ __('messages.table_columns_categories.select_a_user') }}</option>
@@ -133,7 +133,7 @@
                                      @endforeach
                                  ],
                                  datasets: [{
-                                     label: "@if ($budget) Monthly Budget {{ $budget }} - @endif Expenses {{ $currencyType }} ",
+                                     label: "@if ($budget) Monthly Budget {{ $budget }} - @endif Incomes {{ $currencyType }} ",
                                      backgroundColor: '#7e3af280',
                                      borderColor: 'rgba(124, 58, 237, 1)',
                                      borderWidth: 1, // Establecer el ancho de borde para todas las barras
@@ -240,7 +240,7 @@
                                  data: {
                                      labels: labels,
                                      datasets: [{
-                                         label: 'Top 10 Budget Expenses {{ $currencyType }} ',
+                                         label: 'Top 10 Budget Incomes {{ $currencyType }} ',
                                          data: data,
                                          backgroundColor: 'rgba(20, 184, 166, 0.2)',
                                          borderColor: 'rgba(20, 184, 166, 1)',
@@ -304,34 +304,34 @@
 
                          <script>
                              var ctx = document.getElementById('{{ $BudgeIncomeChart3 }}').getContext('2d');
-                             var totalMonthlyExpenses = 0;
+                             var totalMonthlyIncomes = 0;
 
                              @foreach ($operationsFetchMonths as $item)
 
 
                                  @if ($SelectMainCurrencyTypeRender && $SelectMainCurrencyTypeRender === 'USD')
-                                     totalMonthlyExpenses += {{ $item->total_currency }};
+                                     totalMonthlyIncomes += {{ $item->total_currency }};
                                  @else
-                                     totalMonthlyExpenses += {{ $item->total_amount }};
+                                     totalMonthlyIncomes += {{ $item->total_amount }};
                                  @endif
                              @endforeach
 
 
                              var budgetValue = {!! $budget ? json_encode(str_replace(',', '', $budget)) : '0' !!};
                              budgetValue = parseFloat(budgetValue);
-                             var percentageExpense = budgetValue !== null && budgetValue !== 0 ?
-                                 (totalMonthlyExpenses / budgetValue * 100).toFixed(0) :
+                             var percentageIncome = budgetValue !== null && budgetValue !== 0 ?
+                                 (totalMonthlyIncomes / budgetValue * 100).toFixed(0) :
                                  null;
 
-                             var percentageExpense = budgetValue !== 0 ? (totalMonthlyExpenses / budgetValue * 100).toFixed(0) : null;
+                             var percentageIncome = budgetValue !== 0 ? (totalMonthlyIncomes / budgetValue * 100).toFixed(0) : null;
 
                              var myChart = new Chart(ctx, {
                                  type: 'doughnut',
                                  data: {
                                      labels: [],
                                      datasets: [{
-                                         label: '# of Expenses',
-                                         data: [totalMonthlyExpenses, budgetValue],
+                                         label: '# of Incomes',
+                                         data: [totalMonthlyIncomes, budgetValue],
                                          backgroundColor: ['#7e3af280', '#f1f5f980'],
                                          borderColor: ['#7e3af2', '#f1f5f9'],
                                          borderWidth: 1
@@ -345,7 +345,7 @@
                                          },
                                          title: {
                                              display: false,
-                                             text: 'Expenses Chart'
+                                             text: 'Incomes Chart'
                                          },
                                      },
                                      cutoutPercentage: 65,
@@ -358,17 +358,17 @@
                                              var centerX = this.chart.width / 2;
                                              var centerY = this.chart.height / 2;
 
-                                             if (percentageExpense !== null) {
+                                             if (percentageIncome !== null) {
                                                  ctx.fillStyle = '#7e3af2';
                                                  ctx.font = '28px Roboto';
-                                                 ctx.fillText(`${percentageExpense}%`, centerX,
+                                                 ctx.fillText(`${percentageIncome}%`, centerX,
                                                      centerY); // Mostrar el porcentaje con dos decimales
                                              }
 
-                                             if (percentageExpense !== null) {
+                                             if (percentageIncome !== null) {
                                                  ctx.fillStyle = '#808080';
                                                  ctx.font = '14px Roboto';
-                                                 ctx.fillText('of Expense', centerX, centerY + 30);
+                                                 ctx.fillText('of Income', centerX, centerY + 30);
                                              }
                                          }
                                      },
@@ -378,7 +378,7 @@
                                      tooltips: {
                                          callbacks: {
                                              label: function(tooltipItem, data) {
-                                                 var label = (tooltipItem.index === 0) ? 'Total Monthly Expenses' : 'Total Budget';
+                                                 var label = (tooltipItem.index === 0) ? 'Total Monthly Incomes' : 'Total Budget';
                                                  var value = data.datasets[0].data[tooltipItem.index].toLocaleString('en-US');
 
                                                  var currencyType = '{{ $SelectMainCurrencyTypeRender }}';

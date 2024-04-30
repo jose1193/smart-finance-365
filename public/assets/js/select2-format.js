@@ -23,6 +23,7 @@ document.addEventListener("livewire:load", function () {
     var selectUserChart2 = $("#selectUserChart2");
     var selectYearChart2 = $("#selectYearChart2");
     var selectYearChart3 = $("#selectYearChart3");
+    var selectYearChart7 = $("#selectYearChart7");
     var selectCategoryChart = $("#selectCategoryChart");
     var selectUserChart3 = $("#selectUserChart3");
     var selectUserChart4 = $("#selectUserChart4");
@@ -30,8 +31,9 @@ document.addEventListener("livewire:load", function () {
     var selectUserChart5 = $("#selectUserChart5");
     var selectYearChart4 = $("#selectYearChart4");
     var selectUserChart6 = $("#selectUserChart6");
-    var selectUserChart6 = $("#selectUserChart6");
+    var selectUserChart10 = $("#selectUserChart10");
     var selectMonthChart2 = $("#selectMonthChart2");
+    var selectMonthChart3 = $("#selectMonthChart3");
     var selectYearChart5 = $("#selectYearChart5");
 
     var isDropdownOpen = false;
@@ -91,7 +93,10 @@ document.addEventListener("livewire:load", function () {
     initializeSelect2(selectYearChart3, "YearSelected3");
     initializeSelect2(selectUserChart5, "userSelectedChart5");
     initializeSelect2(selectYearChart4, "YearSelectedChart4");
+    initializeSelect2(selectYearChart7, "YearSelectedChart7");
     initializeSelect2(selectUserChart6, "userSelectedChart6");
     initializeSelect2(selectMonthChart2, "MonthSelectedBudget2");
+    initializeSelect2(selectMonthChart3, "MonthSelectedBudget3");
     initializeSelect2(selectYearChart5, "YearSelectedChart5");
+    initializeSelect2(selectUserChart10, "userSelectedChart10");
 });

@@ -1,4 +1,4 @@
- <div x-show="activeTab === '4'">
+ <div x-show="activeTab === '5'">
      <!-- Chart JS -->
      <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center my-10">
          <div class="w-full px-3 md:w-1/3 mb-3 sm:mb-0 ">
@@ -549,7 +549,7 @@
                  // Crea un enlace temporal y simula un clic para descargar la imagen
                  const link = document.createElement('a');
                  const fileName =
-                     `Expense-Monthly-Report-Image-${userNameSelected}-${formattedDate}.jpg`; // Cambia a '.png' si prefieres PNG
+                     `Income-Monthly-Report-Image-${userNameSelected}-${formattedDate}.jpg`; // Cambia a '.png' si prefieres PNG
                  link.href = imgData;
                  link.download = fileName;
                  document.body.appendChild(link);
