@@ -166,8 +166,8 @@ return [
     'dashboard_user_total_users_expense' => 'Total Users Expense',
     'dashboard_user_general_budget' => 'General Budget',
     'dashboard_user_total_operations' => 'Total Operations',
-    'dashboard_user_income' => 'Income',
-    'dashboard_user_expense' => 'Expense',
+    'dashboard_user_income' => 'General Income',
+    'dashboard_user_expense' => 'General Expense',
 
 
      /// ------- DASHBOARD TABLE --------///

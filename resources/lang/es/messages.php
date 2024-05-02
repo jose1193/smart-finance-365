@@ -161,8 +161,8 @@ return [
     'dashboard_user_total_users_expense' => 'Gastos Totales de Usuarios',
     'dashboard_user_general_budget' => 'Presupuesto General',
     'dashboard_user_total_operations' => 'Operaciones Totales',
-    'dashboard_user_income' => 'Ingresos',
-    'dashboard_user_expense' => 'Gastos',
+    'dashboard_user_income' => 'Total de Ingresos',
+    'dashboard_user_expense' => 'Total de Gastos',
 
 
     /// ------- DASHBOARD TABLE --------///

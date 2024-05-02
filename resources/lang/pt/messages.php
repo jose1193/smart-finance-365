@@ -164,8 +164,8 @@ return [
     'dashboard_user_total_users_expense' => 'Despesa Total de Utilizadores',
     'dashboard_user_general_budget' => 'Orçamento Geral',
     'dashboard_user_total_operations' => 'Total de Operações',
-    'dashboard_user_income' => 'Rendimento',
-    'dashboard_user_expense' => 'Despesa',
+    'dashboard_user_income' => 'Total de Rendimento',
+    'dashboard_user_expense' => 'Total de Despesa',
 
     /// ------- TABELA DO PAINEL DE CONTROLO --------///
     'inpur_search' => 'Pesquisar...',
