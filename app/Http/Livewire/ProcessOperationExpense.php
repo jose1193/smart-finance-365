@@ -434,40 +434,50 @@ private function formatCurrency($currency)
     }
 }
 
-
 private function processTodayOrFutureOperation($validatedData)
 {
-    // Obtener la fecha actual
-    $currentDate = now()->format('d');
+    // Iniciar una transacción de base de datos
+    DB::beginTransaction();
 
-    // Verificar si se está editando un registro existente en ProcessOperation
-    if ($this->data_id) {
-        $existingProcessOperation = ProcessOperation::find($this->data_id);
-        $isDateChanged = $existingProcessOperation && $existingProcessOperation->process_operation_date != $validatedData['process_operation_date'];
+    try {
+        // Obtener la fecha actual
+        $currentDate = now()->format('d');
 
-        // Actualizar o crear en ProcessOperation
-        $processOperation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
+        // Verificar si se está editando un registro existente en ProcessOperation
+        if ($this->data_id) {
+            $existingProcessOperation = ProcessOperation::find($this->data_id);
+            $isDateChanged = $existingProcessOperation && $existingProcessOperation->process_operation_date != $validatedData['process_operation_date'];
 
-        // Asignar subcategoría y actualizar ingreso presupuestario
-        $this->ProcessSubcategoryOperationAssignment($processOperation);
-        $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
+            // Actualizar o crear en ProcessOperation
+            $processOperation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
-       
-    } else {
-        // Si es una nueva operación en ProcessOperation
-        $processOperation = ProcessOperation::create($validatedData);
-        $this->ProcessSubcategoryOperationAssignment($processOperation);
-        $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
+            // Asignar subcategoría y actualizar ingreso presupuestario
+            $this->ProcessSubcategoryOperationAssignment($processOperation);
+            $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
 
-        // Si coincide con la fecha actual, registrar en Operation
-        if ($validatedData['process_operation_date'] == $currentDate) {
-            $operation = Operation::create($validatedData);
-            $this->SubcategoryOperationAssignment($operation);
-            $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
+        } else {
+            // Si es una nueva operación en ProcessOperation
+            $processOperation = ProcessOperation::create($validatedData);
+            $this->ProcessSubcategoryOperationAssignment($processOperation);
+            $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
+
+            // Si coincide con la fecha actual, registrar en Operation
+            if ($validatedData['process_operation_date'] == $currentDate) {
+                $operation = Operation::create($validatedData);
+                $this->SubcategoryOperationAssignment($operation);
+                $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
+            }
         }
-    }
 
-    session()->flash('message', __('messages.data_created_successfully'));
+        // Confirmar la transacción
+        DB::commit();
+
+        session()->flash('message', __('messages.data_created_successfully'));
+    } catch (\Exception $e) {
+        // Revertir la transacción en caso de error
+        DB::rollback();
+        session()->flash('error', 'Error: ' . $e->getMessage());
+    }
 }
 
 

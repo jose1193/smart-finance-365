@@ -324,18 +324,25 @@ public function updatedOperationAmount()
          $this->resetValidation();
     }
 
-       
-    public function edit($id)
+          
+public function edit($id)
     {
-       
-        $list = Operation::findOrFail($id);
+        
+        $list = Operation::leftJoin('budget_incomes', 'operations.id', '=', 'budget_incomes.operation_id')
+        ->leftJoin('budgets', 'budget_incomes.budget_id', '=', 'budgets.id')
+        ->findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
         $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
         $this->operation_currency = $list->operation_currency;
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
         $this->operation_status = $list->operation_status;
-        $this->category_id = $list->category_id;
+
+        // Obtener la información de la operación con posible categoría nula
+        $operation = Operation::with('category', 'operationSubcategories')->findOrFail($id);
+       
+        $this->category_id = $operation->category->id;
+
         $this->selectedCurrencyFrom = $list->operation_currency_type;
         $this->operation_currency_type=$list->operation_currency_type;
         $this->operation_date =  Carbon::parse($list->operation_date)->format('d/m/Y');
@@ -345,11 +352,15 @@ public function updatedOperationAmount()
         $this->selectedCategoryId = $list->category_id;
         $this->showSubcategories = true;
 
-        $registeredSubcategory = $list->operationSubcategories->first();
-        $this->updatedCategoryId($list->category_id, optional($registeredSubcategory)->subcategory_id);
+       // Obtener la subcategoría asociada, si existe
+        $registeredSubcategory = $operation->operationSubcategories->first();
+        
+         $this->updatedCategoryId($this->category_id, optional($registeredSubcategory)->subcategory_id);
 
-    
+        // Asignar el budget_id
+       $this->budget_id = $list->budget_id ? $list->budget_id : 'na';
 
+        
     }
 
 

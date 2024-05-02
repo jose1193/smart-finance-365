@@ -23,22 +23,22 @@ class DashboardCards extends Component
     if (auth()->user()->hasRole('Admin')) {
    
     
-    // Obtener el nombre del mes actual y traducir
-$currentMonth = ucfirst(Carbon::now()->translatedFormat('F'));
 
 
-$this->labelBudget = __('messages.dashboard_user_total_users_budget') . ' ' . $currentMonth;
+
+$this->labelBudget = __('messages.dashboard_user_total_users_budget') . ' ' . $currentMonth2;
 $this->labelCountOperation = __('messages.dashboard_user_total_users_operations');
 $this->labelIncome = __('messages.dashboard_user_total_users_income');
 $this->labelExpense = __('messages.dashboard_user_total_users_expense');
 
 
-    $this->income = Operation::whereHas('category', function ($query) {
+   $this->income = Operation::whereHas('category', function ($query) {
         $query->where('main_category_id', 1); // 1 es el ID de la categoría 'income'
     })
     ->whereMonth('created_at', $currentMonth) // Filtra por el mes actual
-     ->whereYear('created_at',  $currentYear) 
+     ->whereYear('created_at',$currentYear) // Filtra por el año actual
     ->sum('operation_currency_total');
+
 
     $this->expense = Operation::whereHas('category', function ($query) {
         $query->where('main_category_id', 2); // 2 es el ID de la categoría 'expense'
@@ -47,14 +47,14 @@ $this->labelExpense = __('messages.dashboard_user_total_users_expense');
      ->whereYear('created_at',$currentYear) // Filtra por el año actual
     ->sum('operation_currency_total');
 
- $this->account_balance = Budget::whereYear('budget_date', $currentYear)
-    ->whereMonth('budget_date', $currentMonth)
+ $this->account_balance = Budget::whereYear('created_at', $currentYear)
+    ->whereMonth('created_at', $currentMonth)
     ->sum('budget_currency_total') ?? 0;
 
 
 
-    $this->total_users_operations = Operation::whereMonth('operation_month', $currentMonth)
-     ->whereYear('operation_year',  $currentYear)->count();
+    $this->total_users_operations = Operation::whereMonth('created_at', $currentMonth)
+     ->whereYear('created_at',  $currentYear)->count();
 
    
 }
@@ -85,8 +85,8 @@ $this->expense = Operation::where('user_id', auth()->id())
     ->sum('operation_currency_total');
 
 $account_balance = Budget::where('user_id', auth()->user()->id)
-    ->whereMonth('budget_date', $currentMonth)
-    ->whereYear('budget_date', $currentYear)
+    ->whereMonth('created_at', $currentMonth)
+    ->whereYear('created_at', $currentYear)
     ->first();
 
 if ($account_balance) {
