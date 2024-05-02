@@ -52,9 +52,9 @@ class ProcessOperation extends Model
     }
 
     public function operationProcessSubcategories()
-    {
-        return $this->hasMany(ProcessOperationSubcategories::class, 'process_operation_id');
-    }
+{
+    return $this->hasMany(ProcessOperationSubcategories::class, 'process_operation_id');
+}
 
     
 }

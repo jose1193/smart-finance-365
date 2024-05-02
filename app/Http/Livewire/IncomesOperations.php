@@ -114,7 +114,7 @@ public $budget_id;
               })
               ->where('main_category_id', 1); 
     })
-    ->orderBy('id', 'asc')
+    ->orderBy('id', 'desc')
     ->get();
 
     

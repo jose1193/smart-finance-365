@@ -113,7 +113,7 @@ public $sortDirection = 'desc'; // Dirección predeterminada para ordenar
               })
               ->where('main_category_id', 2); 
     })
-    ->orderBy('id', 'asc')
+    ->orderBy('id', 'desc')
     ->get();
 
     

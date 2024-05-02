@@ -243,7 +243,7 @@ public function updateDataExpenseOperations()
                     })
                     ->where('main_category_id', 1); 
             })
-            ->orderBy('id', 'asc')
+            ->orderBy('id', 'desc')
             ->get();
 
         $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)

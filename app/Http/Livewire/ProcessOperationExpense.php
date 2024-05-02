@@ -118,7 +118,7 @@ public $checkedSelected = [];
               })
               ->where('main_category_id', 2); 
     })
-    ->orderBy('id', 'asc')
+    ->orderBy('id', 'desc')
     ->get();
 
     
@@ -331,7 +331,9 @@ public function updatedOperationAmount()
     public function edit($id)
     {
        
-        $list = ProcessOperation::findOrFail($id);
+        $list = ProcessOperation::leftJoin('process_budget_expenses', 'process_operations.id', '=', 'process_budget_expenses.process_operation_id')
+        ->leftJoin('budgets', 'process_budget_expenses.budget_id', '=', 'budgets.id')
+        ->findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
         $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
@@ -342,6 +344,7 @@ public function updatedOperationAmount()
         $this->selectedCurrencyFrom = $list->operation_currency_type;
         $this->operation_currency_type=$list->operation_currency_type;
         $this->operation_date =  Carbon::parse($list->operation_date)->format('d/m/Y');
+        $this->process_operation_date = $list->process_operation_date;
         $this->openModal();
         $this->updatedOperationAmount();
        
@@ -351,6 +354,8 @@ public function updatedOperationAmount()
         $registeredSubcategory = $list->operationProcessSubcategories->first();
         $this->updatedCategoryId($list->category_id, optional($registeredSubcategory)->subcategory_id);
 
+         // Asignar el budget_id
+       $this->budget_id = $list->budget_id ? $list->budget_id : 'na';
     
 
     }
@@ -358,13 +363,21 @@ public function updatedOperationAmount()
     ////////// STORT START ////////////
 public function store()
 {
-    // Validación de la fecha de operación
-    if (empty($this->operation_date)) {
-        $this->addError('operation_date', 'The date field is required.');
-        return;
+    // Custom validation for operation_date
+if (empty($this->operation_date)) {
+    $this->addError('operation_date', 'The date field is required.');
+} else {
+    // Verificar si la fecha tiene el formato 'Y-m-d'
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->operation_date)) {
+        // Si ya está en el formato 'Y-m-d', no es necesario convertirlo
+        
+    } else {
+        // Convertir y formatear la fecha si no tiene el formato 'Y-m-d'
+        $fechaCarbon = Carbon::createFromFormat('d/m/Y', $this->operation_date);
+        $this->operation_date = $fechaCarbon->format('Y-m-d');
     }
-
-    $operationDate = $this->validateAndFormatDate($this->operation_date);
+}
+  
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',
@@ -383,10 +396,10 @@ public function store()
 
     // Agregar user_id al array validado
     $validatedData['user_id'] = auth()->user()->id;
-
-    // Calcular el mes y el año usando Carbon
-    $validatedData = $this->processDateData($validatedData, $operationDate);
-
+     // Calcular el mes y el año a partir de expense_date usando Carbon
+    $operationDate = \Carbon\Carbon::createFromFormat('Y-m-d', $validatedData['operation_date']);
+    $validatedData['operation_month'] = $operationDate->format('m');
+    $validatedData['operation_year'] = $operationDate->format('Y');
     // Procesamiento de cantidades y monedas
     $validatedData = $this->processAmountsAndCurrencies($validatedData);
 
@@ -397,23 +410,6 @@ public function store()
     $this->closeModal();
 }
 
-private function validateAndFormatDate($date)
-{
-    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-        return \Carbon\Carbon::createFromFormat('Y-m-d', $date);
-    } else {
-        return \Carbon\Carbon::createFromFormat('d/m/Y', $date);
-    }
-}
-
-private function processDateData($validatedData, $operationDate)
-{
-    
-    $validatedData['operation_month'] = $operationDate->format('m');
-    $validatedData['operation_year'] = $operationDate->format('Y');
-   
-    return $validatedData;
-}
 
 private function processAmountsAndCurrencies($validatedData)
 {
@@ -437,23 +433,42 @@ private function formatCurrency($currency)
         return $currency;
     }
 }
+
+
 private function processTodayOrFutureOperation($validatedData)
 {
+    // Obtener la fecha actual
+    $currentDate = now()->format('d');
+
+    // Verificar si se está editando un registro existente en ProcessOperation
     if ($this->data_id) {
+        $existingProcessOperation = ProcessOperation::find($this->data_id);
+        $isDateChanged = $existingProcessOperation && $existingProcessOperation->process_operation_date != $validatedData['process_operation_date'];
+
+        // Actualizar o crear en ProcessOperation
         $processOperation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
-        $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
-        $this->SubcategoryOperationAssignment($operation);
-        $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
+
+        // Asignar subcategoría y actualizar ingreso presupuestario
         $this->ProcessSubcategoryOperationAssignment($processOperation);
         $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
+
+       
     } else {
+        // Si es una nueva operación en ProcessOperation
         $processOperation = ProcessOperation::create($validatedData);
         $this->ProcessSubcategoryOperationAssignment($processOperation);
         $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
+
+        // Si coincide con la fecha actual, registrar en Operation
+        if ($validatedData['process_operation_date'] == $currentDate) {
+            $operation = Operation::create($validatedData);
+            $this->SubcategoryOperationAssignment($operation);
+            $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
+        }
     }
+
     session()->flash('message', __('messages.data_created_successfully'));
 }
-
 
 
 

@@ -101,7 +101,7 @@
                                         <th class="px-4 py-3">{{ __('messages.operations_total_in_usd') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_status') }}</th>
                                         <th class="px-4 py-3" wire:click="sortBy('process_operations.id')">
-                                            {{ __('messages.modal_operations_scheduled_date') }}
+                                            {{ __('messages.operations_date') }}
                                             @if ($sortBy === 'process_operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>

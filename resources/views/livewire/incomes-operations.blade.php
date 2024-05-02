@@ -25,10 +25,10 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('messages.income_management') }}
+                                {{ __('messages.budget_income_management') }}
                             </x-slot>
                             <a href="{{ route('incomes') }}">
-                                <span> {{ __('messages.income_management') }}</span></a>
+                                <span> {{ __('messages.budget_income_management') }}</span></a>
                         </div>
 
                     </div>
