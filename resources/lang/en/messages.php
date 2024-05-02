@@ -253,6 +253,7 @@ return [
 
     //----------- SWEET ALERT -----------//
     'delete_confirmation_title' => 'Are you sure you want to delete: ',
+    'delete_confirmation_text_all_items' => 'Are you sure you want to delete all items? ',
     'delete_confirmation_text' => "You won not be able to revert this!",
     'delete_confirmation_confirm_button' => 'Yes, delete it!',
     'delete_success_message_your_data' => 'Your data',

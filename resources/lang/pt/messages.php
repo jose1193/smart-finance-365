@@ -246,6 +246,7 @@ return [
 
     //----------- SWEET ALERT -----------//
     'delete_confirmation_title' => 'Tem a certeza de que deseja eliminar: ',
+    'delete_confirmation_text_all_items' => 'Tem certeza de que deseja excluir todos os itens?',
     'delete_confirmation_text' => "Não poderá reverter esta ação!",
     'delete_confirmation_confirm_button' => 'Sim, eliminar!',
     'delete_success_message_your_data' => 'Os seus dados',
