@@ -17,6 +17,7 @@ class ProcessOperation extends Model
         'operation_currency_total',
         'operation_status',
         'operation_date',
+        'process_operation_date',
         'operation_month',
         'operation_year',
         'category_id',
@@ -54,4 +55,6 @@ class ProcessOperation extends Model
     {
         return $this->hasMany(ProcessOperationSubcategories::class, 'process_operation_id');
     }
+
+    
 }

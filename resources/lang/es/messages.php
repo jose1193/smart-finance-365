@@ -263,6 +263,7 @@ return [
     
      //------- FLASH MESSAGE -------------///
     'data_updated_successfully' => ' Datos actualizados exitosamente.',
+    'data_info_process_operation_date' => 'La fecha del proceso debe ser posterior a la fecha actual',
     'data_created_successfully' => ' Datos creados exitosamente.',
     'category_deleted_successfully' => ' Eliminado exitosamente.',
 
@@ -428,9 +429,12 @@ return [
       'modal_operations_operation_with' => 'Operación Con',
       'modal_operations_rate_conv_usd' => 'Tipo de Cambio CONV/USD',
       'modal_operations_total_in_usd' => 'Total en USD',
-      'modal_operations_date' => 'Fecha',
-      'modal_operations_scheduled_date' => 'Fecha Programada C/Mes',
-      'modal_operations_scheduled_date_tooltip' => 'La fecha de registro automatizada cada mes',
+      'modal_operations_date' => 'Fecha Operación',
+      'modal_operations_scheduled_date_td' => 'Día Programado C/Mes',
+      'modal_operations_scheduled_date' => 'Día Programado Mes',
+      'modal_operations_select_day' => 'Seleccione día',
+      'modal_operations_scheduled_date_tooltip' => 'La fecha de operación se actualizará automáticamente en cada día programado de registro',
+      'modal_operations_scheduled_day_tooltip' => 'Día de registro automatizado cada mes',
       'modal_operations_income_category' => 'Categoría de Ingresos',
       'modal_operations_subcategory' => 'Subcategoría',
       'modal_operations_state' => 'Estado',

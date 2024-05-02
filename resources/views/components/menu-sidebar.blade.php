@@ -258,7 +258,7 @@
                                  @role('User')
             href="{{ route('process-operation-income') }}"
         @else
-            href="{{ route('incomes-admin') }}"
+            href="{{ route('process-incomes-admin') }}"
         @endrole>
                                  {{ __('messages.task_incomes') }}
                              </a>
@@ -271,7 +271,7 @@
                                  @role('User')
             href="{{ route('process-operation-expense') }}"
         @else
-            href="{{ route('expenses-admin') }}"
+            href="{{ route('process-expenses-admin') }}"
         @endrole>
                                  {{ __('messages.task_expenses') }}
                              </a>
@@ -660,7 +660,7 @@
                                  @role('User')
             href="{{ route('process-operation-income') }}"
         @else
-            href="{{ route('incomes-admin') }}"
+            href="{{ route('process-incomes-admin') }}"
         @endrole>
                                  {{ __('messages.task_incomes') }}
                              </a>
@@ -673,7 +673,7 @@
                                  @role('User')
             href="{{ route('process-operation-expense') }}"
         @else
-            href="{{ route('expenses-admin') }}"
+            href="{{ route('process-expenses-admin') }}"
         @endrole>
                                  {{ __('messages.task_expenses') }}
                              </a>

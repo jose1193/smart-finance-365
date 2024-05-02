@@ -88,6 +88,9 @@
                                                 @endif
                                             @endif
                                         </th>
+                                        <th class="px-4 py-3">{{ __('messages.modal_operations_scheduled_date_td') }}
+                                        </th>
+
                                         <th class="px-4 py-3">{{ __('messages.budget') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_category') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_subcategory') }}</th>
@@ -97,9 +100,9 @@
                                         <th class="px-4 py-3">{{ __('messages.operations_rate_conv_usd') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_total_in_usd') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_status') }}</th>
-                                        <th class="px-4 py-3" wire:click="sortBy('operations.id')">
+                                        <th class="px-4 py-3" wire:click="sortBy('process_operations.id')">
                                             {{ __('messages.modal_operations_scheduled_date') }}
-                                            @if ($sortBy === 'operations.id')
+                                            @if ($sortBy === 'process_operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>
                                                 @else
@@ -122,6 +125,11 @@
                                             <td class="px-4 py-3 text-center">
 
                                                 {{ $item->id }}
+
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
+
+                                                {{ $item->process_operation_date }}
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
@@ -213,7 +221,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="13">
+                                            <td colspan="14">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -433,32 +441,75 @@
                                                     </div>
 
 
-                                                    <div class="mb-4">
-                                                        <label for="operation_date"
-                                                            class="block text-gray-700 text-sm font-bold mb-2">
-                                                            {{ __('messages.modal_operations_scheduled_date') }} <span
-                                                                x-data="{ isOpen: false }" class="relative ml-1">
-                                                                <!-- Trigger para mostrar el tooltip -->
-                                                                <i @mouseover="isOpen = true"
-                                                                    @mouseleave="isOpen = false"
-                                                                    class="fa-regular fa-circle-question text-red-500 cursor-pointer"></i>
-                                                                <!-- Tooltip -->
-                                                                <div x-show="isOpen"
-                                                                    class="absolute bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
-                                                                    {{ __('messages.modal_operations_scheduled_date_tooltip') }}
+                                                    <div class="flex flex-wrap justify-between">
+                                                        <div class="mb-4 mr-4" style="width: 60%;">
+                                                            <label for="operation_date"
+                                                                class="block text-gray-700 text-sm font-bold mb-2">
+                                                                {{ __('messages.modal_operations_date') }}
+                                                                <span x-data="{ isOpen: false }" class="relative ml-1">
+                                                                    <!-- Trigger para mostrar el tooltip -->
+                                                                    <i @mouseover="isOpen = true"
+                                                                        @mouseleave="isOpen = false"
+                                                                        class="fa-regular fa-circle-question text-red-500 cursor-pointer"></i>
+                                                                    <!-- Tooltip -->
+                                                                    <div x-show="isOpen"
+                                                                        class="absolute z-50 bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
+                                                                        {{ __('messages.modal_operations_scheduled_date_tooltip') }}
 
-                                                                </div>
-                                                            </span> </label>
-                                                        <div wire:ignore>
-                                                            <input type="text" readonly id="myDatePicker"
-                                                                autocomplete="off" wire:model="operation_date"
-                                                                placeholder="dd/mm/yyyy"
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                                    </div>
+                                                                </span>
+                                                            </label>
+                                                            <div wire:ignore>
+                                                                <input type="text" readonly id="myDatePicker"
+                                                                    autocomplete="off" wire:model="operation_date"
+                                                                    placeholder="dd/mm/yyyy"
+                                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                            </div>
+                                                            @error('operation_date')
+                                                                <span class="text-red-500">{{ $message }}</span>
+                                                            @enderror
+
                                                         </div>
-                                                        @error('operation_date')
-                                                            <span class="text-red-500">{{ $message }}</span>
-                                                        @enderror
 
+                                                        <div class="mb-4" style="width: 35%;">
+                                                            <label for="operation_date"
+                                                                class="block text-gray-700 text-sm font-bold mb-2">
+                                                                {{ __('messages.modal_operations_scheduled_date') }}
+                                                                <span x-data="{ isOpen: false }" class="relative ml-1">
+                                                                    <!-- Trigger para mostrar el tooltip -->
+                                                                    <i @mouseover="isOpen = true"
+                                                                        @mouseleave="isOpen = false"
+                                                                        class="fa-regular fa-circle-question text-red-500 cursor-pointer"></i>
+                                                                    <!-- Tooltip -->
+                                                                    <div x-show="isOpen"
+                                                                        class="absolute  bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
+                                                                        {{ __('messages.modal_operations_scheduled_day_tooltip') }}
+
+                                                                    </div>
+                                                                </span>
+                                                            </label>
+
+                                                            <select wire:model="process_operation_date"
+                                                                style="z-index: -9999;"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-8">
+                                                                <option>
+                                                                    {{ __('messages.modal_operations_select_day') }}
+                                                                </option>
+                                                                @for ($day = 1; $day <= 31; $day++)
+                                                                    <option
+                                                                        value="{{ str_pad($day, 2, '0', STR_PAD_LEFT) }}">
+                                                                        {{ str_pad($day, 2, '0', STR_PAD_LEFT) }}
+                                                                    </option>
+                                                                @endfor
+
+                                                            </select>
+
+
+                                                            @error('process_operation_date')
+                                                                <span class="text-red-500">{{ $message }}</span>
+                                                            @enderror
+
+                                                        </div>
                                                     </div>
 
                                                     <div class="mb-4">

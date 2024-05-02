@@ -36,7 +36,6 @@
 
         </div>
 
-
         <script>
             var ctx = document.getElementById('myChartIncomeDashboard').getContext('2d');
             var myChart = new Chart(ctx, {
@@ -100,11 +99,11 @@
             });
         </script>
 
+
         <div
             class="border-solid border-2 border-gray-100 rounded mt-10 p-3 dark:border-gray-700  dark:text-gray-400 dark:bg-gray-700 ">
             <canvas id="myChartIncomeDashboard2"></canvas>
         </div>
-
         <script>
             var ctx = document.getElementById('myChartIncomeDashboard2').getContext('2d');
 
@@ -119,7 +118,11 @@
                     label: "{{ $categoryName }}",
                     backgroundColor: "#0d9488",
                     borderColor: "#0d9488",
-                    data: @json($incomeData)
+                    data: [
+                        @foreach ($monthlyResults as $result)
+                            {{ $result['totalIncomeMonthly'] }},
+                        @endforeach
+                    ]
                 }]
             };
 
@@ -174,6 +177,7 @@
                 options: options
             });
         </script>
+
 
         <!-- TABLE Income -->
         <div class="flex flex-col mt-8 ">
@@ -375,8 +379,6 @@
             <canvas id="myChartExpensesDashboard2"></canvas>
         </div>
 
-
-
         <script>
             var ctx = document.getElementById('myChartExpensesDashboard2').getContext('2d');
 
@@ -390,7 +392,11 @@
                     label: "{{ $categoryName2 }}",
                     backgroundColor: "#7e3af2",
                     borderColor: "#7e3af2",
-                    data: @json($expenseData)
+                    data: [
+                        @foreach ($monthlyResults as $result)
+                            {{ $result['totalExpensesMonthly'] }},
+                        @endforeach
+                    ]
                 }]
             };
 
@@ -445,6 +451,9 @@
                 options: options
             });
         </script>
+
+
+
 
         <!-- TABLE EXPENSES -->
         <div class="flex flex-col mt-8 ">
@@ -564,14 +573,22 @@
                         label: "{{ $categoryName }}",
                         backgroundColor: "#14b8a6",
                         borderColor: "#14b8a6",
-                        data: @json($incomeData)
+                        data: [
+                            @foreach ($monthlyResults as $result)
+                                {{ $result['totalIncomeMonthly'] }},
+                            @endforeach
+                        ]
 
                     },
                     {
                         label: "{{ $categoryName2 }}",
                         backgroundColor: "#7e3af2",
                         borderColor: "#7e3af2",
-                        data: @json($expenseData)
+                        data: [
+                            @foreach ($monthlyResults as $result)
+                                {{ $result['totalExpensesMonthly'] }},
+                            @endforeach
+                        ]
                     }
                 ]
             };
@@ -625,6 +642,7 @@
 
         <!-- Agrega un elemento canvas para el gráfico -->
         <canvas id="myDoughnutChart"></canvas>
+
         <script>
             var ctx = document.getElementById('myDoughnutChart').getContext('2d');
             var totalIncome = {{ $totalIncome }};
@@ -693,7 +711,6 @@
                 }
             });
         </script>
-
 
     </div>
 </div>

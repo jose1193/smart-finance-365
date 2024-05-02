@@ -266,6 +266,7 @@ return [
 
 
     //------- FLASH MESSAGE -------------///
+    'data_info_process_operation_date' => 'The date of the process must be later than the current date',
     'data_updated_successfully' => ' Data updated successfully.',
     'data_created_successfully' => ' Data created successfully.',
     'category_deleted_successfully' => ' Deleted successfully.',
@@ -436,9 +437,12 @@ return [
     'modal_operations_operation_with' => 'Operation With',
     'modal_operations_rate_conv_usd' => 'Rate CONV/USD',
     'modal_operations_total_in_usd' => 'Total in USD',
-    'modal_operations_date' => 'Date',
-    'modal_operations_scheduled_date' => 'Schedule Date',
-    'modal_operations_scheduled_date_tooltip' => 'The automated registration date each month',
+    'modal_operations_date' => 'Operation Date',
+    'modal_operations_scheduled_date_td' => 'Scheduled Day w/Month',
+    'modal_operations_scheduled_date' => 'Scheduled Day',
+    'modal_operations_select_day' => 'Select a Day',
+    'modal_operations_scheduled_date_tooltip' => 'The operation date will be automatically updated on each scheduled registration day',
+    'modal_operations_scheduled_day_tooltip' => 'Automated Registration Day Every Month',
     'modal_operations_income_category' => 'Income Category',
     'modal_operations_subcategory' => 'Subcategory',
     'modal_operations_state' => 'State',

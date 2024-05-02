@@ -259,6 +259,7 @@ return [
 
     //------- FLASH MESSAGE -------------///
     'data_updated_successfully' => ' Dados atualizados com sucesso.',
+    'data_info_process_operation_date' => '"La data do processo deve ser posterior à data atual."',
     'data_created_successfully' => ' Dados criados com sucesso.',
     'category_deleted_successfully' => ' Eliminado com sucesso.',
     'users_removed' => 'Os utilizadores foram removidos!',
@@ -420,9 +421,12 @@ return [
 'modal_operations_operation_with' => 'Operação Com',
 'modal_operations_rate_conv_usd' => 'Taxa CONV/USD',
 'modal_operations_total_in_usd' => 'Total em USD',
-'modal_operations_date' => 'Data',
-'modal_operations_scheduled_date' => 'Data Agendada',
-'modal_operations_scheduled_date_tooltip' => 'A data de registo automatizada a cada mês.',
+'modal_operations_date' => 'Data da Operação',
+'modal_operations_scheduled_date_td' => 'Dia Programado por Mês',
+'modal_operations_scheduled_date' => 'Dia Programado por Mês',
+'modal_operations_select_day' => 'Selecione um dia',
+'modal_operations_scheduled_date_tooltip' => 'A data da operação será atualizada automaticamente em cada dia programado de registo',
+'modal_operations_scheduled_day_tooltip' => 'Dia de registo automatizado em cada mês',
 'modal_operations_income_category' => 'Categoria de Rendimento',
 'modal_operations_subcategory' => 'Subcategoria',
 'modal_operations_state' => 'Estado',

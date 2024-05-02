@@ -51,4 +51,5 @@ class Operation extends Model
         return $this->hasMany(BudgetIncome::class, 'operation_id');
     }
 
+    
 }

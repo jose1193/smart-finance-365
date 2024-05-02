@@ -9,9 +9,13 @@ use App\Models\SubcategoryToAssign;
 use App\Models\ProcessOperationSubcategories;
 use App\Models\CategoriesToAssign;
 use App\Models\StatuOptions;
-use App\Models\Operation;
+
 use App\Models\ProcessOperation;
 use App\Models\ProcessBudgetExpense;
+
+use App\Models\Operation;
+use App\Models\OperationSubcategories;
+use App\Models\BudgetExpense;
 
 use App\Models\Budget;
 use Livewire\WithPagination;
@@ -351,25 +355,16 @@ public function updatedOperationAmount()
 
     }
 
-
+    ////////// STORT START ////////////
 public function store()
 {
-   
-       // Custom validation for operation_date
-if (empty($this->operation_date)) {
-    $this->addError('operation_date', 'The date field is required.');
-} else {
-    // Verificar si la fecha tiene el formato 'Y-m-d'
-    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->operation_date)) {
-        // Si ya está en el formato 'Y-m-d', no es necesario convertirlo
-        
-    } else {
-        // Convertir y formatear la fecha si no tiene el formato 'Y-m-d'
-        $fechaCarbon = Carbon::createFromFormat('d/m/Y', $this->operation_date);
-        $this->operation_date = $fechaCarbon->format('Y-m-d');
+    // Validación de la fecha de operación
+    if (empty($this->operation_date)) {
+        $this->addError('operation_date', 'The date field is required.');
+        return;
     }
-}
 
+    $operationDate = $this->validateAndFormatDate($this->operation_date);
 
     $validationRules = [
         'operation_description' => 'required|string|max:255',
@@ -381,90 +376,142 @@ if (empty($this->operation_date)) {
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
         'budget_id' => 'nullable',
+        'process_operation_date' => 'required',
     ];
-    
+
     $validatedData = $this->validate($validationRules);
 
- 
     // Agregar user_id al array validado
     $validatedData['user_id'] = auth()->user()->id;
 
+    // Calcular el mes y el año usando Carbon
+    $validatedData = $this->processDateData($validatedData, $operationDate);
 
-    // Calcular el mes y el año  usando Carbon
-    $operationDate = \Carbon\Carbon::createFromFormat('Y-m-d', $validatedData['operation_date']);
-    $validatedData['operation_month'] = $operationDate->format('m');
-    $validatedData['operation_year'] = $operationDate->format('Y');
-    $validatedData['process_operation_date'] = $operationDate->format('Y-m-d');
+    // Procesamiento de cantidades y monedas
+    $validatedData = $this->processAmountsAndCurrencies($validatedData);
 
-    // Elimina cualquier carácter no numérico, como comas y puntos
-   $numericValue = str_replace([',', '.'], '', $validatedData['operation_amount']);
-    $numericValue2 = str_replace([',', '.'], '', $validatedData['operation_currency_total']);
-    $numericValue3 = preg_replace('/[\s,\.]/', '', $validatedData['operation_currency']);
-
-    // Divide los valores por 100 y formatea con dos decimales
-    $formattedValue = number_format($numericValue / 100, 2, '.', '');
-    $formattedValue2 = number_format($numericValue2 / 100, 2, '.', '');
-    
-    if (is_numeric($numericValue3)) {
-    $formattedValue3 = number_format(floatval($numericValue3) / 100, 2, ',', '.');
-    } else {
-    $formattedValue3 = $validatedData['operation_currency'];
-    }
-
-    // Asigna la cadena, sin convertirla a un entero
-    $validatedData['operation_amount'] = $formattedValue;
-    $validatedData['operation_currency_total'] = $formattedValue2;
-    $validatedData['operation_currency'] = $formattedValue3;
    
-     
-
-    $operation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
-
-     session()->flash('message', 
-    $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
-    
-    
-    
-    $this->SubcategoryOperationAssignment($operation);
-
-
-    // Llama a la función solo si 'budget_id' está presente
-$this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $operation);
+    // Actualización o creación de operación
+    $this->processTodayOrFutureOperation($validatedData);
 
     $this->closeModal();
+}
+
+private function validateAndFormatDate($date)
+{
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        return \Carbon\Carbon::createFromFormat('Y-m-d', $date);
+    } else {
+        return \Carbon\Carbon::createFromFormat('d/m/Y', $date);
+    }
+}
+
+private function processDateData($validatedData, $operationDate)
+{
+    
+    $validatedData['operation_month'] = $operationDate->format('m');
+    $validatedData['operation_year'] = $operationDate->format('Y');
    
+    return $validatedData;
+}
+
+private function processAmountsAndCurrencies($validatedData)
+{
+    $validatedData['operation_amount'] = $this->formatAmount($validatedData['operation_amount']);
+    $validatedData['operation_currency_total'] = $this->formatAmount($validatedData['operation_currency_total']);
+    $validatedData['operation_currency'] = $this->formatCurrency($validatedData['operation_currency']);
+    return $validatedData;
+}
+
+private function formatAmount($amount)
+{
+    $numericValue = preg_replace('/[\s,\.]/', '', $amount);
+    return number_format(floatval($numericValue) / 100, 2, '.', '');
+}
+
+private function formatCurrency($currency)
+{
+    if (is_numeric($currency)) {
+        return number_format(floatval($currency) / 100, 2, ',', '.');
+    } else {
+        return $currency;
+    }
+}
+private function processTodayOrFutureOperation($validatedData)
+{
+    if ($this->data_id) {
+        $processOperation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
+        $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
+        $this->SubcategoryOperationAssignment($operation);
+        $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
+        $this->ProcessSubcategoryOperationAssignment($processOperation);
+        $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
+    } else {
+        $processOperation = ProcessOperation::create($validatedData);
+        $this->ProcessSubcategoryOperationAssignment($processOperation);
+        $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
+    }
+    session()->flash('message', __('messages.data_created_successfully'));
 }
 
 
-public function SubcategoryOperationAssignment(ProcessOperation $operation)
+
+
+public function ProcessSubcategoryOperationAssignment(ProcessOperation $processOperation)
 {
     // Verificar si $this->registeredSubcategoryItem no es 'N/A' y no está vacío
     if ($this->registeredSubcategoryItem != 'N/A' && !empty($this->registeredSubcategoryItem)) {
         // Buscar una subcategoría existente para la operación
-        $existingSubcategory = ProcessOperationSubcategories::where('process_operation_id', $operation->id)->first();
+        $existingSubcategory = ProcessOperationSubcategories::where('process_operation_id', $processOperation->id)->first();
 
         if ($existingSubcategory) {
             // Si la subcategoría ya existe, actualizarla
             $existingSubcategory->update([
                 'subcategory_id' => $this->registeredSubcategoryItem,
-                'user_id_subcategory' => $operation->user_id,
+                'user_id_subcategory' => $processOperation->user_id,
             ]);
         } else {
             // Si no existe, crear una nueva subcategoría
             ProcessOperationSubcategories::create([
-                'process_operation_id' => $operation->id,
+                'process_operation_id' => $processOperation->id,
                 'subcategory_id' => $this->registeredSubcategoryItem,
-                'user_id_subcategory' => $operation->user_id,
+                'user_id_subcategory' => $processOperation->user_id,
             ]);
         }
     } else {
         // Si $this->registeredSubcategoryItem es 'N/A' o está vacío, eliminar registros en OperationSubcategories
-        ProcessOperationSubcategories::where('process_operation_id', $operation->id)->delete();
+        ProcessOperationSubcategories::where('process_operation_id', $processOperation->id)->delete();
     }
 
     $this->resetInputFields();
 }
 
+
+public function ProcessBudgetExpense($budgetId, ProcessOperation $processOperation)
+{
+    $operationId = $processOperation->id;
+    $categoryId = $processOperation->category_id;
+
+    if ($operationId) {
+        // Verifica si $budgetId está vacío o es igual a 'NO'
+        if (empty($budgetId) || $budgetId === 'na') {
+            // Elimina la entrada existente si $budgetId está vacío o es 'NO'
+            ProcessBudgetExpense::where(['process_operation_id' => $operationId])->delete();
+             session()->flash('message', __('messages.data_deleted_successfully'));
+        } else {
+            // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
+            ProcessBudgetExpense::updateOrCreate(
+                ['process_operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
+                // Puedes agregar aquí otros campos que desees actualizar o crear
+            );
+            session()->flash('message', __('messages.data_created_successfully'));
+        }
+    } else {
+        // session()->flash('info', __('Invalid operation'));
+    }
+}
+
+ ////////// STORT END ////////////
 
 public function updatedCategoryId($value,$registeredSubcategoryId = null)
 {
@@ -504,7 +551,37 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
 }
 
 
-public function ProcessBudgetExpense($budgetId, ProcessOperation $operation)
+public function SubcategoryOperationAssignment(Operation $operation)
+{
+    // Verificar si $this->registeredSubcategoryItem no es 'N/A' y no está vacío
+    if ($this->registeredSubcategoryItem != 'N/A' && !empty($this->registeredSubcategoryItem)) {
+        // Buscar una subcategoría existente para la operación
+        $existingSubcategory = OperationSubcategories::where('operation_id', $operation->id)->first();
+
+        if ($existingSubcategory) {
+            // Si la subcategoría ya existe, actualizarla
+            $existingSubcategory->update([
+                'subcategory_id' => $this->registeredSubcategoryItem,
+                'user_id_subcategory' => $operation->user_id,
+            ]);
+        } else {
+            // Si no existe, crear una nueva subcategoría
+            OperationSubcategories::create([
+                'operation_id' => $operation->id,
+                'subcategory_id' => $this->registeredSubcategoryItem,
+                'user_id_subcategory' => $operation->user_id,
+            ]);
+        }
+    } else {
+        // Si $this->registeredSubcategoryItem es 'N/A' o está vacío, eliminar registros en OperationSubcategories
+        OperationSubcategories::where('operation_id', $operation->id)->delete();
+    }
+
+    $this->resetInputFields();
+}
+
+
+public function BudgetExpense($budgetId, Operation $operation)
 {
     $operationId = $operation->id;
     $categoryId = $operation->category_id;
@@ -513,12 +590,12 @@ public function ProcessBudgetExpense($budgetId, ProcessOperation $operation)
         // Verifica si $budgetId está vacío o es igual a 'NO'
         if (empty($budgetId) || $budgetId === 'na') {
             // Elimina la entrada existente si $budgetId está vacío o es 'NO'
-            ProcessBudgetExpense::where(['process_operation_id' => $operationId])->delete();
-             session()->flash('message', __('messages.data_deleted_successfully'));
+            BudgetExpense::where(['operation_id' => $operationId])->delete();
+             session()->flash('message', __('messages.data_created_successfully'));
         } else {
             // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
-            ProcessBudgetExpense::updateOrCreate(
-                ['process_operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
+            BudgetExpense::updateOrCreate(
+                ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
                 // Puedes agregar aquí otros campos que desees actualizar o crear
             );
             session()->flash('message', __('messages.data_created_successfully'));
@@ -561,15 +638,15 @@ public function getItemsIds()
    
     
     // Retorna un array con los IDs de los elementos disponibles
-    return ProcessOperation::join('categories', 'operations.category_id', '=', 'categories.id')
-        ->join('users', 'operations.user_id', '=', 'users.id')
+    return ProcessOperation::join('categories', 'process_operations.category_id', '=', 'categories.id')
+        ->join('users', 'process_operations.user_id', '=', 'users.id')
         ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-        ->leftJoin('process_operation_subcategories', 'process_operation_subcategories.process_operation_id', '=', 'operations.id')
+        ->join('statu_options', 'process_operations.operation_status', '=', 'statu_options.id')
+        ->leftJoin('process_operation_subcategories', 'process_operation_subcategories.process_operation_id', '=', 'process_operations.id')
         ->leftJoin('subcategories', 'process_operation_subcategories.subcategory_id', '=', 'subcategories.id')
         ->where('users.id', Auth::id()) // Filtra por el ID del usuario autenticado
         ->where('main_categories.id', 1) // Filtra por la categoría principal con ID 1
-        ->pluck('operations.id')
+        ->pluck('process_operations.id')
         ->toArray();
   
    

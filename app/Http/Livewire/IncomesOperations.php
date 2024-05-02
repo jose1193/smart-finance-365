@@ -475,7 +475,7 @@ public function BudgetIncome($budgetId, Operation $operation)
         if (empty($budgetId) || $budgetId === 'na') {
             // Elimina la entrada existente si $budgetId está vacío o es 'NO'
             BudgetIncome::where(['operation_id' => $operationId])->delete();
-             session()->flash('message', __('messages.data_deleted_successfully'));
+             session()->flash('message', __('messages.data_created_successfully'));
         } else {
             // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
             BudgetIncome::updateOrCreate(

@@ -2,28 +2,34 @@
 
 namespace App\Http\Livewire;
 
+
 use Livewire\Component;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\SubcategoryToAssign;
+use App\Models\ProcessOperationSubcategories;
 use App\Models\OperationSubcategories;
+use App\Models\BudgetIncome;
+use App\Models\Operation;
 use App\Models\CategoriesToAssign;
 use App\Models\StatuOptions;
-use App\Models\Operation;
+
+use App\Models\ProcessOperation;
+use App\Models\ProcessBudgetIncome;
+use App\Models\ProcessOperationExecution;
 use App\Models\Budget;
-use App\Models\BudgetExpense;
+use App\Models\User;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- guzzle query api
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-
-class Operations extends Component
+class ProcessIncomeOperationAdmin extends Component
 {
     use WithPagination;
     
-public  $operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
+public  $process_operation_date,$operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
 public $search = '';
 public $categoriesRender;
 public $statusOptionsRender;
@@ -32,7 +38,7 @@ public $data2;
 public $operation_currency; 
 public $operation_currency_total; 
 public $isOpen = 0;
-protected $listeners = ['render','delete','currencyChanged','deleteMultiple']; 
+protected $listeners = ['render','delete','currencyChanged','userSelected8','userSelectedUpdated' => 'updateSelect','updateDataExpenseOperations' => 'updateDataExpense','userSelectedBudgetUpdated' => 'updateBudgetSelect','deleteMultiple']; 
 
 public $subcategory_id = [];
 public $showSubcategories = false;
@@ -49,90 +55,236 @@ public $budget_id;
 
 public $registeredSubcategoryItem;
 
-public $selectedCurrencyFromARS;
+public $selectedUser8;
+public $users;
+public $showData = true;
+public $data;
+public $user_selected;
 
+public $selectedCurrencyFromARS;
+ 
 public $selectAll = false;
 public $checkedSelected = [];
 
 public $sortBy = 'operations.id'; // Columna predeterminada para ordenar
-public $sortDirection = 'desc'; // Dirección predeterminada para ordenar
- public $perPage = 10; // Cantidad predeterminada de elementos por página
- 
+ public $sortDirection = 'desc'; // Dirección predeterminada para ordenar   
+
+
+ protected $rules = [
+        'user_selected' => 'required', 
+    ];
+
     public function authorize()
 {
     return true;
 }
 
-
-    public function render()
+public function userSelected8($userId)
     {
-    $query =  Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-    ->join('users', 'operations.user_id', '=', 'users.id')
-    ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-    ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
-    ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
-    ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
-    ->leftJoin('budget_expenses', 'budget_expenses.operation_id', '=', 'operations.id')
-    ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
-    ->where('users.id', auth()->id())
-    ->where('categories.main_category_id', 2)
-    ->where(function ($query) {
-        $query->where('categories.category_name', 'like', '%' . $this->search . '%')
-              ->orWhere('operations.operation_description', 'like', '%' . $this->search . '%')
-              ->orWhere('operations.id', 'like', '%' . $this->search . '%'); 
-    })
-    ->select(
-        'operations.*',
-        'categories.category_name','budgets.budget_currency_total',
-        'statu_options.status_description',
-        DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name'),
-        'budget_expenses.operation_id as budget_expense_operation_id',
-        'budgets.budget_date as date',
-        'budgets.id as budget_id'
-    );
+        $this->selectedUser8 = $userId;
+         $this->updateDataExpense();
+       
+    }
+
+     // CHANGE USER BUDGET
+  public function updateBudgetUser()
+{
+    
+    $this->refreshBudget($this->user_selected);
+    $this->category_id = null;
+   $this->showSubcategories = false; 
+    $this->emit('userSelectedBudgetUpdated', $this->user_selected);
+     
+}
+
+
+public function updateBudgetSelect($userSelected)
+{
+    $this->user_selected = $userSelected;
+  
+    $this->refreshBudget(); 
+    
+}
+
+
+public function refreshBudget()
+{
+    // Consulta para obtener el presupuesto correspondiente al user_id seleccionado
+    $budget = Budget::where('user_id', $this->user_selected)
+        ->orderBy('id', 'desc')
+        ->first();
+
+    // Asigna el valor de $this->budget_id basado en la existencia del presupuesto
+    $this->budget_id = $budget ? $budget->id : 'na';
+
+    $this->budgets = Budget::where('user_id', $this->user_selected)
+        ->orderBy('id', 'desc')
+        ->get();
+    
+}
+ // END CHANGE USER BUDGET
+ 
+ // CHANGE USER CATEGORY ASSIGNED
+public function updateCategoryUser()
+{ 
+    $this->refreshCategories($this->user_selected);
+    $this->category_id = null;
+   $this->showSubcategories = false; 
+    $this->emit('userSelectedUpdated', $this->user_selected);
+     
+}
+
+public function updateSelect($userSelected)
+{
+    $this->user_selected = $userSelected;
+  
+    $this->refreshCategories(); 
+    
+}
+
+public function refreshCategories()
+{
+    $assignedCategories = CategoriesToAssign::where('user_id_assign', $this->user_selected)
+        ->pluck('category_id');
+$this->updateDataExpense();
+    $this->categoriesRender = Category::where('main_category_id', 1)
+        ->whereIn('id', $assignedCategories)
+        ->orWhere(function ($query) use ($assignedCategories) {
+            $query->whereNotIn('id', $assignedCategories)
+                  ->whereNotExists(function ($subQuery) {
+                      $subQuery->select(DB::raw(1))
+                               ->from('categories_to_assigns')
+                               ->whereColumn('categories_to_assigns.category_id', 'categories.id');
+                  })
+                  ->where('main_category_id', 1); 
+        })
+        ->orderBy('id', 'asc')
+        ->get();
+    
+}
+ // END FUNCTION CHANGE USER CATEGORY ASSIGNED
+
+ 
+  // SELECT SUBCATEGORY_ID TO REGISTERSUBCATEGORYITEM
+
+    public function updateSubCategoryUser()
+    {
+        // Asigna el valor de subcategory_id a registeredSubcategoryItem
+        $this->registeredSubcategoryItem = $this->subcategory_id;
+    }
+
+     // END SELECT SUBCATEGORY_ID TO REGISTERSUBCATEGORYITEM
+
+    public function mount()
+    
+    { 
+        $this->users = User::orderBy('id', 'desc')->get();
+         $this->updateDataExpense();
+    }
+
+     public function render()
+    {
+         $user = auth()->user();
+        if (!$user || !$user->hasRole('Admin')) {
+            abort(403, 'This action is Forbidden.');
+        }
+        return view('livewire.process-income-operation-admin');
+    }
+
+   
+
+// SHOW USER DATA TABLE
+public function updateDataExpense() 
+
+{
+
+ $this->showData= true;
+ $this->emit('reinitDataTable');
+  $this->data = $this->updateDataExpenseOperations();
+   $this->updateKey = now()->timestamp;
+}
+
+public function updateDataExpenseOperations() 
+{
+    $query = Operation::join('categories', 'operations.category_id', '=', 'categories.id')
+        ->join('users', 'operations.user_id', '=', 'users.id')
+        ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
+        ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
+        ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id')
+        ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id')
+        ->leftJoin('budget_incomes', 'budget_incomes.operation_id', '=', 'operations.id')
+        ->leftJoin('budgets', 'budget_incomes.budget_id', '=', 'budgets.id')
+        ->where('categories.main_category_id', 1)
+        ->where('operations.operation_description', 'like', '%' . $this->search . '%')
+        ->select(
+            'operations.*', 'users.username',
+            'categories.category_name', 'budgets.budget_currency_total',
+            'statu_options.status_description',
+            DB::raw('COALESCE(subcategories.subcategory_name, "N/A") as display_name'),
+            'budget_incomes.operation_id as budget_expense_operation_id',
+            'budgets.budget_date as date',
+            'budgets.id as budget_id'
+        );
+        // Ordenar según lo especificado en el encabezado de la columna
     if ($this->sortBy === 'operations.operation_date') {
         $query->orderBy('operations.operation_date', $this->sortDirection);
     } else {
         $query->orderBy($this->sortBy, $this->sortDirection);
     }
 
-    $data = $query->paginate($this->perPage);
+    // Agregar la condición para el usuario seleccionado solo si está configurado
+    if ($this->selectedUser8) {
+        $query->where('users.id', $this->selectedUser8);
 
+        $assignedCategories = CategoriesToAssign::where('user_id_assign', $this->selectedUser8)
+            ->pluck('category_id');
 
-    $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
-    ->pluck('category_id');
+        $this->categoriesRender = Category::where('main_category_id', 1)
+            ->whereIn('id', $assignedCategories)
+            ->orWhere(function ($query) use ($assignedCategories) {
+                $query->whereNotIn('id', $assignedCategories)
+                    ->whereNotExists(function ($subQuery) {
+                        $subQuery->select(DB::raw(2))
+                            ->from('categories_to_assigns')
+                            ->whereColumn('categories_to_assigns.category_id', 'categories.id');
+                    })
+                    ->where('main_category_id', 1); 
+            })
+            ->orderBy('id', 'asc')
+            ->get();
 
-    $this->categoriesRender = Category::where('main_category_id', 2)
-    ->whereIn('id', $assignedCategories)
-    ->orWhere(function ($query) use ($assignedCategories) {
-        $query->whereNotIn('id', $assignedCategories)
-              ->whereNotExists(function ($subQuery) {
-                  $subQuery->select(DB::raw(2))
-                           ->from('categories_to_assigns')
-                           ->whereColumn('categories_to_assigns.category_id', 'categories.id');
-              })
-              ->where('main_category_id', 2); 
-    })
-    ->orderBy('id', 'asc')
-    ->get();
+        $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
+            ->orderBy('id', 'asc')
+            ->get();
 
-    
-    $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
-                                  ->orderBy('id', 'asc')
-                                  ->get();
-       
-    $this->budgets = Budget::where('user_id', auth()->id())
-        ->orderBy('id', 'desc')
-        ->get();
+        $this->budgets = Budget::where('user_id', $this->selectedUser8)
+            ->orderBy('id', 'desc')
+            ->get();
+    } else {
+        // Si no se ha seleccionado un usuario, obtén todos los usuarios
+        $this->categoriesRender = Category::where('main_category_id', 1)
+            ->orderBy('id', 'asc')
+            ->get();
 
-     
+        $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
+            ->orderBy('id', 'asc')
+            ->get();
 
-        return view('livewire.expenses-operations', [
-            'data' => $data]);
+        // No asignar nada a $this->budgets si no hay usuario seleccionado
     }
 
+    return $query->get();
+}
 
 
+// Método para cambiar la cantidad de elementos por página
+    public function updatedPerPage()
+    {
+        $this->resetPage(); // Resetear la página al cambiar la cantidad de elementos por página
+          $this->updateData();
+    }
+
+    
     //----------- ordering columns start --------------//
 public function sortBy($column)
     {
@@ -143,26 +295,10 @@ public function sortBy($column)
         }
 
         $this->sortBy = $column;
+          $this->updateDataExpense();
     }
     
      //----------- end ordering columns --------------//
-
-// Método para cambiar la cantidad de elementos por página
-    public function updatedPerPage()
-    {
-        $this->resetPage(); // Resetear la página al cambiar la cantidad de elementos por página
-    }
-
-     
- // SELECT SUBCATEGORY_ID TO REGISTERSUBCATEGORYITEM
-
-    public function updateSubCategoryUser()
-    {
-        // Asigna el valor de subcategory_id a registeredSubcategoryItem
-        $this->registeredSubcategoryItem = $this->subcategory_id;
-    }
-
-     // END SELECT SUBCATEGORY_ID TO REGISTERSUBCATEGORYITEM
 
 
         public function fetchData()
@@ -208,7 +344,7 @@ public function sortBy($column)
         $this->fetchData();
 
         if ($this->selectedCurrencyFrom === 'Blue-ARS' && isset($this->data2['blue']['value_sell'])) {
-       $formattedCurrency = number_format($this->data2['blue']['value_sell'], 2, ',', '.');
+        $formattedCurrency = number_format($this->data2['blue']['value_sell'], 2, ',', '.');
         $this->operation_currency = $formattedCurrency;
 
         $this->operation_currency_type = $this->selectedCurrencyFrom;
@@ -247,10 +383,9 @@ public function sortBy($column)
     }
       // Emitir evento para reiniciar los valores
     $this->emit('currencyChanged');
-    $this->emit('modalOpenedAutonumeric5');
-    $this->selectedCurrencyFromARS = $this->selectedCurrencyFrom === 'Blue-ARS' ? 'ARS' : $this->selectedCurrencyFrom;  
-    
-    
+    $this->emit('modalOpenedAutonumeric3'); 
+     $this->emit('modalOpenedAutonumeric4'); 
+    $this->selectedCurrencyFromARS = $this->selectedCurrencyFrom === 'Blue-ARS' ? 'ARS' : $this->selectedCurrencyFrom; 
 }
 
 
@@ -258,7 +393,7 @@ public function sortBy($column)
 // CALCULATE CURRENCY
 public function updatedOperationAmount()
 {
-    // Reemplaza comas por nada para manejar el formato con comas
+     // Reemplaza comas por nada para manejar el formato con comas
   $cleanedValue = str_replace([',', '.'], '', $this->operation_amount);
     // Reemplaza el espacio por nada para manejar el formato con espacios
   $cleanedCurrency = preg_replace('/[\s,\.]/', '', $this->operation_currency);
@@ -293,17 +428,20 @@ public function updatedOperationAmount()
     public function create()
     {
          
-       
-        $this->resetInputFields();
+        $this->authorize('manage admin');
         $this->openModal();
+        $this->updateDataExpense();
+         $this->user_selected = $this->selectedUser8;
     }
 
     public function openModal()
     {
         $this->isOpen = true;
         $this->emit('modalOpened'); // Emitir un evento cuando el modal se abre
-          $this->emit('modalOpenedAutonumeric5'); 
+        $this->emit('modalOpenedAutonumeric3'); 
+         $this->emit('modalOpenedAutonumeric4'); 
         $this->fetchDataCurrencies();
+        
     }
 
     public function closeModal()
@@ -311,23 +449,40 @@ public function updatedOperationAmount()
         $this->isOpen = false;
         $this->resetInputFields();
         
+       
     }
 
     private function resetInputFields(){
-         $this->reset();
-         $this->resetValidation(); 
+        $this->reset([
+        'operation_description',
+        'selectedCurrencyFrom',
+        'operation_amount',
+        'operation_currency',
+        'operation_currency_type',
+        'operation_currency_total',
+        'operation_date',
+        'category_id',
+        'registeredSubcategoryItem',
+        'operation_status',
+         'user_selected',
+         'budget_id',
+       
+    ]);
+     $this->showSubcategories = false; 
+        $this->resetValidation(); 
+        $this->updateDataExpense();
     }
 
        
 public function edit($id)
     {
-        
-        $list = Operation::leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
-        ->leftJoin('budgets', 'budget_expenses.budget_id', '=', 'budgets.id')
+        $this->authorize('manage admin');
+        $list = Operation::leftJoin('budget_incomes', 'operations.id', '=', 'budget_incomes.operation_id')
+        ->leftJoin('budgets', 'budget_incomes.budget_id', '=', 'budgets.id')
         ->findOrFail($id);
         $this->data_id = $id;
         $this->operation_description = $list->operation_description;
-        $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
+       $this->operation_amount = number_format($list->operation_amount, 2, '.', ',');
         $this->operation_currency = $list->operation_currency;
         $this->operation_currency_total = number_format($list->operation_currency_total, 2, '.', ',');
         $this->operation_status = $list->operation_status;
@@ -344,30 +499,39 @@ public function edit($id)
         $this->updatedOperationAmount();
        
         $this->selectedCategoryId = $list->category_id;
-        $this->showSubcategories = true;
+         $this->category_id = $list->category_id;
+
+         // Asignar el user id
+        $defaultValue = Operation::findOrFail($id);
+        $this->user_selected = isset($list->user_id) ? $list->user_id : $defaultValue->user_id;
+      
+
+       $this->budget_id = $list->budget_id ? $list->budget_id : 'na';
+
 
        // Obtener la subcategoría asociada, si existe
         $registeredSubcategory = $operation->operationSubcategories->first();
         
          $this->updatedCategoryId($this->category_id, optional($registeredSubcategory)->subcategory_id);
-
-        // Asignar el budget_id
-       $this->budget_id = $list->budget_id ? $list->budget_id : 'na';
-
-        
+        $this->emit('reinitDataTable');
+        $this->updateDataExpense();
+       
+     
     }
+
+
 
 public function store()
 {
  
-      // Custom validation for operation_date
+// Custom validation for operation_date
 if (empty($this->operation_date)) {
     $this->addError('operation_date', 'The date field is required.');
 } else {
     // Verificar si la fecha tiene el formato 'Y-m-d'
     if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->operation_date)) {
         // Si ya está en el formato 'Y-m-d', no es necesario convertirlo
-        
+       
     } else {
         // Convertir y formatear la fecha si no tiene el formato 'Y-m-d'
         $fechaCarbon = Carbon::createFromFormat('d/m/Y', $this->operation_date);
@@ -385,13 +549,17 @@ if (empty($this->operation_date)) {
         'operation_status' => 'required',
         'operation_date' => 'required|date',
         'category_id' => 'required|exists:categories,id',
-        
+        'user_selected' => 'required',
+         'budget_id' => 'required',
+         
     ];
     
     $validatedData = $this->validate($validationRules);
 
+    
     // Agregar user_id al array validado
-    $validatedData['user_id'] = auth()->user()->id;
+    $validatedData['user_id'] = $this->user_selected ?? $this->selectedUser8;
+
     $validatedData['budget_id'] = $this->budget_id;
 
     // Calcular el mes y el año a partir de expense_date usando Carbon
@@ -420,6 +588,9 @@ if (empty($this->operation_date)) {
     $validatedData['operation_currency'] = $formattedValue3;
    
 
+    // SEND UPDATE USER  RENDER
+    $this->selectedUser8 = $validatedData['user_id']; 
+
     $operation = Operation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
     session()->flash('message', 
@@ -431,15 +602,18 @@ if (empty($this->operation_date)) {
     $this->SubcategoryOperationAssignment($operation);
 
    // Llama a la función solo si 'budget_id' está presente
-$this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
+$this->BudgetIncome($validatedData['budget_id'] ?? null, $operation);
 
-
-
-   
 
     $this->closeModal();
     $this->resetInputFields();
+
+    // UPDATE USER  RENDER
+   $this->emit('updateDataExpenseOperations');
+
+   
 }
+
 
 
 public function SubcategoryOperationAssignment(Operation $operation)
@@ -472,8 +646,13 @@ public function SubcategoryOperationAssignment(Operation $operation)
 }
 
 
+
+
+
+
 public function updatedCategoryId($value,$registeredSubcategoryId = null)
 {
+      $this->updateDataExpense();
     $userId = auth()->user()->id;
 
     // Lógica para obtener las subcategorías asignadas al usuario autenticado en la categoría seleccionada
@@ -500,25 +679,24 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
     $this->registeredSubcategoryItem = $registeredSubcategoryId;
 }
 
-
-public function BudgetExpense($budgetId, Operation $operation)
+public function BudgetIncome($budgetId, Operation $operation)
 {
     $operationId = $operation->id;
     $categoryId = $operation->category_id;
-
+    $operationUser = $operation->user_id;
+    
     if ($operationId) {
-        // Verifica si $budgetId está vacío o es igual a 'NO'
-        if (empty($budgetId) || $budgetId === 'na') {
-            // Elimina la entrada existente si $budgetId está vacío o es 'NO'
-            BudgetExpense::where(['operation_id' => $operationId])->delete();
+        // Verifica si $budgetId es "na" para eliminar la entrada
+        if ($budgetId === 'na') {
+            BudgetIncome::where(['operation_id' => $operationId])->delete();
              session()->flash('message', __('messages.data_created_successfully'));
         } else {
-            // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
-            BudgetExpense::updateOrCreate(
+            // Si $budgetId tiene otro valor, realiza un updateOrCreate
+            BudgetIncome::updateOrCreate(
                 ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
                 // Puedes agregar aquí otros campos que desees actualizar o crear
             );
-            session()->flash('message', __('messages.data_created_successfully'));
+             session()->flash('message', __('messages.data_created_successfully'));
         }
     } else {
         // session()->flash('info', __('Invalid operation'));
@@ -526,18 +704,18 @@ public function BudgetExpense($budgetId, Operation $operation)
 }
 
 
-
-     public function delete($id)
+public function delete($id)
 {
+     $this->authorize('manage admin');
     $operation = Operation::find($id);
     $description = $operation->operation_description; // Obteniendo la descripción antes de eliminarla
     $operation->delete();
+     $this->updateDataExpense();
      session()->flash('message', $description .  __('messages.category_deleted_successfully'));
 }
 
-
-
-//---- FUNCTION DELETE MULTIPLE ----//
+    
+    //---- FUNCTION DELETE MULTIPLE ----//
  public function updatedSelectAll($value)
 {
      
@@ -558,13 +736,10 @@ public function BudgetExpense($budgetId, Operation $operation)
 public function getItemsIds()
 {
     
-    
     // Retorna un array con los IDs de los elementos disponibles
     return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
-        ->join('users', 'operations.user_id', '=', 'users.id')
         ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-        ->where('users.id', Auth::id()) // Filtra por el ID del usuario autenticado
-        ->where('main_categories.id', 2) // Filtra por la categoría principal con ID 2
+        ->where('main_categories.id', 1) // Filtra por la categoría principal con ID 1
         ->pluck('operations.id')
         ->toArray();
   
@@ -574,6 +749,7 @@ public function getItemsIds()
 public function confirmDelete()
 {
     $this->emit('showConfirmation'); // Emite un evento para mostrar la confirmación
+     $this->updateDataExpense();
     
 }
 
@@ -586,9 +762,10 @@ public function deleteMultiple()
         $this->selectAll = false;
         
     }
-   
+    $this->updateDataExpense();
     
 }
 
  //---- END FUNCTION DELETE MULTIPLE ----//
+
 }

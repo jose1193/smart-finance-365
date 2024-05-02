@@ -33,6 +33,8 @@ use App\Http\Livewire\ShowPost;
 use App\Http\Livewire\LatestPosts;
 use App\Http\Livewire\ProcessOperationIncome;
 use App\Http\Livewire\ProcessOperationExpense;
+use App\Http\Livewire\ProcessOperationAdmin;
+use App\Http\Livewire\ProcessIncomeOperationAdmin;
 
 /*
 |--------------------------------------------------------------------------
@@ -150,6 +152,9 @@ Route::middleware([
      Route::get('posts', PostCrud::class)->name('posts');
      Route::get('process-operation-income', ProcessOperationIncome::class)->name('process-operation-income');
     Route::get('process-operation-expense', ProcessOperationExpense::class)->name('process-operation-expense');
-    });
+    
+    Route::get('process-incomes-admin', ProcessIncomeOperationAdmin::class)->name('process-incomes-admin');
+    Route::get('process-expenses-admin', ProcessOperationAdmin::class)->name('process-expenses-admin');    
+});
 
 

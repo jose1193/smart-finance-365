@@ -682,7 +682,7 @@ public function BudgetIncome($budgetId, Operation $operation)
         // Verifica si $budgetId es "na" para eliminar la entrada
         if ($budgetId === 'na') {
             BudgetIncome::where(['operation_id' => $operationId])->delete();
-             session()->flash('message', __('messages.data_deleted_successfully'));
+             session()->flash('message', __('messages.data_created_successfully'));
         } else {
             // Si $budgetId tiene otro valor, realiza un updateOrCreate
             BudgetIncome::updateOrCreate(
@@ -732,7 +732,7 @@ public function getItemsIds()
     // Retorna un array con los IDs de los elementos disponibles
     return Operation::join('categories', 'operations.category_id', '=', 'categories.id')
         ->join('main_categories', 'main_categories.id', '=', 'categories.main_category_id')
-        ->where('main_categories.id', 2) // Filtra por la categoría principal con ID 1
+        ->where('main_categories.id', 1) // Filtra por la categoría principal con ID 1
         ->pluck('operations.id')
         ->toArray();
   

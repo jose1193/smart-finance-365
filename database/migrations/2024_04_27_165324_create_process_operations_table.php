@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('operation_currency');
             $table->string('operation_currency_total');
             $table->string('operation_date');
+            $table->string('process_operation_date');
             $table->string('operation_month');
             $table->string('operation_year');
             $table->foreignId('operation_status')

@@ -158,7 +158,7 @@ private function buildBaseQuery()
         ->join('statu_options', 'operations.operation_status', '=', 'statu_options.id')
         ->leftJoin('operation_subcategories', 'operation_subcategories.operation_id', '=', 'operations.id') 
         ->leftJoin('subcategories', 'operation_subcategories.subcategory_id', '=', 'subcategories.id') 
-        ->leftJoin('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
+        ->join('budget_expenses', 'operations.id', '=', 'budget_expenses.operation_id')
         ->leftJoin('budgets', 'budgets.id', '=', 'budget_expenses.budget_id')
         ->leftJoin('categories as budget_category', 'budget_category.id', '=', 'budget_expenses.category_id');
 }

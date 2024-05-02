@@ -682,7 +682,7 @@ public function BudgetExpense($budgetId, Operation $operation)
         // Verifica si $budgetId es "na" para eliminar la entrada
         if ($budgetId === 'na') {
             BudgetExpense::where(['operation_id' => $operationId])->delete();
-             session()->flash('message', __('messages.data_deleted_successfully'));
+             session()->flash('message', __('messages.data_created_successfully'));
         } else {
             // Si $budgetId tiene otro valor, realiza un updateOrCreate
             BudgetExpense::updateOrCreate(
