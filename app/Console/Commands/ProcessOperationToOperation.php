@@ -45,6 +45,11 @@ class ProcessOperationToOperation extends Command
         $currentDay = Carbon::now()->format('d');
         $processOperations = ProcessOperation::with('processBudgetIncome', 'processBudgetExpense', 'operationProcessSubcategories')
                                              ->where('process_operation_date', $currentDay)
+                                              ->where(function ($query) {
+                                                 // Agregar condición para seleccionar registros no procesados hoy o cuya fecha de último procesamiento no coincide con la fecha actual
+                                                 $query->whereNull('last_processed_at')
+                                                       ->orWhereDate('last_processed_at', '!=', Carbon::today());
+                                             })
                                              ->get();
 
         foreach ($processOperations as $processOperation) {
@@ -70,9 +75,13 @@ class ProcessOperationToOperation extends Command
                 'operation_year' => $newOperationDate->format('Y'),
                 'category_id' => $processOperation->category_id,
                 'user_id' => $processOperation->user_id,
+                
             ]);
 
             $this->createRelatedRecords($processOperation, $operation);
+
+             // Actualiza last_processed_at después de procesar los registros relacionados
+            $processOperation->update(['last_processed_at' => now()]);
         }
     });
 }

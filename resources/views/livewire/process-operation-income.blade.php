@@ -90,11 +90,13 @@
                                         </th>
                                         <th class="px-4 py-3">{{ __('messages.modal_operations_scheduled_date_td') }}
                                         </th>
-
+                                        <th class="px-4 py-3">{{ __('messages.last_processed_at') }}
+                                        </th>
                                         <th class="px-4 py-3">{{ __('messages.budget') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.operations_description') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_category') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_subcategory') }}</th>
-                                        <th class="px-4 py-3">{{ __('messages.operations_description') }}</th>
+
                                         <th class="px-4 py-3">{{ __('messages.operations_currency') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_operation') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_rate_conv_usd') }}</th>
@@ -132,10 +134,26 @@
                                                 {{ $item->process_operation_date }}
 
                                             </td>
+                                            <td class="px-4 py-3 text-center">
+                                                @if (empty($item->last_processed_at))
+                                                    {{ __('messages.last_processed_at_text') }}
+                                                @elseif (app()->getLocale() === 'en')
+                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('m/d/Y H:i:s') }}</span>
+                                                @elseif (app()->getLocale() === 'pt')
+                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') }}</span>
+                                                @else
+                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->format('d/m/Y H:i:s') }}</span>
+                                                @endif
+
+
+                                            </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ isset($item->date)? \Carbon\Carbon::parse($item->date)->locale('es')->isoFormat('MMMM [de] YYYY') . ' - ': '' }}
                                                 {{ isset($item->budget_currency_total) && $item->budget_currency_total != 0 ? number_format($item->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
 
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ $item->operation_description }}
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->category_name }}
@@ -144,9 +162,7 @@
                                                 {{ $item->display_name }}
 
                                             </td>
-                                            <td class="px-4 py-3 text-xs">
-                                                {{ $item->operation_description }}
-                                            </td>
+
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
 

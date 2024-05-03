@@ -28,7 +28,7 @@ class ProcessOperationExpense extends Component
 {
     use WithPagination;
     
-public  $process_operation_date,$operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
+public  $last_processed_at,$process_operation_date,$operation_description, $operation_amount,$operation_date, $operation_status, $category_id, $data_id;
 
 public $search = '';
 public $categoriesRender;
@@ -390,6 +390,9 @@ if (empty($this->operation_date)) {
         'category_id' => 'required|exists:categories,id',
         'budget_id' => 'nullable',
         'process_operation_date' => 'required',
+        'last_processed_at' => 'nullable',
+        'registeredSubcategoryItem' => 'nullable',
+        
     ];
 
     $validatedData = $this->validate($validationRules);
@@ -463,9 +466,13 @@ private function processTodayOrFutureOperation($validatedData)
 
             // Si coincide con la fecha actual, registrar en Operation
             if ($validatedData['process_operation_date'] == $currentDate) {
+               
                 $operation = Operation::create($validatedData);
-                $this->SubcategoryOperationAssignment($operation);
+                
+                $this->SubcategoryOperationAssignment($operation,$validatedData['registeredSubcategoryItem']);
                 $this->BudgetExpense($validatedData['budget_id'] ?? null, $operation);
+                 // Actualiza last_processed_at después de procesar los registros relacionados
+            $processOperation->update(['last_processed_at' => now()]);
             }
         }
 
@@ -484,6 +491,7 @@ private function processTodayOrFutureOperation($validatedData)
 
 public function ProcessSubcategoryOperationAssignment(ProcessOperation $processOperation)
 {
+    
     // Verificar si $this->registeredSubcategoryItem no es 'N/A' y no está vacío
     if ($this->registeredSubcategoryItem != 'N/A' && !empty($this->registeredSubcategoryItem)) {
         // Buscar una subcategoría existente para la operación
@@ -576,24 +584,25 @@ public function updatedCategoryId($value,$registeredSubcategoryId = null)
 }
 
 
-public function SubcategoryOperationAssignment(Operation $operation)
+public function SubcategoryOperationAssignment(Operation $operation,$subcategory)
 {
+    
     // Verificar si $this->registeredSubcategoryItem no es 'N/A' y no está vacío
-    if ($this->registeredSubcategoryItem != 'N/A' && !empty($this->registeredSubcategoryItem)) {
+    if ($subcategory != 'N/A' && !empty($subcategory)) {
         // Buscar una subcategoría existente para la operación
         $existingSubcategory = OperationSubcategories::where('operation_id', $operation->id)->first();
 
         if ($existingSubcategory) {
             // Si la subcategoría ya existe, actualizarla
             $existingSubcategory->update([
-                'subcategory_id' => $this->registeredSubcategoryItem,
+                'subcategory_id' => $subcategory,
                 'user_id_subcategory' => $operation->user_id,
             ]);
         } else {
             // Si no existe, crear una nueva subcategoría
             OperationSubcategories::create([
                 'operation_id' => $operation->id,
-                'subcategory_id' => $this->registeredSubcategoryItem,
+                'subcategory_id' => $subcategory,
                 'user_id_subcategory' => $operation->user_id,
             ]);
         }

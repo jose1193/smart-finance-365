@@ -22,6 +22,7 @@ class ProcessOperation extends Model
         'operation_year',
         'category_id',
         'user_id',
+        'last_processed_at',
         
     ];
    public function user()

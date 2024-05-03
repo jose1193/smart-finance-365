@@ -412,6 +412,8 @@ return [
       'income_management' => 'Gestión de Ingresos',
       'operations_username' => 'Nombre de usuario',
       'operations_category' => 'Categoría',
+      'last_processed_at' => 'Último Procesado En',
+      'last_processed_at_text' => 'NO PROCESADO',
       'operations_subcategory' => 'Subcategoría',
       'operations_description' => 'Descripción',
       'operations_currency' => 'Moneda',

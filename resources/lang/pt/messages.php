@@ -405,6 +405,8 @@ return [
 'income_management' => 'Gestão de Rendimento',
 'operations_username' => 'Nome de Utilizador',
 'operations_category' => 'Categoria',
+'last_processed_at' => 'Último Processado Em',
+'last_processed_at_text' => 'NÃO PROCESSADO',
 'operations_subcategory' => 'Subcategoria',
 'operations_description' => 'Descrição',
 'operations_currency' => 'Moeda',

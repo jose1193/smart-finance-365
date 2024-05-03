@@ -421,6 +421,8 @@ return [
     'income_management' => 'Income Management',
     'operations_username' => 'Username',
     'operations_category' => 'Category',
+    'last_processed_at' => 'Last Processed At',
+    'last_processed_at_text' => 'UNPROCESSED',
     'operations_subcategory' => 'Subcategory',
     'operations_description' => 'Description',
     'operations_currency' => 'Currency',

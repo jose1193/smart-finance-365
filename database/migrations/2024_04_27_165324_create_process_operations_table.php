@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('process_operation_date');
             $table->string('operation_month');
             $table->string('operation_year');
+            $table->string('last_processed_at')->nullable();
             $table->foreignId('operation_status')
             ->constrained('statu_options')
             ->onUpdate('cascade')
