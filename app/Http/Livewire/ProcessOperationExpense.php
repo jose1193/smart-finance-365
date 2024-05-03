@@ -468,7 +468,7 @@ private function processTodayOrFutureOperation($validatedData)
 
         // Asignar subcategoría y actualizar ingreso presupuestario
         $this->ProcessSubcategoryOperationAssignment($processOperation);
-        $this->ProcessBudgetIncome($validatedData['budget_id'] ?? null, $processOperation);
+        $this->ProcessBudgetExpense($validatedData['budget_id'] ?? null, $processOperation);
         }  else {
             // Si es una nueva operación en ProcessOperation
             $processOperation = ProcessOperation::create($validatedData);
