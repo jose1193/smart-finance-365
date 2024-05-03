@@ -21,7 +21,7 @@ class ProcessBudgetIncome extends Model
 
     public function processOperation()
     {
-        return $this->belongsTo(ProcessOperation::class);
+        return $this->belongsTo(ProcessOperation::class, 'process_operation_id');
     }
 
     public function category()
