@@ -114,9 +114,7 @@
                                         </th>
                                         <th class="px-4 py-3">{{ __('messages.operations_action') }}</th>
                                         <th class="px-4 py-3">
-                                            @if (!$data->isEmpty())
-                                                <input type="checkbox" wire:model="selectAll" id="select-all">
-                                            @endif
+
                                         </th>
                                     </tr>
                                 </thead>
@@ -228,8 +226,6 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-sm">
-                                                <input type="checkbox" wire:model="checkedSelected"
-                                                    value="{{ $item->id }}" id="checkbox-{{ $item->id }}">
 
                                             </td>
                                         </tr>

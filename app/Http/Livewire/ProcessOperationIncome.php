@@ -450,18 +450,24 @@ private function processTodayOrFutureOperation($validatedData)
         // Obtener la fecha actual
         $currentDate = now()->format('d');
 
-        // Verificar si se está editando un registro existente en ProcessOperation
+       // Verificar si se está editando un registro existente en ProcessOperation
         if ($this->data_id) {
-            $existingProcessOperation = ProcessOperation::find($this->data_id);
-            $isDateChanged = $existingProcessOperation && $existingProcessOperation->process_operation_date != $validatedData['process_operation_date'];
+    
+        // Encontrar la operación existente
+        $existingProcessOperation = ProcessOperation::find($this->data_id);
+    
+        // Comprobar si la fecha ha cambiado
+        $isDateChanged = $existingProcessOperation && $existingProcessOperation->process_operation_date != $validatedData['process_operation_date'];
 
-            // Actualizar o crear en ProcessOperation
-            $processOperation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
+        // Asegúrate de eliminar 'last_processed_at' de $validatedData si existe
+        unset($validatedData['last_processed_at']);
 
-            // Asignar subcategoría y actualizar ingreso presupuestario
-            $this->ProcessSubcategoryOperationAssignment($processOperation);
-            $this->ProcessBudgetIncome($validatedData['budget_id'] ?? null, $processOperation);
+        // Actualizar o crear en ProcessOperation, excluyendo last_processed_at
+        $processOperation = ProcessOperation::updateOrCreate(['id' => $this->data_id], $validatedData);
 
+        // Asignar subcategoría y actualizar ingreso presupuestario
+        $this->ProcessSubcategoryOperationAssignment($processOperation);
+        $this->ProcessBudgetIncome($validatedData['budget_id'] ?? null, $processOperation);
         } else {
             // Si es una nueva operación en ProcessOperation
             $processOperation = ProcessOperation::create($validatedData);
