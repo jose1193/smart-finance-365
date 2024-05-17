@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('process_operations', function (Blueprint $table) {
+        Schema::create('generated_operations', function (Blueprint $table) {
             $table->id();
             $table->string('operation_description');
             $table->string('operation_currency_type');
@@ -19,21 +19,15 @@ return new class extends Migration
             $table->string('operation_currency');
             $table->string('operation_currency_total');
             $table->string('operation_date');
+            $table->string('operation_status');
+            $table->string('budget_id')->nullable();
+           
+
             $table->string('process_operation_date');
-            $table->string('process_operation_date_end');
-            $table->string('operation_month');
-            $table->string('operation_year');
-            //$table->string('last_processed_at')->nullable();
-            $table->foreignId('operation_status')
-            ->constrained('statu_options')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
-            $table->foreignId('category_id')
-            ->constrained('categories')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
-            $table->foreignId('user_id')
-            ->constrained('users')
+            
+            $table->string('last_processed_at')->nullable();
+            $table->foreignId('process_operation_id')
+            ->constrained('process_operations')
             ->onUpdate('cascade')
             ->onDelete('cascade');
             $table->timestamps();
@@ -45,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('process_operations');
+        Schema::dropIfExists('generated_operations');
     }
 };

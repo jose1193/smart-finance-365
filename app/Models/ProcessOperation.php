@@ -18,11 +18,13 @@ class ProcessOperation extends Model
         'operation_status',
         'operation_date',
         'process_operation_date',
+        'process_operation_date_end',
         'operation_month',
         'operation_year',
         'category_id',
         'user_id',
-        'last_processed_at',
+        
+        //'last_processed_at',
         
     ];
    public function user()
@@ -32,22 +34,23 @@ class ProcessOperation extends Model
 
     // Agrega la relación con la categoría de ingreso si no la has hecho aún
     public function category()
-    {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
+{
+    return $this->belongsTo(Category::class);
+}
 
-    public function status()
+
+    public function statuOption()
     {
         return $this->belongsTo(StatuOptions::class, 'operation_status');
     }
 
    
-  public function ProcessBudgetIncome()
+  public function processBudgetIncomes()
     {
         return $this->hasMany(ProcessBudgetIncome::class, 'process_operation_id');
     }
 
-    public function ProcessBudgetExpense()
+    public function processBudgetExpenses()
     {
         return $this->hasMany(ProcessBudgetExpense::class, 'process_operation_id');
     }
@@ -57,5 +60,14 @@ class ProcessOperation extends Model
     return $this->hasMany(ProcessOperationSubcategories::class, 'process_operation_id');
 }
 
-    
+public function generatedOperations()
+{
+    return $this->hasMany(GeneratedOperation::class, 'process_operation_id');
+}
+
+public function latestGeneratedOperation()
+    {
+        return $this->hasOne(GeneratedOperation::class, 'process_operation_id')->latest('last_processed_at');
+    }
+   
 }

@@ -55,4 +55,9 @@ public function income()
     {
         return $this->hasMany(BudgetIncome::class);
     }
+
+    public function processOperation()
+    {
+        return $this->hasMany(ProcessOperation::class);
+    }
 }

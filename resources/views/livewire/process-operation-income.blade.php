@@ -88,12 +88,15 @@
                                                 @endif
                                             @endif
                                         </th>
-                                        <th class="px-4 py-3">{{ __('messages.modal_operations_scheduled_date_td') }}
+                                        <th class="px-4 py-3">{{ __('messages.operations_description') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.modal_operations_date') }}
+                                        </th>
+                                        <th class="px-4 py-3">{{ __('messages.modal_operations_date_end') }}
                                         </th>
                                         <th class="px-4 py-3">{{ __('messages.last_processed_at') }}
                                         </th>
                                         <th class="px-4 py-3">{{ __('messages.budget') }}</th>
-                                        <th class="px-4 py-3">{{ __('messages.operations_description') }}</th>
+
                                         <th class="px-4 py-3">{{ __('messages.operations_category') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_subcategory') }}</th>
 
@@ -103,7 +106,7 @@
                                         <th class="px-4 py-3">{{ __('messages.operations_total_in_usd') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_status') }}</th>
                                         <th class="px-4 py-3" wire:click="sortBy('process_operations.id')">
-                                            {{ __('messages.operations_date') }}
+                                            {{ __('messages.registration_date') }}
                                             @if ($sortBy === 'process_operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>
@@ -127,38 +130,83 @@
                                                 {{ $item->id }}
 
                                             </td>
-                                            <td class="px-4 py-3 text-center">
-
-                                                {{ $item->process_operation_date }}
-
-                                            </td>
-                                            <td class="px-4 py-3 text-center">
-                                                @if (empty($item->last_processed_at))
-                                                    {{ __('messages.last_processed_at_text') }}
-                                                @elseif (app()->getLocale() === 'en')
-                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('m/d/Y H:i:s') }}</span>
-                                                @elseif (app()->getLocale() === 'pt')
-                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') }}</span>
-                                                @else
-                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->format('d/m/Y H:i:s') }}</span>
-                                                @endif
-
-
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-                                                {{ isset($item->date)? \Carbon\Carbon::parse($item->date)->locale('es')->isoFormat('MMMM [de] YYYY') . ' - ': '' }}
-                                                {{ isset($item->budget_currency_total) && $item->budget_currency_total != 0 ? number_format($item->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
-
-                                            </td>
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->operation_description }}
                                             </td>
-                                            <td class="px-4 py-3 text-xs">
-                                                {{ $item->category_name }}
+                                            <td class="px-4 py-3 text-center">
+
+                                                @if (app()->getLocale() === 'en')
+                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date)->translatedFormat('m/d/Y') }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date)->translatedFormat('d/m/Y') }}</span>
+                                                @else
+                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date)->format('d/m/Y') }}</span>
+                                                @endif
+
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
+
+                                                @if (app()->getLocale() === 'en')
+                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date_end)->translatedFormat('m/d/Y') }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date_end)->translatedFormat('d/m/Y') }}</span>
+                                                @else
+                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date_end)->format('d/m/Y') }}</span>
+                                                @endif
+
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
+                                                @if (app()->getLocale() === 'en')
+                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('m/d/Y H:i:s A') ?? 'N/A' }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') ?? 'N/A' }}</span>
+                                                @else
+                                                    <span>{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') ?? 'N/A' }}</span>
+                                                @endif
+
+
+
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                {{ $item->display_name }}
 
+                                                @php
+                                                    $hasIncomes = false; // Variable de bandera para verificar si hay ingresos
+                                                @endphp
+
+                                                @foreach ($item->processBudgetIncomes as $income)
+                                                    @if (isset($income->budget->budget_date))
+                                                        @php
+                                                            $locale = app()->getLocale();
+                                                            \Carbon\Carbon::setLocale($locale); // Configura Carbon con el idioma actual
+                                                            $budgetDate = \Carbon\Carbon::parse(
+                                                                $income->budget->budget_date,
+                                                            );
+                                                            $formattedDate = $budgetDate->isoFormat('MMMM YYYY'); // Formatea la fecha según el idioma
+                                                            $hasIncomes = true; // Cambia la variable de bandera si hay ingresos
+                                                        @endphp
+                                                        {{ $formattedDate }} -
+                                                        {{ $income->budget->budget_currency_total != 0 ? number_format($income->budget->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
+                                                    @endif
+                                                @endforeach
+
+                                                @if (!$hasIncomes)
+                                                    N/A <!-- Muestra N/A si no hay ingresos -->
+                                                @endif
+
+                                            </td>
+
+                                            <td class="px-4 py-3 text-xs">
+                                                {{ $item->category->category_name }}
+                                            </td>
+                                            <td class="px-4 py-3 text-xs">
+
+                                                @if ($item->operationProcessSubcategories->isEmpty())
+                                                    N/A
+                                                @else
+                                                    @foreach ($item->operationProcessSubcategories as $subcategory)
+                                                        {{ $subcategory->subcategory->subcategory_name ?? 'N/A' }}
+                                                    @endforeach
+                                                @endif
                                             </td>
 
                                             <td class="px-4 py-3 text-xs">
@@ -180,26 +228,25 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
-                                                @if ($item->operation_status == '1')
+                                                @if ($item->statuOption->id == 1)
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                                                        {{ $item->status_description }}
+                                                        {{ $item->statuOption->status_description }}
                                                     </span>
-                                                @elseif ($item->operation_status == '3')
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:text-red-100 dark:bg-red-700">
-                                                        {{ $item->status_description }}
-                                                    </span>
-                                                @elseif ($item->operation_status == '2')
+                                                @elseif ($item->statuOption->id == 2)
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
-                                                        {{ $item->status_description }}
+                                                        {{ $item->statuOption->status_description }}
+                                                    </span>
+                                                @elseif ($item->statuOption->id == 3)
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
+                                                        {{ $item->statuOption->status_description }}
                                                     </span>
                                                 @else
-                                                    <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-700 dark:text-red-100">
-                                                        {{ $item->status_description }}
+                                                        {{ $item->statuOption->status_description }}
                                                     </span>
                                                 @endif
 
@@ -207,11 +254,11 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 @if (app()->getLocale() === 'en')
-                                                    <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('m/d/Y') }}</span>
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('m/d/Y H:i:s A') }}</span>
                                                 @elseif(app()->getLocale() === 'pt')
-                                                    <span>{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('d/m/Y') }}</span>
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d/m/Y H:i:s') }}</span>
                                                 @else
-                                                    <span>{{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}</span>
+                                                    <span>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y H:i:s') }}</span>
                                                 @endif
 
                                             </td>
@@ -234,7 +281,7 @@
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="14">
+                                            <td colspan="16">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -455,7 +502,7 @@
 
 
                                                     <div class="flex flex-wrap justify-between">
-                                                        <div class="mb-4 mr-4" style="width: 60%;">
+                                                        <div class="mb-4" style="flex: 0 0 46%;">
                                                             <label for="operation_date"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
                                                                 {{ __('messages.modal_operations_date') }}
@@ -468,26 +515,25 @@
                                                                     <div x-show="isOpen"
                                                                         class="absolute z-50 bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
                                                                         {{ __('messages.modal_operations_scheduled_date_tooltip') }}
-
                                                                     </div>
                                                                 </span>
                                                             </label>
                                                             <div wire:ignore>
                                                                 <input type="text" readonly id="myDatePicker"
-                                                                    autocomplete="off" wire:model="operation_date"
+                                                                    autocomplete="off"
+                                                                    wire:model="process_operation_date"
                                                                     placeholder="dd/mm/yyyy"
                                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                             </div>
-                                                            @error('operation_date')
+                                                            @error('process_operation_date')
                                                                 <span class="text-red-500">{{ $message }}</span>
                                                             @enderror
-
                                                         </div>
 
-                                                        <div class="mb-4" style="width: 35%;">
-                                                            <label for="operation_date"
+                                                        <div class="mb-4" style="flex: 0 0 46%;">
+                                                            <label for="operation_date_end"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
-                                                                {{ __('messages.modal_operations_scheduled_date') }}
+                                                                {{ __('messages.modal_operations_date_end') }}
                                                                 <span x-data="{ isOpen: false }" class="relative ml-1">
                                                                     <!-- Trigger para mostrar el tooltip -->
                                                                     <i @mouseover="isOpen = true"
@@ -495,35 +541,24 @@
                                                                         class="fa-regular fa-circle-question text-red-500 cursor-pointer"></i>
                                                                     <!-- Tooltip -->
                                                                     <div x-show="isOpen"
-                                                                        class="absolute  bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
-                                                                        {{ __('messages.modal_operations_scheduled_day_tooltip') }}
-
+                                                                        class="absolute z-50 bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
+                                                                        {{ __('messages.modal_operations_end_date_tooltip') }}
                                                                     </div>
                                                                 </span>
                                                             </label>
-
-                                                            <select wire:model="process_operation_date"
-                                                                style="z-index: -9999;"
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pl-8">
-                                                                <option>
-                                                                    {{ __('messages.modal_operations_select_day') }}
-                                                                </option>
-                                                                @for ($day = 1; $day <= 31; $day++)
-                                                                    <option
-                                                                        value="{{ str_pad($day, 2, '0', STR_PAD_LEFT) }}">
-                                                                        {{ str_pad($day, 2, '0', STR_PAD_LEFT) }}
-                                                                    </option>
-                                                                @endfor
-
-                                                            </select>
-
-
-                                                            @error('process_operation_date')
+                                                            <div wire:ignore>
+                                                                <input type="text" readonly id="myDatePickerEnd"
+                                                                    autocomplete="off"
+                                                                    wire:model="process_operation_date_end"
+                                                                    placeholder="dd/mm/yyyy"
+                                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                            </div>
+                                                            @error('process_operation_date_end')
                                                                 <span class="text-red-500">{{ $message }}</span>
                                                             @enderror
-
                                                         </div>
                                                     </div>
+
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
@@ -771,7 +806,28 @@
                 dateFormat: "d/m/Y",
                 onClose: function(selectedDates, dateStr, instance) {
                     // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
-                    @this.set('operation_date', dateStr);
+                    @this.set('process_operation_date', dateStr);
+                    console.log(dateStr);
+                }
+            });
+
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('modalOpened', function() {
+            flatpickr("#myDatePickerEnd", {
+                locale: "es",
+
+                allowInput: true,
+                altInput: true,
+                altFormat: "l, F j, Y",
+                dateFormat: "d/m/Y",
+                onClose: function(selectedDates, dateStr, instance) {
+                    // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
+                    @this.set('process_operation_date_end', dateStr);
                     console.log(dateStr);
                 }
             });
