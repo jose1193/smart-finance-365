@@ -19,6 +19,8 @@ use App\Models\Budget;
 use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+
 
 class ProcessOperationToOperation extends Command
 {
@@ -45,62 +47,134 @@ class ProcessOperationToOperation extends Command
 {
     DB::transaction(function () {
         try {
-            $currentDate = Carbon::today()->toDateString(); // Obtén la fecha actual en formato Y-m-d
+            $currentDate = Carbon::today()->toDateString();
 
-            $processOperations = ProcessOperation::with([
-                'generatedOperations' => function ($query) use ($currentDate) {
-                    $query->whereDate('process_operation_date_job', $currentDate);
-                },
-                'processBudgetIncomes',
-                'processBudgetExpenses',
-                'operationProcessSubcategories'
-            ])
-            ->whereHas('generatedOperations', function ($query) use ($currentDate) {
-                $query->whereNull('last_processed_at')
-                      ->orWhereDate('last_processed_at', '!=', $currentDate);
-            })
-            ->get();
+            $processOperations = $this->getProcessOperations($currentDate);
 
             foreach ($processOperations as $processOperation) {
-                foreach ($processOperation->generatedOperations as $generatedOperation) {
-                    // Procesar solo las operaciones generadas que no han sido procesadas hoy
-                    if (is_null($generatedOperation->last_processed_at) || Carbon::parse($generatedOperation->last_processed_at)->toDateString() != $currentDate) {
-                        $parsedDate = Carbon::parse($generatedOperation->operation_date);
-
-                        // Verifica si ya existe una operación con los mismos detalles antes de crear una nueva
-                        $existingOperation = Operation::where('operation_description', $generatedOperation->operation_description)
-                            ->exists();
-
-                        if (!$existingOperation) {
-                            $operation = Operation::create([
-                                'operation_description' => $generatedOperation->operation_description,
-                                'operation_currency_type' => $generatedOperation->operation_currency_type,
-                                'operation_amount' => $generatedOperation->operation_amount,
-                                'operation_currency' => $generatedOperation->operation_currency,
-                                'operation_currency_total' => $generatedOperation->operation_currency_total,
-                                'operation_status' => $generatedOperation->operation_status,
-                                'operation_date' => $parsedDate, // Usa la fecha ajustada
-                                'operation_month' => $parsedDate->format('m'),
-                                'operation_year' => $parsedDate->format('Y'),
-                                'category_id' => $processOperation->category_id,
-                                'user_id' => $processOperation->user_id,
-                            ]);
-
-                            $this->createRelatedRecords($processOperation, $operation);
-
-                            // Actualiza last_processed_at para la operación generada
-                            $generatedOperation->update(['last_processed_at' => now()]);
-                        }
-                    }
-                }
+                $this->processGeneratedOperations($processOperation, $currentDate);
             }
         } catch (\Exception $e) {
-            // Manejo de excepción
             DB::rollBack();
-            throw $e; // Re-lanza la excepción después de hacer rollback
+            throw $e;
         }
     });
 }
+
+private function getProcessOperations($currentDate)
+{
+    
+    return ProcessOperation::with([
+        'generatedOperations' => function ($query) use ($currentDate) {
+            $query->whereDate('process_operation_date_job', $currentDate);
+        },
+        'processBudgetIncomes',
+        'processBudgetExpenses',
+        'operationProcessSubcategories'
+    ])
+    ->whereHas('generatedOperations', function ($query) use ($currentDate) {
+        $query->whereNull('last_processed_at')
+              ->orWhereDate('last_processed_at', '!=', $currentDate);
+    })
+    ->get();
+}
+
+private function processGeneratedOperations($processOperation, $currentDate)
+{
+    foreach ($processOperation->generatedOperations as $generatedOperation) {
+        if ($this->shouldProcessGeneratedOperation($generatedOperation, $currentDate)) {
+            $this->processSingleOperation($processOperation, $generatedOperation);
+        }
+    }
+}
+
+private function shouldProcessGeneratedOperation($generatedOperation, $currentDate)
+{
+    
+    return is_null($generatedOperation->last_processed_at) || 
+           Carbon::parse($generatedOperation->last_processed_at)->toDateString() != $currentDate;
+}
+
+
+
+
+
+private function processSingleOperation($processOperation, $generatedOperation)
+{
+    $parsedDate = Carbon::parse($generatedOperation->operation_date)->toDateString(); // Solo la fecha
+
+    // Consulta la API de CurrencyLayer para obtener la tasa de cambio
+    $currencyType = $generatedOperation->operation_currency_type;
+    $amount = $generatedOperation->operation_amount;
+    $rate = 1.0; // Default rate if currency is USD
+
+    if ($currencyType != 'USD') {
+        $response = Http::get('http://api.currencylayer.com/live', [
+            'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
+            'currencies' => $currencyType,
+            'source' => 'USD',
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $quoteKey = "USD{$currencyType}";
+
+            if (isset($data['quotes']) && isset($data['quotes'][$quoteKey])) {
+                $rate = $data['quotes'][$quoteKey];
+            } else {
+                throw new \Exception('Error: No se encontró la tasa de cambio para la moneda especificada.');
+            }
+        } else {
+            throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API.');
+        }
+
+        // Formatear la tasa de cambio
+        $formattedRate = $this->formatCurrency($rate);
+
+        // Convertir la cantidad a USD usando la tasa de cambio formateada
+        $convertedAmount = $amount / floatval(str_replace(',', '.', $formattedRate));
+        $convertedAmount = round($convertedAmount, 2); // Redondear a dos decimales
+    } else {
+        $formattedRate = $this->formatCurrency($rate);
+        $convertedAmount = $amount;
+    }
+
+    if (!$this->operationExists($generatedOperation->operation_description)) {
+        $operation = Operation::create([
+            'operation_description' => $generatedOperation->operation_description,
+            'operation_currency_type' => $currencyType,
+            'operation_amount' => $generatedOperation->operation_amount,
+            'operation_currency' => $formattedRate, // Guardar la tasa de cambio formateada
+            'operation_currency_total' => $convertedAmount,
+            'operation_status' => $generatedOperation->operation_status,
+            'operation_date' => $parsedDate,
+            'operation_month' => Carbon::parse($parsedDate)->format('m'),
+            'operation_year' => Carbon::parse($parsedDate)->format('Y'),
+            'category_id' => $processOperation->category_id,
+            'user_id' => $processOperation->user_id,
+        ]);
+
+        $this->createRelatedRecords($processOperation, $operation);
+
+        $generatedOperation->update(['last_processed_at' => now()]);
+    }
+}
+
+private function formatCurrency($currency)
+{
+    if (is_numeric($currency)) {
+        return number_format(floatval($currency), 2, ',', '.'); // Ajuste de formato
+    } else {
+        return $currency;
+    }
+}
+
+
+private function operationExists($description)
+{
+    return Operation::where('operation_description', $description)->exists();
+}
+
 
 
 
