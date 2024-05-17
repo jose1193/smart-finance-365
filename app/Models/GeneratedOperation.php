@@ -17,7 +17,7 @@ class GeneratedOperation extends Model
         'operation_currency_total',
 
         'process_operation_id',
-        'process_operation_date',
+        'process_operation_date_job',
         'operation_date',
         'operation_status',
         'budget_id',

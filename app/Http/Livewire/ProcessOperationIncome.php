@@ -677,7 +677,7 @@ private function createGeneratedOperations($processOperation, $startDate, $endDa
     while ($startDate->lessThanOrEqualTo($endDate)) {
         $generatedOperation = GeneratedOperation::create([
             'process_operation_id' => $processOperation->id,
-            'process_operation_date' => $startDate->format('Y-m-d'),
+            'process_operation_date_job' => $startDate->format('Y-m-d'),
             'operation_description' => $processOperation->operation_description,
             'operation_currency_type' => $processOperation->operation_currency_type,
             'operation_amount' => $processOperation->operation_amount,
@@ -724,7 +724,7 @@ private function deleteAndCreateGeneratedOperations($processOperation, $startDat
         $budgetIncome = $processOperation->processBudgetIncomes()->first();
 
         $generatedOperation = $processOperation->generatedOperations()->create([
-            'process_operation_date' => $startDate->format('Y-m-d'),
+            'process_operation_date_job' => $startDate->format('Y-m-d'),
             'operation_description' => $processOperation->operation_description,
             'operation_currency_type' => $processOperation->operation_currency_type,
             'operation_amount' => $processOperation->operation_amount,
@@ -733,7 +733,7 @@ private function deleteAndCreateGeneratedOperations($processOperation, $startDat
             'process_operation_id' => $processOperation->id,
             'operation_date' => $startDate->format('Y-m-d'),
             'operation_status' => $processOperation->operation_status,
-            'budget_id' => $budgetIncome ? $budgetIncome->id : null,
+            'budget_id' => $budgetIncome ? $budgetIncome->budget_id : null,
         ]);
 
         if ($startDate->isSameDay(now())) {

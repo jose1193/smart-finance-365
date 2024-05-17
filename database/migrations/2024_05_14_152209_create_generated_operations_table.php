@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('budget_id')->nullable();
            
 
-            $table->string('process_operation_date');
+            $table->string('process_operation_date_job');
             
             $table->string('last_processed_at')->nullable();
             $table->foreignId('process_operation_id')

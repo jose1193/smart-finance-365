@@ -8,6 +8,8 @@ use App\Models\ProcessOperation;
 use App\Models\ProcessOperationSubcategories;
 use App\Models\ProcessBudgetExpense;
 use App\Models\ProcessBudgetIncome;
+use App\Models\GeneratedOperation;
+
 
 use App\Models\OperationSubcategories;
 use App\Models\Operation;
@@ -39,58 +41,73 @@ class ProcessOperationToOperation extends Command
     /**
      * Execute the console command.
      */
-  public function handle()
+ public function handle()
 {
     DB::transaction(function () {
-        $currentDay = Carbon::now()->format('d');
-        $processOperations = ProcessOperation::with('processBudgetIncome', 'processBudgetExpense', 'operationProcessSubcategories')
-                                             ->where('process_operation_date', $currentDay)
-                                              ->where(function ($query) {
-                                                 // Agregar condición para seleccionar registros no procesados hoy o cuya fecha de último procesamiento no coincide con la fecha actual
-                                                 $query->whereNull('last_processed_at')
-                                                       ->orWhereDate('last_processed_at', '!=', Carbon::today());
-                                             })
-                                             ->get();
+        try {
+            $currentDate = Carbon::today()->toDateString(); // Obtén la fecha actual en formato Y-m-d
 
-        foreach ($processOperations as $processOperation) {
-            $parsedDate = Carbon::parse($processOperation->operation_date);
-            
-            // Crea una nueva fecha basada en el año y mes actual con el día de la fecha original
-            $newOperationDate = Carbon::now()->setDay($parsedDate->day);
+            $processOperations = ProcessOperation::with([
+                'generatedOperations' => function ($query) use ($currentDate) {
+                    $query->whereDate('process_operation_date_job', $currentDate);
+                },
+                'processBudgetIncomes',
+                'processBudgetExpenses',
+                'operationProcessSubcategories'
+            ])
+            ->whereHas('generatedOperations', function ($query) use ($currentDate) {
+                $query->whereNull('last_processed_at')
+                      ->orWhereDate('last_processed_at', '!=', $currentDate);
+            })
+            ->get();
 
-            // Ajusta el día al máximo posible del mes si el día original no existe en el nuevo mes
-            if (!$newOperationDate->isSameMonth(Carbon::now())) {
-                $newOperationDate->setDay($newOperationDate->daysInMonth);
+            foreach ($processOperations as $processOperation) {
+                foreach ($processOperation->generatedOperations as $generatedOperation) {
+                    // Procesar solo las operaciones generadas que no han sido procesadas hoy
+                    if (is_null($generatedOperation->last_processed_at) || Carbon::parse($generatedOperation->last_processed_at)->toDateString() != $currentDate) {
+                        $parsedDate = Carbon::parse($generatedOperation->operation_date);
+
+                        // Verifica si ya existe una operación con los mismos detalles antes de crear una nueva
+                        $existingOperation = Operation::where('operation_description', $generatedOperation->operation_description)
+                            ->exists();
+
+                        if (!$existingOperation) {
+                            $operation = Operation::create([
+                                'operation_description' => $generatedOperation->operation_description,
+                                'operation_currency_type' => $generatedOperation->operation_currency_type,
+                                'operation_amount' => $generatedOperation->operation_amount,
+                                'operation_currency' => $generatedOperation->operation_currency,
+                                'operation_currency_total' => $generatedOperation->operation_currency_total,
+                                'operation_status' => $generatedOperation->operation_status,
+                                'operation_date' => $parsedDate, // Usa la fecha ajustada
+                                'operation_month' => $parsedDate->format('m'),
+                                'operation_year' => $parsedDate->format('Y'),
+                                'category_id' => $processOperation->category_id,
+                                'user_id' => $processOperation->user_id,
+                            ]);
+
+                            $this->createRelatedRecords($processOperation, $operation);
+
+                            // Actualiza last_processed_at para la operación generada
+                            $generatedOperation->update(['last_processed_at' => now()]);
+                        }
+                    }
+                }
             }
-
-            $operation = Operation::create([
-                'operation_description' => $processOperation->operation_description,
-                'operation_currency_type' => $processOperation->operation_currency_type,
-                'operation_amount' => $processOperation->operation_amount,
-                'operation_currency' => $processOperation->operation_currency,
-                'operation_currency_total' => $processOperation->operation_currency_total,
-                'operation_status' => $processOperation->operation_status,
-                'operation_date' => $newOperationDate->format('Y-m-d'), // Usa la nueva fecha ajustada
-                'operation_month' => $newOperationDate->format('m'),
-                'operation_year' => $newOperationDate->format('Y'),
-                'category_id' => $processOperation->category_id,
-                'user_id' => $processOperation->user_id,
-                
-            ]);
-
-            $this->createRelatedRecords($processOperation, $operation);
-
-             // Actualiza last_processed_at después de procesar los registros relacionados
-            $processOperation->update(['last_processed_at' => now()]);
+        } catch (\Exception $e) {
+            // Manejo de excepción
+            DB::rollBack();
+            throw $e; // Re-lanza la excepción después de hacer rollback
         }
     });
 }
 
 
+
 protected function createRelatedRecords($processOperation, $operation)
 {
-    if ($processOperation->processBudgetIncome->isNotEmpty()) {
-        foreach ($processOperation->processBudgetIncome as $budgetIncome) {
+    if ($processOperation->processBudgetIncomes->isNotEmpty()) {
+        foreach ($processOperation->processBudgetIncomes as $budgetIncome) {
             BudgetIncome::create([
                 'operation_id' => $operation->id,
                 'budget_id' => $budgetIncome->budget_id,
@@ -99,8 +116,8 @@ protected function createRelatedRecords($processOperation, $operation)
         }
     }
 
-    if ($processOperation->processBudgetExpense->isNotEmpty()) {
-        foreach ($processOperation->processBudgetExpense as $budgetExpense) {
+    if ($processOperation->processBudgetExpenses->isNotEmpty()) {
+        foreach ($processOperation->processBudgetExpenses as $budgetExpense) {
             BudgetExpense::create([
                 'operation_id' => $operation->id,
                 'budget_id' => $budgetExpense->budget_id,
@@ -119,5 +136,6 @@ protected function createRelatedRecords($processOperation, $operation)
         }
     }
 }
+
 
 }
