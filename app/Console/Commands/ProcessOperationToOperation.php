@@ -109,41 +109,44 @@ private function processSingleOperation($processOperation, $generatedOperation)
     $rate = 1.0; // Default rate if currency is USD
 
     if ($currencyType != 'USD') {
-        $response = Http::get('http://api.currencylayer.com/live', [
-            'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
-            'currencies' => $currencyType,
-            'source' => 'USD',
-        ]);
+        try {
+            $response = Http::get('http://api.currencylayer.com/live', [
+                'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
+                'currencies' => $currencyType,
+                'source' => 'USD',
+            ]);
 
-        if ($response->successful()) {
-            $data = $response->json();
-            $quoteKey = "USD{$currencyType}";
+            if ($response->successful()) {
+                $data = $response->json();
+                $quoteKey = "USD{$currencyType}";
 
-            if (isset($data['quotes']) && isset($data['quotes'][$quoteKey])) {
-                $rate = $data['quotes'][$quoteKey];
+                if (isset($data['quotes']) && isset($data['quotes'][$quoteKey])) {
+                    $rate = $data['quotes'][$quoteKey];
+                } else {
+                    throw new \Exception('Error: No se encontró la tasa de cambio para la moneda especificada.');
+                }
             } else {
-                throw new \Exception('Error: No se encontró la tasa de cambio para la moneda especificada.');
+                throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API.');
             }
-        } else {
-            throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API.');
+        } catch (\Exception $e) {
+            // Manejo de errores específico
+            throw new \Exception("Error: Falló la obtención de la tasa de cambio - {$e->getMessage()}");
         }
 
-        // Formatear la tasa de cambio
-        $formattedRate = $this->formatCurrency($rate);
-
-        // Convertir la cantidad a USD usando la tasa de cambio formateada
-        $convertedAmount = $amount / floatval(str_replace(',', '.', $formattedRate));
+        // Convertir la cantidad a USD usando la tasa de cambio
+        $convertedAmount = $amount / $rate;
         $convertedAmount = round($convertedAmount, 2); // Redondear a dos decimales
     } else {
-        $formattedRate = $this->formatCurrency($rate);
         $convertedAmount = $amount;
     }
+
+    $formattedRate = $this->formatCurrency($rate);
 
     if (!$this->operationExists($generatedOperation->operation_description)) {
         $operation = Operation::create([
             'operation_description' => $generatedOperation->operation_description,
             'operation_currency_type' => $currencyType,
-            'operation_amount' => $generatedOperation->operation_amount,
+            'operation_amount' => $amount,
             'operation_currency' => $formattedRate, // Guardar la tasa de cambio formateada
             'operation_currency_total' => $convertedAmount,
             'operation_status' => $generatedOperation->operation_status,
@@ -163,11 +166,18 @@ private function processSingleOperation($processOperation, $generatedOperation)
 private function formatCurrency($currency)
 {
     if (is_numeric($currency)) {
+        // Eliminar espacios
+        $currency = preg_replace('/\s+/', '', $currency);
+
+        // Convertir a float correctamente
+        $currency = str_replace(',', '.', $currency);
+
         return number_format(floatval($currency), 2, ',', '.'); // Ajuste de formato
     } else {
         return $currency;
     }
 }
+
 
 
 private function operationExists($description)
