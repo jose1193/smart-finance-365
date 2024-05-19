@@ -98,63 +98,16 @@ private function shouldProcessGeneratedOperation($generatedOperation, $currentDa
 
 
 
-
 private function processSingleOperation($processOperation, $generatedOperation)
 {
     $parsedDate = Carbon::parse($generatedOperation->operation_date)->toDateString(); // Solo la fecha
 
-    // Consulta la API de CurrencyLayer o Bluelytics para obtener la tasa de cambio
     $currencyType = $generatedOperation->operation_currency_type;
     $amount = $generatedOperation->operation_amount;
-    $rate = 1.0; // Default rate if currency is USD
-
-    if ($currencyType == 'Blue-ARS') {
-        try {
-            $response = Http::get('https://api.bluelytics.com.ar/v2/latest');
-
-            if ($response->successful()) {
-                $data = $response->json();
-                if (isset($data['blue']) && isset($data['blue']['value_sell'])) {
-                    $rate = $data['blue']['value_sell'];
-                } else {
-                    throw new \Exception('Error: No se encontró la tasa de cambio para Blue-ARS.');
-                }
-            } else {
-                throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API de Bluelytics.');
-            }
-        } catch (\Exception $e) {
-            // Manejo de errores específico
-            throw new \Exception("Error: Falló la obtención de la tasa de cambio - {$e->getMessage()}");
-        }
-    } elseif ($currencyType != 'USD') {
-        try {
-            $response = Http::get('http://api.currencylayer.com/live', [
-                'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
-                'currencies' => $currencyType,
-                'source' => 'USD',
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                $quoteKey = "USD{$currencyType}";
-
-                if (isset($data['quotes']) && isset($data['quotes'][$quoteKey])) {
-                    $rate = $data['quotes'][$quoteKey];
-                } else {
-                    throw new \Exception('Error: No se encontró la tasa de cambio para la moneda especificada.');
-                }
-            } else {
-                throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API de CurrencyLayer.');
-            }
-        } catch (\Exception $e) {
-            // Manejo de errores específico
-            throw new \Exception("Error: Falló la obtención de la tasa de cambio - {$e->getMessage()}");
-        }
-    }
+    $rate = $this->getExchangeRate($currencyType);
 
     // Convertir la cantidad a USD usando la tasa de cambio
-    $convertedAmount = $currencyType == 'USD' ? $amount : $amount / $rate;
-    $convertedAmount = round($convertedAmount, 2); // Redondear a dos decimales
+    $convertedAmount = $currencyType == 'USD' ? $amount : round($amount / $rate, 2);
 
     $formattedRate = $this->formatCurrency($rate);
 
@@ -178,6 +131,62 @@ private function processSingleOperation($processOperation, $generatedOperation)
         $generatedOperation->update(['last_processed_at' => now()]);
     }
 }
+
+private function getExchangeRate($currencyType)
+{
+    if ($currencyType == 'Blue-ARS') {
+        return $this->getBlueARSSellRate();
+    } elseif ($currencyType != 'USD') {
+        return $this->getCurrencyLayerRate($currencyType);
+    }
+    return 1.0; // Default rate if currency is USD
+}
+
+private function getBlueARSSellRate()
+{
+    try {
+        $response = Http::get('https://api.bluelytics.com.ar/v2/latest');
+        if ($response->successful()) {
+            $data = $response->json();
+            if (isset($data['blue']) && isset($data['blue']['value_sell'])) {
+                return $data['blue']['value_sell'];
+            } else {
+                throw new \Exception('Error: No se encontró la tasa de cambio para Blue-ARS.');
+            }
+        } else {
+            throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API de Bluelytics.');
+        }
+    } catch (\Exception $e) {
+        throw new \Exception("Error: Falló la obtención de la tasa de cambio - {$e->getMessage()}");
+    }
+}
+
+private function getCurrencyLayerRate($currencyType)
+{
+    try {
+        $response = Http::get('http://api.currencylayer.com/live', [
+            'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
+            'currencies' => $currencyType,
+            'source' => 'USD',
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $quoteKey = "USD{$currencyType}";
+
+            if (isset($data['quotes']) && isset($data['quotes'][$quoteKey])) {
+                return $data['quotes'][$quoteKey];
+            } else {
+                throw new \Exception('Error: No se encontró la tasa de cambio para la moneda especificada.');
+            }
+        } else {
+            throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API de CurrencyLayer.');
+        }
+    } catch (\Exception $e) {
+        throw new \Exception("Error: Falló la obtención de la tasa de cambio - {$e->getMessage()}");
+    }
+}
+
 
 
 

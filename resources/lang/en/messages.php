@@ -204,7 +204,7 @@ return [
     ///---- DASHBOARD CHART -------------///
     'label_category_budget' => 'Budget',
     'label_difference' => 'Difference',
-    'label_month_th '  => 'Month',
+    'label_month_th'  => 'Month',
 
     ////----- CURRENCY CALCULATOR ------///
     'currency_exchange_rates'  => 'Currency Exchange Rates',

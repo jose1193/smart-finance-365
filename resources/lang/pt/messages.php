@@ -199,7 +199,7 @@ return [
         ///---- GRÁFICO DO PAINEL DE CONTROLO -------------///
     'label_category_budget' => 'Orçamento',
     'label_difference' => 'Diferença',
-    'label_month_th '  => 'Mês',
+    'label_month_th'  => 'Mês',
 
     ////----- CALCULADORA DE CÂMBIO DE MOEDA ------///
     'currency_exchange_rates'  => 'Taxas de Câmbio de Moeda',

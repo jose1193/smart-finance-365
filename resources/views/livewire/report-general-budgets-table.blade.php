@@ -9,6 +9,7 @@
                  <div wire:ignore>
                      <select id="selectUser5" style="width: 100%" wire:model="selectedUser5" wire:change="updateDataBudget"
                          wire:ignore>
+
                          <option value="">{{ __('messages.table_columns_categories.select_a_user') }}</option>
 
                          @if (auth()->user()->hasRole('Admin'))
@@ -16,7 +17,6 @@
                                  <option value="{{ $user->id }}">{{ $user->name }}</option>
                              @endforeach
                          @else
-                             <option value="">{{ __('messages.table_columns_categories.select_a_user') }}</option>
                              <option value="{{ auth()->user()->id }}">{{ auth()->user()->name }}
                              </option>
                          @endif
