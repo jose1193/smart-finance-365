@@ -103,12 +103,30 @@ private function processSingleOperation($processOperation, $generatedOperation)
 {
     $parsedDate = Carbon::parse($generatedOperation->operation_date)->toDateString(); // Solo la fecha
 
-    // Consulta la API de CurrencyLayer para obtener la tasa de cambio
+    // Consulta la API de CurrencyLayer o Bluelytics para obtener la tasa de cambio
     $currencyType = $generatedOperation->operation_currency_type;
     $amount = $generatedOperation->operation_amount;
     $rate = 1.0; // Default rate if currency is USD
 
-    if ($currencyType != 'USD') {
+    if ($currencyType == 'Blue-ARS') {
+        try {
+            $response = Http::get('https://api.bluelytics.com.ar/v2/latest');
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (isset($data['blue']) && isset($data['blue']['value_sell'])) {
+                    $rate = $data['blue']['value_sell'];
+                } else {
+                    throw new \Exception('Error: No se encontró la tasa de cambio para Blue-ARS.');
+                }
+            } else {
+                throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API de Bluelytics.');
+            }
+        } catch (\Exception $e) {
+            // Manejo de errores específico
+            throw new \Exception("Error: Falló la obtención de la tasa de cambio - {$e->getMessage()}");
+        }
+    } elseif ($currencyType != 'USD') {
         try {
             $response = Http::get('http://api.currencylayer.com/live', [
                 'access_key' => 'd3314ac151faa4aaed99cefe494d4fc2',
@@ -126,19 +144,17 @@ private function processSingleOperation($processOperation, $generatedOperation)
                     throw new \Exception('Error: No se encontró la tasa de cambio para la moneda especificada.');
                 }
             } else {
-                throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API.');
+                throw new \Exception('Error: No se pudo obtener la tasa de cambio desde la API de CurrencyLayer.');
             }
         } catch (\Exception $e) {
             // Manejo de errores específico
             throw new \Exception("Error: Falló la obtención de la tasa de cambio - {$e->getMessage()}");
         }
-
-        // Convertir la cantidad a USD usando la tasa de cambio
-        $convertedAmount = $amount / $rate;
-        $convertedAmount = round($convertedAmount, 2); // Redondear a dos decimales
-    } else {
-        $convertedAmount = $amount;
     }
+
+    // Convertir la cantidad a USD usando la tasa de cambio
+    $convertedAmount = $currencyType == 'USD' ? $amount : $amount / $rate;
+    $convertedAmount = round($convertedAmount, 2); // Redondear a dos decimales
 
     $formattedRate = $this->formatCurrency($rate);
 
@@ -162,6 +178,9 @@ private function processSingleOperation($processOperation, $generatedOperation)
         $generatedOperation->update(['last_processed_at' => now()]);
     }
 }
+
+
+
 
 private function formatCurrency($currency)
 {
