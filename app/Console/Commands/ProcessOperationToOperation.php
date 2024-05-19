@@ -60,6 +60,8 @@ class ProcessOperationToOperation extends Command
     }
 }
 
+
+
 private function getProcessOperations($currentDate)
 {
     return ProcessOperation::with([
@@ -75,6 +77,9 @@ private function getProcessOperations($currentDate)
         'operationProcessSubcategories'
     ])->get();
 }
+
+
+
 
 private function processGeneratedOperations($processOperation, $currentDate)
 {

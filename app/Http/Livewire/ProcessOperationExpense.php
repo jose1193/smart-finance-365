@@ -654,14 +654,18 @@ private function createNewProcessOperation($validatedData, $currentDate)
     
     $processOperation = ProcessOperation::create($validatedData);
 
-    $this->createGeneratedOperations($processOperation, $startDate, $endDate, $currentDate);
+   
 
     if ($validatedData['process_operation_date'] == $currentDate) {
         $this->saveOperation($validatedData);
     }
 
+    // Process related data
     $this->registeredSubcategoryItem = $validatedData['registeredSubcategoryItem'];
     $this->processRelatedData($processOperation, $validatedData);
+
+    // Create Generated Operations
+    $this->createGeneratedOperations($processOperation, $startDate, $endDate, $currentDate);
 }
 
 private function processRelatedData($processOperation, $validatedData)
