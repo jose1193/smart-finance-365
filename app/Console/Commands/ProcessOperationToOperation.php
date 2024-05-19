@@ -45,38 +45,35 @@ class ProcessOperationToOperation extends Command
      */
  public function handle()
 {
-    DB::transaction(function () {
-        try {
+    try {
+        DB::transaction(function () {
             $currentDate = Carbon::today()->toDateString();
-
             $processOperations = $this->getProcessOperations($currentDate);
 
             foreach ($processOperations as $processOperation) {
                 $this->processGeneratedOperations($processOperation, $currentDate);
             }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    });
+        });
+    } catch (\Exception $e) {
+        // DB::transaction automáticamente hace rollback si se lanza una excepción
+        throw $e;
+    }
 }
 
 private function getProcessOperations($currentDate)
 {
-    
     return ProcessOperation::with([
         'generatedOperations' => function ($query) use ($currentDate) {
-            $query->whereDate('process_operation_date_job', $currentDate);
+            $query->whereDate('process_operation_date_job', $currentDate)
+                  ->where(function ($q) use ($currentDate) {
+                      $q->whereNull('last_processed_at')
+                        ->orWhereDate('last_processed_at', '!=', $currentDate);
+                  });
         },
         'processBudgetIncomes',
         'processBudgetExpenses',
         'operationProcessSubcategories'
-    ])
-    ->whereHas('generatedOperations', function ($query) use ($currentDate) {
-        $query->whereNull('last_processed_at')
-              ->orWhereDate('last_processed_at', '!=', $currentDate);
-    })
-    ->get();
+    ])->get();
 }
 
 private function processGeneratedOperations($processOperation, $currentDate)
@@ -90,13 +87,9 @@ private function processGeneratedOperations($processOperation, $currentDate)
 
 private function shouldProcessGeneratedOperation($generatedOperation, $currentDate)
 {
-    
     return is_null($generatedOperation->last_processed_at) || 
            Carbon::parse($generatedOperation->last_processed_at)->toDateString() != $currentDate;
 }
-
-
-
 
 private function processSingleOperation($processOperation, $generatedOperation)
 {
@@ -131,6 +124,7 @@ private function processSingleOperation($processOperation, $generatedOperation)
         $generatedOperation->update(['last_processed_at' => now()]);
     }
 }
+
 
 private function getExchangeRate($currencyType)
 {
