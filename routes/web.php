@@ -35,6 +35,9 @@ use App\Http\Livewire\ProcessOperationIncome;
 use App\Http\Livewire\ProcessOperationExpense;
 use App\Http\Livewire\ProcessOperationAdmin;
 use App\Http\Livewire\ProcessIncomeOperationAdmin;
+use App\Http\Livewire\IncomeGeneratedOperations;
+use App\Http\Livewire\IncomesGeneratedOperations;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -149,12 +152,16 @@ Route::middleware([
 
     //Route::get('expense/{budget}', Operations::class)->name('expense');
 
-     Route::get('posts', PostCrud::class)->name('posts');
-     Route::get('process-operation-income', ProcessOperationIncome::class)->name('process-operation-income');
+    Route::get('posts', PostCrud::class)->name('posts');
+    Route::get('process-operation-income', ProcessOperationIncome::class)->name('process-operation-income');
     Route::get('process-operation-expense', ProcessOperationExpense::class)->name('process-operation-expense');
     
     Route::get('process-incomes-admin', ProcessIncomeOperationAdmin::class)->name('process-incomes-admin');
     Route::get('process-expenses-admin', ProcessOperationAdmin::class)->name('process-expenses-admin');    
+
+    Route::get('income-generated-operations/{operationId}', IncomeGeneratedOperations::class)->name('income-generated.operations');
+    //Route::get('incomes-generated-operations', IncomesGeneratedOperations::class)->name('incomes-generated-operations');
+
 });
 
 

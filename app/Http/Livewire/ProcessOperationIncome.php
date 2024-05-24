@@ -738,6 +738,7 @@ private function deleteAndCreateGeneratedOperations($processOperation, $startDat
             'operation_date' => $startDate->format('Y-m-d'),
             'operation_status' => $processOperation->operation_status,
             'budget_id' => $budgetIncome ? $budgetIncome->budget_id : null,
+            
         ]);
 
         if ($startDate->isSameDay(now())) {
@@ -976,5 +977,8 @@ public function deleteMultiple()
 
  //---- END FUNCTION DELETE MULTIPLE ----//
 
- 
+public function redirectToOperation($operationId)
+    {
+        return redirect()->route('income-generated.operations', ['operationId' => $operationId]);
+    }
 }

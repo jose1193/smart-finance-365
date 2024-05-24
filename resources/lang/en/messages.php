@@ -468,6 +468,11 @@ return [
     'enter_income_description' => 'Enter Income Description',
     'enter_expense_description' => 'Enter Expense Description',
 
+    'income_generated_operations' => 'Operations Created for Income Generation',
+    'expense_generated_operations' => 'Operations Created for Expense Generation',
+
+    'generated_operation_date' => 'Operation Date',
+    'process_operation_date_job' => 'Process Operation Date',
 
      /// ------------- OPTIONS STATUS RENDER ----------///
 

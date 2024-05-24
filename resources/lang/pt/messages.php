@@ -451,6 +451,12 @@ return [
 'enter_income_description' => 'Introduzir Descrição do Rendimento',
 'enter_expense_description' => 'Introduzir Descrição da Despesa',
 
+'budget_income_management' => 'Gestão de Receitas e Orçamento',
+'income_generated_operations' => 'Operações Criadas para Geração de Rendimento',
+'expense_generated_operations' => 'Operações Criadas para Geração de Despesas',
+'generated_operation_date' => 'Data de Operação',
+'process_operation_date_job' => 'Processar Data de Operação',
+
 /// ------------- OPÇÕES DE STATUS ----------///
 
 'status_options' => [

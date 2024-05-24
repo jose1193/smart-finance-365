@@ -633,7 +633,7 @@
                                                         <div class="mb-4">
                                                             <label for="operation_date"
                                                                 class="block text-gray-700 text-sm font-bold mb-2">
-                                                                {{ __('messages.modal_operations_date') }}</label>
+                                                                {{ __('messages.generated_operation_date') }}</label>
                                                             <div wire:ignore>
                                                                 <input type="text" id="myDatePicker" readonly
                                                                     wire:model="operation_date"

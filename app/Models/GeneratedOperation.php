@@ -10,6 +10,7 @@ class GeneratedOperation extends Model
     use HasFactory;
 
      protected $fillable = [
+        
         'operation_description',
         'operation_currency_type',
         'operation_amount',
@@ -26,9 +27,16 @@ class GeneratedOperation extends Model
         
     ];
 
+
     public function ProcessOperation()
     {
         return $this->belongsTo(ProcessOperation::class, 'process_operation_id');
     }
 
+    public function statuOption()
+    {
+        return $this->belongsTo(StatuOptions::class, 'operation_status');
+    }
+    
+    
 }

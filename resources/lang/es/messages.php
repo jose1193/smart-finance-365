@@ -459,6 +459,12 @@ return [
       'enter_income_description' => 'Ingrese la Descripción del Ingreso',
       'enter_expense_description' => 'Ingrese la Descripción del Gasto',
 
+      'income_generated_operations' => 'Operaciones Creadas para la Generación de Ingresos',
+      'expense_generated_operations' => 'Operaciones Creadas para la Generación de Gastos',
+
+      'generated_operation_date' => 'Fecha de Operación',
+      'process_operation_date_job' => 'Fecha de Operación Procesada',
+
 
       /// ------------- OPTIONS STATUS RENDER ----------///
 
