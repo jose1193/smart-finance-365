@@ -107,15 +107,15 @@
                                                 {{ \Carbon\Carbon::parse($item->budget_date)->format('d/m/Y') }}
                                             </td>
                                             <td class="px-4 py-3 text-sm">
-
-                                                <button wire:click="edit({{ $item->id }})"
-                                                    class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                        class="fa-solid fa-pen-to-square"></i></button>
-                                                <button
-                                                    wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->budget_currency_total }}')"
-                                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                        class="fa-solid fa-trash"></i></button>
-
+                                                <div class="flex items-center space-x-2">
+                                                    <button wire:click="edit({{ $item->id }})"
+                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button
+                                                        wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->budget_currency_total }}')"
+                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                                </div>
                                             </td>
                                         </tr>
 

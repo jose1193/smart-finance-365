@@ -158,21 +158,22 @@
 
                                             @can('manage admin')
                                                 <td class="px-4 py-3 text-sm">
-                                                    <a href="{{ route('posts.show', ['postId' => $post->post_title_slug]) }}"
-                                                        class="bg-purple-600 transition duration-500 ease-in-out hover:bg-purple-700 text-white font-bold inline-flex items-center p-3 px-4 py-2.5 mr-0.5  rounded text-base">
-                                                        <i class="fa-solid fa-eye "></i>
-                                                    </a>
+                                                    <div class="flex items-center space-x-2">
+                                                        <a href="{{ route('posts.show', ['postId' => $post->post_title_slug]) }}"
+                                                            class="bg-purple-600 transition duration-500 ease-in-out hover:bg-purple-700 text-white font-bold inline-flex items-center py-2.5 px-3.5 rounded text-base">
+                                                            <i class="fa-solid fa-eye"></i>
+                                                        </a>
 
 
 
-                                                    <button wire:click="edit({{ $post->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold p-3 py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-pen-to-square"></i></button>
-                                                    <button
-                                                        wire:click="$emit('deleteData', {{ $post->id }}, '{{ $post->post_title }}')"
-                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                            class="fa-solid fa-trash"></i></button>
-
+                                                        <button wire:click="edit({{ $post->id }})"
+                                                            class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold p-3 py-2 px-4 rounded"><i
+                                                                class="fa-solid fa-pen-to-square"></i></button>
+                                                        <button
+                                                            wire:click="$emit('deleteData', {{ $post->id }}, '{{ $post->post_title }}')"
+                                                            class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                                class="fa-solid fa-trash"></i></button>
+                                                    </div>
                                                 <td class="px-4 py-3 text-sm">
                                                     <input type="checkbox" wire:model="checkedSelected"
                                                         value="{{ $post->id }}" id="checkbox-{{ $post->id }}">
