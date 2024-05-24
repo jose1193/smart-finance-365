@@ -23,6 +23,7 @@ class ProcessOperation extends Model
         'operation_year',
         'category_id',
         'user_id',
+        'process_operation_uuid',
         
         //'last_processed_at',
         

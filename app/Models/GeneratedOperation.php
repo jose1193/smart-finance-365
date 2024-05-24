@@ -10,7 +10,7 @@ class GeneratedOperation extends Model
     use HasFactory;
 
      protected $fillable = [
-        
+        'process_operation_uuid',
         'operation_description',
         'operation_currency_type',
         'operation_amount',

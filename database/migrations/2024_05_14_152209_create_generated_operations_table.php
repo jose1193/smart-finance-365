@@ -29,7 +29,7 @@ return new class extends Migration
 
 
             $table->string('process_operation_date_job');
-            
+            $table->string('process_operation_uuid');
             $table->string('last_processed_at')->nullable();
             $table->foreignId('process_operation_id')
             ->constrained('process_operations')

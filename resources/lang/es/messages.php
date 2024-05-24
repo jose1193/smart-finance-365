@@ -464,6 +464,8 @@ return [
 
       'generated_operation_date' => 'Fecha de Operación',
       'process_operation_date_job' => 'Fecha de Operación Procesada',
+      'open_generated_operations_income' => 'Ingresos Generados por Operaciones',
+      'open_generated_operations_expense' => 'Gastos Generados por Operaciones',
 
 
       /// ------------- OPTIONS STATUS RENDER ----------///

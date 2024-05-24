@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('process_operations', function (Blueprint $table) {
             $table->id();
+            $table->string('process_operation_uuid')->unique();
             $table->string('operation_description');
             $table->string('operation_currency_type');
             $table->string('operation_amount');

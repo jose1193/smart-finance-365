@@ -12,7 +12,7 @@ use App\Models\StatuOptions;
 
 use App\Models\GeneratedOperation;
 use App\Models\Budget;
-use App\Models\BudgetIncome;
+use App\Models\BudgetExpense;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- guzzle query api
@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 
-class IncomeGeneratedOperations extends Component
+class ExpenseGeneratedOperations extends Component
 {
     use WithPagination;
     
@@ -61,9 +61,9 @@ public $checkedSelected = [];
  
  
 
-public $categoriesRender = [];
-public $statusOptionsRender = [];
-public $budgets = [];
+    public $categoriesRender = [];
+    public $statusOptionsRender = [];
+    public $budgets = [];
     
 public $budget_id;
 
@@ -95,7 +95,7 @@ public function loadCategories()
         $assignedCategories = CategoriesToAssign::where('user_id_assign', auth()->user()->id)
             ->pluck('category_id');
 
-        $this->categoriesRender = Category::where('main_category_id', 1)
+        $this->categoriesRender = Category::where('main_category_id', 2)
             ->whereIn('id', $assignedCategories)
             ->orWhere(function ($query) use ($assignedCategories) {
                 $query->whereNotIn('id', $assignedCategories)
@@ -104,7 +104,7 @@ public function loadCategories()
                                    ->from('categories_to_assigns')
                                    ->whereColumn('categories_to_assigns.category_id', 'categories.id');
                       })
-                      ->where('main_category_id', 1);
+                      ->where('main_category_id', 2);
             })
             ->orderBy('id', 'desc')
             ->get();
@@ -112,7 +112,7 @@ public function loadCategories()
 
     public function loadStatusOptions()
     {
-        $this->statusOptionsRender = StatuOptions::where('main_category_id', 1)
+        $this->statusOptionsRender = StatuOptions::where('main_category_id', 2)
             ->orderBy('id', 'asc')
             ->get();
     }
@@ -147,7 +147,7 @@ public function render()
 
     $generatedOperations = $query->paginate($this->perPage);
 
-    return view('livewire.income-generated-operations', [
+    return view('livewire.expense-generated-operations', [
         'data' => $generatedOperations,
         'categoriesRender' => $this->categoriesRender,
         'statusOptionsRender' => $this->statusOptionsRender,
@@ -454,8 +454,7 @@ if (empty($this->operation_date)) {
     $this->data_id ? __('messages.data_updated_successfully') : __('messages.data_created_successfully'));
     
     
-
-    return redirect()->route('income-generated.operations', ['uuid' => $this->operationId]);
+    return redirect()->route('expense-generated.operations',  ['uuid' => $this->operationId]);
    
 }
 
@@ -490,7 +489,7 @@ public function SubcategoryOperationAssignment(Operation $operation)
 }
 
 
-public function BudgetIncome($budgetId, Operation $operation)
+public function BudgetExpense($budgetId, Operation $operation)
 {
     $operationId = $operation->id;
     $categoryId = $operation->category_id;
@@ -499,11 +498,11 @@ public function BudgetIncome($budgetId, Operation $operation)
         // Verifica si $budgetId está vacío o es igual a 'NO'
         if (empty($budgetId) || $budgetId === 'na') {
             // Elimina la entrada existente si $budgetId está vacío o es 'NO'
-            BudgetIncome::where(['operation_id' => $operationId])->delete();
+            BudgetExpense::where(['operation_id' => $operationId])->delete();
              session()->flash('message', __('messages.data_created_successfully'));
         } else {
             // Realiza un updateOrCreate si $budgetId tiene un valor diferente de 'NO'
-            BudgetIncome::updateOrCreate(
+            BudgetExpense::updateOrCreate(
                 ['operation_id' => $operationId, 'budget_id' => $budgetId, 'category_id' => $categoryId],
                 // Puedes agregar aquí otros campos que desees actualizar o crear
             );

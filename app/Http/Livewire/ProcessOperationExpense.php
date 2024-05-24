@@ -28,6 +28,7 @@ use App\Models\GeneratedOperation;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Log;
 
+use Ramsey\Uuid\Uuid;
 
 class ProcessOperationExpense extends Component
 {
@@ -651,7 +652,7 @@ private function createNewProcessOperation($validatedData, $currentDate)
     $validatedData['process_operation_date'] = $startDate->format('Y-m-d');
     $validatedData['process_operation_date_end'] = $endDate->format('Y-m-d');
     $validatedData['operation_date'] = $startDate->format('Y-m-d');
-    
+    $validatedData['process_operation_uuid'] = Uuid::uuid4()->toString();
     $processOperation = ProcessOperation::create($validatedData);
 
    
@@ -692,7 +693,9 @@ private function createGeneratedOperations($processOperation, $startDate, $endDa
             'operation_currency_total' => $processOperation->operation_currency_total,
             'operation_date' => $startDate->format('Y-m-d'),
             'operation_status' => $processOperation->operation_status,
-            'budget_id' => $processOperation->budget_id
+            'budget_id' => $processOperation->budget_id,
+            'process_operation_uuid' => $processOperation->process_operation_uuid,
+            
         ]);
 
         if ($startDate->format('Y-m-d') == $currentDate) {
@@ -742,6 +745,8 @@ private function deleteAndCreateGeneratedOperations($processOperation, $startDat
             'operation_date' => $startDate->format('Y-m-d'),
             'operation_status' => $processOperation->operation_status,
             'budget_id' => $budgetExpense ? $budgetExpense->budget_id : null,
+            'process_operation_uuid' => $processOperation->process_operation_uuid,
+            
         ]);
 
         if ($startDate->isSameDay(now())) {
@@ -979,5 +984,9 @@ public function deleteMultiple()
 
  //---- END FUNCTION DELETE MULTIPLE ----//
 
+ public function redirectToOperation($operationId)
+    {
+        return redirect()->route('expense-generated.operations', ['operationId' => $operationId]);
+    }
  
 }

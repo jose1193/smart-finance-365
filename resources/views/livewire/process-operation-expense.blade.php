@@ -262,15 +262,19 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-sm">
-
-                                                <button wire:click="edit({{ $item->id }})"
-                                                    class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
-                                                        class="fa-solid fa-pen-to-square"></i></button>
-                                                <button
-                                                    wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
-                                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                        class="fa-solid fa-trash"></i></button>
-
+                                                <div class="flex items-center space-x-2">
+                                                    <a href="{{ route('expense-generated.operations', ['uuid' => $item->latestGeneratedOperation->process_operation_uuid]) }}"
+                                                        class="bg-purple-600 transition duration-500 ease-in-out hover:bg-purple-700 text-white font-bold inline-flex items-center py-2.5 px-3.5 rounded text-base">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </a>
+                                                    <button wire:click="edit({{ $item->id }})"
+                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button
+                                                        wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
+                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                                </div>
                                             </td>
                                             <td class="px-4 py-3 text-sm">
 

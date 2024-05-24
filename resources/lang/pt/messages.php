@@ -456,6 +456,9 @@ return [
 'expense_generated_operations' => 'Operações Criadas para Geração de Despesas',
 'generated_operation_date' => 'Data de Operação',
 'process_operation_date_job' => 'Processar Data de Operação',
+'open_generated_operations_income' => 'Rendimentos Gerados por Operações',
+'open_generated_operations_expense' => 'Despesas Geradas por Operações',
+
 
 /// ------------- OPÇÕES DE STATUS ----------///
 

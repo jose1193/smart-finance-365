@@ -25,10 +25,10 @@
                             <i class="fa-solid fa-money-bills mr-3"></i>
 
                             <x-slot name="title">
-                                {{ __('messages.task_incomes') }}
+                                {{ __('messages.expense_generated_operations') }}
                             </x-slot>
-                            <a href="{{ route('incomes') }}">
-                                <span> {{ __('messages.task_incomes') }}</span></a>
+                            <a href="{{ route('expense') }}">
+                                <span> {{ __('messages.expense_generated_operations') }}</span></a>
                         </div>
 
                     </div>
@@ -41,10 +41,8 @@
 
                     <!-- END INCLUDE ALERTS MESSAGES-->
 
-                    <div class=" my-7 flex justify-between space-x-2">
-                        <x-button wire:click="create()"><span class="font-semibold">{{ __('messages.create_new') }} <i
-                                    class="fa-solid fa-money-bill-wave"></i></span>
-                        </x-button>
+                    <div class=" my-7 flex justify-end space-x-2">
+
                         <x-input id="name" type="text" wire:model="search"
                             placeholder="{{ __('messages.inpur_search') }}" autofocus autocomplete="off"
                             class="dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
@@ -79,8 +77,8 @@
                                 <thead>
                                     <tr
                                         class="text-xs font-bold tracking-wide text-center text-gray-600 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3" wire:click="sortBy('process_operations.id')">Id
-                                            @if ($sortBy === 'process_operations.id')
+                                        <th class="px-4 py-3" wire:click="sortBy('generated_operations.id')">Id
+                                            @if ($sortBy === 'generated_operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>
                                                 @else
@@ -88,26 +86,18 @@
                                                 @endif
                                             @endif
                                         </th>
-                                        <th class="px-4 py-3">{{ __('messages.operations_description') }}</th>
-                                        <th class="px-4 py-3">{{ __('messages.modal_operations_date') }}
-                                        </th>
-                                        <th class="px-4 py-3">{{ __('messages.modal_operations_date_end') }}
-                                        </th>
-                                        <th class="px-4 py-3">{{ __('messages.last_processed_at') }}
-                                        </th>
                                         <th class="px-4 py-3">{{ __('messages.budget') }}</th>
 
-                                        <th class="px-4 py-3">{{ __('messages.operations_category') }}</th>
-                                        <th class="px-4 py-3">{{ __('messages.operations_subcategory') }}</th>
-
+                                        <th class="px-4 py-3">{{ __('messages.operations_description') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_currency') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_operation') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_rate_conv_usd') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_total_in_usd') }}</th>
                                         <th class="px-4 py-3">{{ __('messages.operations_status') }}</th>
-                                        <th class="px-4 py-3" wire:click="sortBy('process_operations.id')">
-                                            {{ __('messages.registration_date') }}
-                                            @if ($sortBy === 'process_operations.id')
+
+                                        <th class="px-4 py-3" wire:click="sortBy('generated_operations.id')">
+                                            {{ __('messages.generated_operation_date') }}
+                                            @if ($sortBy === 'generated_operations.id')
                                                 @if ($sortDirection === 'asc')
                                                     <i class="fa-solid fa-arrow-up"></i>
                                                 @else
@@ -115,8 +105,16 @@
                                                 @endif
                                             @endif
                                         </th>
+                                        <th class="px-4 py-3">{{ __('messages.process_operation_date_job') }}</th>
+                                        <th class="px-4 py-3">{{ __('messages.last_processed_at') }}
+                                        </th>
                                         <th class="px-4 py-3">{{ __('messages.operations_action') }}</th>
-                                        <th class="px-4 py-3"></th>
+
+                                        <th class="px-4 py-3">
+                                            @if (!$data->isEmpty())
+                                                <input type="checkbox" wire:model="selectAll" id="select-all">
+                                            @endif
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
@@ -129,87 +127,26 @@
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
+
+                                                @if (app()->getLocale() === 'es')
+                                                    <span>{{ $item->budgets ? \Carbon\Carbon::parse($item->budgets->budget_date)->isoFormat('MMMM [de] YYYY') . ' - ' : '' }}</span>
+                                                @elseif(app()->getLocale() === 'en')
+                                                    <span>{{ $item->budgets ? \Carbon\Carbon::parse($item->budgets->budget_date)->isoFormat('MMMM YYYY') . ' - ' : '' }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span>{{ $item->budgets ? \Carbon\Carbon::parse($item->budgets->budget_date)->isoFormat('MMMM [de] YYYY') . ' - ' : '' }}</span>
+                                                @else
+                                                    <span>{{ $item->budgets ? \Carbon\Carbon::parse($item->budgets->budget_date)->isoFormat('MMMM YYYY') . ' - ' : '' }}</span>
+                                                @endif
+
+
+                                                {{ $item->budgets ? number_format($item->budgets->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
+
+                                            </td>
+
+
+                                            <td class="px-4 py-3 text-xs">
                                                 {{ $item->operation_description }}
                                             </td>
-                                            <td class="px-4 py-3 text-center">
-
-                                                @if (app()->getLocale() === 'en')
-                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date)->translatedFormat('m/d/Y') }}</span>
-                                                @elseif(app()->getLocale() === 'pt')
-                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date)->translatedFormat('d/m/Y') }}</span>
-                                                @else
-                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date)->format('d/m/Y') }}</span>
-                                                @endif
-
-                                            </td>
-                                            <td class="px-4 py-3 text-center">
-
-                                                @if (app()->getLocale() === 'en')
-                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date_end)->translatedFormat('m/d/Y') }}</span>
-                                                @elseif(app()->getLocale() === 'pt')
-                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date_end)->translatedFormat('d/m/Y') }}</span>
-                                                @else
-                                                    <span>{{ \Carbon\Carbon::parse($item->process_operation_date_end)->format('d/m/Y') }}</span>
-                                                @endif
-
-                                            </td>
-                                            <td class="px-4 py-3 text-center">
-                                                @if (app()->getLocale() === 'en')
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('m/d/Y H:i:s A') ?? 'N/A' }}</span>
-                                                @elseif(app()->getLocale() === 'pt')
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') ?? 'N/A' }}</span>
-                                                @else
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') ?? 'N/A' }}</span>
-                                                @endif
-
-
-
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-
-                                                @php
-                                                    $hasIncomes = false; // Variable de bandera para verificar si hay ingresos
-                                                @endphp
-
-                                                @foreach ($item->processBudgetIncomes as $income)
-                                                    @if (isset($income->budget->budget_date))
-                                                        @php
-                                                            $locale = app()->getLocale();
-                                                            \Carbon\Carbon::setLocale($locale); // Configura Carbon con el idioma actual
-                                                            $budgetDate = \Carbon\Carbon::parse(
-                                                                $income->budget->budget_date,
-                                                            );
-                                                            $formattedDate = $budgetDate->isoFormat('MMMM YYYY'); // Formatea la fecha según el idioma
-                                                            $hasIncomes = true; // Cambia la variable de bandera si hay ingresos
-                                                        @endphp
-                                                        {{ $formattedDate }} -
-                                                        {{ $income->budget->budget_currency_total != 0 ? number_format($income->budget->budget_currency_total, 0, '.', ',') . ' $' : 'N/A' }}
-                                                    @endif
-                                                @endforeach
-
-                                                @if (!$hasIncomes)
-                                                    N/A <!-- Muestra N/A si no hay ingresos -->
-                                                @endif
-
-                                            </td>
-
-                                            <td class="px-4 py-3 text-xs">
-                                                {{ $item->category->category_name }}
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-
-                                                @if ($item->operationProcessSubcategories->isEmpty())
-                                                    N/A
-                                                @else
-                                                    @foreach ($item->operationProcessSubcategories as $subcategory)
-                                                        {{ $subcategory->subcategory->subcategory_name ?? 'N/A' }}
-                                                    @endforeach
-                                                @endif
-                                            </td>
-
                                             <td class="px-4 py-3 text-xs">
                                                 {{ $item->operation_currency_type === 'Blue-ARS' ? 'ARS' : $item->operation_currency_type }}
 
@@ -229,73 +166,95 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs">
 
-                                                @if ($item->statuOption->id == 1)
+                                                @if ($item->operation_status == '3')
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                                                        {{ $item->statuOption->status_description }}
+                                                        {{ $item->statuOption ? $item->statuOption->status_description : 'N/A' }}
                                                     </span>
-                                                @elseif ($item->statuOption->id == 2)
+                                                @elseif ($item->operation_status == '4')
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-orange-700 bg-orange-100 rounded-full dark:text-white dark:bg-orange-600">
-                                                        {{ $item->statuOption->status_description }}
-                                                    </span>
-                                                @elseif ($item->statuOption->id == 3)
-                                                    <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-700">
-                                                        {{ $item->statuOption->status_description }}
+                                                        {{ $item->statuOption ? $item->statuOption->status_description : 'N/A' }}
                                                     </span>
                                                 @else
+                                                    <!-- Otro caso por defecto si no coincide con 'admin' ni 'user' -->
                                                     <span
                                                         class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full dark:bg-red-700 dark:text-red-100">
-                                                        {{ $item->statuOption->status_description }}
+                                                        {{ $item->operation_status }}
                                                     </span>
                                                 @endif
+
 
 
                                             </td>
                                             <td class="px-4 py-3 text-xs">
                                                 @if (app()->getLocale() === 'en')
                                                     <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-100">{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('m/d/Y H:i:s A') }}</span>
+                                                        class="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-100">{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('m/d/Y') }}</span>
                                                 @elseif(app()->getLocale() === 'pt')
                                                     <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-100">{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d/m/Y H:i:s') }}</span>
+                                                        class="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-100">{{ \Carbon\Carbon::parse($item->operation_date)->translatedFormat('d/m/Y') }}</span>
                                                 @else
                                                     <span
-                                                        class="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-100">{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y H:i:s') }}</span>
+                                                        class="px-2 py-1 font-semibold leading-tight text-gray-700 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-100">{{ \Carbon\Carbon::parse($item->operation_date)->format('d/m/Y') }}</span>
                                                 @endif
 
                                             </td>
+                                            <td class="px-4 py-3 text-xs">
+
+                                                @if (app()->getLocale() === 'en')
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-indigo-700 bg-indigo-100 rounded-full dark:bg-indigo-700 dark:text-indigo-100">{{ \Carbon\Carbon::parse($item->process_operation_date_job)->translatedFormat('m/d/Y') }}</span>
+                                                @elseif(app()->getLocale() === 'pt')
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-indigo-700 bg-indigo-100 rounded-full dark:bg-indigo-700 dark:text-indigo-100">{{ \Carbon\Carbon::parse($item->process_operation_date_job)->translatedFormat('d/m/Y') }}</span>
+                                                @else
+                                                    <span
+                                                        class="px-2 py-1 font-semibold leading-tight text-indigo-700 bg-indigo-100 rounded-full dark:bg-indigo-700 dark:text-indigo-100">{{ \Carbon\Carbon::parse($item->process_operation_date_job)->format('d/m/Y') }}</span>
+                                                @endif
+                                            </td>
+
+                                            <td class="px-4 py-3 text-center">
+                                                @if ($item->last_processed_at)
+                                                    @if (app()->getLocale() === 'en')
+                                                        <span
+                                                            class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('m/d/Y H:i:s A') }}</span>
+                                                    @elseif(app()->getLocale() === 'pt')
+                                                        <span
+                                                            class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') }}</span>
+                                                    @else
+                                                        <span
+                                                            class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">{{ \Carbon\Carbon::parse($item->last_processed_at)->translatedFormat('d/m/Y H:i:s') }}</span>
+                                                    @endif
+                                                @else
+                                                    <span>N/A</span>
+                                                @endif
+                                            </td>
+
                                             <td class="px-4 py-3 text-sm">
-
                                                 <div class="flex items-center space-x-2">
-                                                    <a href="{{ route('income-generated.operations', ['uuid' => $item->latestGeneratedOperation->process_operation_uuid]) }}"
-                                                        class="bg-purple-600 transition duration-500 ease-in-out hover:bg-purple-700 text-white font-bold inline-flex items-center py-2.5 px-3.5 rounded text-base">
-                                                        <i class="fa-solid fa-eye"></i>
-                                                    </a>
-
-
-                                                    <button wire:click="edit({{ $item->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                                        <i class="fa-solid fa-pen-to-square"></i>
-                                                    </button>
-
+                                                    @if (!$item->last_processed_at)
+                                                        <button wire:click="edit({{ $item->id }})"
+                                                            class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                                            <i class="fa-solid fa-pen-to-square"></i>
+                                                        </button>
+                                                    @endif
                                                     <button
                                                         wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
-                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
+                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-trash"></i></button>
                                                 </div>
-
-
                                             </td>
                                             <td class="px-4 py-3 text-sm">
+                                                <input type="checkbox" wire:model="checkedSelected"
+                                                    value="{{ $item->id }}" id="checkbox-{{ $item->id }}">
+
                                             </td>
                                         </tr>
 
                                     @empty
                                         <tr class="text-center">
-                                            <td colspan="16">
+                                            <td colspan="13">
                                                 <div class="grid justify-items-center w-full mt-5">
                                                     <div class="text-center bg-red-100 rounded-lg py-5 w-full px-6 mb-4 text-base text-red-700 "
                                                         role="alert">
@@ -330,7 +289,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                {{ __('messages.task_incomes') }}
+                                                {{ __('messages.open_generated_operations_expense') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
@@ -438,7 +397,47 @@
                                                                     @endforeach
                                                                 @endif
                                                             </select>
+                                                            <script>
+                                                                document.addEventListener('livewire:load', function() {
+                                                                    Livewire.hook('message.sent', () => {
+                                                                        // Vuelve a aplicar Select2 después de cada actualización de Livewire
+                                                                        applySelect2('#select2CategoryId, #select2SubcategoryId, #selectedCurrencyFrom');
+                                                                    });
+                                                                });
 
+                                                                $(document).ready(function() {
+                                                                    // Inicializa Select2 para category_id
+                                                                    initializeSelect2('#select2CategoryId', function(e) {
+                                                                        @this.set('category_id', $(this).val());
+                                                                    });
+
+                                                                    // Muestra el select2 de subcategorías al seleccionar una categoría
+                                                                    @if ($showSubcategories)
+                                                                        initializeSelect2('#select2SubcategoryId', function(e) {
+                                                                            @this.set('subcategory_id', $(this).val());
+                                                                        });
+                                                                    @endif
+
+                                                                    // Inicializa Select2 para selectedCurrencyFrom
+                                                                    initializeSelect2('#selectedCurrencyFrom', function(e) {
+                                                                        @this.set('selectedCurrencyFrom', $(this).val());
+                                                                        @this.call('showSelectedCurrency');
+                                                                    });
+                                                                });
+
+                                                                function initializeSelect2(selector, onChangeCallback) {
+                                                                    $(selector).select2();
+
+                                                                    // Escucha el cambio en Select2 y ejecuta la devolución de llamada de cambio
+                                                                    $(selector).on('change', onChangeCallback);
+                                                                }
+
+                                                                function applySelect2(selector) {
+                                                                    $(selector).select2({
+                                                                        width: 'resolve' // need to override the changed default
+                                                                    });
+                                                                }
+                                                            </script>
                                                             @error('selectedCurrencyFrom')
                                                                 <span class="text-red-500">{{ $message }}</span>
                                                             @enderror
@@ -515,210 +514,21 @@
                                                     </div>
 
 
-                                                    <div class="flex flex-wrap justify-between">
-                                                        <div class="mb-4" style="flex: 0 0 46%;">
-                                                            <label for="operation_date"
-                                                                class="block text-gray-700 text-sm font-bold mb-2">
-                                                                {{ __('messages.modal_operations_date') }}
-                                                                <span x-data="{ isOpen: false }" class="relative ml-1">
-                                                                    <!-- Trigger para mostrar el tooltip -->
-                                                                    <i @mouseover="isOpen = true"
-                                                                        @mouseleave="isOpen = false"
-                                                                        class="fa-regular fa-circle-question text-red-500 cursor-pointer"></i>
-                                                                    <!-- Tooltip -->
-                                                                    <div x-show="isOpen"
-                                                                        class="absolute z-50 bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
-                                                                        {{ __('messages.modal_operations_scheduled_date_tooltip') }}
-                                                                    </div>
-                                                                </span>
-                                                            </label>
-                                                            <div wire:ignore>
-                                                                <input type="text" readonly id="myDatePicker"
-                                                                    autocomplete="off"
-                                                                    wire:model="process_operation_date"
-                                                                    placeholder="dd/mm/yyyy"
-                                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                                            </div>
-                                                            @error('process_operation_date')
-                                                                <span class="text-red-500">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-
-                                                        <div class="mb-4" style="flex: 0 0 46%;">
-                                                            <label for="operation_date_end"
-                                                                class="block text-gray-700 text-sm font-bold mb-2">
-                                                                {{ __('messages.modal_operations_date_end') }}
-                                                                <span x-data="{ isOpen: false }" class="relative ml-1">
-                                                                    <!-- Trigger para mostrar el tooltip -->
-                                                                    <i @mouseover="isOpen = true"
-                                                                        @mouseleave="isOpen = false"
-                                                                        class="fa-regular fa-circle-question text-red-500 cursor-pointer"></i>
-                                                                    <!-- Tooltip -->
-                                                                    <div x-show="isOpen"
-                                                                        class="absolute z-50 bg-gray-900 text-white px-4 py-2 text-xs rounded-lg shadow-lg">
-                                                                        {{ __('messages.modal_operations_end_date_tooltip') }}
-                                                                    </div>
-                                                                </span>
-                                                            </label>
-                                                            <div wire:ignore>
-                                                                <input type="text" readonly id="myDatePickerEnd"
-                                                                    autocomplete="off"
-                                                                    wire:model="process_operation_date_end"
-                                                                    placeholder="dd/mm/yyyy"
-                                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                                            </div>
-                                                            @error('process_operation_date_end')
-                                                                <span class="text-red-500">{{ $message }}</span>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-
-
                                                     <div class="mb-4">
-                                                        <label for="exampleFormControlInput2"
+                                                        <label for="operation_date"
                                                             class="block text-gray-700 text-sm font-bold mb-2">
-                                                            {{ __('messages.modal_operations_income_category') }}
-                                                        </label>
-
+                                                            {{ __('messages.generated_operation_date') }}</label>
                                                         <div wire:ignore>
-                                                            <select wire:model="category_id" id="select2CategoryId"
-                                                                style="width: 100%;">
-                                                                <option value=""></option>
-                                                                @foreach ($categoriesRender as $item)
-                                                                    <option value="{{ $item->id }}">
-                                                                        {{ $item->category_name }}</option>
-                                                                @endforeach
-                                                            </select>
+                                                            <input type="text" readonly id="myDatePicker"
+                                                                autocomplete="off" wire:model="operation_date"
+                                                                placeholder="dd/mm/yyyy"
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                         </div>
-
-                                                        @error('category_id')
+                                                        @error('operation_date')
                                                             <span class="text-red-500">{{ $message }}</span>
                                                         @enderror
+
                                                     </div>
-
-                                                    @if ($subcategoryMessage)
-                                                        <p class="text-gray-500">{{ $subcategoryMessage }}</p>
-                                                    @endif
-                                                    <div id="subcategory-container" class="my-5"
-                                                        wire:key="subcategory-{{ $category_id }}">
-
-                                                        @if ($showSubcategories)
-                                                            <div class="mb-4">
-                                                                <label for="exampleFormControlInput2"
-                                                                    class="block text-gray-700 text-sm font-bold mb-2">{{ __('messages.modal_operations_subcategory') }}</label>
-                                                                <div wire:ignore>
-                                                                    <select wire:model="registeredSubcategoryItem"
-                                                                        id="select2SubcategoryId"
-                                                                        style="width: 100%;">
-                                                                        <option value=""></option>
-                                                                        <option value="N/A">N/A</option>
-                                                                        {{-- Display Assigned Subcategories --}}
-                                                                        @if (is_array($subcategory_id) && count($subcategory_id) > 0)
-                                                                            @php
-                                                                                $subcategories = \App\Models\Subcategory::whereIn(
-                                                                                    'id',
-                                                                                    $subcategory_id,
-                                                                                )->get();
-                                                                            @endphp
-
-                                                                            {{-- Find the selected subcategory --}}
-                                                                            @php
-                                                                                $selectedSubcategory = $subcategories
-                                                                                    ->where(
-                                                                                        'id',
-                                                                                        $registeredSubcategoryItem,
-                                                                                    )
-                                                                                    ->first();
-                                                                            @endphp
-
-                                                                            {{-- Display the selected subcategory first --}}
-                                                                            @if ($selectedSubcategory)
-                                                                                <option
-                                                                                    value="{{ $selectedSubcategory->id }}">
-                                                                                    {{ $selectedSubcategory->subcategory_name }}
-                                                                                </option>
-                                                                            @endif
-
-                                                                            {{-- Display the rest of the subcategories --}}
-                                                                            @foreach ($subcategories as $subcategory)
-                                                                                @if ($subcategory->id !== $registeredSubcategoryItem)
-                                                                                    <option
-                                                                                        value="{{ $subcategory->id }}">
-                                                                                        {{ $subcategory->subcategory_name }}
-                                                                                    </option>
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endif
-                                                                    </select>
-                                                                    <script>
-                                                                        $(document).ready(function() {
-                                                                            $('#select2SubcategoryId').select2();
-
-                                                                            // Escucha el cambio en Select2 y actualiza Livewire para el selectUserAssignSubcategory
-                                                                            $('#select2SubcategoryId').on('change', function(e) {
-                                                                                const selectedData = $(this).val();
-                                                                                const index = $(this).data('index');
-                                                                                @this.set('subcategory_id', selectedData);
-                                                                                @this.call('updateSubCategoryUser');
-                                                                            });
-                                                                        });
-                                                                    </script>
-                                                                    <input type="hidden" readonly
-                                                                        wire:model="registeredSubcategoryItem"
-                                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-
-                                                                </div>
-                                                                @if ($subcategoryMessage)
-                                                                    <p class="text-gray-500 mb-3">
-                                                                        {{ $subcategoryMessage }}</p>
-                                                                @endif
-                                                            </div>
-                                                        @endif
-                                                        <script>
-                                                            document.addEventListener('livewire:load', function() {
-                                                                Livewire.hook('message.sent', () => {
-                                                                    // Vuelve a aplicar Select2 después de cada actualización de Livewire
-                                                                    applySelect2('#select2CategoryId, #select2SubcategoryId, #selectedCurrencyFrom');
-                                                                });
-                                                            });
-
-                                                            $(document).ready(function() {
-                                                                // Inicializa Select2 para category_id
-                                                                initializeSelect2('#select2CategoryId', function(e) {
-                                                                    @this.set('category_id', $(this).val());
-                                                                });
-
-                                                                // Muestra el select2 de subcategorías al seleccionar una categoría
-                                                                @if ($showSubcategories)
-                                                                    initializeSelect2('#select2SubcategoryId', function(e) {
-                                                                        @this.set('subcategory_id', $(this).val());
-                                                                    });
-                                                                @endif
-
-                                                                // Inicializa Select2 para selectedCurrencyFrom
-                                                                initializeSelect2('#selectedCurrencyFrom', function(e) {
-                                                                    @this.set('selectedCurrencyFrom', $(this).val());
-                                                                    @this.call('showSelectedCurrency');
-                                                                });
-                                                            });
-
-                                                            function initializeSelect2(selector, onChangeCallback) {
-                                                                $(selector).select2();
-
-                                                                // Escucha el cambio en Select2 y ejecuta la devolución de llamada de cambio
-                                                                $(selector).on('change', onChangeCallback);
-                                                            }
-
-                                                            function applySelect2(selector) {
-                                                                $(selector).select2({
-                                                                    width: 'resolve' // need to override the changed default
-                                                                });
-                                                            }
-                                                        </script>
-                                                    </div>
-
-
-
 
                                                     <div class="mb-4">
                                                         <label for="exampleFormControlInput2"
@@ -778,7 +588,7 @@
 
 
 </div>
-
+<link href="{{ asset('assets/css/select2.min.css') }}" rel="stylesheet" />
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         Livewire.on('deleteData', function(id, description) {
@@ -793,7 +603,7 @@
                 confirmButtonText: '{{ __('messages.delete_confirmation_confirm_button') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.emitTo('process-operation-income', 'delete', id);
+                    Livewire.emitTo('expense-generated-operations', 'delete', id);
                     Swal.fire(
                         '{!! __('messages.delete_success_title') !!}',
                         '{{ __('messages.delete_success_message_your_data') }} ' +
@@ -820,28 +630,7 @@
                 dateFormat: "d/m/Y",
                 onClose: function(selectedDates, dateStr, instance) {
                     // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
-                    @this.set('process_operation_date', dateStr);
-                    console.log(dateStr);
-                }
-            });
-
-        });
-    });
-</script>
-
-<script>
-    document.addEventListener('livewire:load', function() {
-        Livewire.on('modalOpened', function() {
-            flatpickr("#myDatePickerEnd", {
-                locale: "es",
-
-                allowInput: true,
-                altInput: true,
-                altFormat: "l, F j, Y",
-                dateFormat: "d/m/Y",
-                onClose: function(selectedDates, dateStr, instance) {
-                    // Actualiza Livewire con la nueva fecha cuando se selecciona una fecha
-                    @this.set('process_operation_date_end', dateStr);
+                    @this.set('operation_date', dateStr);
                     console.log(dateStr);
                 }
             });
@@ -874,7 +663,7 @@
                 confirmButtonText: "{{ __('messages.delete_confirmation_confirm_button') }}"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.emitTo('process-operation-income',
+                    Livewire.emitTo('expense-generated-operations',
                         'deleteMultiple'); // Envía el Id al método delete
                     Swal.fire(
                         '{!! __('messages.delete_success_title') !!}',

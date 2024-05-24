@@ -237,18 +237,18 @@
                                             </td>
 
                                             <td class="px-4 py-3 text-sm">
-
-                                                @if (!$item->last_processed_at)
-                                                    <button wire:click="edit({{ $item->id }})"
-                                                        class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                                        <i class="fa-solid fa-pen-to-square"></i>
-                                                    </button>
-                                                @endif
-                                                <button
-                                                    wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
-                                                    class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
-                                                        class="fa-solid fa-trash"></i></button>
-
+                                                <div class="flex items-center space-x-2">
+                                                    @if (!$item->last_processed_at)
+                                                        <button wire:click="edit({{ $item->id }})"
+                                                            class="bg-blue-600 duration-500 ease-in-out hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                                            <i class="fa-solid fa-pen-to-square"></i>
+                                                        </button>
+                                                    @endif
+                                                    <button
+                                                        wire:click="$emit('deleteData', {{ $item->id }}, '{{ $item->operation_description }}')"
+                                                        class="bg-red-600 duration-500 ease-in-out hover:bg-red-700 text-white font-bold py-2 px-4 rounded"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                                </div>
                                             </td>
                                             <td class="px-4 py-3 text-sm">
                                                 <input type="checkbox" wire:model="checkedSelected"
@@ -294,7 +294,7 @@
                                             <div class="text-center"></div>
                                             <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                                                 id="exampleModalLabel">
-                                                {{ __('messages.income_management') }}
+                                                {{ __('messages.open_generated_operations_income') }}
                                             </h5>
                                             <!--Close button-->
                                             <button type="button" wire:click="closeModal()"
